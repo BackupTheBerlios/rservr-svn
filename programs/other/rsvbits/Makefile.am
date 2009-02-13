@@ -1,0 +1,10 @@
+STANDARD_INCLUDES=-I/usr/include -I/usr/local/include
+ALL_INCLUDES=$(STANDARD_INCLUDES) -I$(srcdir)/../../.. -I$(srcdir)/../../../include/rservr -I$(srcdir)/../../../include -I$(srcdir)/../../../libs/include
+AM_CPPFLAGS=$(ALL_INCLUDES)
+AM_CXXFLAGS=-DENABLE_VIRT_ARRAY_ALL -ansi -Wall
+AM_CFLAGS=-Wall
+AM_LDFLAGS=
+bin_PROGRAMS=rsvbits
+rsvbits_CPPFLAGS=$(ALL_INCLUDES) -DRSV_RELAY -DRSV_PIPE
+rsvbits_SOURCES=rsvbits.cpp bit-data.cpp bit-data.hpp
+rsvbits_LDADD=../../../libs/client/librservr-client.la

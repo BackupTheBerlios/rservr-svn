@@ -1,0 +1,10 @@
+STANDARD_INCLUDES=-I/usr/include -I/usr/local/include
+ALL_INCLUDES=$(STANDARD_INCLUDES) -I$(srcdir)/../.. -I$(srcdir)/../../include/rservr -I$(srcdir)/../../include -I$(srcdir)/../include/command -I$(srcdir)/../include
+AM_CPPFLAGS=-DENABLE_VIRT_ARRAY_ALL $(ALL_INCLUDES)
+AM_CXXFLAGS=-ansi -Wall
+AM_CFLAGS=-Wall
+STANDARD_LIBS=-L/lib -L/usr/lib -L/usr/local/lib
+AM_LDFLAGS=--version-info 1:1:0 $(STANDARD_LIBS)
+lib_LTLIBRARIES=librservr-command.la
+librservr_command_la_SOURCES=api-command.cpp api-external-command.cpp command-generator.cpp command-transmit.cpp api-label-check.cpp ../include/command/api-command.h ../include/command/api-external-command.hpp ../include/command/auto-response.hpp ../include/command/command-generator.hpp ../include/command/command-transmit.hpp ../include/command/api-label-check.h
+librservr_command_la_LIBADD=-lhparser -lhpaux ../protocol/librservr-protocol.la
