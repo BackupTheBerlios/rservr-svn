@@ -40,6 +40,10 @@
     <div class="overview_box">
       <h3 class="overview_title"> Recent Project News. </h3>
       <p class="overview_content">
+     <span class="news_date">February 16<sup>th</sup>, 2009:</span> Added a <a class="general_link" href="https://resourcerver.svn.sourceforge.net/svnroot/resourcerver/">subversion repository mirror</a> for public access.  The previous link can be used with <span class="style_command_line">svn</span> command-line client, or you can browse the source and changes <a class="general_link" href="http://resourcerver.svn.sourceforge.net/viewvc/resourcerver/">directly</a>.  I tracked changes with CVS for quite a while; however, the structure changed too often for me to keep up.  Version control will start from just after the last beta release.  Formal releases will carry the "gamma" designator, but should still be considered beta releases.  The mirror repository is a copy of the repository on my development machine.  I only plan to synchronize the mirror when the code compiles and runs; not in between. <br />
+        <br />
+      </p>
+      <p class="overview_content">
      <span class="news_date">December 22<sup>nd</sup>, 2008:</span> Added a network security filter to temporarily deny attempted reconnections by hosts disconnected for errors. This filter is a socket-forwarder plug-in intended to mitigate the effects of port scanners. After disconnecting a host for sending bad data, etc., the forwarder will notify the filter, which will tabulate the host's address. The filter will deny incoming connections from that host for a period of time specified when the filter is loaded, preventing performance degradation caused by unfriendly programs. <br />
         <br />
       </p>
