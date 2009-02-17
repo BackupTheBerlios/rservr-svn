@@ -46,6 +46,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 #include "external-command.hpp"
 
+
 extern "C" {
 extern command_handle manual_command(text_info, struct external_command*);
 extern command_handle manual_response(message_handle, struct external_command*);

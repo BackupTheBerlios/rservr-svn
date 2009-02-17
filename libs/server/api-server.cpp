@@ -312,7 +312,7 @@ private:
 
 	    bool mutex_status() const
 	    {
-	    return protect::mutex_base::mutex_status(&set_one) &&
+	    return protect::mutex_base::mutex_status(&set_one) ||
 	           protect::mutex_base::mutex_status(&set_two);
 	    }
 

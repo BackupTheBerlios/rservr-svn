@@ -74,10 +74,6 @@ extern "C" {
 #define PARAM_FILE_CREATE_MODE (S_IRUSR | S_IWUSR | S_IRGRP)
 #define PARAM_FILE_CREATE_MASK (~(S_IRWXU | S_IRGRP | S_IXGRP))
 
-/* enable auto-blocking for pipe input (improves timing) */
-/* DEFINE FOR RELEASE VERSIONS! */
-#define PARAM_AUTO_BLOCKING
-
 /* memory limits for command data (hard-coded values that don't change) */
 #define PARAM_MAX_INPUT_SECTION 1024
 #define PARAM_MAX_HOLDING_INPUT 4096

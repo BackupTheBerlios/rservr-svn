@@ -44,10 +44,7 @@ extern "C" {
 #include "execute-queue.hpp"
 
 #include "external/global-sentry.hpp"
-
-#ifdef PARAM_AUTO_BLOCKING
 #include "global/condition-block.hpp"
-#endif
 
 #include "api-server.hpp"
 #include "client-list.hpp"
@@ -437,30 +434,21 @@ bool get_exit_status()
 { return exit_status; }
 
 
-#ifdef PARAM_AUTO_BLOCKING
 static auto_condition execute_resume;
-#endif
 
 void execute_continue()
-#ifdef PARAM_AUTO_BLOCKING
 { execute_resume.unblock(); }
-#else
-{ }
-#endif
 
 static bool block_execute_command()
 {
 	if (waiting_command_available()) return true;
-	if (!auto_blocking_state()) return false;
 
-    #ifdef PARAM_AUTO_BLOCKING
 	static auto_mutex sync_mutex;
 	if (!sync_mutex.valid()) return false;
 
 	if (!execute_resume.block(sync_mutex)) return false;
 
 	return waiting_command_available();
-    #endif
 }
 
 //END server execution control--------------------------------------------------
@@ -687,9 +675,7 @@ int execute_server_thread(const exposed_server *sServer)
 	                              server_timing_specs->execute_standby_retry,
 	                              server_timing_specs->execute_standby_wait);
 
-    #ifdef PARAM_AUTO_BLOCKING
 	execute_resume.activate();
-    #endif
 
 	while (local_client_check() && !get_exit_flag())
 	{
@@ -713,9 +699,7 @@ int execute_server_thread(const exposed_server *sServer)
 	 }
 	}
 
-    #ifdef PARAM_AUTO_BLOCKING
 	execute_resume.deactivate();
-    #endif
 
 	restore_terminal();
 

@@ -66,13 +66,11 @@ extern "C" {
 #include <sys/un.h> //socket macros
 #endif
 
-#ifdef PARAM_AUTO_BLOCKING
-#include "global/condition-block.hpp"
-#endif
-
 #include "external/clist.hpp"
 #include "external/global-sentry-pthread.hpp"
+
 #include "global/regex-check.hpp"
+#include "global/condition-block.hpp"
 
 #include "connect.hpp"
 

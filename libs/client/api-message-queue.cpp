@@ -53,6 +53,8 @@ extern "C" {
 #include "external/clist.hpp"
 #include "external/global-sentry-pthread.hpp"
 
+#include "global/condition-block.hpp"
+
 #include "client-command.hpp"
 #include "client-output.hpp"
 #include "client-input.hpp"
@@ -70,10 +72,6 @@ extern "C" {
 #include "protocol/local-types.h"
 #include "command/api-command.h"
 }
-
-#ifdef PARAM_AUTO_BLOCKING
-#include "global/condition-block.hpp"
-#endif
 
 
 struct message_mirror
@@ -166,10 +164,7 @@ static protect::literal_capsule <message_list, global_sentry_pthread <> >
 local_message_list(PARAM_DEFAULT_MAX_MESSAGES);
 
 static pthread_t internal_thread = (pthread_t) NULL;
-
-#ifdef PARAM_AUTO_BLOCKING
 static auto_condition message_sync_resume;
-#endif
 
 
 static void auto_pause_check(unsigned int, unsigned int);
@@ -258,7 +253,8 @@ private:
 
 	else if (current_type == command_response)
 	 {
-	const struct incoming_response_data *message_data = (const struct incoming_response_data*) current_message;
+	const struct incoming_response_data *message_data =
+	  (const struct incoming_response_data*) current_message;
 
 	object->last_element().value().__response.__dimension = no_message;
 	object->last_element().value().__response.__type      = message_data->__type;
@@ -267,14 +263,16 @@ private:
 	  {
 	object->last_element().value().__response.__dimension = single_message;
 	object->last_element().value().__response.__n1.__n2.__size = message_data->__n1.__n2.__size;
-	if (!message_data->__n1.__n2.__size) object->last_element().key().message = message_data->__n1.__n2.__n3.__message;
+	if (!message_data->__n1.__n2.__size) object->last_element().key().message =
+	  message_data->__n1.__n2.__n3.__message;
 	else
 	   {
 	object->last_element().key().message.resize(message_data->__n1.__n2.__size);
 	for (unsigned int I = 0; I < message_data->__n1.__n2.__size; I++)
 	object->last_element().key().message[I] = (char) message_data->__n1.__n2.__n3.__binary[I];
 	   }
-	object->last_element().value().__response.__n1.__n2.__n3.__message = object->last_element().key().message.c_str();
+	object->last_element().value().__response.__n1.__n2.__n3.__message =
+	  object->last_element().key().message.c_str();
 	  }
 
 	else if (message_data->__dimension == multi_message)
@@ -292,34 +290,40 @@ private:
 	   }
 
 	object->last_element().key().message_pointers.push_back(NULL);
-	object->last_element().value().__response.__n1.__list = &object->last_element().key().message_pointers[0];
+	object->last_element().value().__response.__n1.__list =
+	  &object->last_element().key().message_pointers[0];
 	  }
 	 }
 
 
 	else if (current_type == command_remote)
 	 {
-	const struct incoming_remote_data *message_data = (const struct incoming_remote_data*) current_message;
+	const struct incoming_remote_data *message_data =
+	  (const struct incoming_remote_data*) current_message;
 
 	object->last_element().value().__remote.__pending = message_data->__pending;
 
-	object->last_element().value().message_reference = current_original->orig_reference;
+	object->last_element().value().message_reference =
+	  current_original->orig_reference;
 	 }
 
 
 	else if (current_type == command_null)
 	 {
-	const struct incoming_info_data *message_data = (const struct incoming_info_data*) current_message;
+	const struct incoming_info_data *message_data =
+	  (const struct incoming_info_data*) current_message;
 
 	object->last_element().value().__info.__size = message_data->__size;
-	if (!message_data->__size) object->last_element().key().message = message_data->__n1.__message;
+	if (!message_data->__size) object->last_element().key().message =
+	  message_data->__n1.__message;
 	else
 	  {
 	object->last_element().key().message.resize(message_data->__size);
 	for (unsigned int I = 0; I < message_data->__size; I++)
 	object->last_element().key().message[I] = (char) message_data->__n1.__binary[I];
 	  }
-	object->last_element().value().__info.__n1.__message = object->last_element().key().message.c_str();
+	object->last_element().value().__info.__n1.__message =
+	  object->last_element().key().message.c_str();
 	 }
 
 
@@ -341,7 +345,8 @@ private:
 };
 
 
-static bool find_message_handle(message_list::const_return_type eElement, message_handle mMessage)
+static bool find_message_handle(message_list::const_return_type eElement,
+message_handle mMessage)
 { return &eElement.value() == (const void*) mMessage; }
 
 
@@ -422,8 +427,12 @@ private:
 };
 
 
-static bool find_by_reference(message_list::const_return_type eElement, command_reference rReference)
-{ return eElement.value().__type == command_response && eElement.value().message_reference == rReference; }
+static bool find_by_reference(message_list::const_return_type eElement,
+command_reference rReference)
+{
+	return eElement.value().__type == command_response &&
+	  eElement.value().message_reference == rReference;
+}
 
 
 class count_responses : public protected_message_list::modifier
@@ -464,9 +473,11 @@ class rotate_messages : public protected_message_list::modifier
 {
 public:
 	ATTR_INT rotate_messages(protected_message_list *lList) :
-	current_reference(0), current_type(0x00), current_info(NULL), current_list(lList) { }
+	current_reference(0), current_type(0x00), current_info(NULL),
+	current_list(lList) { }
 
-	const struct message_info ATTR_INT *operator () (command_reference rReference, command_type tType)
+	const struct message_info ATTR_INT *operator () (command_reference rReference,
+	  command_type tType)
 	{
 	current_reference = rReference;
 	current_type      = tType;
@@ -498,7 +509,7 @@ private:
 	return protect::entry_success;
 	}
 
-	command_reference           current_reference;
+	command_reference          current_reference;
 	command_type               current_type;
 	const struct message_info *current_info;
 
@@ -701,31 +712,23 @@ result message_queue_sync(pthread_mutex_t *mMutex)
 {
 	if (calling_from_message_queue()) return false;
 
-    #ifdef PARAM_AUTO_BLOCKING
 	if (message_queue_size()) return true;
 	if (!message_queue_status()) return message_queue_size()? true : false;
 
-	if (!mMutex || !auto_blocking_state() || !message_sync_resume.active()) return false;
+	if (!mMutex || !message_sync_resume.active()) return false;
 
 	message_queue_unpause();
 	if (!message_sync_resume.block(mMutex)) return false;
 
 	return message_queue_status() || message_queue_size();
-    #else
-	return message_queue_size()? true : false;
-    #endif
 }
 
 
 void queue_sync_continue()
-#ifdef PARAM_AUTO_BLOCKING
 {
 	message_sync_resume.unblock();
 	message_queue_event(RSERVR_QUEUE_MESSAGE);
 }
-#else
-{ }
-#endif
 
 
 //client interface==============================================================
@@ -1051,7 +1054,8 @@ static bool internal_queue_loop()
 	 {
 	if (input_test == protect::entry_denied || input_test == protect::exit_forced) break;
 
-	if (!auto_blocking_state()) local_standby.wait();
+	//(currently unused)
+	//local_standby.wait();
 
 	//NOTE: use 'select' to prevent mutex problems with input source
 	else
@@ -1075,7 +1079,8 @@ static bool internal_queue_loop()
 	 }
 	if (input_test == protect::entry_denied || input_test == protect::exit_forced) break;
 
-	local_standby.reset();
+	//(currently unused)
+	//local_standby.reset();
 
 	input_test = new_input(&internal_command);
 	if (input_test == protect::entry_denied || input_test == protect::exit_forced) break;
@@ -1108,9 +1113,7 @@ static void *message_queue_thread(void*)
 {
 	exit_state = false;
 
-    #ifdef PARAM_AUTO_BLOCKING
 	message_sync_resume.activate();
-    #endif
 
 	message_queue_event(RSERVR_QUEUE_START);
 	internal_queue_loop();
@@ -1119,9 +1122,7 @@ static void *message_queue_thread(void*)
 	if (internal_thread && !inline_queue) pthread_detach(pthread_self());
 	internal_thread = (pthread_t) NULL;
 
-    #ifdef PARAM_AUTO_BLOCKING
 	message_sync_resume.deactivate();
-    #endif
 
 	message_queue_event(RSERVR_QUEUE_STOP);
 	return NULL;
@@ -1205,9 +1206,7 @@ result stop_message_queue()
 	//NOTE: this is the only way to resume when thread is blocked for input
 	if (pthread_cancel(temp_thread) == 0) pthread_detach(temp_thread);
 
-    #ifdef PARAM_AUTO_BLOCKING
 	message_sync_resume.deactivate();
-    #endif
 
 	message_queue_event(RSERVR_QUEUE_STOP);
 
@@ -1220,6 +1219,8 @@ result message_queue_status()
 
 
 static void cancel_pause_timeout();
+
+//TODO: add log points for pausing
 
 result message_queue_pause()
 {
@@ -1273,7 +1274,7 @@ result message_queue_timed_pause(long_time tTime)
 	return true;
 }
 
-static double     auto_pause_threshold = 0.0;
+static double    auto_pause_threshold = 0.0;
 static double    auto_pause_restore   = 0.0;
 static long_time auto_pause_timeout   = 0.0;
 
@@ -1337,7 +1338,8 @@ static void *pause_timeout_thread(void *tTimeout)
 	//TODO: make the conversion function from protocol lib available for this
 	struct timespec wait_timeout = { 0, 0 };
 	wait_timeout.tv_sec  = (int) timeout;
-	wait_timeout.tv_nsec = (int) ((timeout - (double) wait_timeout.tv_sec) * 1000.0 * 1000.0 * 1000.0);
+	wait_timeout.tv_nsec = (int) ((timeout -
+	  (double) wait_timeout.tv_sec) * 1000.0 * 1000.0 * 1000.0);
 
 	if (pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) != 0)
 	{

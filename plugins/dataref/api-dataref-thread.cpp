@@ -145,7 +145,7 @@ ssize_t oOffset, ssize_t sSize)
 	else return 0;
 }
 
-int rsvp_dataref_exchange_exchange_data(const struct dataref_source_info *iInfo, int rReference,
+int rsvp_dataref_thread_exchange_data(const struct dataref_source_info *iInfo, int rReference,
 ssize_t oOffset, ssize_t sSize)
 {
 	if (!message_queue_status() || !iInfo) return -1;

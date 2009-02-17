@@ -223,16 +223,6 @@ static const input_section default_input_section;
 	while ( !this->receive_input().size() && !this->is_terminated() && active &&
 	        ( identity->process_id == 0 ||
 	          waitpid(-getpgid(identity->process_id), NULL, WNOHANG) >= 0 || errno == EINTR ) )
-	//NOTE: client is deemed inactive if the standy timeout is reached and the client isn't registered
-	//NOTE: doesn't happen when auto-blocking is on
-	if (!auto_blocking_state() && local_standby.wait() && identity->client_type == type_none)
-	  {
-	send_server_directive(identity, directed_disconnect);
-    log_server_client_register_timeout(identity->process_id);
-	return false;
-	  }
-
-	else if (auto_blocking_state())
 	//NOTE: 'select' maintains symmetry with client message queue
 	  {
 	FD_ZERO(&input_set);

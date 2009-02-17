@@ -53,9 +53,7 @@
 #include <errno.h> /* 'errno' */
 #include <unistd.h> /* 'close' */
 
-#ifdef PARAM_AUTO_BLOCKING
 #include "static-auto-conditions.h"
-#endif
 
 #include "daemon-socket.h"
 #include "daemon-commands.h"
@@ -64,7 +62,6 @@
 static void register_handlers();
 
 
-#ifdef PARAM_AUTO_BLOCKING
 static pthread_t select_thread = (pthread_t) NULL;
 
 static int select_socket = -1;
@@ -134,7 +131,6 @@ static void message_queue_hook(int eEvent)
 	accept_condition_deactivate();
 	}
 }
-#endif
 
 
 int daemon_socket = -1;
@@ -150,7 +146,6 @@ static void daemon_loop(int sSocket)
 
 	struct stat current_stats;
 
-    #ifdef PARAM_AUTO_BLOCKING
 	accept_condition_activate();
 	set_queue_event_hook(&message_queue_hook);
 
@@ -161,7 +156,6 @@ static void daemon_loop(int sSocket)
 	set_queue_event_hook(NULL);
 	select_socket = -1;
 	}
-    #endif
 
 	while (message_queue_status() && stat(get_server_name(), &current_stats) >= 0)
 	{
@@ -172,15 +166,11 @@ static void daemon_loop(int sSocket)
 	 {
 	if (!message_queue_status() || stat(get_server_name(), &current_stats) < 0) return;
 
-    #ifdef PARAM_AUTO_BLOCKING
-	if (!auto_blocking_state() || !accept_condition_block())
-    #endif
+	if (!accept_condition_block())
 	nanosleep(&connect_cycle, NULL);
 	 }
 
-    #ifdef PARAM_AUTO_BLOCKING
 	select_condition_unblock();
-    #endif
 
 	//NOTE: allow blocking since the socket is protected by setuid
 	int current_state = fcntl(new_connection, F_GETFL);
@@ -203,10 +193,8 @@ static void daemon_loop(int sSocket)
 	shutdown(new_connection, SHUT_RDWR);
 	fclose(new_stream);
 
-    #ifdef PARAM_AUTO_BLOCKING
 	set_queue_event_hook(NULL);
 	select_socket = -1;
-    #endif
 
 	return;
 	  }
@@ -222,10 +210,8 @@ static void daemon_loop(int sSocket)
 	new_connection = -1;
 	}
 
-    #ifdef PARAM_AUTO_BLOCKING
 	set_queue_event_hook(NULL);
 	select_socket = -1;
-    #endif
 
 	/*NOTE: select thread doesn't exit here: it should wait until the socket closes*/
 }
@@ -341,7 +327,6 @@ int daemon_main(int argc, char *argv[])
 	remove(get_server_name());
 	close(daemon_socket);
 
-    #ifdef PARAM_AUTO_BLOCKING
 	if (select_thread != (pthread_t) NULL)
 	{
 	select_condition_deactivate();
@@ -349,7 +334,6 @@ int daemon_main(int argc, char *argv[])
 	pthread_cancel(select_thread);
 	pthread_detach(select_thread);
 	}
-    #endif
 
 	if (message_queue_status())
 	 {

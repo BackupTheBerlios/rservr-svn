@@ -506,26 +506,6 @@ extern result remove_responses(command_reference);
  */
 extern message_handle set_async_response();
 
-
-/*! \brief Turn off automatic blocking.
- *
- * Prevent the message queue from blocking for input. This keeps the queue
- * constantly running using a short loop latency and also prevents functions
- * from synchronizing with incoming messages.
- * @see message_queue_sync
- */
-extern void auto_blocking_off() __attribute__ ((deprecated));
-
-/*! \brief Turn on automatic blocking. This is the default.
- *
- * @see auto_blocking_off
- * @see message_queue_sync
- */
-extern void auto_blocking_on() __attribute__ ((deprecated));
-
-/*! Determine the state of automatic blocking.*/
-extern result auto_blocking_state();
-
 #ifdef __cplusplus
 }
 #endif

@@ -218,7 +218,6 @@ extern "C" {
 	return protect::entry_fail;
 	}
     #else
-	if (!auto_blocking_state()) outcome &= object->synchronize();
 	is_terminated = !outcome && object->is_closed();
     #endif
 

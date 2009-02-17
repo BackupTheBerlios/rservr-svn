@@ -312,7 +312,7 @@ extern "C" {
 
 	else if (input_underrun)
 	  {
-	if (auto_blocking_state() && !underrun_logged)
+	if (!underrun_logged)
 	   {
     log_protocol_input_underrun("buffered_common_input");
 	underrun_logged = true;
@@ -498,29 +498,3 @@ int check_input_waiting(protected_input *iInput)
 	static is_input_waiting local_waiting;
 	return iInput->access_contents(&local_waiting);
 }
-
-
-#ifdef PARAM_AUTO_BLOCKING
-static bool auto_blocking_flag = true;
-#endif
-
-void auto_blocking_off()
-#ifdef PARAM_AUTO_BLOCKING
-{ auto_blocking_flag = false; }
-#else
-{ }
-#endif
-
-void auto_blocking_on()
-#ifdef PARAM_AUTO_BLOCKING
-{ auto_blocking_flag = true; }
-#else
-{ }
-#endif
-
-result auto_blocking_state()
-#ifdef PARAM_AUTO_BLOCKING
-{ return auto_blocking_flag; }
-#else
-{ return false; }
-#endif

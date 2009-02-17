@@ -138,7 +138,6 @@ static int get_unlock()
 }
 
 
-#ifdef PARAM_AUTO_BLOCKING
 static int set_block(int iInput)
 {
 	int current_state = fcntl(iInput, F_GETFL);
@@ -151,7 +150,6 @@ static int set_nonblock(int iInput)
 	int current_state = fcntl(iInput, F_GETFL);
 	return (fcntl(iInput, F_SETFL, current_state | O_NONBLOCK) >= 0)? 0 : -1;
 }
-#endif
 
 
 int __execute_filter_hook(int iInput, int oOutput, int dDirection)
@@ -161,17 +159,11 @@ int __execute_filter_hook(int iInput, int oOutput, int dDirection)
 	static char input_data[PARAM_MAX_INPUT_SECTION];
 	ssize_t read_size = 0, write_size = 0;
 
-    #ifndef PARAM_AUTO_BLOCKING
-	struct timespec read_cycle = { tv_sec: 0, tv_nsec: 10 * 1000 * 1000 };
-    #endif
-
 	while (1)
 	if ((read_size = read(iInput, input_data, PARAM_MAX_INPUT_SECTION)) > 0 && read_size != (ssize_t) -1)
 	{
 	if (!locked && !get_lock()) break;
-    #ifdef PARAM_AUTO_BLOCKING
 	if (set_nonblock(iInput) < 0) break;
-    #endif
 
 	while ((write_size = write(oOutput, input_data, read_size))  == (ssize_t) -1)
 	if (errno != EINTR) break;
@@ -186,11 +178,7 @@ int __execute_filter_hook(int iInput, int oOutput, int dDirection)
 	{
 	if (locked && !get_unlock()) break;
 	if (read_size == 0) break;
-    #ifdef PARAM_AUTO_BLOCKING
 	if (set_block(iInput) < 0) break;
-    #else
-	nanosleep(&read_cycle, NULL);
-    #endif
 	}
 
 	struct stat current_state;
