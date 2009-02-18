@@ -45,7 +45,7 @@
 int check_##name(const char *mMessage) \
 { return strcmp(mMessage, #name) == 0; }
 
-#define DECLARE_SHOW(name)               void show_##name();
+#define DECLARE_SHOW(name) void show_##name();
 #define DEFINE_SHOW(name, info, example) \
 void show_##name() \
 { fprintf(stderr, "%s", #name ": " info "\n"); \
@@ -106,7 +106,8 @@ ABORT_MESSAGE_ACTION("bad " value " value for " TAGGED_NAME(name), action)
 ABORT_MESSAGE_ACTION("too many arguments for " TAGGED_NAME(name) " request", action)
 
 #define ABORT_BAD_FORMAT(name) ABORT_BAD_FORMAT_ACTION(name,)
-#define ABORT_BAD_FORMAT_ACTION(name, action) ABORT_MESSAGE_ACTION("bad argument format for " TAGGED_NAME(name) " request", action)
+#define ABORT_BAD_FORMAT_ACTION(name, action) \
+ABORT_MESSAGE_ACTION("bad argument format for " TAGGED_NAME(name) " request", action)
 
 #define ABORT_NO_SEND(name) ABORT_NO_SEND_ACTION(name,)
 #define ABORT_NO_SEND_ACTION(name, action) \
