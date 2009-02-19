@@ -30,9 +30,11 @@ static void message_queue_hook(int);
 
 //simulated on/off controllers
 
-static std::vector <int> all_lights;
-static std::vector <int> all_fans;
-static std::vector <int> all_vents;
+typedef std::vector <uint8_t> flag_set;
+
+static flag_set all_lights;
+static flag_set all_fans;
+static flag_set all_vents;
 
 
 int main(int argc, char *argv[])
@@ -74,7 +76,7 @@ int main(int argc, char *argv[])
 	if (!set_program_name(argv[0])) return 1;
 	if (!initialize_client())       return 1;
 
-	//only required when 'librsvp-rqsrvc.so' is used
+	//only required because 'librsvp-rqsrvc.so' is used
 	load_internal_plugins();
 
 	if (!start_message_queue()) return 1;
@@ -94,6 +96,42 @@ int main(int argc, char *argv[])
 
 	//merge the message queue with this thread until it exits
 	return inline_message_queue()? 0 : 1;
+}
+
+
+static command_handle execute_message(const message_info *mMessage,
+int nNumber,
+flag_set &oObjects)
+{
+	command_handle new_command = NULL;
+
+
+	if (nNumber >= 0 && nNumber < oObjects.size())
+	    {
+	if (strcmp(RSERVR_TO_REQUEST_MESSAGE(mMessage), "check") == 0)
+	new_command = oObjects[nNumber]?
+	  client_response(RSERVR_RESPOND(mMessage), event_complete, "on") :
+	  client_response(RSERVR_RESPOND(mMessage), event_complete, "off");
+
+	else if (strcmp(RSERVR_TO_REQUEST_MESSAGE(mMessage), "on") == 0)
+	     {
+	oObjects[nNumber] = true;
+	new_command = short_response(RSERVR_RESPOND(mMessage), event_complete);
+	     }
+
+	else if (strcmp(RSERVR_TO_REQUEST_MESSAGE(mMessage), "off") == 0)
+	     {
+	oObjects[nNumber] = false;
+	new_command = short_response(RSERVR_RESPOND(mMessage), event_complete);
+	     }
+
+	else new_command = short_response(RSERVR_RESPOND(mMessage), event_error);
+	    }
+
+	else new_command = short_response(RSERVR_RESPOND(mMessage), event_error);
+
+
+	return new_command;
 }
 
 
@@ -139,91 +177,18 @@ static void message_queue_hook(int eEvent)
 	//the response is assigned to 'new_command' and sent at the end
 	//admittedly, a lot of similar code here
 
-	if (object_type == "lights")
 	//lights
-	   {
-	if (object_number >= 0 && object_number < all_lights.size())
-	    {
-	if (strcmp(RSERVR_TO_REQUEST_MESSAGE(message), "check") == 0)
-	new_command = all_lights[object_number]?
-	  client_response(RSERVR_RESPOND(message), event_complete, "on") :
-	  client_response(RSERVR_RESPOND(message), event_complete, "off");
+	     if (object_type == "lights")
+	new_command = execute_message(message, object_number, all_lights);
 
-	else if (strcmp(RSERVR_TO_REQUEST_MESSAGE(message), "on") == 0)
-	     {
-	all_lights[object_number] = true;
-	new_command = short_response(RSERVR_RESPOND(message), event_complete);
-	     }
-
-	else if (strcmp(RSERVR_TO_REQUEST_MESSAGE(message), "off") == 0)
-	     {
-	all_lights[object_number] = false;
-	new_command = short_response(RSERVR_RESPOND(message), event_complete);
-	     }
-
-	else new_command = short_response(RSERVR_RESPOND(message), event_error);
-	    }
-
-	else new_command = short_response(RSERVR_RESPOND(message), event_error);
-	   }
-
-
-	else if (object_type == "fans")
 	//fans
-	   {
-	if (object_number >= 0 && object_number < all_fans.size())
-	    {
-	if (strcmp(RSERVR_TO_REQUEST_MESSAGE(message), "check") == 0)
-	new_command = all_lights[object_number]?
-	  client_response(RSERVR_RESPOND(message),  event_complete, "on") :
-	  client_response(RSERVR_RESPOND(message),  event_complete, "off");
+	else if (object_type == "fans")
+	new_command = execute_message(message, object_number, all_fans);
 
-	else if (strcmp(RSERVR_TO_REQUEST_MESSAGE(message), "on") == 0)
-	     {
-	all_fans[object_number] = true;
-	new_command = short_response(RSERVR_RESPOND(message), event_complete);
-	     }
-
-	else if (strcmp(RSERVR_TO_REQUEST_MESSAGE(message), "off") == 0)
-	     {
-	all_fans[object_number] = false;
-	new_command = short_response(RSERVR_RESPOND(message), event_complete);
-	     }
-
-	else new_command = short_response(RSERVR_RESPOND(message), event_complete);
-	    }
-
-	else new_command = short_response(RSERVR_RESPOND(message), event_error);
-	   }
-
-
-	else if (object_type == "vents")
 	//vents
-	   {
-	if (object_number >= 0 && object_number < all_vents.size())
-	    {
-	if (strcmp(RSERVR_TO_REQUEST_MESSAGE(message), "check") == 0)
-	new_command = all_lights[object_number]?
-	  client_response(RSERVR_RESPOND(message),  event_complete, "on") :
-	  client_response(RSERVR_RESPOND(message),  event_complete, "off");
+	else if (object_type == "vents")
+	new_command = execute_message(message, object_number, all_vents);
 
-	else if (strcmp(RSERVR_TO_REQUEST_MESSAGE(message), "on") == 0)
-	     {
-	all_vents[object_number] = true;
-	new_command = short_response(RSERVR_RESPOND(message), event_complete);
-	     }
-
-	else if (strcmp(RSERVR_TO_REQUEST_MESSAGE(message), "off") == 0)
-	     {
-	all_vents[object_number] = false;
-	new_command = short_response(RSERVR_RESPOND(message), event_complete);
-	     }
-
-	else new_command = short_response(RSERVR_RESPOND(message), event_error);
-	    }
-
-	else new_command = short_response(RSERVR_RESPOND(message), event_error);
-	   }
 
 	//something besides lights, vents, fans is an error
 	else new_command = short_response(RSERVR_RESPOND(message), event_error);

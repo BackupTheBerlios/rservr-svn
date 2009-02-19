@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 	if (!set_program_name(argv[0])) return 1;
 	if (!initialize_client())       return 1;
 
-	//only required when 'librsvp-rqsrvc.so' is used
+	//only required because plug-ins are used
 	load_internal_plugins();
 
 	//restrict queued messages to responses *only*
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 	destroy_command(new_service);
 	clear_command_status(service_status);
 
-	//only required since 'librsvp-rqsrvc.so' is used
+	//stop the queue so that it can be subsequently inlined
 	if (!stop_message_queue()) return 1;
 
 	//merge the message queue with this thread until it exits
@@ -130,7 +130,8 @@ text_info sSystem)
 }
 
 
-static info_list wait_list_response(command_handle cCommand)
+static info_list wait_list_response(command_handle cCommand,
+command_reference &rReference)
 //helper function to wait for a response list from servers and clients
 {
 	if (!cCommand) return NULL;
@@ -139,18 +140,18 @@ static info_list wait_list_response(command_handle cCommand)
 	info_list           response_list = NULL;
 
 	//send the command provided
-	command_reference new_reference = send_command(cCommand);
+	rReference = send_command(cCommand);
 	destroy_command(cCommand);
-	if (!new_reference) return NULL;
+	if (!rReference) return NULL;
 
 	//wait for an indication of command success
-	command_event command_outcome = wait_command_event(new_reference,
+	command_event command_outcome = wait_command_event(rReference,
 	  event_complete, local_default_short_timeout());
-	clear_command_status(new_reference);
+	clear_command_status(rReference);
 
 	if (!(command_outcome & event_complete)) return NULL;
 
-	if (!(message = rotate_response(new_reference))) return NULL;
+	if (!(message = rotate_response(rReference))) return NULL;
 
 	if (!(response_list = RSERVR_TO_LIST_RESPONSE(message)))
 	//a non-list message in response is an error
@@ -173,7 +174,8 @@ static int configure_sub_function(text_info sSystem)
 	std::string        response_copy;
 
 	//find all local relay services on the local server
-	response_list = wait_list_response( find_services("", "^fsrelay$") );
+	response_list = wait_list_response( find_services("", "^fsrelay$"),
+	  new_reference );
 	if (!response_list) return -1;
 
 	std::vector <std::string> local_relays;
@@ -198,7 +200,7 @@ static int configure_sub_function(text_info sSystem)
 	if (!new_command) continue;
 	set_alternate_sender(new_command, service_name);
 
-	response_list = wait_list_response(new_command);
+	response_list = wait_list_response(new_command, new_reference);
 	if (!response_list) continue;
 
 	//assemble a target specification based on the relay's connections
@@ -225,7 +227,7 @@ static int configure_sub_function(text_info sSystem)
 	continue;
 	 }
 
-	response_list = wait_list_response(new_command);
+	response_list = wait_list_response(new_command, new_reference);
 	if (!response_list) continue;
 
 	while (*response_list)

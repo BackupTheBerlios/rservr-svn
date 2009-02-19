@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 	if (!set_program_name(argv[0])) return 1;
 	if (!initialize_client())       return 1;
 
-	//only required when 'librsvp-rqsrvc.so' is used
+	//only required because plug-ins are used
 	load_internal_plugins();
 
 	//don't allow *any* messages in the message queue

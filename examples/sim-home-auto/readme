@@ -75,8 +75,8 @@ indicating the outcome of the configuration.
 
 Once the system is set up, type the following to experiment with the system:
 
-	rservrd system @execute@rsv-terminal@/tmp/terminal
-	unsterm /tmp/terminal
+	rservrd system @execute@rsv-terminal@./terminal
+	unsterm ./terminal
 
 The first line adds the 'rsv-terminal' client to the main server.  This client
 creates a local socket as specified, and the second line opens that socket in
