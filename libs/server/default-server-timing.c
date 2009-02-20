@@ -51,7 +51,7 @@ int ATTR_INT create_default_timing_table(struct server_timing_table *tTable)
 	tTable->input.scale.mode  = timing_recursive;
 	tTable->input.read.normal_retry.value  =  0.25;
 	tTable->input.read.standby_retry.value =  1.0;
-	tTable->input.read.standby_wait.value  = 30.0; /*NOTE: also client registration timeout*/
+	tTable->input.read.standby_wait.value  = 30.0;
 	tTable->input.discard_latency.value    =  0.05;
 	tTable->input.underrun_retry.value     =  0.01;
 	tTable->input.underrun_retry_max.value =  0.75;

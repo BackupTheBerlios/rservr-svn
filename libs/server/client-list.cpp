@@ -552,7 +552,7 @@ bool cCritical, command_reference rReference, entity_handle nNotify)
 	requester = &tTable->get_element(position);
 	pPerm &= (requester->max_permissions | requester->max_new_client);
 	nNew  &= (requester->max_permissions | requester->max_new_client);
-	if (requester->min_priority > pPri) pPri = requester->min_priority;
+	//NOTE: don't change priority based on requester's!
 	}
 
 	pid_t new_process = -1;

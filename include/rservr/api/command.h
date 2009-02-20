@@ -221,3 +221,19 @@ extern const monitor_event monitor_clients;             /**< General client even
 #endif
 
 #endif /*rservr_command_h*/
+
+/*! \mainpage Resourcerver API Reference
+ * 
+ * <!-- this is just some info for the API index HTML page -->
+ *
+ * <h2 align="center"><a href="http://rservr.berlios.de/" target="_blank"><b>Resourcerver Main Page</b></a><br /><br /></h2>
+ * <h3 align="center">hosted by <a href="http://developer.berlios.de/" target="_blank">http://developer.berlios.de/</a></h3>
+ * <img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" align="left" />
+ *
+ * <h3><br />The <a href="http://rservr.berlios.de/" target="_blank"><b>Resourcerver Project</b></a>
+ * was conceived, designed, and written by
+ * <a href="mailto:ta0kira@users.berlios.de">Kevin P. Barry</a>.  Source code is
+ * released under the terms of the
+ * <a href="http://www.opensource.org/licenses/bsd-license.php" target="_blank">BSD License</a>.
+ * </h3>
+ */

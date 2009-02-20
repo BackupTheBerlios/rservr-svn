@@ -362,11 +362,7 @@ bool take_terminal_control(pid_t pPid, pid_t pPidActual, entity_type tType, comm
 	if (!isatty(execute_terminal)) return false;
 
 	if (terminal_pid < 0) tcgetattr(execute_terminal, &terminal_state);
-	if (tcsetpgrp(execute_terminal, pPid) < 0) //return false;
-{
-printf("%i %i\n", tcgetsid(execute_terminal), getpid());
-return false;
-}
+	if (tcsetpgrp(execute_terminal, pPid) < 0) return false;
 
 	if (terminal_pid < 0)
 	{

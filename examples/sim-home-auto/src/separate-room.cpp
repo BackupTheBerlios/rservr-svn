@@ -100,8 +100,7 @@ int main(int argc, char *argv[])
 
 
 static command_handle execute_message(const message_info *mMessage,
-int nNumber,
-flag_set &oObjects)
+int nNumber, flag_set &oObjects)
 {
 	command_handle new_command = NULL;
 
