@@ -1,0 +1,10 @@
+STANDARD_INCLUDES=-I/usr/include -I/usr/local/include
+ALL_INCLUDES=$(STANDARD_INCLUDES) -I$(srcdir)/../.. -I$(srcdir)/../../include/rservr
+AM_CPPFLAGS=-DENABLE_VIRT_ARRAY_ALL -DRSERVR_RESTRICT_COMMAND_INTERFACE $(ALL_INCLUDES)
+AM_CXXFLAGS=-ansi -Wall
+AM_CFLAGS=-Wall
+STANDARD_LIBS=-L/lib -L/usr/lib -L/usr/local/lib
+AM_LDFLAGS=--version-info 1:1:0 $(STANDARD_LIBS)
+lib_LTLIBRARIES=librsvx-testing.la
+librsvx_testing_la_SOURCES=rsvx-testing.cpp
+librsvx_testing_la_LIBADD=

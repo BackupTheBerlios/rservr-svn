@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver User's Guide - Filtering Communication</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver User's Guide </h1>
+      <h2 align="center" class="page_subtitle"> Filtering Communication </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="connections.html" class="overview_link">Previous - Connecting Independent Systems</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="package.html" class="overview_link">Next - Core Package Contents</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#ItF" class="overview_link">Introduction to Filtering.</a>
+        </li>
+        <li>
+          <a href="#SF" class="overview_link">Standard Filters.</a>
+          <div>
+            <ul class="toc_list">
+              <li>
+                <a href="#SF_LSF" class="overview_link">Local System Filtering.</a>
+              </li>
+              <li>
+                <a href="#SF_IsF" class="overview_link">Inter-system Filtering.</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="ItF">Introduction to Filtering.</a>
+      </h3>
+      <p class="overview_content"> IPC filtering is the process of intercepting IPC commands transmitted between a client and a server or between two clients. This is intended for command logging for debugging, and for command modification and injection. </p>
+      <p class="overview_content"> IPC filtering is achieved by adding an additional layer of IPC where one already exists. The filter program intercepts incoming IPC and performs an action, normally passing the IPC on to its original destination when it's done. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="SF">Standard Filters.</a>
+      </h3>
+      <p class="overview_content"> All standard Resourcerver IPC filters will follow the general guidelines in this section. </p>
+      <h4 class="overview_title">
+        <a name="SF_LSF">Local System Filtering.</a>
+      </h4>
+      <p class="overview_content"> Local system filtering is done between a client and its server. This requires the filter be started in conjunction with the client itself. The filter <i>cannot</i> be added to an existing client/server connection. </p>
+      <p class="overview_content"> Filtering with a standard filter requires that the filter program itself appear as the client's program name when the server starts the client, and the filter subsequently starts the client program itself after making changes to the initial IPC configuration to insert itself in the communication chain. Normally this is transparent to the client program. </p>
+      <p class="overview_content"> Standard filter programs will execute all remaining arguments (after those it uses) as a child process. Because of this, standard filters can be stacked arbitrarily, with the arguments after the last filter becoming the actual client process. Each filter slows down IPC slightly, however, so as few filters as possible should be used. Filters should not be a standard part of a Resourcerver system: they should only be used for debugging. </p>
+      <p class="overview_content"> Standard filter programs don't normally need to perform additional copy operations for IPC that isn't processed. </p>
+      <h4 class="overview_title">
+        <a name="SF_IsF">Inter-system Filtering.</a>
+      </h4>
+      <p class="overview_content"> Inter-system filtering takes place between two remotely-connected clients. This is done by specifying a standard filter at the time of connection between a standard socket forwarder and another of the same type. </p>
+      <p class="overview_content"> Although the command used to start a standard filter itself doesn't require anything other than the arguments needed to set up that filter, you can also stack standard filters when filtering this type of IPC. The standard filters will execute all arguments following the arguments the filter itself uses, but those additional arguments must <i>also</i> execute a standard filter, otherwise the IPC connection will fail. </p>
+      <p class="overview_content"> Unlike local system filtering, <i>all</i> inter-system filters must copy perform a copy on <i>all</i> IPC, even if that filter doesn't use it. This can slow down IPC more than inter-system filters do. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="connections.html" class="overview_link">Previous - Connecting Independent Systems</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="package.html" class="overview_link">Next - Core Package Contents</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver Application Developement Guide - Creating Detached Clients</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver Application Developement Guide </h1>
+      <h2 align="center" class="page_subtitle"> Creating Detached Clients </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="monitor.html" class="overview_link">Previous - Monitoring the Server</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="plugin-table.html" class="overview_link">Next - Table of Plug-in Commands</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#PR" class="overview_link">Pre-conversion Requirements.</a>
+        </li>
+        <li>
+          <a href="#TCP" class="overview_link">The Conversion Process.</a>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="PR" class="overview_link">Pre-conversion Requirements.</a>
+      </h3>
+      <p class="overview_content"> Detached clients are processes that start as "other-than" clients and then become clients. This is a major difference from normal clients, which are started as forks of the server and are therefore child processes of the server. The detached client conversion involves a single local socket and an IPC conversion. Normally a call to <span class="style_command_line">rservrd</span> from outside of the process itself is required in order to actually attach the process to a server as a client. </p>
+      <p class="overview_content"> The first step in converting an existing process is for that process to create a local socket accessible by the server it's trying to connect it to.  This step is required; the process itself must initiate the connection using this step.  The socket must be in blocking mode because the server will attempt a connection in non-blocking mode.  The prospective <span class="style_command_line">rservr</span> to connect to must already be running, it must be past the configuration stage to proceed with the connection, and it must not have detached clients disabled. </p>
+      <p class="overview_content"> <span class="style_command_line">rservr</span> imposes strict security requirements on all sockets it connects to (detached clients are the only circumstance the server will connect to a socket.) <span class="style_command_line">rservr</span> implements a much higher level of security with detached clients because it cannot control what user and group IDs it will be run under, it has no reference of its process ID, and <span class="style_command_line">rservr</span> has no way of knowing if the socket being connected to is actually intended for use in the conversion process.  The socket's owning user and group IDs will become the server's internal reference of the user and group IDs of the process being attached; therefore, <span class="style_command_line">rservr</span> will only connect to the socket if the permissions of the socket are exactly <span class="style_inline_code">S_IRUSR | S_IWUSR | S_ISUID</span> (defined as the macro <span class="style_inline_code">PARAM_DETACHED_SOCKET_CHMOD</span> in <span class="style_file_name">param.h</span>.) The suid flag obviously has no purpose with sockets, so its absence indicates to the server that a socket <i>isn't</i> intended for detached-client conversion. Presense of the suid flag is informal acknowledgement to the server that the server will treat the client as if it were being run under the socket's owning user and group IDs. The owner-only read and write restriction prevents a non-super-user server from connecting to processes that it couldn't otherwise run itself (unless root has somehow interfered to change the socket's ownership.) The server also imposes group association requirements between the socket's user ID, group ID, and the group ID of the client calling for the connection to be made.  See the <a href="../user/rservr.html" class="general_link"><span class="style_command_line">rservr</span> Program Guide</a> for more information.  A connection to the server can be initiated once the socket is correctly set up. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TCP">The Conversion Process.</a>
+      </h3>
+      <p class="overview_content"> The function below can be used to create a socket for the purposes of connecting the process implementing it to a server.  This function relies only on the <span class="style_file_name">param.h</span> header to access the compiled-in socket permissions expected by <span class="style_command_line">rservr</span>. This is by no means a comprehensive example. Actual implementations should handle all signals that can terminate the process and remove the socket file before exiting. The rest of the program should also clean up before a "proper" exit. </p>
+      <div align="center">
+        <pre class="example_box code_box source_box">
+<b>#include &lt;unistd.h&gt;</b>
+<b>#include &lt;stddef.h&gt;</b>
+<b>#include &lt;sys/un.h&gt;</b>
+<b>#include &lt;sys/stat.h&gt;</b>
+<b>#include &lt;sys/socket.h&gt;</b>
+<b>#include &lt;rservr/param.h&gt;</b> <i>//(for <b>PARAM_DETACHED_SOCKET_CHMOD</b>)</i>
+
+<i>//this is a basic example of how to create a socket for the conversion process</i>
+
+int create_socket(const char *nName)
+{
+	<i>//(checks to 'errno' upon system call failure omitted for clarity)</i>
+
+	if (!nName) return -1;
+
+	<i>//create the socket descriptor to use for an incoming connection</i>
+
+	struct sockaddr_un new_address;
+	size_t new_length = sizeof new_address;
+
+	int socket_fd = socket(PF_LOCAL, SOCK_STREAM, 0);
+	if (socket_fd &lt; 0) return -1;
+
+	<i>//create an address spec and create the socket file</i>
+
+	new_address.sun_family = AF_LOCAL;
+	strncpy(new_address.sun_path, nName, sizeof new_address.sun_path);
+
+	new_length = (offsetof(struct sockaddr_un, sun_path) + SUN_LEN(&new_address) + 1);
+
+	if (bind(socket_fd, (struct sockaddr*) &new_address, new_length) &lt; 0)
+	{
+	shutdown(socket_fd, SHUT_RDWR);
+	return -1;
+	}
+
+	<i>//set socket permissions to be compliant for attachment to the server</i>
+
+	mode_t socket_mode = <b>PARAM_DETACHED_SOCKET_CHMOD</b>;
+	if (chmod(nName, socket_mode) &lt; 0)
+	{
+	shutdown(socket_fd, SHUT_RDWR);
+	remove(nName);
+	return -1;
+	}
+
+	<i>//sockets are always created in blocking mode; no change required</i>
+
+	return socket_fd;
+} 
+</pre>
+      </div>
+      <p class="overview_content"> The process attempting to connect to a server for conversion to a client should implement a function similar to that below.  The function below assumes that the requirements of the above section (user and group ownership, permissions, blocking mode) have all been met.  The call to <span class="style_inline_code">convert_client_detached</span> will cause the client library to initialize (or replace) the internal IPC file descriptors with the socket.  This function will terminate any existing IPC with the server; therefore, it should normally never be called from a process that's already a client. </p>
+      <div align="center">
+        <pre class="example_box code_box source_box">
+<b>#include &lt;sys/socket.h&gt;</b>
+<b>#include &lt;rservr/api/detached-client.h&gt;</b>
+
+<i>//this example assumes you provide a blocking socket already bound to the file system</i>
+
+int convert_to_client(int sSocket)
+{
+	if (sSocket &lt; 0) return -1;
+
+	listen(sSocket, 0);
+
+	struct sockaddr new_address;
+	socklen_t new_length = sizeof new_address;
+	int new_connection = -1;
+
+	new_connection = accept(sSocket, &new_address, &new_length);
+	if (new_connection &lt; 0) return -1;
+
+	if (!<b>convert_client_detached</b>(new_connection))
+	{
+	shutdown(new_connection, SHUT_RDWR);
+	return -1;
+	}
+	
+	return 0;
+} 
+</pre>
+      </div>
+      <p class="overview_content"> Once the process has a local socket bound to the local file system, call the function above and wait for its return to convert the process to a client. The socket <i>must</i> be in blocking mode so that this function blocks until the server picks up the connection. This is necessary since the server won't block waiting for the connection. </p>
+      <p class="overview_content"> The conversion function alone doesn't allow the process to act as a client; it only establishes IPC with the server.  The process can remove and close the socket that's bound to the file system, or it can leave it for future connections.  Leaving the socket open can allow a process to serve as a "client generator."  This can be done by forking right after the call to <span class="style_inline_code">convert_client_detached</span> and then waiting for another connection. The file descriptor submitted to <span class="style_inline_code">convert_client_detached</span> will be closed upon success and will be left unchanged upon failure. </p>
+      <p class="overview_content"> The process should be considered a newly-started client immediately after <span class="style_inline_code">convert_client_detached</span> returns successfully. After the conversion, proceed with initialization and client registration exactly as you would in a normal client, as if that point of the program was the beginning of its execution. </p>
+      <p class="overview_content"> The function example above doesn't take into account the possibility that the server might refuse connection to the socket.  A program should take that possibility into account and have a means to terminate the process and clean up the socket if the conversion fails (two appropriate methods would be to use <span class="style_command_line">select</span> with a timeout and to set an alarm.)  Failure cannot be predicted by the process (except for failure due to an erroneous conversion setup.)  Failure of an otherwise-valid conversion procedure will normally be caused by the specific security state of the <span class="style_command_line">rservr</span> instance being connected to.  For example, a server can be started with detached clients disabled, or <span class="style_command_line">rservrd</span> can be run in a way that prevents it specifically from attaching a detached client. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="monitor.html" class="overview_link">Previous - Monitoring the Server</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="plugin-table.html" class="overview_link">Next - Table of Plug-in Commands</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

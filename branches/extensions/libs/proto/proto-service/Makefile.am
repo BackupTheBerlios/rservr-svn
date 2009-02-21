@@ -1,0 +1,9 @@
+STANDARD_INCLUDES=-I/usr/include -I/usr/local/include
+ALL_INCLUDES=$(STANDARD_INCLUDES) -I$(srcdir)/../../.. -I$(srcdir)/../../../include/rservr -I$(srcdir)/../../../include -I$(srcdir)/../../include/proto -I$(srcdir)/../local-include -I$(srcdir)/../../include
+AM_CPPFLAGS=-DENABLE_VIRT_ARRAY_ALL -DRSERVR_RESTRICT_COMMAND_INTERFACE $(ALL_INCLUDES)
+AM_CXXFLAGS=-ansi -Wall
+AM_CFLAGS=-Wall
+AM_LDFLAGS=-version-info 1:1:0
+lib_LTLIBRARIES=librservr-proto-service.la
+librservr_proto_service_la_SOURCES=proto-service-client.cpp ../../include/proto/proto-service-client.hpp
+librservr_proto_service_la_LIBADD=../../command/librservr-command.la

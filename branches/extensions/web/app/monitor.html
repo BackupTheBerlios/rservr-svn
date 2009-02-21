@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver Application Developement Guide - Monitoring the Server</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver Application Developement Guide </h1>
+      <h2 align="center" class="page_subtitle"> Monitoring the Server </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="command-plugin.html" class="overview_link">Previous - Using Plug-in Commands</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="detached.html" class="overview_link">Next - Creating Detached Clients</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#PfMtS" class="overview_link">Prerequisites for Monitoring the Server.</a>
+        </li>
+        <li>
+          <a href="#CCMS" class="overview_link">Changing Client Monitor Settings.</a>
+        </li>
+        <li>
+          <a href="#ToSM" class="overview_link">Types of Server Monitoring.</a>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="PfMtS">Prerequisites for Monitoring the Server.</a>
+      </h3>
+      <p class="overview_content"> A client must be registered with a server in order to monitor that specific server. A client must meet one of the following requirements in order to monitor its server: </p>
+      <ul class="other_bullet_list">
+        <li class="overview_content"> The client must be registered as a monitor client. <br />
+          <br />
+        </li>
+        <li class="overview_content"> The client must be registered as a different type of client and the server must not have had monitoring disabled at the time the client was started. Monitoring will <i>always</i> be disabled for detached clients. <br />
+          <br />
+        </li>
+      </ul>
+      <p class="overview_content"> The client must define the hook function below to process monitor-update messages from the server. This function will make the message queue block until it returns, so it should be a fairly trivial function. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/monitor-client.h&gt;</u></b>
+
+<i>//the client must define this function to process monitoring messages</i>
+<b>extern void __monitor_update_hook(const struct monitor_update_data*);</b>
+</pre>
+      </div>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="CCMS">Changing Client Monitor Settings.</a>
+      </h3>
+      <p class="overview_content"> Use the command below to change the client's monitoring settings. This command will be queued, and therefore must be sent. Remote addressing isn't allowed. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/monitor-client.h&gt;</u></b>
+
+<i>//the returned command is added to the queue and must be sent</i>
+<b>command_handle set_monitor_flags(monitor_event);</b>
+</pre>
+      </div>
+      <p class="overview_content"> Subsequent calls to the function above will override the client's entire monitoring preferences.  Using <span class="style_inline_code">monitor_none</span> will clear all monitoring preferences for the client. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="ToSM">Types of Server Monitoring.</a>
+      </h3>
+      <p class="overview_content"> The guide below outlines the various monitor messages sent by the server via the client-defined <span class="style_inline_code">__monitor_update_hook</span> function: The monitored event type will be the bit combination of the flag to the left and that above a particular cell, with the message formats in parantheses. Monitor the category on the left to receive corresponding messages. </p>
+      <div align="center">
+        <table width="900" class="command_table">
+		    <tr style="font-size: larger;">
+		      <td width="200"></td>
+		      <td width="140" class="style_inline_code"><b>monitor_add</b></td>
+		      <td width="140" class="style_inline_code"><b>monitor_remove</b></td>
+		      <td width="140" class="style_inline_code"><b>monitor_rejection</b></td>
+		      <td width="140" class="style_inline_code"><b>monitor_change</b></td>
+		      <td width="140" class="style_inline_code"><b>monitor_limit</b></td>
+          </tr>
+		    <tr>
+		      <td class="style_inline_code" style="font-size: larger;"><b>monitor_attached_clients</b></td>
+		      <td >new client attached<br />('<b><i>pid</i>*<i>command</i></b>')</td>
+		      <td >client detached<br />('<b><i>pid</i></b>')</td>
+		      <td ></td>
+		      <td ></td>
+		      <td ></td>
+          </tr>
+		    <tr>
+		      <td class="style_inline_code" style="font-size: larger;"><b>monitor_registered_clients</b></td>
+		      <td >client registered<br />('<b><i>pid</i>*<i>name</i></b>')</td>
+		      <td >client deregistered<br />('<b><i>pid</i>*<i>name</i></b>')</td>
+		      <td ></td>
+		      <td ></td>
+		      <td ></td>
+          </tr>
+		    <tr>
+		      <td class="style_inline_code" style="font-size: larger;"><b>monitor_registered_services</b></td>
+		      <td >service registered<br />('<b><i>pid</i>*<i>name</i>*<i>type</i>*<i>location</i></b>')</td>
+		      <td >service deregistered<br />('<b><i>pid</i>*<i>name</i>*<i>type</i>*<i>location</i></b>')</td>
+		      <td ></td>
+		      <td ></td>
+		      <td ></td>
+          </tr>
+		    <tr>
+		      <td class="style_inline_code" style="font-size: larger;"><b>monitor_terminal_status</b></td>
+		      <td >terminal control given<br />('<b><i>pid</i></b>')</td>
+		      <td >terminal control returned<br />('<b><i>pid</i></b>')</td>
+		      <td >terminal control rejected<br />('<b><i>pid</i></b>')</td>
+		      <td >terminal control revoked<br />('<b><i>old-pid</i>*<i>new-pid</i></b>')</td>
+		      <td ></td>
+		      <td ></td>
+          </tr>
+		    <tr>
+		      <td class="style_inline_code" style="font-size: larger;"><b>monitor_server</b></td>
+		      <td ></td>
+		      <td ></td>
+		      <td ></td>
+		      <td ></td>
+		      <td >server limit reached<br />('<b><i>parameter</i>*<i>value</i></b>')</td>
+          </tr>
+		    <tr>
+		      <td class="style_inline_code" style="font-size: larger;"><b>monitor_client</b></td>
+		      <td ></td>
+		      <td ></td>
+		      <td ></td>
+		      <td ></td>
+		      <td >client limit reached<br />('<b><i>pid</i>*<i>parameter</i>*<i>value</i></b>')</td>
+          </tr>
+        </table>
+      </div>
+      <p></p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="command-plugin.html" class="overview_link">Previous - Using Plug-in Commands</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="detached.html" class="overview_link">Next - Creating Detached Clients</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

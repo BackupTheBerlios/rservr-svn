@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver Application Developement Guide - Using the Message Queue</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver Application Developement Guide </h1>
+      <h2 align="center" class="page_subtitle"> Using the Message Queue </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="command-queue.html" class="overview_link">Previous - Using the Command Queue</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="client-administration.html" class="overview_link">Next - Basic Client Administration</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#RtMQ" class="overview_link">Running the Message Queue.</a>
+          <div>
+            <ul class="toc_list">
+              <li>
+                <a href="#RtMQ_NOotMQ" class="overview_link">Normal Operation of the Message Queue.</a>
+              </li>
+              <li>
+                <a href="#RtMQ_ItMQ" class="overview_link">Inlining the Message Queue.</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <a href="#RaHM" class="overview_link">Retrieving and Handling Messages.</a>
+          <div>
+            <ul class="toc_list">
+              <li>
+                <a href="#RaHM_TSoaM" class="overview_link">The Structure of a Message.</a>
+              </li>
+              <li>
+                <a href="#RaHM_RM" class="overview_link">Request Messages.</a>
+              </li>
+              <li>
+                <a href="#RaHM_R2M" class="overview_link">Response Messages.</a>
+              </li>
+              <li>
+                <a href="#RaHM_R3M" class="overview_link">Remote Messages.</a>
+              </li>
+              <li>
+                <a href="#RaHM_IM" class="overview_link">Info Messages.</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <a href="#BtWfM" class="overview_link">Blocking to Wait for Messages.</a>
+        </li>
+        <li>
+          <a href="#RToM" class="overview_link">Restricting Types of Messages.</a>
+        </li>
+        <li>
+          <a href="#PtMQ" class="overview_link">Pausing the Message Queue.</a>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="RtMQ">Running the Message Queue.</a>
+      </h3>
+      <h4 class="overview_title">
+        <a name="RtMQ_NOotMQ">Normal Operation of the Message Queue.</a>
+      </h4>
+      <p class="overview_content"> The message queue is a client's standard interface for dealing with incoming messages from the server and from other clients (via the server.) The message queue <i>must</i> be running in order to interact with the server or any other client, to include communication for client registration. It must be running even if the client won't receive messages because it's required to update the status of all sent commands. The queue normally runs in the background on its own thread and can be controlled using the functions below: </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<i>//start the message queue in a background thread</i>
+<b>result start_message_queue();</b>
+
+<i>//stop the message queue if it's running in the background</i>
+<b>result stop_message_queue();</b>
+<i>/* this should be called before any client program exits to ensure that it isn't still
+   running when the destruction of static data takes place. this can be called to request
+   an inline queue (see next section) exit, but doesn't force it to. */</i>
+
+<i>//determine if the message queue is running</i>
+<b>result message_queue_status();</b>
+</pre>
+      </div>
+      <p>
+      </p>
+      <h4 class="overview_title">
+        <a name="RtMQ_ItMQ">Inlining the Message Queue.</a>
+      </h4>
+      <p class="overview_content"> The message queue may also be run in the current thread with the function below. The queue must be stopped first if it's running in the background. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<i>//start the message queue in the current thread</i>
+<b>result inline_message_queue();</b>
+<i>/* this function is not reversible unless the program has another thread that can request
+   the message queue exit (which would defeat its purpose.) the message queue will
+   normally only exit on its own when it loses communication with the server, which can't
+   be restored. */</i>
+</pre>
+      </div>
+      <p class="overview_content"> A call to the above function will normally be the last line of <span class="style_inline_code">main</span> in a single-threaded client program. It will block the program until the queue exits on its own (normally at the direction of the server or upon its exit) or will return with an error right away. </p>
+      <p class="overview_content"> Even when using this function as the client's main thread, clients still must use the background message queue initially in order to register the client. Once the client is registered, the message queue can be stopped and inlined into the main thread. </p>
+      <p class="overview_content"> Running the queue in the main thread has the advantage of allowing very simple clients, but precludes proactive actions by the client. A hook function must therefore be set with the function below in order to effectively deal with incoming messages: </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<i>//set the hook function to be called upon message queue events</i>
+<b>void(*set_queue_event_hook(void(*)(int)))(int);</b>
+<i>//takes a <span class="style_inline_code">void(*)(int)</span> as the new handler and returns the previous handler</i>
+</pre>
+      </div>
+      <p class="overview_content"> The message queue will call the hook function upon certain events. The hook function will cause the queue to block until it returns, which might backlog the server's communication with it if it isn't a simple function. The function used should be fairly short. The argument provided to the hook function will be one of the macros below, indicating the type of event that occurred: </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<b>#define RSERVR_QUEUE_START</b>   <i>//the queue loop is starting</i>
+<b>#define RSERVR_QUEUE_STOP</b>    <i>//the queue loop is stopping</i>
+<b>#define RSERVR_QUEUE_BLOCK</b>   <i>//the queue is blocking to wait for input</i>
+<b>#define RSERVR_QUEUE_UNBLOCK</b> <i>//the queue has stopped blocking (not always because of input)</i>
+<b>#define RSERVR_QUEUE_MESSAGE</b> <i>//the queue has registered a message</i>
+</pre>
+      </div>
+      <p class="overview_content"> Most of the events can be ignored if the client doesn't need to perform any actions. The hook function can be used even when the message queue is running in the background to monitor its status. For example, a hook function may be defined to end the program when the message queue exits: </p>
+      <div align="center">
+        <pre class="example_box code_box source_box">
+<b><u>#include &lt;stdlib.h&gt;</u></b>
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<i>//hook the function below with <b>set_queue_event_hook</b> to exit when the queue does</i>
+static void message_queue_hook(int eEvent)
+{ if (eEvent == <b>RSERVR_QUEUE_STOP</b>) exit(0); } 
+</pre>
+      </div>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="RaHM">Retrieving and Handling Messages.</a>
+      </h3>
+      <p class="overview_content"> Not all commands received by the message queue result in registered messages. In fact most don't, but a lot of the "important" content sent between clients will be registered as messages to be interpreted by the receiving client. </p>
+      <p class="overview_content"> Use the functions below to retrieve the current message and to delete single messages. The current message isn't always the last one added, but it's normally the last one accessed. The oldest message normally becomes the current message when any message is deleted. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<i>//retrieve the current message</i>
+<b>const struct message_info *current_message();</b>
+
+<i>//delete the current message</i>
+<b>result remove_current_message();</b>
+
+<i>//delete the specified message</i>
+<b>result remove_message(message_handle);</b>
+
+<i>//remove all messages currently in the queue</i>
+<b>void clear_messages();</b>
+</pre>
+      </div>
+      <p class="overview_content"> Message pointers are stable, so they're safe to use regardless of if other messages are added, removed, or read as long as the message being used hasn't been deleted. </p>
+      <p class="overview_content"> Use the functions below to locate responses to a particular request sent to the server or another client. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<i>//count the number of responses to a request</i>
+<b>unsigned int check_responses(command_reference);</b>
+
+<i>//rotate to the oldest response to a request</i>
+<b>const struct message_info *rotate_response(command_reference);</b>
+
+<i>//remove all responses to a request</i>
+<b>result remove_responses(command_reference);</b>
+</pre>
+      </div>
+      <p class="overview_content"> All messages are allocations, so all should be removed immediately when they're no longer required. You can control the types of messages received using functions outlined in a section further down this page. </p>
+      <h4 class="overview_title">
+        <a name="RaHM_TSoaM">The Structure of a Message.</a>
+      </h4>
+      <p class="overview_content"> All messages contain the basic information shown below. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<i>//this is an incomplete definition of the message structure</i>
+
+struct message_info
+{
+	<i>//reference number of the original request</i>
+	<b>command_reference message_reference;</b>
+
+	<i>//reference number used by the most recent sender</i>
+	<b>command_reference last_reference;</b>
+
+	<i>//name of the sending entity</i>
+	<b>text_info received_from;</b>
+
+	<i>//address of the original entity</i>
+	<b>text_info received_address;</b>
+
+	<i>//current target of the message (current client's name or a service it owns)</i>
+	<b>text_info sent_to;</b>
+
+	<i>//address to forward the message to (if applicable)</i>
+	<b>text_info sent_address;</b>
+
+	<i>//process ID of the originator (used internally)</i>
+	<b>pid_t creator_pid;</b>
+
+	<i>//clock time the message was registered</i>
+	<b>client_time time_received;</b>
+
+	<i>//priority the command was sent with</i>
+	<b>command_priority priority;</b>
+
+	<i>//name of the command used to create the message</i>
+	<b>text_info command_name;</b>
+};
+</pre>
+      </div>
+      <h4 class="overview_title">
+        <a name="RaHM_RM">Request Messages.</a>
+      </h4>
+      <p class="overview_content"> Request messages are data-only messages that can take the form of either a single text section or of binary data. Use the macros below to use request messages. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<b>#define RSERVR_IS_REQUEST(msg)</b>         <i>//check if the message is a request</i>
+<b>#define RSERVR_TO_REQUEST_MESSAGE(msg)</b> <i>//convert the request to it's text data</i>
+<b>#define RSERVR_TO_REQUEST_BINARY(msg)</b>  <i>//convert the request to it's binary data</i>
+<b>#define RSERVR_REQUEST_SIZE(msg)</b>       <i>//find a request's binary data size</i>
+</pre>
+      </div>
+      <p class="overview_content"> All messages, regardless of if they're a request or not, have a binary size of 0 if the content is text. An easier way to find out if any message is binary is with the macro below: </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<b>#define RSERVR_IS_BINARY(msg)</b> <i>//check if the message contains binary data</i>
+</pre>
+      </div>
+      <div align="center">
+      </div>
+      <h4 class="overview_title">
+        <a name="RaHM_R2M">Response Messages.</a>
+      </h4>
+      <p class="overview_content"> Response messages are in response to commands sent by the client receiving that response. These responses can come from other clients or from the server. For example, the server will send a response to a client requesting a list of clients currently registered, which would be retrieved with the macros below. Responses can contain any data a request can and can contain a list of text data. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<b>#define RSERVR_IS_RESPONSE(msg)</b>        <i>//check if the message is a response</i>
+<b>#define RSERVR_IS_SINGLE_RESPONSE(msg)</b> <i>//determine if a response is a single text section</i>
+<b>#define RSERVR_TO_SINGLE_RESPONSE(msg)</b> <i>//convert the response to a single text section</i>
+<b>#define RSERVR_IS_LIST_RESPONSE(msg)</b>   <i>//determine if a response is a list of text sections</i>
+<b>#define RSERVR_TO_LIST_RESPONSE(msg)</b>   <i>//convert the response to a list of text sections</i>
+<b>#define RSERVR_TO_RESPONSE_BINARY(msg)</b> <i>//convert the response to it's binary data</i>
+<b>#define RSERVR_RESPONSE_SIZE(msg)</b>      <i>//find a response's binary data size</i>
+</pre>
+      </div>
+      <p class="overview_content"> Lists are in the form of <span class="style_inline_code">NULL</span>-terminated arrays of C-strings. </p>
+      <h4 class="overview_title">
+        <a name="RaHM_R3M">Remote Messages.</a>
+      </h4>
+      <p class="overview_content"> Remote messages are received when a command is sent to a client with the intention of that client forwarding it outside of the current Resourcerver system. They aren't used in normal client programs and most systems won't require their functionality directly. They're currently reserved for IPC forwarders, which aren't currently supported for third-party development. </p>
+      <h4 class="overview_title">
+        <a name="RaHM_IM">Info Messages.</a>
+      </h4>
+      <p class="overview_content"> Info messages are similar to requests, but they're intended for informational purposes only. No response is generally requested with info messages, but they can still be provided. Use the functions below with info messages. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<b>#define RSERVR_IS_INFO(msg)</b>         <i>//check if the message is info-only</i>
+<b>#define RSERVR_TO_INFO_MESSAGE(msg)</b> <i>//convert the info message to it's text data</i>
+<b>#define RSERVR_TO_INFO_BINARY(msg)</b>  <i>//convert the info message to it's binary data</i>
+<b>#define RSERVR_INFO_SIZE(msg)</b>       <i>//find a info message's binary data size</i>
+</pre>
+      </div>
+      <p></p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="BtWfM">Blocking to Wait for Messages.</a>
+      </h3>
+      <p class="overview_content"> In most cases it isn't appropropriate to wait for messages using a function hooked with <span class="style_inline_code">set_queue_event_hook</span> because that function will hold up the message queue while it's processing those messages. To avoid this, you can synchronize any thread to the message queue with the functions below. These are generally used when running a background (vs. an inline) message queue. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<i>//block the current thread until the queue receives message</i>
+<b>result message_queue_sync(pthread_mutex_t*);</b>
+<i>//provide an unlocked mutex</i>
+
+<i>//manually release all threads blocked to wait for messages</i>
+<b>void queue_sync_continue();</b>
+</pre>
+      </div>
+      <p class="overview_content"> A successful return from <span class="style_inline_code">message_queue_sync</span> may denote any number of messages, even none (normally only true when using <span class="style_inline_code">queue_sync_continue</span>.) The function will return with an error if it's called from within the message queue thread itself, such as from a plug-in hook or from a function hooked into the queue with <span class="style_inline_code">set_queue_event_hook</span>, to prevent a lockout. The function will also return with an error if the queue is no longer running and no messages are waiting. </p>
+      <div align="center">
+        <pre class="example_box code_box source_box">
+<b><u>#include &lt;pthread.h&gt;</u></b>
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<i>//this function (if used) would likely be called as the last line of <span class="style_inline_code">main</span></i>
+
+result await_messages()
+{
+	pthread_mutex_t wait_mutex = PTHREAD_MUTEX_INITIALIZER;
+	if (pthread_mutex_init(&wait_mutex, NULL) &lt; 0) return 0;
+
+	const struct <b>message_info</b> *message = NULL;
+
+	while (<b>message_queue_sync</b>(&wait_mutex))
+	{
+
+	while ((message = <b>current_message</b>()))
+	 {
+	<i>//deal with message</i>
+
+	<b>remove_message</b>(message);
+	 }
+
+	}
+
+	return 1;
+}
+</pre>
+      </div>
+      <p></p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="RToM">Restricting Types of Messages.</a>
+      </h3>
+      <p class="overview_content"> Most clients will want to restrict certain types of messages so that they don't have to continually free themselves from unwanted clutter. By default, normal requests and responses are allowed and remote messages are not. Use the functions below to further exercise control over the types of message a client will accept. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<i>//use the functions below to control all messages</i>
+
+<i>//don't allow any messages from anywhere</i>
+<b>void block_messages();</b>
+
+<i>//allow all non-remote messages</i>
+<b>void allow_messages();</b>
+
+<i>//check the status of message blocking</i>
+<b>result block_messages_status();</b>
+
+
+<i>//use the functions to limit messages to responses</i>
+
+<i>//allow only responses from the server</i>
+<b>void allow_privileged_responses();</b>
+
+<i>//allow only responses, but from anywhere</i>
+<b>void allow_responses();</b>
+
+<i>//check the status of only-from-server responses</i>
+<b>result allow_privileged_responses_status();</b>
+
+<i>//check the status of only responses</i>
+<b>result allow_responses_status();</b>
+
+
+<i>//use the functions below to control remote messages</i>
+
+<i>//don't allow any remote messages (default)</i>
+<b>void block_remote();</b>
+
+<i>//allow all remote messages</i>
+<b>void allow_remote();</b>
+
+<i>//check the status of blocking remote messages</i>
+<b>result block_remote_status();</b>
+</pre>
+      </div>
+      <p class="overview_content"> All of the functions above that effect non-remote messages will change the entire state of what non-remote messages are allowed. </p>
+      <p class="overview_content"> Normally the message-acceptance state should be set before starting the message queue. If your client doesn't have a thread that regularly checks for messages then you should block all messages except for when you're expecting one, then clear the message list and start blocking messages again when you're done with the messages you expected. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="PtMQ">Pausing the Message Queue.</a>
+      </h3>
+      <p class="overview_content"> Eventually a client's message queue will reach capacity if the client fails to process and remove messages quickly enough. Once that happens, the client will reject all new messages with an automatic response, but that doesn't stop the message queue thread from parsing new messages; therefore, a client can end up spending most of its time rejecting new messages and almost no time processing its backlog of messages. In extreme situations, it is therefore necessary to pause the message queue thread to prevent the parsing of <i>any</i> new data. This has the following drawbacks: </p>
+      <ul class="other_bullet_list">
+        <li class="overview_content"> The client won't receive non-message information, such as success or failure notifications for sent commands. This can have an adverse impact if a response is required before a message can be safely removed from the queue. <br />
+          <br />
+        </li>
+        <li class="overview_content"> The server will requeue commands originating from <i>other clients</i> while the client's message queue is paused, but only a finite number of times per command. This means that responses originating from the server will be discarded and, after a short period of time, other commands will also be discarded. An inter-client message will fail with <span class="style_inline_code">event_discarded</span> if the target client is paused for so long that the server gives up. The time limit entirely depends on the server's load and the retry parameters set in <span class="style_file_name">param.h</span>. <br />
+          <br />
+        </li>
+        <li class="overview_content"> The client won't be notified if it's been disconnected from the server or if the server exited until the queue is unpaused. <br />
+          <br />
+        </li>
+      </ul>
+      <p>
+      </p>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> Don't use message-queue pausing if you process messages from an inline message queue; this can cause the client to freeze (even beyond server termination if no timeout is used) and it won't allow the client to process a backlog of messages. </p>
+        </div>
+      </div>
+      <p class="overview_content"> Despite these drawbacks, pausing the message queue is a necessary measure when a client becomes inundated with message traffic. Not only does it allow the client to silence input temporarily, but it indicates to the server that the client is overloaded. </p>
+      <p class="overview_content"> The functions below allow clients to pause the message queue, either indefinitely, for a short period of time, or automatically. These functions may be used within message-queue hooks; that in particular won't cause the queue to deadlock. Pausing will take effect at the beginning of the thread's next cycle, just before it parses new input. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
+
+<i>//use the functions below to pause the message queue</i>
+
+<i>//pause the message queue (no effect if already paused)</i>
+<b>result message_queue_pause();</b>
+
+<i>//unpause the message queue (cancels any pending timeout)</i>
+<b>result message_queue_unpause();</b>
+
+<i>//current pause state (also indicates an impending pause)</i>
+<b>result message_queue_pause_state();</b>
+
+<i>//pause the message queue with timeout (cancels any previous timeout)</i>
+<b>result message_queue_timed_pause(long_time);</b>
+
+<i>//enable automatic message-queue pausing</i>
+<b>result message_queue_auto_pause(double, double, long_time);</b>
+<i>/* the first argument indicates the threshold limit and the second argument indicates 
+   the restore mark, both by percentage of queue fullness, (0,1] and [0,1), respectively.
+   the third argument indicates the timeout value once the queue is paused, in seconds.
+   once the message queue reaches the threshold it pauses for the time given, or until
+   the queue fullness has dropped below the restore mark, whichever happens first. the
+   restore mark must be less than the threshold limit. a timeout of zero will cause no
+   timeout to occur. provide a value of zero for all to disable previous settings. */</i>
+</pre>
+      </div>
+      <p>
+      </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="command-queue.html" class="overview_link">Previous - Using the Command Queue</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="client-administration.html" class="overview_link">Next - Basic Client Administration</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
