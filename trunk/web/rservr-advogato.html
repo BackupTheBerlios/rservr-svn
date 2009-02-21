@@ -4,13 +4,20 @@
       <table>
         <tr>
           <td>
-            <a href="http://rservr.berlios.de/" target="_blank"><img src="http://rservr.berlios.de/rservr-rabbit2.png" width="150" height="150" border="0" alt="Resourcerver Bunny" /></a>
+            <a href="http://rservr.berlios.de/"
+target="_blank"><img
+src="http://rservr.berlios.de/rservr-rabbit2.png"
+width="150" height="150" border="0" alt="Resourcerver Bunny"
+/></a>
           </td>
           <td>
             <table>
               <tr>
                 <td align="center">
-                  <a href="http://rservr.berlios.de/" target="_blank"><b><span style="color:#220066;">Resourcerver</span></b></a> - a framework for modularized control of *nix applications </td>
+                  <a href="http://rservr.berlios.de/"
+target="_blank"><b><span
+style="color:#220066;">Resourcerver</span></b></a> - a
+framework for modularized control of *nix applications </td>
               </tr>
               <tr>
                 <td>
@@ -22,19 +29,26 @@
                     <tr>
                       <td align="right"> main:&nbsp; </td>
                       <td>
-                        <i><a href="http://rservr.berlios.de/" target="_blank">http://rservr.berlios.de/</a></i>
+                        <i><a
+href="http://rservr.berlios.de/"
+target="_blank">http://rservr.berlios.de/</a></i>
                       </td>
                     </tr>
                     <tr>
                       <td align="right"> subversion:&nbsp; </td>
                       <td>
-                        <i><a href="http://svn.berlios.de/svnroot/repos/rservr/" target="_blank">http://svn.berlios.de/svnroot/repos/rservr/</a></i>
+                        <i><a
+href="http://svn.berlios.de/svnroot/repos/rservr/trunk/"
+target="_blank">http://svn.berlios.de/svnroot/repos/rservr/trunk/</a></i>
                       </td>
                     </tr>
                     <tr>
-                      <td align="right"> browse source:&nbsp; </td>
+                      <td align="right"> browse
+source:&nbsp; </td>
                       <td>
-                        <i><a href="http://svn.berlios.de/wsvn/rservr/" target="_blank">http://svn.berlios.de/wsvn/rservr/</a></i>
+                        <i><a
+href="http://svn.berlios.de/wsvn/rservr/trunk/"
+target="_blank">http://svn.berlios.de/wsvn/rservr/trunk/</a></i>
                       </td>
                     </tr>
                   </table>
@@ -47,25 +61,84 @@
     </td>
   </tr>
   <tr>
-    <td align="justify"> Resourcerver is a set of libraries and programs used as the control infrastructure of multi-process applications. An instance of an application consists of the <code>rservr</code> server daemon and the processes that server binds together. The server is the starting point of the application, which in turn spawns each of the application's component processes, referred to as "clients." Clients are the 3rd-party functional components of the application written with the <a href="http://rservr.berlios.de/api/index.html">Resourcerver API</a> to allow them to interface with the rest of the system. <br /> <br /> </td>
+    <td align="justify"> Resourcerver is a set of libraries
+and programs used as the control infrastructure of
+multi-process applications. An instance of an application
+consists of the <code>rservr</code> server daemon and the
+processes that server binds together. The server is the
+starting point of the application, which in turn spawns each
+of the application's component processes, referred to as
+"clients." Clients are the 3rd-party functional components
+of the application written with the <a
+href="http://rservr.berlios.de/api/index.html">Resourcerver
+API</a> to allow them to interface with the rest of the
+system. <br /> <br /> </td>
   </tr>
   <tr>
     <td align="center">
-      <a href="http://rservr.berlios.de/user/introduction.html#AS_RtAL" target="_blank"><img src="http://rservr.berlios.de/user/runtime-layout.png" width="500" height="438" border="0" alt="Run-time
+      <a
+href="http://rservr.berlios.de/user/introduction.html#AS_RtAL"
+target="_blank"><img
+src="http://rservr.berlios.de/user/runtime-layout.png"
+width="500" height="438" border="0" alt="Run-time
 Application Layout" /></a> <br /> <br />
     </td>
   </tr>
   <tr>
-    <td align="justify"> Although the diagram above makes <code>rservr</code> appear to be an IPC server like many others, its purpose is to bind the application together and regulate its operation.  The server daemon regulates the <i>control</i> IPC of the application by enforcing several permission sets. Each client process must select a permission set defining what that client's general purpose is. These permissions restrict which other types of client one can communicate with and what actions it can perform on the server daemon. The system defines permissions for three main types of client: admin clients, to control the structure of the application; control clients, to actively control the processes carried out; and resource clients, to actually carry out those processes. <br /> <br /> </td>
+    <td align="justify"> Although the diagram above makes
+<code>rservr</code> appear to be an IPC server like many
+others, its purpose is to bind the application together and
+regulate its operation.  The server daemon regulates the
+<i>control</i> IPC of the application by enforcing several
+permission sets. Each client process must select a
+permission set defining what that client's general purpose
+is. These permissions restrict which other types of client
+one can communicate with and what actions it can perform on
+the server daemon. The system defines permissions for three
+main types of client: admin clients, to control the
+structure of the application; control clients, to actively
+control the processes carried out; and resource clients, to
+actually carry out those processes. <br /> <br /> </td>
   </tr>
   <tr>
-    <td align="justify"> Client processes communicate with each other using well-defined data bursts referred to as "commands." Each command has creation and execution permissions associate with it, as well as compiled-in actions that are executed at the final destination. The emphasis here is that the IPC system <i>isn't</i> intended for data transfer; it's intended for communication to control the operations of the application as a whole. <br /> <br /> </td>
+    <td align="justify"> Client processes communicate with
+each other using well-defined data bursts referred to as
+"commands." Each command has creation and execution
+permissions associate with it, as well as compiled-in
+actions that are executed at the final destination. The
+emphasis here is that the IPC system <i>isn't</i> intended
+for data transfer; it's intended for communication to
+control the operations of the application as a whole. <br />
+<br /> </td>
   </tr>
   <tr>
-    <td align="justify"> Resourcerver has an expandable IPC system to allow 3rd-party command plug-ins. A plug-in is loaded at run time by both the originator of the command and the target; by loading a plug-in, potential targets consent to execution of the associated commands when they arrive. The core system contains several plug-ins, all of which rely on hook functions being defined by potential targets. Commands execute their respective hook functions when they arrive at a target, providing the function with the parameters sent with the command. One of the more illustrative examples is a plug-in library to request networking actions. One command in the plug-in is a request for a target to connect to a host; however, the plug-in doesn't define how that will happen. The implementation of the action is left up to the target when the plug-in provides the hook function with the requested parameters of the connection (such as the address and port.) <br /> <br /> </td>
+    <td align="justify"> Resourcerver has an expandable IPC
+system to allow 3rd-party command plug-ins. A plug-in is
+loaded at run time by both the originator of the command and
+the target; by loading a plug-in, potential targets consent
+to execution of the associated commands when they arrive.
+The core system contains several plug-ins, all of which rely
+on hook functions being defined by potential targets.
+Commands execute their respective hook functions when they
+arrive at a target, providing the function with the
+parameters sent with the command. One of the more
+illustrative examples is a plug-in library to request
+networking actions. One command in the plug-in is a request
+for a target to connect to a host; however, the plug-in
+doesn't define how that will happen. The implementation of
+the action is left up to the target when the plug-in
+provides the hook function with the requested parameters of
+the connection (such as the address and port.) <br /> <br />
+</td>
   </tr>
   <tr>
-    <td align="justify"> Resourcerver has many other features and capabilities not given here. It has extensive documentation at the main page listed above. This is more of a random summary of the project as a whole; therefore, it might not accurately reflect the project's purpose. This is a large project that can't be explained well in one page. <br /> <br /> </td>
+    <td align="justify"> Resourcerver has many other
+features and capabilities not given here. It has extensive
+documentation at the main page listed above. This is more of
+a random summary of the project as a whole; therefore, it
+might not accurately reflect the project's purpose. This is
+a large project that can't be explained well in one page.
+<br /> <br /> </td>
   </tr>
 </table>
 <hr />
