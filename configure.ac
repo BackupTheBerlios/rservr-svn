@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(rservr-core, gamma.1, [Kevin P. Barry (ta0kira@users.sourceforge.net)])
+AC_INIT(rservr-core, gamma.2, [Kevin P. Barry (ta0kira@users.berlios.de)])
 AM_INIT_AUTOMAKE([dist-bzip2])
 
 AC_CONFIG_FILES([ Makefile

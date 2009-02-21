@@ -11,5 +11,5 @@ cd "$actual"
 
 rm -f $(find -name "*~")
 
-tar --owner=root --group=root -cvvzf "$file" api app fragment.png index.html \
-  rservr-rabbit2.png rservr.css user
+tar --owner=root --group=root -cvvjf "$file" $( find api/ app user -type f | grep -v '/\.' ) \
+  fragment.png index.html rservr-rabbit2.png rservr.css
