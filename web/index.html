@@ -1,245 +1,71 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <title>Resourcerver - *nix Resource Server</title>
-    <meta name="generator" content="Bluefish 1.0.7"/>
-    <link href="rservr.css" rel="stylesheet" type="text/css" />
-  </head>
-  <body class="page_body">
-    <div align="center" class="page_title_frame" style="background-color: #ffffff; background-image: url(fragment.png); background-repeat: no-repeat;">
-      <table summary="page title block">
+<table>
+  <tr>
+    <td align="center">
+      <table>
         <tr>
-          <td width="350" align="left">
-            <img alt="Resourcerver Bunny" src="rservr-rabbit2.png" height="250" width="250" />
+          <td>
+            <a href="http://rservr.berlios.de/" target="_blank"><img src="http://rservr.berlios.de/rservr-rabbit2.png" width="150" height="150" border="0" alt="Resourcerver Bunny" /></a>
           </td>
           <td>
-            <div>
-              <h1 align="center" class="page_title"> Resourcerver - *nix Resource Server </h1>
-            </div>
-            <div>
-              <h2 align="center" class="page_subtitle"> Project Overview - Main Page </h2>
-            </div>
+            <table>
+              <tr>
+                <td align="center">
+                  <a href="http://rservr.berlios.de/" target="_blank"><b><span style="color:#220066;">Resourcerver</span></b></a> - a framework for modularized control of *nix applications </td>
+              </tr>
+              <tr>
+                <td>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <table>
+                    <tr>
+                      <td align="right"> main:&nbsp; </td>
+                      <td>
+                        <i><a href="http://rservr.berlios.de/" target="_blank">http://rservr.berlios.de/</a></i>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="right"> subversion:&nbsp; </td>
+                      <td>
+                        <i><a href="http://svn.berlios.de/svnroot/repos/rservr/" target="_blank">http://svn.berlios.de/svnroot/repos/rservr/</a></i>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="right"> browse source:&nbsp; </td>
+                      <td>
+                        <i><a href="http://svn.berlios.de/wsvn/rservr/" target="_blank">http://svn.berlios.de/wsvn/rservr/</a></i>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
       </table>
-    </div>
-    <div class="overview_box">
-      <h3 class="overview_title"> Purpose of this Project. </h3>
-      <p class="overview_content"> Resourcerver is a *nix ("Unix<sup>&reg;</sup>-like operating systems" such as Linux and FreeBSD) framework for large, multi-process applications. Resourcerver is intended to help developers create large applications using several smaller, special-purpose programs by controlling their run-time structures and by facilitating control-oriented IPC between the special-purpose components. </p>
-      <p class="overview_content"> Resourcerver is intended to be the permeating structural entity of an application designed to utilize it.  Resourcerver functions by providing a daemonized server process for each instance of each application.  All of the application's components are connected to that server and communicate with each other through it.  This communication is regulated by the server to bring stability to the application as a whole, thereby increasing its reliability.  Communication regulation is based on a role-based model where each of the application's processes has a discrete category within the context of the Resourcerver system.  These categories define the fundamental requirements of how each process can interact with the system. </p>
-      <p class="overview_content"> Applications built around Resourcerver will generally use programs with discretely-defined functionality. Ideally, an application will use separate programs to manage data retrieval, data processing, network connections, and user control over the application. The Resourcerver system will assemble these programs as a set of processes attached to a single server based on a configuration specified at run-time, allowing for dynamic application instances. </p>
-      <p class="overview_content"> The individual programs used in an application can be written by the application's developer in either C or C++ using the Resourcerver API. The API provides a simple C interface between the running program and the Resourcerver libraries. The Resourcerver libraries manage all communication with the server based on the actions taken by the running program. Communication with other processes is routed through the server for security and "sanity" filtering. </p>
-      <p class="overview_content"> The main purpose of the server in a Resourcerver application is to bind third-party programs into a dynamic system to form an application. Incidentally, it must facilitate IPC while exercising security control over the application. Most of the application's processes will be created by the server itself so that it can control the process' user and group IDs (super-user applications can use multiple users and groups,) which the server strictly regulates. </p>
-      <p class="overview_content"> The primary benefit of creating an application with Resourcerver is the ability to modify the structure of the application while it's running. This allows the application to be assembled in a series of steps, allows isolation and correction of run-time errors, allows different instances of the application to have different structures, and lastly allows the application to be shut down incrementally. </p>
-      <p class="overview_content"> The core Resourcerver package includes IPC-forwarding programs that allow an application to relocate processes across network connections. These programs don't have built-in network security, but allow loading of specially-designed network security plug-ins at run-time to provide potentially strong network control. </p>
-      <p class="overview_content"> The Resourcerver IPC system is fully extensible. The core package includes and utilized several standardized extensions that can be used as examples for third-party extensions. The inner workings and other pertinent information about the IPC system are discussed in detail in the project's documentation (see the links below.) </p>
-    </div>
-    <div class="overview_box">
-      <h3 class="overview_title"> Recent Project News. </h3>
-      <p class="overview_content">
-     <span class="news_date">February 20<sup>th</sup>, 2009:</span> Permanently migrated project hosting from SourceForge.net to BerliOS.de. <br />
-        <br />
-      </p>
-      <p class="overview_content">
-     <span class="news_date">February 16<sup>th</sup>, 2009:</span> Added a <a class="general_link" href="http://svn.berlios.de/svnroot/repos/rservr/">subversion repository mirror</a> for public access.  The link given can be used with <span class="style_command_line">svn</span> command-line client, or you can browse the source and changes <a class="general_link" href="http://svn.berlios.de/wsvn/rservr/">directly</a> from the web.  I'd tracked changes with CVS for quite a while; however, the structure changed too often for me to keep up.  Version control restarts from just after the last beta release.  Formal releases will carry the "gamma" designator, but should still be considered beta releases.  The mirror repository is a copy of the repository on my development machine.  I only plan to synchronize the mirror when the code compiles and runs; not between those times. <br />
-        <br />
-      </p>
-      <p class="overview_content">
-     <span class="news_date">December 22<sup>nd</sup>, 2008:</span> Added a network security filter to temporarily deny attempted reconnections by hosts disconnected for errors. This filter is a socket-forwarder plug-in intended to mitigate the effects of port scanners. After disconnecting a host for sending bad data, etc., the forwarder will notify the filter, which will tabulate the host's address. The filter will deny incoming connections from that host for a period of time specified when the filter is loaded, preventing performance degradation caused by unfriendly programs. <br />
-        <br />
-      </p>
-      <p class="overview_content">
-        <span class="news_date">December 20<sup>th</sup>, 2008:</span> First successful high-intensity network test. This required quite a bit of tuning to get it to work properly and with reproducible results. This test was performed by sending a "ping server" message from a client to the server on a remote machine 1024 times within about 3 seconds. This caused severe problems initially, but after about 10 hours of troubleshooting and with the addition of message-queue pausing I got it to reliably respond to all effective ping messages (some were discarded by the server as a self-protection measure to prevent a crash due to a backlog at the forwarder.) <br />
-        <br />
-      </p>
-      <p class="overview_content">
-        <span class="news_date">December 16<sup>th</sup>, 2008:</span> Completion of the first successful wide-area-network (WAN) test between Resourcerver systems. This involved two machines: one with a static IP address on a controlled network and one with a dynamic wireless IP address. The machine with the static IP listened to a port and the other connected. I proceeded to poll the wireless-IP server for registered Resourcerver services from the static-IP server, and succeeded in having the wireless-IP server automatically register a remote service with the static-IP server. Upon disconnecting the wireless-IP server, the static-IP server registered the loss of connection with no human-visible delay. While I've performed a substantial number of local-machine network tests, this was the first test between two separate machines. <br />
-        <br />
-      </p>
-      <p class="overview_content">
-        <span class="news_date">December 8<sup>th</sup>, 2008:</span> Addition of a "respawn" client. This client will monitor other clients (specified with a configuration file) and if they disconnect for any reason (e.g. crash or are killed,) this client will restart them. The respawn client is a very powerful addition to the system because it allows "self-healing" applications, which can be especially useful for remote systems. <br />
-        <br />
-      </p>
-      <p class="overview_content">
-        <span class="news_date">November 29<sup>th</sup>, 2008:</span> Addition of command substitution in configuration files. While the sematics are very limited, this provides a very powerful interface between the shell and the configuration stage of the server (and some client programs.) <br />
-        <br />
-      </p>
-      <p class="overview_content">
-        <span class="news_date">November 1<sup>st</sup>, 2008:</span> Release of the first beta version. This version contains several improvements over the last alpha version. This release marks a significant shift toward the eventual prototyping of ideal implementation methods, which will be the major focus of the beta versions. The secondary focus will be on securing super-user server instances. This release comes with a refined emphasis of purpose as a structural framework instead of merely an IPC infrastructure. Future project efforts will follow this refined philosophy. <br />
-        <br />
-      </p>
-      <p class="overview_content">
-        <span class="news_date">August 7<sup>th</sup>, 2008:</span> Release of the first fully-functional example application. This application is a very simple simulation of a home automation system. Development of this example resulted in quite a few project improvements. <br />
-        <br />
-      </p>
-      <p class="overview_content">
-        <span class="news_date">April 13<sup>th</sup>, 2008:</span> The initial versions of the project's documentation are complete. I'm performing final checks before posting the initial release. <i>Update:</i> Initial release posted the same day. <br />
-        <br />
-      </p>
-      <p class="overview_content">
-        <span class="news_date">February 24<sup>th</sup>, 2008:</span> Posted the first version of this front page. I'm currently working on the API reference and rewriting the guides (composting the working guides.) The first release should be out around the beginning of summer 2008. <br />
-        <br />
-      </p>
-      <p class="overview_content">
-        <span class="news_date">February 18<sup>th</sup>, 2008:</span> The core Resourcerver package is complete and awaiting documentation. Initial release won't happen before at least the user's and application developer's guides are complete. The initial API documentation is nearly complete. <br />
-        <br />
-      </p>
-    </div>
-    <div class="overview_box">
-      <h3 class="overview_title"> Project Resources. </h3>
-      <ul class="overview_link_list">
-        <li>
-          <a href="https://developer.berlios.de/projects/rservr/" target="_blank" class="overview_link">Resourcerver Download Site.</a> <span style="font-size:smaller; vertical-align:text-top;">&nbsp;<a class="general_link" href="http://svn.berlios.de/svnroot/repos/rservr/">[subversion]</a> &nbsp;<a class="general_link" href="http://svn.berlios.de/wsvn/rservr/">[browse source]</a></span>
-          <br />
-          <span class="overview_link_info">The official download site for the Resourcerver Project.</span>
-          <br />
-          <br />
-        </li>
-        <li>
-          <a href="user/user-guide.html" target="_blank" class="overview_link">Resourcerver User's Guide.</a>
-          <br />
-          <span class="overview_link_info">An in-depth guide for programmers and non-programmers.</span>
-          <br />
-          <br />
-        </li>
-        <li>
-          <a href="app/app-developer-guide.html" target="_blank" class="overview_link">Resourcerver Application Development Guide.</a>
-          <br />
-          <span class="overview_link_info">An introductory guide for programmers writing clients and assembling applications.</span>
-          <br />
-          <br />
-        </li>
-        <li>
-          <a href="api/index.html" target="_blank" class="overview_link">Resourcerver C/C++ API Reference.</a>
-          <br />
-          <span class="overview_link_info">A complete reference of the Resourcerver C/C++ API.</span>
-          <br />
-          <br />
-        </li>
-        <li>
-          <!-- href="command/command-developer-guide.html" --><a target="_blank" class="overview_link"><strike>Resourcerver Command Plug-in Development Guide.</strike></a>
-          <br />
-          <span class="overview_link_info">An (unfinished) in-depth guide for programmers writing command plug-ins.</span>
-          <br />
-          <br />
-        </li>
-        <li>
-          <!-- href="security/security-developer-guide.html" --><a target="_blank" class="overview_link"><strike>Resourcerver Security Plug-in Development Guide.</strike></a>
-          <br />
-          <span class="overview_link_info">An (unfinished) in-depth guide for programmers writing network security filter plug-ins.</span>
-          <br />
-        </li>
-      </ul>
-    </div>
-    <div class="split_overview_box" align="center">
-      <table style="width: 100%; table-layout: fixed; border-spacing: 0px;" summary="related project links">
-        <tr style="vertical-align: top;">
-          <td class="overview_box">
-            <h3 class="overview_title"> Resourcerver Applications. </h3>
-            <p class="overview_content"> (nothing available at this time) </p>
-          </td>
-          <td style="width: 20px;">
-          </td>
-          <td class="overview_box">
-            <h3 class="overview_title"> Resourcerver Clients and Plug-ins. </h3>
-            <p class="overview_content"> (nothing available at this time) </p>
-          </td>
-        </tr>
-      </table>
-    </div>
-    <div class="overview_box">
-      <h3 class="overview_title"> Resourcerver Terms of Use. </h3>
-      <div style="font-size: smaller;">
-        <p class="overview_content">
-          <b>This software is released under the <u>BSD License</u>.</b>
-        </p>
-        <p class="overview_content"> Copyright (c) <b>2008</b>, <b>Kevin P. Barry</b>
-        </p>
-        <p class="overview_content"> All rights reserved. </p>
-        <p class="overview_content"> Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: </p>
-        <ul class="overview_bullet_list">
-          <li class="overview_content"> Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. <br />
-            <br />
-          </li>
-          <li class="overview_content"> Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. <br />
-            <br />
-          </li>
-          <li class="overview_content"> Neither the name of the <b>Resourcerver Project</b> nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission. <br />
-            <br />
-          </li>
-        </ul>
-        <p class="overview_content" style="font-size: smaller;"> THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. </p>
-      </div>
-    </div>
-    <div class="overview_box">
-      <h3 class="overview_title"> Acknowledgements and "Thanks". </h3>
-      <p class="overview_content"> I'll list your name, project, or organization here if you provide a significant contribution to the Resourcerver Project. I'll ask before listing any individual person or private project/organization in case you don't want to be known publicly. I can't list <i>everyone</i> here; therefore, I'll only list those who've expended a generous amount of time or effort, so as to not trivialize major contributions. </p>
-      <h4 class="overview_title"> Code Contributions, Bug Fixes, and Quality Improvements. </h4>
-      <div class="thanks_table">
-        <table class="overview_content">
-          <tr>
-            <td class="thanks_title"><b></b></td>
-            <td></td>
-          </tr>
-        </table>
-      </div>
-      <p></p>
-      <h4 class="overview_title"> Development Tools. </h4>
-      <div class="thanks_table">
-        <table class="overview_content">
-          <tr>
-            <td class="thanks_title"><b>GNU Project</b></td>
-            <td>Free compiler, libc with extensive documentation, and automatic build system</td>
-          </tr>
-          <tr>
-            <td class="thanks_title"><b>Slackware Project</b></td>
-            <td>Free, stable operating system for users who insist on doing things manually</td>
-          </tr>
-          <tr>
-            <td class="thanks_title"><b>Eclipse Project</b></td>
-            <td>Free IDE, but mostly just used as a text editor</td>
-          </tr>
-          <tr>
-            <td class="thanks_title"><b>Bluefish Project</b></td>
-            <td>Free HTML editor with built-in reference documents</td>
-          </tr>
-        </table>
-      </div>
-      <p></p>
-      <h4 class="overview_title"> General. </h4>
-      <div class="thanks_table">
-        <table class="overview_content">
-          <tr>
-            <td class="thanks_title"><b>LinuxQuestions.org</b></td>
-            <td>Suggestions and ideas from other users</td>
-          </tr>
-          <tr>
-            <td class="thanks_title"><b>BerliOS.de</b></td>
-            <td>Free project hosting, February 2009 - present</td>
-          </tr>
-          <tr>
-            <td class="thanks_title"><b>SourceForge.net</b></td>
-            <td>Free project hosting, April 2007 - February 2009</td>
-          </tr>
-        </table>
-      </div>
-      <p></p>
-    </div>
-    <hr />
-    <table style="width: 100%; table-layout: fixed;" summary="footer info">
-      <tr>
-        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
-        </td>
-        <td align="center">
-          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
-        </td>
-        <td class="signature" align="right">
-          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>
+    </td>
+  </tr>
+  <tr>
+    <td align="justify"> Resourcerver is a set of libraries and programs used as the control infrastructure of multi-process applications. An instance of an application consists of the <code>rservr</code> server daemon and the processes that server binds together. The server is the starting point of the application, which in turn spawns each of the application's component processes, referred to as "clients." Clients are the 3rd-party functional components of the application written with the <a href="http://rservr.berlios.de/api/index.html">Resourcerver API</a> to allow them to interface with the rest of the system. <br /> <br /> </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="http://rservr.berlios.de/user/introduction.html#AS_RtAL" target="_blank"><img src="http://rservr.berlios.de/user/runtime-layout.png" width="500" height="438" border="0" alt="Run-time
+Application Layout" /></a> <br /> <br />
+    </td>
+  </tr>
+  <tr>
+    <td align="justify"> Although the diagram above makes <code>rservr</code> appear to be an IPC server like many others, its purpose is to bind the application together and regulate its operation.  The server daemon regulates the <i>control</i> IPC of the application by enforcing several permission sets. Each client process must select a permission set defining what that client's general purpose is. These permissions restrict which other types of client one can communicate with and what actions it can perform on the server daemon. The system defines permissions for three main types of client: admin clients, to control the structure of the application; control clients, to actively control the processes carried out; and resource clients, to actually carry out those processes. <br /> <br /> </td>
+  </tr>
+  <tr>
+    <td align="justify"> Client processes communicate with each other using well-defined data bursts referred to as "commands." Each command has creation and execution permissions associate with it, as well as compiled-in actions that are executed at the final destination. The emphasis here is that the IPC system <i>isn't</i> intended for data transfer; it's intended for communication to control the operations of the application as a whole. <br /> <br /> </td>
+  </tr>
+  <tr>
+    <td align="justify"> Resourcerver has an expandable IPC system to allow 3rd-party command plug-ins. A plug-in is loaded at run time by both the originator of the command and the target; by loading a plug-in, potential targets consent to execution of the associated commands when they arrive. The core system contains several plug-ins, all of which rely on hook functions being defined by potential targets. Commands execute their respective hook functions when they arrive at a target, providing the function with the parameters sent with the command. One of the more illustrative examples is a plug-in library to request networking actions. One command in the plug-in is a request for a target to connect to a host; however, the plug-in doesn't define how that will happen. The implementation of the action is left up to the target when the plug-in provides the hook function with the requested parameters of the connection (such as the address and port.) <br /> <br /> </td>
+  </tr>
+  <tr>
+    <td align="justify"> Resourcerver has many other features and capabilities not given here. It has extensive documentation at the main page listed above. This is more of a random summary of the project as a whole; therefore, it might not accurately reflect the project's purpose. This is a large project that can't be explained well in one page. <br /> <br /> </td>
+  </tr>
+</table>
+<hr />
