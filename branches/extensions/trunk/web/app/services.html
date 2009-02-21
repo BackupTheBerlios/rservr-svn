@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver Application Developement Guide - Using the Services System</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver Application Developement Guide </h1>
+      <h2 align="center" class="page_subtitle"> Using the Services System </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="client-administration.html" class="overview_link">Previous - Basic Client Administration</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="command-plugin.html" class="overview_link">Next - Using Plug-in Commands</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#RS" class="overview_link">Registering Services.</a>
+          <div>
+            <ul class="toc_list">
+              <li>
+                <a href="#RS_LS" class="overview_link">Local Services.</a>
+              </li>
+              <li>
+                <a href="#RS_RS" class="overview_link">Remote Services.</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <a href="#CUS" class="overview_link">Communicating Using Services.</a>
+        </li>
+        <li>
+          <a href="#SR" class="overview_link">Service Restrictions.</a>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="RS">Registering Services.</a>
+      </h3>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> A client <i>must</i> be registered as a resource client in order to register services. </p>
+        </div>
+      </div>
+      <h4 class="overview_title">
+        <a name="RS_LS">Local Services.</a>
+      </h4>
+      <p class="overview_content"> Registering services requires two pieces of information: a service name and a service type. The service name serves as an alias for the client with one minor difference: only other service clients can send commands to a service. The service-type identifier is arbitrary as far as server operation and is only used when a service performs a search for registered services. The service name is subject to the same naming restrictions as client names and <i>cannot</i> duplicate an existing service or client name, even if the service type is different. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/resource-client.h&gt;</u></b>
+
+<i>//the first argument is the service name and the second is the service type</i>
+<b>command_handle register_service(text_info, text_info);</b>
+
+<i>//deregister all services when they're no longer valid</i>
+<b>command_handle deregister_own_service(text_info);
+command_handle deregister_all_own_services();</b>
+</pre>
+      </div>
+      <p class="overview_content"> Once the command is created, send it using the command queue. </p>
+      <h4 class="overview_title">
+        <a name="RS_RS">Remote Services.</a>
+      </h4>
+      <p class="overview_content"> Remote services allow clients on remote servers to send commands to a client without knowing or using its address scope. In other words, it appears as if the service is local to the remote server. </p>
+      <p class="overview_content"> Register remote services by adding a target address to the registration command before sending it, then send the command. See the <a href="command-queue.html#ATA" class="general_link">command queue section</a> for information about adding a target address to a command. Deregister services in the same manner. </p>
+      <p class="overview_content"> All clients along the path between the originating client and the remote server must <i>also</i> be resource clients. To make identification simpler, all of the standard forwarders that register themselves as resource clients end in <span class="style_command_line">relay</span>, and also register a service ending in the same. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="CUS">Communicating Using Services.</a>
+      </h3>
+      <p class="overview_content"> Use the functions below to send basic commands using services. These are very similar to other messaging commands, but these commands are restricted for use by service clients. The target name can be the name of a service <i>or</i> of a client. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/request.h&gt;</u></b>
+
+<i>//the first argument is the target of the request and the second is the request data</i>
+<b>command_handle service_request(text_info, text_info);</b>
+
+<i>//same as above but using raw binary data</i>
+<b>command_handle binary_service_request(text_info, binary_info, binary_size);</b>
+</pre>
+      </div>
+      <p class="overview_content"> Use the function below to search for locally-registered services. Optionally, add an address once the command is queued to find services on a remote server. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/service-client.h&gt;</u></b>
+
+<i>//find services using name and type regular expressions</i>
+<b>command_handle find_services(text_info, text_info);</b>
+
+<i>//insert the address of a service for command forwarding (use service names only)</i>
+<b>result insert_service_address(command_handle, text_info);</b>
+</pre>
+      </div>
+      <p class="overview_content"> Use the commands below to provide basic service responses to <i>any</i> request that registers a message in the message queue. Normally these responses are used to respond to <i>service</i> requests, but it isn't mandatory. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/response.h&gt;</u></b>
+
+<i>//respond using the message itself and response data</i>
+<b>command_handle service_response(message_handle, text_info);</b>
+
+<i>//same as above but using raw binary data</i>
+<b>command_handle binary_service_response(message_handle, binary_info, binary_size);</b>
+
+<i>//partially respond using the message itself, response data, and a type</i>
+<b>command_handle partial_service_response(message_handle, text_info, response_type);</b>
+
+<i>//partially respond using the message itself, response list, and a type</i>
+<b>command_handle partial_service_response_list(message_handle, const text_info*,
+  response_type);</b>
+</pre>
+      </div>
+      <p class="overview_content"> Like other simple responses, clients <i>cannot</i> change the target address of service responses. These responses can <i>only</i> go to the sender of the original message. </p>
+      <p class="overview_content"> When <i>sending</i> commands from resource clients, optionally use the function below to change the name of the sender. This is <i>required</i> for anonymously-registered resource clients if the target <i>isn't</i> its own server. This incidentally requires anonymously-registered resource clients to have at least one registered service before sending commands to other clients. When registering a service on a remote server, this <i>should</i> be used to change the sender's name to that of the service being registered, making it a "symmetrical remote service." By default, unless <span class="style_inline_code">PARAM_ASYM_REMOTE_SERVICES</span> is commented out in <span class="style_file_name">param.h</span>, the sender's name <i>may</i> differ from the service name when registering remote services. The name used with this function must <i>always</i> be associated with the sending client (at the time of execution, allowing back-to-back local and remote service registration,) otherwise the server won't route the command. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/resource-client.h&gt;</u></b>
+
+<i>//set the name of the sending entity</i>
+<b>result set_alternate_sender(command_handle, text_info);</b>
+</pre>
+      </div>
+      <p></p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="SR">Service Restrictions.</a>
+      </h3>
+      <p class="overview_content"> Only clients registered as service-typed clients (control and resource clients) can perform functions related to services and only the client that registered a given service can remove it (aside from the server.) Remote services are a unique case since technically <i>every</i> client touching a registration request is responsible for registering that service. This allows any client along the path from the initiating client to the remote server to deregister the service. The standard <span class="style_command_line">relay</span> forwarders (resource clients) automatically detect broken connections and deregister services registered via that connection, making this inadvertent feature very critical to proper operation of multi-server systems. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="client-administration.html" class="overview_link">Previous - Basic Client Administration</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="command-plugin.html" class="overview_link">Next - Using Plug-in Commands</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

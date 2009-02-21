@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver User's Guide - rsv-fs* and rsv-net* Program Guide</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver User's Guide </h1>
+      <h2 align="center" class="page_subtitle">
+        <span class="style_command_line">rsv-fs<span style="font-weight:normal;">*</span></span> and <span class="style_command_line">rsv-net<span style="font-weight:normal;">*</span></span> Program Guide </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="rservrd.html" class="overview_link">Previous - <span class="style_command_line">rservrd</span> Program Guide</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="respawn.html" class="overview_link">Next - <span class="style_command_line">rsv-respawn</span> Program Guide</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#SFI" class="overview_link">Socket Forwarder Invocation.</a>
+        </li>
+        <li>
+          <a href="#SFC" class="overview_link">Socket Forwarder Configuration.</a>
+        </li>
+        <li>
+          <a href="#NAA" class="overview_link">Notes About Addressing.</a>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="SFI">Socket Forwarder Invocation.</a>
+      </h3>
+      <p class="overview_content"> The socket forwarder clients (those with names matching the pattern "<span class="style_command_line">rsv-<span style="font-weight:normal;"><i>(</i></span>fs<span style="font-weight:normal;"><i>|</i></span>net<span style="font-weight:normal;"><i>)</i></span><span style="font-weight:normal;"><i>(</i></span>relay<span style="font-weight:normal;"><i>|</i></span>controller<span style="font-weight:normal;"><i>)</i></span></span>") all use the same command-line and configuration interfaces. Use the following command format to start a socket forwarder as an <span class="style_command_line">rservr</span> client:</p><div align="center">
+        <pre class="example_box shell_box">
+<b><i>&lt;client&gt; &lt;name&gt; (config file) ...</i></b>
+</pre>
+      </div>
+      <p class="overview_content"> The name provided is used to register with the server upon the client's execution. The name will be the actual client's name for controller clients and a service name for relay clients (which will register anonymously.) The configuration files are closed upon parsing completion, allowing them to be a pipes. If no configuration is provided then no sockets or connections are made, but connections can be made later using <span class="style_command_line">rservrd</span> if it's attached to the same server. Sockets and connections requested during configuration are made only after the client has successfully registered with the server. Although these clients don't require a configuration file, they <i>will not</i> read configuration from standard input because there is no reasonably-graceful way to implement it with the way <span class="style_command_line">rservr</span> creates clients. </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="SFC">Socket Forwarder Configuration.</a>
+      </h3>
+      <p class="overview_content"> Use the configuration options below to set the initial state of the forwarder. The forwarder won't exit until the server exits or directs the forwarder to, or until it receives a signal. </p>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> Place a "<b>!</b>" at the beginning of a configuration line to allow that line to fail. This can prevent options with possible invalid values from aborting forwarder startup. </p>
+        </div>
+      </div>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> listen_allow <i>&lt;regex&gt;</i>
+          </td>
+          <td class="style_definition_short"> allow a pattern of listening addresses </td>
+        </tr>
+        <tr>
+          <td width="400" align="left" class="style_term"> listen_require <i>&lt;regex&gt;</i>
+          </td>
+          <td class="style_definition_short"> require a pattern of listening addresses </td>
+        </tr>
+        <tr>
+          <td width="400" align="left" class="style_term"> connect_allow <i>&lt;regex&gt;</i>
+          </td>
+          <td class="style_definition_short"> allow a pattern of connection addresses </td>
+        </tr>
+        <tr>
+          <td width="400" align="left" class="style_term"> connect_require <i>&lt;regex&gt;</i>
+          </td>
+          <td class="style_definition_short"> require a pattern of connection addresses </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> The <span class="style_command_line">listen_*</span> options specify an allowed pattern and a required pattern (respectively) for listening locations.  These only apply after the configuration stage is complete; they will not effect listen requests contained in the configuration file.  The expressions should be enclosed in quotes and as with other regexes in Resourcerver, you may precede the expression with "<b>!</b>" to invert the requirement. </p>
+      <p class="overview_content style_definition_long"> <span class="style_command_line">listen_allow</span> specifies an alternative pattern of what location are allowed. All ports or local sockets must comply with at least one pattern specified with this option.  <u>For networking only</u>, if this option isn't used then no port can be listened to by compiled-in default.  This can be changed so that lack of specification of this option implies that everything is allowed as long as it complies with the requirements of any <span class="style_command_line">listen_require</span> options (see <span class="style_inline_code">PARAM_FORCE_SOCKET_AUTHORIZE</span> in <span class="style_file_name">param.h</span> at the top of the source code package.) </p>
+      <p class="overview_content style_definition_long"> <span class="style_command_line">listen_require</span> specifies cumulative requirements for all ports or local sockets specified for listening to.  All requested listen locations must comply with <u>all</u> requirements specified with this option.  In other words, a port or local socket won't be listened to unless it complies with at least one <span class="style_command_line">listen_allow</span> line and <u>all</u> <span class="style_command_line">listen_require</span> lines. Example (for local sockets): </p>
+      <div align="center">
+        <table>
+          <tr class="style_definition_example"><td><b>listen_allow "/program$"</b></td></tr>
+          <tr class="style_definition_example"><td><b>listen_allow "/user$"</b></td></tr>
+          <tr class="style_definition_example"><td><b>listen_require "^/tmp/"</b></td></tr>
+          <tr class="style_definition_example"><td><b>listen_require "!(^|/)\\.\\./"</b></td></tr>
+        </table>
+      </div>
+      <p class="overview_content style_definition_long"> The above set of requirements will only allow sockets with the names "<b>program</b>" or "<b>user</b>", all must be somewhere in <span class="style_file_name">/tmp</span>, and none may contain "<b>../</b>" (to prevent something like <span class="style_file_name">/tmp/../home/user</span>.)  Remember to double-escape "<b>\</b>" so the parser doesn't remove them. </p>
+      <p class="overview_content style_definition_long"> The <span class="style_command_line">connect_*</span> options are conceptually identical to their <span class="style_command_line">listen_*</span> counterparts an apply only to the <u>initiating</u> end of the connection (use security filters to protect the listening end from incoming connections.) As with <span class="style_command_line">listen_allow</span> when networking, lack of a <span class="style_command_line">connect_allow</span> specification will prevent connection to any network address by default (see <span class="style_inline_code">PARAM_FORCE_SOCKET_AUTHORIZE</span> in <span class="style_file_name">param.h</span> at the top of the source code package.) Example (for network sockets): </p>
+      <div align="center">
+        <table>
+          <tr class="style_definition_example"><td><b>connect_allow ":2[0-9]{3}$"</b></td></tr>
+          <tr class="style_definition_example"><td><b>connect_allow "^localhost:"</b></td></tr>
+          <tr class="style_definition_example"><td><b>connect_allow "^192\\.168\\.2\\.[0-9]{0,3}:"</b></td></tr>
+          <tr class="style_definition_example"><td><b>connect_require "!^192\\.168\\.2\\.1"</b></td></tr>
+        </table>
+      </div>
+      <p class="overview_content style_definition_long"> This example will allow connection to any port between <span class="style_address">2000</span> and <span class="style_address">2999</span>, any port on <span class="style_address">localhost</span> (by name only) or on IPs starting with <span class="style_address">192.168.2</span>, but not <span class="style_address">192.168.2.1</span>. </p>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> Patterns can be empty; however, they still must be specified using empty quotes. This is to prevent implicitly allowing all patterns (e.g. <span class="style_command_line">listen_allow ""</span>.) </p>
+        </div>
+      </div>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> You can allow listening to any location with <span class="style_command_line">listen_allow ""</span> and connection to any location with <span class="style_command_line">connect_allow ""</span>. You can also disallow listening to any location with <span class="style_command_line">listen_require "!"</span> and connection to any location with <span class="style_command_line">connect_require "!"</span>. </p>
+        </div>
+      </div>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> listen <i>&lt;socket&gt;</i>
+          </td>
+          <td class="style_definition_short"> listen to a local socket or network port </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option listens to either a local socket or the specified port, depending on whether you use the <span class="style_command_line">fs</span> or <span class="style_command_line">net</span> version of a forwarder, respectively. Ports must be specified using a decimal number. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> connect <i>&lt;socket&gt;</i>
+          </td>
+          <td class="style_definition_short"> connect to a socket </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option connects to the specified socket which must already have a forwarder listening. The socket is specified using a local socket name or an <span class="style_address">address:port</span> pair. Address may be either IP addresses or listed domain names. Ports may be specified using a decimal port number or with the name of a registered service, although service lookup will be based on the local machine's services. </p>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> Connection requests will indicate success if the forwarder is able to connect; however, the listening end might subsequently disconnect the forwarder based on failed address filtering or authentication. </p>
+        </div>
+      </div>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> filtered_connect <i>&lt;socket&gt;</i> <i>&lt;filter&gt;</i>
+          </td>
+          <td class="style_definition_short"> connect to a socket with a filter </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option does the same thing as <span class="style_command_line">connect</span> with the addition of a filter to intercept communications between the two forwarders. The filter will be executed only on the initiating end of the connection. The filter specification consists of a string that starts by specifying a delimiter character, followed by a command with arguments separated by that delimiter. Example: </p>
+      <div align="center">
+        <p class="style_definition_example">
+          <b>filtered_connect <i>&lt;socket&gt;</i> "@<i>&lt;filter&gt;</i>@<i>&lt;argument1&gt;</i>"</b>
+        </p>
+      </div>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> security_filter <i>&lt;plug-in&gt;</i> <i>&lt;options&gt;</i>
+          </td>
+          <td class="style_definition_short"> use a security filter for new connections </td>
+        </tr>
+      </table>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> You should always place this at the head of the configuration file if used.  Configuration will abort if this option is encountered after a listen or connection request. </p>
+        </div>
+      </div>
+      <p class="overview_content style_definition_long"> This option allows the specification of a security plug-in to secure connections between two forwarders. Configuration will fail if this option follows any listening or connection lines; otherwise the filter might cause existing connections to fail. The plug-in is specified using the name of a library file to be loaded (normally <span class="style_file_name">librsvx-<span style="font-weight:normal;">*</span>.so</span>.) If the plug-in isn't in a conventional library path that can be loaded by the dynamic loader without prodding then you need a fully-qualified path name. The specified filter applies to all connections. If this option is used more than once, the first filter that defines authentication functions will be used for authentication, and the first defining send or receive functions will be used for sending and receiving. Address filtering and encoding are performed in the order the filters are loaded, but decoding is done in the reverse order. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> capacity <i>&lt;limit&gt;</i>
+          </td>
+          <td class="style_definition_short"> limit the number of pending transmissions </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option limits the number of commands queued to be sent outside of the current Resourcerver system.  Once this limit is reached, the forwarder will no longer accept new outgoing transmissions until it empties the queue to a reasonable level.  The built-in default is 256, but setting this to 1024 would be a good starting point for high-traffic systems.  Normally you don't need to change this unless the server starts reporting discarded commands back to the sender. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> listen_limit <i>&lt;number&gt;</i>
+          </td>
+          <td class="style_definition_short"> limit the total number of listening sockets </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option will limit the total number of ports or local sockets a forwarder can listen to.  This applies at the time it's encountered, it applies to all actions in the configuration file coming after it, and it's persistent after the configuration stage.  No error occurs if the limit has already been exceeded when it's set; the forwarder will just require that the number of listening sockets fall below the limit before allowing new sockets.  A value of zero will allow an unlimited number of sockets.  Use the option <span class="style_command_line">listen_require "!"</span> to prevent listening to any new socket after the configuration stage. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> total_limit <i>&lt;number&gt;</i>
+          </td>
+          <td class="style_definition_short"> limit the total number of connections </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option works identically to <span class="style_command_line">listen_limit</span>, but for connections <b>both</b> initiated from the forwarder <b>and</b> received from listening sockets. This value is taken into account in conjunction with individual limitations set by <span class="style_command_line">individual_limit</span>. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> individual_limit <i>&lt;number&gt;</i>
+          </td>
+          <td class="style_definition_short"> limit the number of connections per listening socket </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This limits the total number of current connections made by each individual socket being listened to.  This value is applied to all new listen requests following it.  A value of zero allows unlimited connections (within the limitations of <span class="style_command_line">total_limit</span>.) This is persistent after the configuration stage. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> log_mode <i>&lt;spec&gt;</i>
+          </td>
+          <td class="style_definition_short"> change the client's logging mode </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option changes the logging mode using the same pattern as <span class="style_command_line">rservr</span>. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> setenv <i>(&lt;var&gt;</i>=<i>"str") ...</i>
+          </td>
+          <td class="style_definition_short"> set environment variable(s) </td>
+        </tr>
+        <tr>
+          <td width="400" align="left" class="style_term"> unsetenv <i>(&lt;var&gt;) ...</i>
+          </td>
+          <td class="style_definition_short"> unset environment variable(s) </td>
+        </tr>
+        <tr>
+          <td width="400" align="left" class="style_term"> clearenv</i>
+          </td>
+          <td class="style_definition_short"> clear all environment variables </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> These options are identical to those provided for <a href="rservr.html" class="general_link"><span class="style_command_line">rservr</span></a>. These are of limited use other than setting variables for use within command substitution, or to pass external information to the program for use with plug-in security filters and IPC filters. </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="NAA">Notes About Addressing.</a>
+      </h3>
+      <p class="overview_content"> The forwarders outlined in this guide fall into two distinct categories: one type uses an Internet addressing format, the other uses a file-system addressing format. This should be intuitive to anyone who's used Internet addressing (with ports) and a Unix file system, but these forwarders extend both slightly. </p>
+      <p class="overview_content"> The forwarders outlined in this guide fall into two distinct categories: one type uses an Internet addressing format, the other uses a file-system addressing format. This should be intuitive to anyone who's used Internet addressing (with ports) and a Unix file system, but these forwarders extend both slightly. </p>
+      <ul class="other_bullet_list">
+        <li class="overview_content">
+          <b>Internet Addressing.</b> The network forwarders use the standard <span class="style_address">hostname:port</span> format.  Either a hostname or an IP address may be used, but the address is tracked internally based on IP address; therefore, they should be interchangeable once a connection is made.  All connections <i>must</i> be initiated using <i>both</i> a host and a port number. The initiating end will record the full address (IP address and port number); therefore, <i>both</i> must be used when targeting a connection from the initiating end.  Incoming connections on listening sockets are recorded with the incoming IP address <i>without</i> any port number; therefore, <i>no</i> port number may be used when targeting a connection from the listening end. Multiple connections to the same location (as determined by the retained information) will be differentiated internally by appending "<b>/</b>" plus a numerical identifier.  This can be used to explicitly address a certain connection; however, if it isn't used to indicate a specific connection then the first match will be used. For example, two separate clients from a single remote machine might connect to the same forwarder located at <span class="style_address">192.168.2.1:2048</span>, but the receiving forwarder can't differentiate between the two clients; therefore, it will record the connections as <span class="style_address">192.168.2.1/1</span> and <span class="style_address">192.168.2.1/2</span>, based on the order they're connected in.  Requests passed through that forwarder may be addressed to merely <span class="style_address">192.168.2.1</span>, which would result in the command being passed to the first connection made, or explicitly to one of the two by appending <span class="style_address">/1</span> or <span class="style_address">/2</span>. These numerical identifiers may be arbitrarily included in or excluded from any address specification. <br />
+          <br />
+        </li>
+        <li class="overview_content">
+          <b>File-system Addressing.</b> Socket files are limited to the same <a class="general_link" href="introduction.html#NR">naming restrictions</a> as all other components used in a Resourcerver system.  Additionally, they <i>may not</i> contain the character "<b>;</b>", which is used to differentiate between multiple connections to the same location. As with "<b>/</b>" for Internet addressing, "<b>;</b>" is followed by a numerical identifier which may be used to target specific connections, or it may left out to default to the first matching connection.  Unlike Internet addressing, no relevant information is available for the initiating end (because it's from the same machine); therefore, connections received from listening sockets will be recorded with a hexadecimal serial number to differentiate between the different connections. For example, one forwarder might listen to a socket at <span class="style_file_name">/tmp/relay2in</span>, and another forwarder might connect to it. The connecting forwarder would record a connection to "<b>/tmp/relay2in;1</b>" (with "<b>;1</b>" denoting its first connection to that address) and the listening forwarder would record an address such as "<b>0x8069ee0</b>" to differentiate it from all other incoming connections; unlike Internet addressing, no information is provided to the forwarder about the incoming connection. <br />
+          <br />
+        </li>
+      </ul>
+      <p class="overview_content"> While address-scope assembly is built into the protocol of Resourcerver, this guide is an appropriate place to discuss it a little further.  When addressing a command to a target, the command will hold both a target name and an address name.  The address name will <i>always</i> have complete pairs of targets and addresses for remote targeting, to include zero complete pairs for a local command.  The combination of the initial target and the address indicates the final target of the command.  For example, a command might target "<b>client1</b>" and have an address of "<b>client2?localhost:2048</b>". The command would initially be sent to "<b>client1</b>" on the local system, which is presumably a socket-forwarder.  If not, the send operation would probably result in an error. Assuming that "<b>client1</b>" is a socket-forwarder, it would check to see if it has a connection to "<b>localhost:2048</b>", and if so, would forward the command across that connection.  Lastly, the receiving end, also a socket-forwarder, would send the command through its local Resourcerver system to "<b>client2</b>". </p>
+      <p class="overview_content"> The most difficult part to understand about addressing is how and why target addresses are represented differently internally than how they're specified within a program (this is more of an issue for developers.)  For example, you might specify that a command should be sent to "<b>client1?localhost:2048</b>" before sending to the initial target of "<b>client2</b>", which was probably the target used to initialize the command object, yet internally it becomes "<b>client1</b>" and "<b>client2?localhost:2048</b>", as given in the above example. This transformation from in-order to reverse-ordered client/address pairs is essential to making sure addressing isn't corrupted, but other than that, the internal representations are generally only seen when listing remote services. For this reason, It's generally alright to ignore the actual addressing shown for remote services. </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="rservrd.html" class="overview_link">Previous - <span class="style_command_line">rservrd</span> Program Guide</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="respawn.html" class="overview_link">Next - <span class="style_command_line">rsv-respawn</span> Program Guide</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

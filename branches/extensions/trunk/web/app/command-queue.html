@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver Application Developement Guide - Using the Command Queue</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver Application Developement Guide </h1>
+      <h2 align="center" class="page_subtitle"> Using the Command Queue </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="basic.html" class="overview_link">Previous - Basic Requirements of a Client</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="message-queue.html" class="overview_link">Next - Using the Message Queue</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#ICP" class="overview_link">Individual Command Permissions.</a>
+          <div>
+            <ul class="toc_list">
+              <li>
+                <a href="#ICP_CCP" class="overview_link">Command Creation Permissions.</a>
+              </li>
+              <li>
+                <a href="#ICP_CPP" class="overview_link">Command Parse Permissions.</a>
+              </li>
+              <li>
+                <a href="#ICP_CEP" class="overview_link">Command Execution Permissions.</a>
+              </li>
+              <li>
+                <a href="#ICP_AR" class="overview_link">Additional Restrictions.</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <a href="#CCaAL" class="overview_link">Checking Client and Address Labels.</a>
+        </li>
+        <li>
+          <a href="#CC" class="overview_link">Creating Commands.</a>
+        </li>
+        <li>
+          <a href="#SC" class="overview_link">Sending Commands.</a>
+        </li>
+        <li>
+          <a href="#ATA" class="overview_link">Adding Target Addresses.</a>
+        </li>
+        <li>
+          <a href="#CCP" class="overview_link">Changing Command Priority.</a>
+        </li>
+        <li>
+          <a href="#CaSR" class="overview_link">Creating and Sending Responses.</a>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="ICP">Individual Command Permissions.</a>
+      </h3>
+      <p class="overview_content"> All commands have 3 sets of permissions, plus possible transmission restrictions.  All of these restrictions are security related and allow client types to be well defined. </p>
+      <h4 class="overview_title">
+        <a name="ICP_CCP">Command Creation Permissions.</a>
+      </h4>
+      <p class="overview_content"> All built-in commands created by clients have a pair of type specifications used to determine if a client can actually create them for sending.  The first specification denotes the required type flags the client must have.  The second denotes the type flags the client <i>must not</i> have.  Together they define a set of client types that can create and send the command. </p>
+      <p class="overview_content"> All plug-in commands have a single type specification used to define the type flags a client must have <i>one or more of</i> to create a command. Plug-in commands don't have a second specification denoting "must not" types as built-in commands do. Unlike built-in command permissions, the client need only have <i>one</i> of the flags required (as opposed to <i>all</i> required, as with built-in commands). </p>
+      <p class="overview_content"> Within the Resourcerver API, creation permissions are generally tied with the specific header that's used to create a command.  For example, all commands in <span class="style_inline_code">&lt;rservr/api/service-client.h&gt;</span> can be created, sent, and parsed by service clients.  Most built-in commands are aranged in this manner, but most of the included plug-in commands have individual requirements for each command. See the <a href="plugin-table.html" class="general_link">plug-in table</a> for information about specific plug-in commands. </p>
+      <h4 class="overview_title">
+        <a name="ICP_CPP">Command Parse Permissions.</a>
+      </h4>
+      <p class="overview_content"> All commands have type specifications, used in the same manner as command creation specifications, to determine if a client can parse an incoming command.  Once the header of the incoming command is received and the command name is known, each client will check its command table to determine if it meets that command’s parsing requirements before parsing the content of the command. </p>
+      <h4 class="overview_title">
+        <a name="ICP_CEP">Command Execution Permissions.</a>
+      </h4>
+      <p class="overview_content"> All commands have a single type specification denoting the type flags required to execute the command.  This is often more restrictive than the parse permissions to allow other types of client to parse and forward the command without executing it. </p>
+      <h4 class="overview_title">
+        <a name="ICP_AR">Additional Restrictions.</a>
+      </h4>
+      <p class="overview_content"> Some commands cannot be sent outside of the current Resourcerver system due to the nature of their execution.  For example, it makes no sense to send a client registration command or terminal request command outside of the local system because neither will work.  These commands are generally sent pseudo-atomically, but some are placed on the command queue with addressing restrictions. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="CCaAL">Checking Client and Address Labels.</a>
+      </h3>
+      <p class="overview_content"> You don't normally need to check names and addresses specifically since all built-in libraries perform checks as appropriate. You can check names and addresses for validity with the functions below to avoid passing bad user input, though. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/label-check.h&gt;</u></b>
+
+<i>//perform a validity check on a client, server, or service name or a single address</i>
+<b>int check_entity_label(text_info);</b>
+
+<i>//perform a validity check on a multi-part address</i>
+<b>int check_address_label(text_info);</b>
+</pre>
+      </div>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="CC">Creating Commands.</a>
+      </h3>
+      <p class="overview_content"> Commands are created and are automatically queued by all functions in <span class="style_file_name">rservr/api/<span style="font-weight:normal;">*</span>.h</span> that have a return type of <span class="style_inline_code">command_handle</span>. A return of <span class="style_inline_code">NULL</span> from any of these functions indicates an error; otherwise the command has successfully been queued and can be sent. </p>
+      <p class="overview_content"> Most commands can be remotely-addressed to clients or servers in other Resourcerver systems. Clients can also change the requested priority of all queued commands. </p>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> Consider the creation of <i>all</i> queued commands as memory allocation. <i>All</i> queued commands must be deallocated when they're no longer needed. The size of the command queue is always unlimited; therefore, deallocate commands as soon as they're no longer needed. </p>
+        </div>
+      </div>
+      <p class="overview_content"> All commands to be created by the client or received from the server must be listed in the client's local command table. This table is only used internally to verify the client's permissions against each prospective command and to create new command objects when commands are received. All built-in commands are loaded when the client is initialized, so they don't need to be loaded again. When a client loads a command plug-in library, the library registers its commands in the command table so that they can be used. </p>
+      <p class="overview_content"> Use the functions below to find information about loaded commands. This is for informational purposes only and <i>doesn't</i> provide any information about how to create each command. The actual name of a command <i>will not</i> be the same name as the API function used to create it, but it can be used to verify that specific plug-ins are loaded and to give the user a general idea of what's available. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/command-table.h&gt;</u></b>
+
+<i>//use the command's name to see if it's loaded</i>
+<b>result check_command_loaded(text_info);</b>
+
+<i>//use the command's name to see if the client can create it with current permissions</i>
+<b>result check_command_can_create(text_info);</b>
+
+<i>//retrieve general information about a command using its name</i>
+<b>text_info command_information(text_info);</b>
+
+<i>//retrieve a <span class="style_inline_code">NULL</span>-terminated list of commands matching types and a name regular expression</i>
+<b>const command_table_element *get_local_command_table(command_type, text_info);</b>
+
+<i>//use this to free a list retrieved using the above function (don't free independently)</i>
+<b>void free_command_table_info(const command_table_element*);</b>
+</pre>
+      </div>
+      <p>
+      </p>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> You can't retrieve a list of commands loaded in the server's command table; however, normally the server will have the same built-in commands listed as all clients do by default and no others. </p>
+        </div>
+      </div>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="SC">Sending Commands.</a>
+      </h3>
+      <p class="overview_content"> The most important thing to remember when using the command queue is to deallocate queued commands as soon as they're no longer required. You need only destroy a <span class="style_inline_code">command_handle</span> <i>once</i> regardless of how many times you send it. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/command-queue.h&gt;</u></b>
+
+<i>//provide the function with the command's handle</i>
+<b>result destroy_command(command_handle);</b>
+</pre>
+      </div>
+      <p class="overview_content"> The simplest way to send a command is with no conditions: </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/command-queue.h&gt;</u></b>
+
+<i>//provide the function with the command's handle</i>
+<b>command_reference send_command_no_status(command_handle);</b>
+</pre>
+      </div>
+      <p class="overview_content"> The return value of all send functions is a reference value representing how many commands have been sent by the client. A reference of 0 <i>always</i> means an error when sending from a client. The reference value is trivial when using the function above because the command queue won't retain an updated status of the sent command. </p>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> You can send a single command multiple times by repeating the call to the same function. </p>
+        </div>
+      </div>
+      <p class="overview_content"> To retain an updated status of a sent command, send using one of the following functions: </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/command-queue.h&gt;</u></b>
+
+<i>//provide the function with the command's handle</i>
+<b>command_reference send_command(command_handle);</b>
+
+<i>/* the callback(s) provided below will be called every time the status is updated. a
+   callback will be removed if it returns non-zero, and the command's status will be
+   removed if all callbacks are removed (only if callbacks are used.) */</i>
+
+<i>//provide a single callback function in addition</i>
+<b>command_reference send_command_callback(command_handle, event_callback);</b>
+
+<i>//provide a <span class="style_inline_code">NULL-</span>terminated list of callback functions in addition</i>
+<b>command_reference send_command_callbacks(command_handle, const event_callback*);</b>
+</pre>
+      </div>
+      <p>
+      </p>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> Consider use of the above functions to be allocations of status objects <i>every</i> time they're are called, even if called on the same <span class="style_inline_code">command_handle</span> multiple times. Once the status of a command is no longer required, ensure you deallocate it (see below.) </p>
+        </div>
+      </div>
+      <p class="overview_content"> Use the <span class="style_inline_code">clear_command_status</span> function to deallocate the resources required by retaining the status of sent commands. This function should be called once for each reference number provided by a send function other than <span class="style_inline_code">send_command_no_status</span>. If you send a command using callback(s) and you can be certain that all will return non-zero at least once then you do not need to call <span class="style_inline_code">clear_command_status</span>. Keep in mind that the callback won't be called unless the server actually receives the sent command. Calling <span class="style_inline_code">clear_command_status</span> more than once on the same status object has no adverse effect. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/command-queue.h&gt;</u></b>
+
+<i>//provide the function with the sent command's reference number</i>
+<b>result clear_command_status(command_reference);</b>
+</pre>
+      </div>
+      <p class="overview_content"> Clients can check or wait on a particular status of sent commands using the functions below: </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/command-queue.h&gt;</u></b>
+
+<i>//all of the functions below will return the cumulative status of the command</i>
+
+<i>//use the send reference to obtain immediate command status</i>
+<b>command_event find_command_status(command_reference);</b>
+
+<i>//the functions below match any bit of the mask provided but return the entire status</i>
+
+<i>//use the send reference, an event mask, and a timeout interval</i>
+<b>command_event wait_command_event(command_reference, command_event, long_time);</b>
+
+<i>//same as above with a callback (<span class="style_inline_code">0</span> = continue, <span class="style_inline_code">-1</span> = cancel)</i>
+<b>command_event cancelable_wait_command_event(command_reference, command_event,
+  long_time, int(*)(command_reference, command_event));</b>
+<i>/* the callback provided will be called an indefinite number of times at an indefinite
+   interval. the callback will be provided with the current send reference being used as
+   well as the command's cumulative status. */</i>
+</pre>
+      </div>
+      <p>
+      </p>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> As a reminder, make sure clients deallocate <i>both</i> queued commands <i>and</i> command status using the appropriate functions. It's perfectly safe to attempt deallocation of the same queued command or command status multiple times, though doing so is "bad form." </p>
+        </div>
+      </div>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="ATA">Adding Target Addresses.</a>
+      </h3>
+      <p class="overview_content"> Clients can address commands to remote clients or servers using the functions listed here. Commands sent to remote systems must pass through the local server to a forwarder client which is also registered on the local server. That forwarder will then forward the command to the address specified within the command, which will be received by a corresponding forwarder in another system. Addressing therefore requires pairs consisting of a single forwarder name and a single address specification. The address specification format is determined by the forwarder, but it's normally the name of a local socket or of an IP address. See the <a href="../user/socket-forward.html" class="general_link">standard command forwarder</a> documentation for more information about addressing. </p>
+      <p class="overview_content"> A set of forwarder and address pairs is called a "scope." To insert a target scope at the beginning of the existing command's target, use the function below. This added scope will precede all previously-added scopes and will be the first destination of the command once it's sent. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/command-queue.h&gt;</u></b>
+
+<i>//provide the command's handle and the scope of the remote target</i>
+<b>result add_remote_address(command_handle, text_info);</b>
+</pre>
+      </div>
+      <p class="overview_content"> The address used above must consist only of complete forwarder and address pairs. The forwarder and address components are separated by a single "<b>?</b>", as in "<span class="style_address">client?address</span>". Each pair is separated by a single "<b>|</b>", as in "<span class="style_address">client1?address1|client2?address2</span>". </p>
+      <p class="overview_content"> Subsequent calls to this function will insert the new scopes before those previously inserted. Inserting scopes in front of those already existing allows server commands (such as service registration commands) to be sent to remote servers. This also has the effect of displacing the initial target client's name, so the target used when creating a command will always be the terminal entity of the command. Clients should therefore use the name of the terminal entity when creating a command, then add address scopes if necessary to reach that target's server. </p>
+      <p class="overview_content"> Addresses are executed in left-to-right order. Using the example address above (assuming the command was created using "<span class="style_address">target</span>" as its target,) the command will first be sent to <span class="style_address">client1</span> on the local server, which will forward the command over its connection <span class="style_address">address1</span> to a connected forwarder and subsequently to <span class="style_address">client2</span> via that forwarder's server, which will then forward the command over its connection <span class="style_address">address2</span> to a connected forwarder, and once in that forwarder's Resourcerver system the command will be sent to "<span class="style_address">target</span>". Notice that the actual name of the forwarder connected on the opposite end of a connection <i>doesn't matter</i> (and generally isn't available) for the purposes of addressing. </p>
+      <div align="center">
+        <img alt="Run-time Application Layout" src="address-example.png" height="385" width="400" />
+      </div>
+      <p></p>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> Addresses revealed when filtering IPC won't accurately represent those inserted by the client. The command library needs to split and shift the forwarder and address pairs in order to accurately route commands. </p>
+        </div>
+      </div>
+      <p class="overview_content"> Use the function below to insert a <i>single</i> forwarder and address pair at the beginning of the existing address scope of a client: </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/command-queue.h&gt;</u></b>
+
+<i>//provide the command's handle, the next client's name, and the next address</i>
+<b>result add_remote_target(command_handle, text_info, text_info);</b>
+</pre>
+      </div>
+      <p class="overview_content"> This inserts the pair in the same manner as the <span class="style_inline_code">add_remote_address</span> function, but <i>only</i> allows a single pair to be added. The address portion <i>may not</i> contain embedded addressing pairs. </p>
+      <p class="overview_content"> If a client receives a request to perform an action on the requester's server, the client can replace the entire target and address of a command using the function below. This function will erase the <i>entire</i> existing addressing, to include the target, and replace it with a target and scope resulting in the command being executed on the server of the requesting client. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/command-queue.h&gt;</u></b>
+
+<i>//provide the command's handle and the sender's name and address</i>
+<b>result set_target_to_server_of(command_handle, text_info, text_info);</b>
+</pre>
+      </div>
+      <p class="overview_content"> This is meant to be used with server commands using an originator's name and address. This is primarily intended to facilitate the <span class="style_file_name">librsvp-rqsrvc.so</span> command plug-in library. The example code below vaguely demonstrates how the function should be used. </p>
+      <div align="center">
+        <pre class="example_box code_box source_box">
+<b><u>#include &lt;rservr/api/client.h&gt;
+#include &lt;rservr/api/command-queue.h&gt;
+#include &lt;rservr/api/resource-client.h&gt;
+#include &lt;rservr/plugins/rsvp-rqsrvc-hook.h&gt;</u></b>
+
+<i>//this is the definition of a plug-in hook function (which is discussed later)</i>
+
+<b>command_event __rsvp_rqsrvc_hook_register_services(const struct rqsrvc_source_info *iInfo,
+  text_info tType)</b>
+{
+	if (!iInfo) return <b>event_rejected</b>;
+
+	<b>command_handle</b> new_service = <b>register_service</b>(iInfo-&gt;target, tType);
+	if (!new_service) return <b>event_error</b>;
+
+	if ( !<b>set_target_to_server_of</b>(new_service, iInfo-&gt;sender, iInfo-&gt;address) ||
+	     !<b>send_command_no_status</b>(new_service) )
+	{
+	<b>destroy_command</b>(new_service);
+	return <b>event_error</b>;
+	}
+
+	<b>destroy_command</b>(new_service);
+	return <b>event_complete</b>;
+} 
+</pre>
+      </div>
+      <p class="overview_content"> A side note regarding the hook function defined above: If the function above is defined, the client loads the <span class="style_file_name">librsvp-rqsrvc.so</span> command plug-in library, and another client sends a <span class="style_inline_code">rqsrvc_register_services</span> command to the client, the receiving client should register a service in its own name on the sender's server. The <span class="style_file_name">librsvp-rqsrvc-auto.so</span> plug-in library automates this process, however, so that plug-in is a better alternative. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="CCP">Changing Command Priority.</a>
+      </h3>
+      <p class="overview_content"> The priority of a command can greatly effect the order in which it's executed by a server. While priority is always limited by the client's current priority restrictions, you can always request an extremely low priority value. Priority values range from 0 to 255, the lower values indicating a higher priority, with a default minimum value of 127. This default value is the absolute minimum allowed by the server unless it's changed within the server's configuration before the client is started. The default value <i>attempted</i> by all commands is 0, so only change the priority if you're willing to place the command behind others. </p>
+      <p class="overview_content"> While it might seem that the actual usefulness of a command's priority is limited to whether or not it's greater than another, that's far from the truth. The server uses an algorithm to determine the order in which to execute commands that involves moving older commands up in the wait list incrementally based both on how long they've been waiting and on their priorities. In other words, if commands with a priority of 127 constantly arrive in the server's queue, a command arriving with a priority higher than that <i>won't</i> be bumped out of the way indefinitely. In that particular case, though, the command would get through a lot faster with a priority of 128 than with one of 255. </p>
+      <p class="overview_content"> Use the function below to change the priority of a command before sending it: </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/command-queue.h&gt;</u></b>
+
+<i>//provide the command's handle and the new priority</i>
+<b>result change_command_priority(command_handle, command_priority);</b>
+</pre>
+      </div>
+      <p class="overview_content"> The function above can be used regardless of other restrictions placed on a command. This includes changing the priority of commands to be forwarded outside of the current Resourcerver system. If you're developing a command forwarder, there's no need to set the priority of commands to be forwarded to 0 before sending them. </p>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> Commands sharing the same priority are <i>always</i> executed in the order they're received by the server; therefore, you can count on two sequential commands with the same priority being executed in that order. </p>
+        </div>
+      </div>
+      <p></p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="CaSR">Creating and Sending Responses.</a>
+      </h3>
+      <p class="overview_content"> Responses are a very limited type of client command. They require a message to be received in the message queue from another client, and that message must be visible to the client program at the time the response is created. Use the functions below to create responses. See the <a href="message-queue.html" class="general_link">message queue</a> section for information about retrieving messages. </p>
+      <p class="overview_content"> You will need to cast messages with <span class="style_inline_code">RSERVR_RESPOND</span> to use them with the response API. This provides additional run-time protection while allowing things like <span class="style_inline_code">set_async_response</span> to work. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/client.h&gt;</u></b>
+
+<i>/* the commands below are "bypass" commands which allows them to bypass normal response
+   permissions. this allows a client to briefly respond to clients it wouldn't normally
+   be able to respond to. for example, a resource client can respond to an admin client
+   using these responses, provided it received a request from one. */</i>
+
+<i>//respond to a request with an event</i>
+<b>command_handle short_response(message_handle, command_event);</b>
+
+<i>//respond to a request with an event and a message</i>
+<b>command_handle client_response(message_handle, command_event, text_info);</b>
+<i>/* because this command is a bypass command, data is limited to the limit set by
+   <span class="style_inline_code">PARAM_BYPASS_LENGTH_MAX</span> in <span class="style_file_name">param.h</span>. this command is only intended for very short
+   responses to indicate the status of a request. data will be truncated if it exceeds
+   this length. */</i>
+</pre>
+      </div>
+      <p class="overview_content"> The responses above create a command in the command queue which must be sent and deallocated. You can't add or change the target or address of a response, but you can change its priority. A response uses the priority of the command it's in response to by default. The simple commands above should only be used for short responses with trivial data. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="basic.html" class="overview_link">Previous - Basic Requirements of a Client</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="message-queue.html" class="overview_link">Next - Using the Message Queue</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

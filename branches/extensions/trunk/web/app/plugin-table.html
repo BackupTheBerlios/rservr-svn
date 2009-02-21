@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver Application Developement Guide - Table of Plug-in Commands</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver Application Developement Guide </h1>
+      <h2 align="center" class="page_subtitle"> Table of Plug-in Commands </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="detached.html" class="overview_link">Previous - Creating Detached Clients</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a class="overview_link">Next</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#O" class="overview_link">Overview.</a>
+        </li>
+        <li>
+          <a href="#lns" class="overview_link"><span class="style_file_name">librsvp-netcntl.so</span>.</a>
+        </li>
+        <li>
+          <a href="#lrs" class="overview_link"><span class="style_file_name">librsvp-rqconfig.so</span>.</a>
+        </li>
+        <li>
+          <a href="#lrsalras" class="overview_link"><span class="style_file_name">librsvp-rqsrvc.so</span> and <span class="style_file_name">librsvp-rqsrvc-auto.so</span>.</a>
+        </li>
+        <li>
+          <a href="#lr2s" class="overview_link"><span class="style_file_name">librsvp-ready.so</span>.</a>
+        </li>
+        <li>
+          <a href="#lds" class="overview_link"><span class="style_file_name">librsvp-dataref.so</span>.</a>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="O">Overview.</a>
+      </h3>
+      <p class="overview_content"> This section provides a basic overview of each command plug-in library. Its main purpose is to provide a quick permissions reference for each command. Only the actual command-creation functions and their corresponding hook functions (called upon command execution at the terminal client) are shown here. See the <a href="../api/index.html" class="general_link">C/C++ API Reference</a> for more specific information about each function. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="lns"><span class="style_file_name">librsvp-netcntl.so</span>.</a>
+      </h3>
+      <p class="overview_content"> This library is intended for socket connection control. This library is implemented by the standard command forwarders to allow their connections to be controlled remotely. <span class="style_command_line">rservrd</span> uses this library to create and send its commands to allow command-line control of forwarders' socket connections. </p>
+      <p class="overview_content"> Each command in this library has both a network and a local variant. Both are essentially the same internally, but clients executing them might want to behave differently with each. The standard command forwarders, for example, perform IP and port operations with the network variants and local socket operations with the local variants. Normally a client will only implement one or the other, but not both. It <i>isn't</i> non-standard for a single client to create and send commands of both types, however, which is what <span class="style_command_line">rservrd</span> does. </p>
+      <div align="center">
+        <table width="900" class="command_table">
+		    <tr style="font-size: larger;">
+		      <td width="300" class="command_table_element"><b>command / hook</b></td>
+		      <td width="75"><b>create</b></td>
+		      <td width="75"><b>parse</b></td>
+		      <td width="75"><b>execute</b></td>
+		      <td><b>purpose</b></td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">netcntl_net_connection_list</span><br />
+		        <span class="style_inline_code">__rsvp_netcntl_hook_net_connection_list</span>
+		        <div><hr /></div>
+		        <span class="style_inline_code">netcntl_local_connection_list</span><br />
+		        <span class="style_inline_code">__rsvp_netcntl_hook_local_connection_list</span></td>
+		      <td>active</td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td class="command_table_comment">list all active connections</td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">netcntl_net_connect</span><br />
+		        <span class="style_inline_code">netcntl_net_connect_cut</span><br />
+		        <span class="style_inline_code">__rsvp_netcntl_hook_net_connect</span>
+		        <div><hr /></div>
+		        <span class="style_inline_code">netcntl_local_connect</span><br />
+		        <span class="style_inline_code">__rsvp_netcntl_hook_local_connect</span></td>
+		      <td>active</td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td class="command_table_comment">make a new connection</td>
+          </tr>
+		    <tr class="command_table_row">
+		      <td class="command_table_element">
+		        <span class="style_inline_code">netcntl_net_filtered_connect</span><br />
+		        <span class="style_inline_code">netcntl_net_filtered_connect_cut</span><br />
+		        <span class="style_inline_code">__rsvp_netcntl_hook_net_filtered_connect</span>
+		        <div><hr /></div>
+		        <span class="style_inline_code">netcntl_local_filtered_connect</span><br />
+		        <span class="style_inline_code">__rsvp_netcntl_hook_local_filtered_connect</span></td>
+		      <td>active</td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td class="command_table_comment">make a new filtered connection</td>
+          </tr>
+		    <tr class="command_table_row">
+		      <td class="command_table_element">
+		        <span class="style_inline_code">netcntl_net_disconnect</span><br />
+		        <span class="style_inline_code">__rsvp_netcntl_hook_net_disconnect</span>
+		        <div><hr /></div>
+		        <span class="style_inline_code">netcntl_local_disconnect</span><br />
+		        <span class="style_inline_code">__rsvp_netcntl_hook_local_disconnect</span></td>
+		      <td>active</td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td class="command_table_comment">disconnect an active connection</td>
+          </tr>
+		    <tr class="command_table_row">
+		      <td class="command_table_element">
+		        <span class="style_inline_code">netcntl_net_listen_list</span><br />
+		        <span class="style_inline_code">__rsvp_netcntl_hook_net_listen_list</span>
+		        <div><hr /></div>
+		        <span class="style_inline_code">netcntl_local_listen_list</span><br />
+		        <span class="style_inline_code">__rsvp_netcntl_hook_local_listen_list</span></td>
+		      <td>admin</td>
+		      <td>active</td>
+		      <td>service</td>
+		      <td class="command_table_comment">list locations being listened to for connections</td>
+          </tr>
+		    <tr class="command_table_row">
+		      <td class="command_table_element">
+		        <span class="style_inline_code">netcntl_net_listen</span><br />
+		        <span class="style_inline_code">__rsvp_netcntl_hook_net_listen</span>
+		        <div><hr /></div>
+		        <span class="style_inline_code">netcntl_local_listen</span><br />
+		        <span class="style_inline_code">__rsvp_netcntl_hook_local_listen</span></td>
+		      <td>admin</td>
+		      <td>active</td>
+		      <td>service</td>
+		      <td class="command_table_comment">listen to a new location for connections</td>
+          </tr>
+		    <tr class="command_table_row">
+		      <td class="command_table_element">
+		        <span class="style_inline_code">netcntl_net_unlisten</span><br />
+		        <span class="style_inline_code">__rsvp_netcntl_hook_net_unlisten</span>
+		        <div><hr /></div>
+		        <span class="style_inline_code">netcntl_local_unlisten</span><br />
+		        <span class="style_inline_code">__rsvp_netcntl_hook_local_unlisten</span></td>
+		      <td>admin</td>
+		      <td>active</td>
+		      <td>service</td>
+		      <td class="command_table_comment">stop listening to a location for connections</td>
+          </tr>
+        </table>
+      </div>
+      <p></p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="lrs"><span class="style_file_name">librsvp-rqconfig.so</span>.</a>
+      </h3>
+      <p class="overview_content"> This library provides a generic command interface between two clients for one client to request another client "configure" itself. The actual implementation of the commands' execution at the terminal client are entirely up to the developer. </p>
+      <div align="center">
+        <table width="900" class="command_table">
+		    <tr style="font-size: larger;">
+		      <td width="300" class="command_table_element"><b>command / hook</b></td>
+		      <td width="75"><b>create</b></td>
+		      <td width="75"><b>parse</b></td>
+		      <td width="75"><b>execute</b></td>
+		      <td><b>purpose</b></td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">rqconfig_request_configure</span><br />
+		        <span class="style_inline_code">__rsvp_rqconfig_hook_request_configure</span></td>
+		      <td>admin<br />control</td>
+		      <td>active</td>
+		      <td>active</td>
+		      <td class="command_table_comment">request a client configure itself</td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">rqconfig_request_deconfigure</span><br />
+		        <span class="style_inline_code">__rsvp_rqconfig_hook_request_deconfigure</span></td>
+		      <td>admin<br />control</td>
+		      <td>active</td>
+		      <td>active</td>
+		      <td class="command_table_comment">request a client deconfigure itself</td>
+          </tr>
+        </table>
+      </div>
+      <p></p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="lrsalras"><span class="style_file_name">librsvp-rqsrvc.so</span> and <span class="style_file_name">librsvp-rqsrvc-auto.so</span>.</a>
+      </h3>
+      <p class="overview_content"> <span class="style_file_name">librsvp-rqsrvc.so</span> provides commands for one client to request another client register or deregister a service on the sending client's server. These requests are generally sent outside of the local system to remote clients, allowing access to the remote clients' services as if they were local. </p>
+      <p class="overview_content"> <span class="style_file_name">librsvp-rqsrvc-auto.so</span> is a transparent automation of <span class="style_file_name">librsvp-rqsrvc.so</span>. It's a generic implementation of <span class="style_file_name">librsvp-rqsrvc.so</span> which allows the client to screen the type of service requested, then registers the service automatically if approved. </p>
+      <div align="center">
+        <table width="900" class="command_table">
+		    <tr style="font-size: larger;">
+		      <td width="300" class="command_table_element"><b>command / hook</b></td>
+		      <td width="75"><b>create</b></td>
+		      <td width="75"><b>parse</b></td>
+		      <td width="75"><b>execute</b></td>
+		      <td><b>purpose</b></td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">rqsrvc_register_services</span><br />
+		        <span class="style_inline_code">__rsvp_rqsrvc_hook_register_services</span></td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td>resource</td>
+		      <td class="command_table_comment">request a client register services remotely</td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">rqsrvc_deregister_services</span><br />
+		        <span class="style_inline_code">__rsvp_rqsrvc_hook_deregister_services</span></td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td>resource</td>
+		      <td class="command_table_comment">request a client deregister services remotely</td>
+          </tr>
+        </table>
+      </div>
+      <p></p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="lr2s"><span class="style_file_name">librsvp-ready.so</span>.</a>
+      </h3>
+      <p class="overview_content"> This library provides a generic command interface between two clients for one to indicate a "readiness" state to another. The actual implementation of the commands' execution at the terminal client are entirely up to the developer. </p>
+      <div align="center">
+        <table width="900" class="command_table">
+		    <tr style="font-size: larger;">
+		      <td width="300" class="command_table_element"><b>command / hook</b></td>
+		      <td width="75"><b>create</b></td>
+		      <td width="75"><b>parse</b></td>
+		      <td width="75"><b>execute</b></td>
+		      <td><b>purpose</b></td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">ready_system_ready</span><br />
+		        <span class="style_inline_code">ready_system_ready_response</span><br />
+		        <span class="style_inline_code">__rsvp_ready_hook_system_ready</span></td>
+		      <td>active</td>
+		      <td>active</td>
+		      <td>active</td>
+		      <td class="command_table_comment">indicate a system is ready</td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">ready_system_not_ready</span><br />
+		        <span class="style_inline_code">ready_system_not_ready_response</span><br />
+		        <span class="style_inline_code">__rsvp_ready_hook_system_not_ready</span></td>
+		      <td>active</td>
+		      <td>active</td>
+		      <td>active</td>
+		      <td class="command_table_comment">indicate a system is <i>not</i> ready</td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">ready_system_never_ready</span><br />
+		        <span class="style_inline_code">ready_system_never_ready_response</span><br />
+		        <span class="style_inline_code">__rsvp_ready_hook_system_never_ready</span></td>
+		      <td>active</td>
+		      <td>active</td>
+		      <td>active</td>
+		      <td class="command_table_comment">indicate a system is <i>will never be</i> ready</td>
+          </tr>
+        </table>
+      </div>
+      <p></p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="lds"><span class="style_file_name">librsvp-dataref.so</span>.</a>
+      </h3>
+      <p class="overview_content"> This library is meant to defer raw data exchanges to external communication lines. Because of the command object structure of Resourcerver communications and the limitations thereof, this allows clients to transmit unformatted and unlimited-sized data segments by providing location information to another client. Using this library, clients can exchange a raw stream of binary data externally and communicate segmentation information through Resourcerver. </p>
+      <p class="overview_content"> This library intends for one client to send location-opening information to another client to initiate the transfer process. The location and type are arbitrary, though the intended types are pipes, files, sockets, and mapped memory.  The client receiving the opening information should open the data location in the requested mode and wait for instructions. </p>
+      <p class="overview_content"> The initiating client assigns each location a unique reference number to use when referencing it to another client. The initiating client starts a data transfer by sending a "read," "write," or "exchange" request to the other client, making reference to the location reference, an offset length, and a data length. </p>
+      <div align="center">
+        <table width="900" class="command_table">
+		    <tr style="font-size: larger;">
+		      <td width="300" class="command_table_element"><b>command / hook</b></td>
+		      <td width="75"><b>create</b></td>
+		      <td width="75"><b>parse</b></td>
+		      <td width="75"><b>execute</b></td>
+		      <td><b>purpose</b></td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">dataref_open_reference</span><br />
+		        <span class="style_inline_code">__rsvp_dataref_hook_open_reference</span></td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td class="command_table_comment">request a client open a data reference</td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">dataref_change_reference</span><br />
+		        <span class="style_inline_code">__rsvp_dataref_hook_change_reference</span></td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td class="command_table_comment">request a client change the open specifics of a data reference</td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">dataref_close_reference</span><br />
+		        <span class="style_inline_code">__rsvp_dataref_hook_close_reference</span></td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td class="command_table_comment">request a client close a data reference</td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">dataref_read_data</span><br />
+		        <span class="style_inline_code">__rsvp_dataref_hook_read_data</span></td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td class="command_table_comment">request a client read data to a reference</td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">dataref_write_data</span><br />
+		        <span class="style_inline_code">__rsvp_dataref_hook_write_data</span></td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td class="command_table_comment">request a client write data from a reference</td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">dataref_exchange_data</span><br />
+		        <span class="style_inline_code">__rsvp_dataref_hook_exchange_data</span></td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td class="command_table_comment">request a client read, then write data from a reference</td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">dataref_alteration_response</span><br />
+		        <span class="style_inline_code">__rsvp_dataref_hook_alteration</span></td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td>service</td>
+		      <td class="command_table_comment">notify the sender of an alteration</td>
+          </tr>
+        </table>
+      </div>
+      <p></p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="detached.html" class="overview_link">Previous - Creating Detached Clients</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a class="overview_link">Next</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

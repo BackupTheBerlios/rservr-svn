@@ -1,0 +1,118 @@
+This example is a very basic simulation of a home automation system.  It
+consists of a main 'rservr' system for control of the entire system plus one
+additional 'rservr' subsystem to control each floor of the home.  Each separate
+system simulates a separate computer on a home network, where each of the floor-
+controlling 'rservr' systems would reside on a "headless" computer located on
+the floor it controls and the main 'rservr' system would reside on a "normal"
+computer for user control.
+
+To run this interactive example, make sure Resourcerver is installed and is of
+the same version as this example's package.  Run 'make' to build the binaries
+and if all goes well, enter the following:
+
+	./main-system.sh subsystems
+
+The above command line will start the main system and all floor subsystems
+according to the 'subsystems' configuration file.  It will start the main
+server system, plus one server system per floor with a "room" client
+corresponding to each room in the house.  All of the floor-controlling systems
+are connected to the main system via a local-socket connection.  These
+connections simulate port connections on a local network between the different
+computers.
+
+Each 'rservr' system in this example is initialized by starting several clients.
+All of the servers are started using the "register_all_wait" configuration
+option, meaning that the scripts will wait until all new clients are ready
+before going on to the next line.  Each server uses an instance of 'rservrd' to
+aid in system control, all using the "r" option, meaning that command lines
+calling for 'rservrd' to start a new client will wait for that client to be
+ready before continuing.  These greatly improves synchronization, and without
+them the scripts would require wait intervals between operations.
+
+Once the main server is initialized with its clients, the main script creates a
+local socket to allow the other 'rservr' systems to connect.  This socket is
+managed by an instance of 'rsv-fsrelay', which is an IPC-forwarding client.
+This client allows commands to be sent between the separate 'rservr' systems.
+The main script then calls the 'floor-subsystem.sh' script to start each of the
+floor-controlling systems.
+
+The floor-controlling systems are initialized by starting an 'rservr' with an
+instance of 'rsv-fsrelay'.  This IPC-forwarding client is used to connect to
+its counterpart on the main system.
+
+After initialization, the subsystem script adds a client for each room of its
+floor using 'rservrd'.  Lastly, the subsystem script connects the floor-
+controlling system to the main system using 'rservrd' to connect the
+corresponding 'rsv-fsrelay' clients.
+
+Once the main system and the floor-controlling subsystems are online, the main
+script starts an instance of 'system-control' as a client on the main system.
+This client takes the name of a status-updating client as well as the name of a
+system to configure.  The name of the system is sent to the other client using a
+"configuration request" from the plug-in 'librsvp-rqconfig.so'.
+
+The receiving client proceeds to search the entire system for resource clients.
+The first step in the process is to find all IPC-forwarding services available
+on the local system.  With a list of services, the client requests a list of
+connections from each.  Each combination of forwarding service + connection
+forms an address to a remote server, in this case the floor-controlling
+subsystems.
+
+To allow the main system's clients to use the services found on the subsystems,
+the client performing the configuration sends a "register services" request to
+each of the remote services from the plug-in 'librsvp-rqsrvc.so'.  Each service
+is addressed explicitly, and when the request is received, each registers
+several services on their own server plus corresponding services on the main
+system's server.  This allows the clients on the main system's server to access
+the services provided as if they were local to the main server.  In other words,
+without having to specify an address explicitly.  Each of these new services
+corresponds to a specific object in a specific room of the home.
+
+After the status-updating client completes configuration, it responds to the
+configuration initiator (the client that sent the configuration request to it)
+indicating the outcome of the configuration.
+
+
+Once the system is set up, type the following to experiment with the system:
+
+	rservrd system @execute@rsv-terminal@./terminal
+	unsterm ./terminal
+
+The first line adds the 'rsv-terminal' client to the main server.  This client
+creates a local socket as specified, and the second line opens that socket in
+the current terminal with the 'unsterm' program.
+
+The 'rsv-terminal' program provides a text-based control interface with an
+'rservr' system.  Here are a few things to try:
+
+	find_services
+	- This will list all of the controlled objects in the home.  This will
+	  also list the forwarding service, which is of little use in this
+	  context.
+
+	service_message <object> check
+	- Insert a service name where <object> is.  Take a line for one of the
+	  services from 'find_services' and use the first part, e.g.
+	  'level1:entry:lights:0'.
+
+	service_message <object> on
+	- Use the name of a service you already checked, then check it again.
+
+	service_message <object> off
+	- Use the name of a service you already checked, then check it again.
+
+
+When you're done experimenting, exit 'unsterm' with [Ctrl]+D.  To terminate all
+of the parts of the system, type the following:
+
+	rservrd '(system|level[1-3])' @server_term
+
+The expression in '' is a regex to include all of the system names we've started
+in the example.  If you use an alternate configuration file, use an expression
+that includes all of the floor names or make one call to 'rservrd' for each
+server separately.  If you aren't sure, type 'rservrd' to list all active
+server systems with the 'rservrd' client.
+
+Please write to me at ta0kira@users.sourceforge.net if you have questions,
+comments, or suggestions.
+Kevin P. Barry

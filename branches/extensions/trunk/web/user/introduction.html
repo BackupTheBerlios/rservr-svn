@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver User's Guide - Introduction</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver User's Guide </h1>
+      <h2 align="center" class="page_subtitle"> Introduction </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a class="overview_link">Previous</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="assembly.html" class="overview_link">Next - Application Assembly</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#PoR" class="overview_link">Purpose of Resourcerver.</a>
+        </li>
+        <li>
+          <a href="#GS" class="overview_link">Getting Started.</a>
+          <div>
+            <ul class="toc_list">
+              <li>
+                <a href="#GS_I" class="overview_link">Installation.</a>
+              </li>
+              <li>
+                <a href="#GS_LaC" class="overview_link">Licensing and Copying.</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <a href="#AS" class="overview_link">Application Structure.</a>
+          <div>
+            <ul class="toc_list">
+              <li>
+                <a href="#NR" class="overview_link">Naming Rules.</a>
+              </li>
+              <li>
+                <a href="#AS_TS" class="overview_link">The Server.</a>
+              </li>
+              <li>
+                <a href="#AS_C" class="overview_link">Clients.</a>
+                <div>
+                  <ul class="toc_list">
+                    <li>
+                      <a href="#AS_CC_AC" class="overview_link">Admin Clients.</a>
+                    </li>
+                    <li>
+                      <a href="#AS_CC_MC" class="overview_link">Monitor Clients.</a>
+                    </li>
+                    <li>
+                      <a href="#AS_CC_SC" class="overview_link">Service Clients.</a>
+                    </li>
+                    <li>
+                      <a href="#AS_CC_CC" class="overview_link">Control Clients.</a>
+                    </li>
+                    <li>
+                      <a href="#AS_CC_RC" class="overview_link">Resource Clients.</a>
+                    </li>
+                    <li>
+                      <a href="#AS_CC_A2C" class="overview_link">Active Clients.</a>
+                    </li>
+                    <li>
+                      <a href="#AS_CC_DC" class="overview_link">Detached Clients.</a>
+                    </li>
+                    <li>
+                      <a href="#AS_CC_R2C" class="overview_link">Remote Clients.</a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <a href="#AS_RtAL" class="overview_link">Run-time Application Layout.</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <a href="#IpC" class="overview_link">Inter-process Communication.</a>
+          <div>
+            <ul class="toc_list">
+              <li>
+                <a href="#IpC_IUCO" class="overview_link">IPC Using Command Objects.</a>
+              </li>
+              <li>
+                <a href="#IpC_CT" class="overview_link">Command Types.</a>
+              </li>
+              <li>
+                <a href="#IpC_ECaAC" class="overview_link">Error Checking and Abuse Control.</a>
+              </li>
+              <li>
+                <a href="#IpC_SCttS" class="overview_link">Sending Commands to the Server.</a>
+              </li>
+              <li>
+                <a href="#IpC_SCtOC" class="overview_link">Sending Commands to Other Clients.</a>
+              </li>
+              <li>
+                <a href="#IpC_CE" class="overview_link">Command Execution.</a>
+              </li>
+              <li>
+                <a href="#IpC_IcCR" class="overview_link">Inter-client Communication Restrictions.</a>
+                <div>
+                  <ul class="toc_list">
+                    <li>
+                      <a href="#IpC_IcCR_SBiC" class="overview_link">Sending Built-in Commands.</a>
+                    </li>
+                    <li>
+                      <a href="#IpC_IcCR_SPiC" class="overview_link">Sending Plug-in Commands.</a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <a href="#SuO" class="overview_link">Super-user Oversight.</a>
+        </li>
+        <li>
+          <a href="#RE" class="overview_link">Regular Expressions.</a>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="PoR">Purpose of Resourcerver.</a>
+      </h3>
+      <p class="overview_content"> Resourcerver is a system of *nix programs and libraries used to assemble numerous processes into larger applications. It's used to developer "Resourcerver systems" which are comprised of several smaller programs, each with a specific function, coming together to create an application. </p>
+      <p class="overview_content"> Each of the separate processes is designed by the application developer to perform specific tasks within the system.  Resourcerver binds a system together using a server at its core (<span class="style_command_line">rservr</span>,) which facilitates and regulates IPC between each of the specialized processes. In the context of Resourcerver, the specialized processes are referred to as "clients" or "client processes," etc. to distinguish them from processes not connected to a system. The system itself is defined as the specific server process and all of the client processes connected to it. This system is considered the "application." </p>
+      <p class="overview_content"> The <span class="style_command_line">rservr</span> server program is normally the starting point for all Resourcerver systems. It initializes the application through a configuration file specific to that application, which normally specifies clients to start and security options.  Most systems will use the <span class="style_command_line">rservrd</span> client, which will allow modification of the system once it's initialized. Normally a system will be initialized by starting the <span class="style_command_line">rservrd</span> client and setting the minimum security state of the server. The system will then be incrementally assembled using <span class="style_command_line">rservrd</span>, adding new clients and sometimes making socket connections. </p>
+      <p class="overview_content"> Each client process will register itself with <span class="style_command_line">rservr</span> using a specifically-defined client type. These types have well-defined security attributes that control what clients can and can't do as far as inter-client interaction and server actions. The client type itself doesn't define what the client <i>does</i>, but serves as the control mechanism used to determine how that client <i>must</i> fit into the rest of the system. </p>
+      <p class="overview_content"> Client types aren't necessarily arranged cumulatively or hierarchically. Most client types have at least one type of action it can perform that no other client can. The most-defining attributes of each client type relate to what actions it can perform on the server. Most others define what other clients it can communicate with. </p>
+      <p class="overview_content"> Resourcerver has 3 basic types of user involvement: </p>
+      <ul class="other_bullet_list">
+        <li class="overview_content">
+          <b>Administration.</b> The least-involved users will administer Resourcerver systems through the use of command shells and shell scripts. This level of involvement only requires the applicable knowledge given in this guide (plus any documentation provided by the specific application being administered.) <br />
+          <br />
+        </li>
+        <li class="overview_content">
+          <b>Client Development.</b> Client development is the second level of involvement. Developers creating clients will need to know most of the information in this guide and will need both the <a href="../app/app-developer-guide.html" class="general_link">Application Development Guide</a> and the <a href="../api/index.html" class="general_link">C/C++ API Reference</a>. Most Resourcerver application developers will design multiple clients concurrently that interact with each other to form a functioning system. <br />
+          <br />
+        </li>
+        <li class="overview_content">
+          <b>Plug-in Development.</b> The lowest level of involvement is plug-in development. Plug-ins take the form of either IPC commands (to be used by client developers) and security filters (to be used by administrators when using network connections.) Users creating plug-ins will require significant knowledge of how Resourcerver systems work, as well as the internal functioning of clients. <br />
+          <br />
+        </li>
+      </ul>
+      <p class="overview_content"> "Uninvolved" users are end users of a third-party Resourcerver system who might not even be aware of what Resourcerver does. If that describes you, you might be wasting your time reading this guide. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="GS">Getting Started.</a>
+      </h3>
+      <h4 class="overview_title">
+        <a name="GS_I">Installation.</a>
+      </h4>
+      <p class="overview_content"> Resourcerver depends on one external project. This project provides the structure of the IPC system and provides the ability to expand the set of IPC commands extremely easily. Though used by Resourcerver to create and parse XML-style commands, it can be used to create all types of hierarchical data representations. </p>
+      <p align="center">
+        <a href="http://hparser.berlios.de/" target="_blank" class="dependency_link general_link">hparser 1.0.0</a><span class="dependency_text"> - C++ Hierarchical Data Framework</span>
+        <br />
+        <br />
+      </p>
+      <p class="overview_content"> I also wrote and maintain the <b>hparser</b> project.  Some of its minor functionality is a result of this project, but in general this project was developed around the <b>hparser</b> project. Don't be fooled by its primitive (or lack of) documentation and front page. </p>
+      <p class="overview_content"> The <b>hparser</b> package must be installed prior to configuring the Resourcerver package. Don't deviate from the version indicated above unless the documentation contained in the Resourcerver package you downloaded specifies another. </p>
+      <p class="overview_content"> Resourcerver builds with a standard <span class="style_command_line">./configure</span> script. Normally the following works fine for installation: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+<b>shell&gt;</b> ./configure && make
+<b>shell&gt;</b> su
+<i>(change to super-user)</i>
+<b>shell&gt;</b> make install
+</pre>
+      </div>
+      <p class="overview_content"> You'll need to install as the super user so the <span class="style_command_line">rservrd</span> program functions correctly. This program is one of the most important components of the package and super-user privileges are required to set its user and group ownership and the suid/sgid flags. <u>On non-Linux systems, you might need to add the user and group "rservrd" to your system manually, set the ownership of <span class="style_command_line">rservrd</span> to both, and set its permissions to <span class="style_command_line">6755</span>.</u> </p>
+      <p class="overview_content"> The file <span class="style_file_name">param.h</span> in the root package directory contains build macros that control how Resourcerver is compiled. Most relate to debugging and default parameters, but take a look if you're curious. Don't change any parameter if you don't know what it does. That file will be installed with the other headers, so the configuration you build with will be available to packages that depend on Resourcerver to build. </p>
+      <h4 class="overview_title">
+        <a name="GS_LaC">Licensing and Copying.</a>
+      </h4>
+      <div style="font-size: smaller;">
+        <p class="overview_content">
+          <b>This software is released under the <u>BSD License</u>.</b>
+        </p>
+        <p class="overview_content"> Copyright (c) <b>2008</b>, <b>Kevin P. Barry</b>
+        </p>
+        <p class="overview_content"> All rights reserved. </p>
+        <p class="overview_content"> Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: </p>
+        <ul class="overview_bullet_list">
+          <li class="overview_content"> Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. <br />
+            <br />
+          </li>
+          <li class="overview_content"> Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. <br />
+            <br />
+          </li>
+          <li class="overview_content"> Neither the name of the <b>Resourcerver Project</b> nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission. <br />
+            <br />
+          </li>
+        </ul>
+        <p class="overview_content" style="font-size: smaller;"> THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. </p>
+      </div>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="AS">Application Structure.</a>
+      </h3>
+      <h4 class="overview_title">
+        <a name="NR">Naming Rules.</a>
+      </h4>
+      <p class="overview_content"> All components of a Resourcerver system are referenced using names, and sometimes addresses. Each name denotes a unique component such as a client or the server, and addressing allows targeting of components outside of the local Resourcerver system. All names and addresses are restricted to a specific pattern which is somewhere between that of a normal file name and that of a C symbol name. The exact pattern is available in <span class="style_file_name">param.h</span>, but in summary, names may only contain letters, numbers, and the following characters: "<b>~`#$%^&-_+;:',./</b>". This restriction doesn't allow for whitespace in names, but it <i>does</i> allow a few characters that have special meanings in regular expressions ("<b>$^+.</b>".) This can effect searching using regular expressions; however escaping those characters with "<b>\</b>" will allow you to use them literally. Addresses must meet the same requirements, and additionally may contain the address separators "<b>?|</b>" (discussed much later.) Client names, individual addresses, and target scopes as a whole also have length limitations set in <span class="style_file_name">param.h</span>. </p>
+      <h4 class="overview_title">
+        <a name="AS_TS">The Server.</a>
+      </h4>
+      <p class="overview_content"> The central component of all Resourcerver systems is the server, executed using the <span class="style_command_line">rservr</span> program. This program is the starting point of the system and the system ceases to exist when it exits. </p>
+      <p class="overview_content"> The main purpose of the server program is to bind the system of processes together and to regulate communication between them. Other than opening configuration and log files and connecting to detached clients (discussed in a later section,) it doesn't access the file system, doesn't access devices, and doesn't access networks. In fact, once it's started, the only interaction a user has with the server is through clients connected to it and via POSIX signals. </p>
+      <p class="overview_content"> A server can be executed by a normal user or by the super user (given certain conditions.) The server will execute most clients itself as child processes, but will <i>never</i> start a client with super-user permissions and it will <i>never</i> access the file system for <i>any</i> reason as the super-user. It's under these conditions alone that this project supports servers with super-user permissions. </p>
+      <p class="overview_content"> Super-user servers are useful because they allow you to execute clients under different user and group IDs. This allows you to restrict access abilities of certain parts of the application. Servers executed by normal users will <i>always</i> have the same user <i>and</i> group IDs for all clients started by the server itself. </p>
+      <p class="overview_content"> The server assembles an application by starting clients based on command specifications from a configuration file, or at the request of an admin client (discussed in the next section.) A command specification consists of the command line, user and group IDs, and permission limitations ("permission" in this case and in the rest of this guide means "a client's ability to perform actions within a Resourcerver system.") The command is interpreted and executed by the server (provided all conditions are met) under the user and group IDs specified (if it's a super-user server.)  Upon successful execution the new process is attached to the server, now considered a client. The application itself is built through the addition of new clients to form a self-interacting system. </p>
+      <p class="overview_content"> The server program itself can exit one of three ways: </p>
+      <ul class="other_bullet_list">
+        <li class="overview_content">
+          <b>Abandonned Server.</b> A server will exit once all of its clients have exited. <br />
+          <br />
+        </li>
+        <li class="overview_content">
+          <b>Unhandled Signal.</b> A server will exit due to a signal that would normally cause a process to exit. When this happens it disconnects all of its clients, which should then exit on their own. <br />
+          <br />
+        </li>
+        <li class="overview_content">
+          <b>Requested Exit.</b> A server may be forced to exit by certain clients. If this happens, it <i>may</i> send notification to all of its attached clients, disconnect all of them, then exit. <br />
+          <br />
+        </li>
+      </ul>
+      <h4 class="overview_title">
+        <a name="AS_C">Clients.</a>
+      </h4>
+      <p class="overview_content"> Clients have no name, no type, and permission to do nothing by default. A client must register with the server it's attached to in order to perform any Resourcerver-related functions. The type a client registers as dictates what it's able to do within the system, such as what actions it can request of the server and what other clients it can communicate with. </p>
+      <p class="overview_content"> Clients cannot change their type once they're registered without first deregistering (becoming a typeless and nameless client again) and reregistering as a different type. This effectively resets the client's identity within the system, but doesn't reset certain things such as error counters and type restrictions associated with it. </p>
+      <p class="overview_content"> The server starts new clients in their own process group and monitors those groups for running processes.  Once a group ceaces to have processes, the server considers that client to be disconnected and will shut down IPC channels (sometimes after the next input iteration if something else has the channels open.)  Normally forking from a client process and allowing it to exit won't disconnect the child process unless that process creates a new session or group. </p>
+      <h5 class="overview_title">
+        <a name="AS_CC_AC">Admin Clients.</a>
+      </h5>
+      <p class="overview_content"> The purpose of admin clients is to exercise administrative control over a running <span class="style_command_line">rservr</span>. This type of client can start and stop clients on the server and can list all clients attached to a server, along with their current permissions and process IDs. This type of client is only used to perform "special" tasks on the running system and shouldn't be used to fulfill any of the application's core purposes (such as data processes, interaction with the user, etc.) Normally these clients will be used to assemble the system, shut it down, and correct run-time structural errors without the application's user being aware. </p>
+      <p class="overview_content"> Individual admin clients can possess the "server control" attribute that gives it permission to exercise greater server control. This attribute is automatically disabled upon completion of server configuration; therefore, only admin clients started at the same time as the server may have this attribute. This attribute can be disabled at server startup using the configuration file. </p>
+      <p class="overview_content"> The "server control" attribute gives admin clients the following <i>additional</i> permissions that aren't otherwise given to admin clients (most concepts mentioned below are covered later): </p>
+      <ul class="feature_bullet_list">
+        <li class="overview_content"> They can terminate the server. <br />
+          <br />
+        </li>
+        <li class="overview_content"> They can attach detached clients. <br />
+          <br />
+        </li>
+        <li class="overview_content"> They can disconnect other clients without the server sending those clients a message notifying them. <br />
+          <br />
+        </li>
+        <li class="overview_content"> They can send commands to clients using a service name. <br />
+          <br />
+        </li>
+        <li class="overview_content"> They can disconnect a client based on a service name. <br />
+          <br />
+        </li>
+        <li class="overview_content"> They can take control of the terminal away from any other client (the server must be the owner of the terminal.) <br />
+          <br />
+        </li>
+      </ul>
+      <h5 class="overview_title">
+        <a name="AS_CC_MC">Monitor Clients.</a>
+      </h5>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> Clients may register as "monitor clients" specifically, but all other clients inherit the "monitor client" attribute by default. </p>
+        </div>
+      </div>
+      <p class="overview_content"> The purpose of monitor clients is to monitor the activity of a running <span class="style_command_line">rservr</span>. When registered specifically as a monitor client, a client acts passively with the exception of notifying the server of the activity it needs to be aware of. When registered as another client type, clients can monitor the activity of the server while retaining the functionality related to the type they're primarily registered as. <br />
+        <br />
+      </p>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> If monitoring is disabled by the server then no client may register as a monitor client and the "monitor client" attribute of all other clients is disabled. Registering as a monitor client will explicitly fail, but registering as another type will work (if otherwise allowed) without the ability to monitor the server. </p>
+        </div>
+      </div>
+      <h5 class="overview_title">
+        <a name="AS_CC_SC">Service Clients.</a>
+      </h5>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> Clients may not register specifically as "service clients." "Service client" is a category that both control and resource clients are a part of. </p>
+        </div>
+      </div>
+      <p class="overview_content"> Service clients are the primary functional components of a Resourcerver system. Their purpose is to interact with each other via the server to fulfill the core purpose of the application. They provide the control and processing structure of the application. </p>
+      <p class="overview_content"> Service clients primarily interact with each other using a table of services maintained by the server. The tabulated services are aliases for specific clients, either local or remotely-connected. Normally only service clients have access to these services. All service clients may search this list of services and may also send commands to other clients using service names. Multiple services can alias the same client, but all service names must be unique among all service and client names. </p>
+      <p class="overview_content"> Services are registered <i>only</i> by resource clients and are aliases for the clients that register them. The exceptional feature of services is that remotely-addressed clients (such as those connected through a network) may register services on a separate server, allowing service clients connected to that server access the remote services transparently. </p>
+      <h5 class="overview_title">
+        <a name="AS_CC_CC">Control Clients.</a>
+      </h5>
+      <p class="overview_content"> The purpose of control clients is to exercise control over the operation of services in a Resourcerver system. This type of client cannot register services, but inherits all of the functionality of a service client. Additionally, control clients can proactively communicate with each other, but resource clients <i>cannot</i> communicate with a control client unless it's in response to a command that the control client sent. </p>
+      <p class="overview_content"> Control clients are normally the point of user interaction with the application. They should be used to initiate action within the system and to control processes that take place between multiple clients. They should not be used to process data or retreive it from a storage system. </p>
+      <h5 class="overview_title">
+        <a name="AS_CC_RC">Resource Clients.</a>
+      </h5>
+      <p class="overview_content"> The purpose of resource clients is to manage services in a Resourcerver system. Their primary function is to register services and to process commands from other clients associated with those services. Resource clients can proactively communicate with each other, but not with control clients. This type of client can also register anonymously (without a name,) limiting the client's visibility to only those services it has registered. This type of client inherits all of the functionality of service clients. </p>
+      <p class="overview_content"> Resource clients normally don't have any direct interaction with the user. They normally provide specific services to the application and are in "standby" until another client requests they perform an action (normally a control client.) They normally only need to be aware of the immediate actions they're to perform and not of the overall structure of the application. </p>
+      <h5 class="overview_title">
+        <a name="AS_CC_A2C">Active Clients.</a>
+      </h5>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> "Active client" is a group of client types considered to be active participants in the operations of a Resourcerver system. </p>
+        </div>
+      </div>
+      <p class="overview_content"> Active clients are clients that are registered as a type other than "monitor client." This group is used for command-permission purposes only, generally for plug-in commands. </p>
+      <h5 class="overview_title">
+        <a name="AS_CC_DC">Detached Clients.</a>
+      </h5>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> "Detached client" is a category used to describe clients that <i>aren't</i> executed by an <span class="style_command_line">rservr</span>: they're executed independently and are attached to an <span class="style_command_line">rservr</span> later on, then converted to client processes. </p>
+        </div>
+      </div>
+      <p class="overview_content"> Detached clients should normally be avoided in Resourcerver systems. They aren't a normal part of a system and don't have a specific place in the overall design of the Resourcerver project. They're provided for forward compatibility for systems which might require clients to be started by a process other than a server (such as a <span class="style_command_line">inetd</span>, etc.) or for processes that must start with some level of user interaction before becoming a client process. </p>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> Detached clients cannot be connected to an <span class="style_command_line">rservr</span> at server-execution time. They may only be attached by admin clients (such as <span class="style_command_line">rservrd</span>) if the admin client has the "server control" attribute and if detached clients haven't been disabled. </p>
+        </div>
+      </div>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> Detached clients may only register as control or resource clients and may not monitor the server. This is because <span class="style_command_line">rservr</span> has no control over the client: the server won't know the client's process, user, or group IDs. </p>
+        </div>
+      </div>
+      <h5 class="overview_title">
+        <a name="AS_CC_R2C">Remote Clients.</a>
+      </h5>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> "Remote client" is a property of a client that's not connected directly to the local server system. This type of client registers on its own server and is available via a pair of IPC-forwarding clients which connect the two independent Resourcerver systems. </p>
+        </div>
+      </div>
+      <h4 class="overview_title">
+        <a name="AS_RtAL">Run-time Application Layout.</a>
+      </h4>
+      <p class="overview_content"> All Resourcerver systems have exactly one <span class="style_command_line">rservr</span> instance at their core and one or more clients attached exclusively to that server. All clients will be attached to exactly one server. Some specially-designed clients may be connected externally to other clients in other systems to form connections between independent systems, but those connections aren't a part of the server's system itself. The Resourcerver package provides several standard clients to make these connections, and <span class="style_command_line">rservr</span> is explicitly designed to allow those clients to make remote clients appear to be local. </p>
+      <div align="center">
+        <img alt="Run-time Application Layout" src="runtime-layout.png" height="438" width="500" />
+      </div>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="IpC">Inter-process Communication.</a>
+      </h3>
+      <h4 class="overview_title">
+        <a name="IpC_IUCO">IPC Using Command Objects.</a>
+      </h4>
+      <p class="overview_content"> All inter-process communication in a Resourcerver system takes the form of discrete XML-style command objects transmitted between processes using pipes and sockets. This allows simple debugging and more reliable communication, but requires all IPC to be broken down into discrete units with specific actions associated with each. Each units is called a "command object" or simply a "command." </p>
+      <p class="overview_content"> Resourcerver uses both built-in and plug-in commands.  All built-in command are assembled using specifications ("arguments") provided by the command's initiator (client or server program,) exported across a pipe or socket, then parsed by the receiving entity. Each command has associated executable code that's <i>never</i> executed by the initiator and is <i>selectively</i> executed by the receiver. </p>
+      <p class="overview_content"> Each command object sent is a single unit of communication. Each of these units has a specific purpose and behavior at its "terminal location," which is the final destination of the command. Commands are (broadly) either server or client commands, denoting what type of entity will eventually execute the command's specified operation. Most commands will either be requests or responses, which denote proactive requests for action or information and responses thereto, respectively. </p>
+      <p class="overview_content"> The most fundamental built-in commands perform things such as client registration, timing updates, starting new clients, registering services, finding clients, and sending data between clients. Some plug-in commands (such as those provided by <span class="style_file_name">librsvp-netcntl.so</span>) call "hook functions" defined by the client program at the terminal location (and some intermediate locations) that perform complex operations defined by that client, such as connecting to a network. </p>
+      <p class="overview_content"> Each client maintains a command queue within its own process where it queues command objects waiting to be sent. Clients will generally create a command using an API function, which will queue the command for further action. This allows the client to include remote addressing so that the command can be sent to another Resourcerver system that, for example, might be across a network. It also allows clients to retain a command in its current state in case it has to resend it due to an error. </p>
+      <h4 class="overview_title">
+        <a name="IpC_CT">Command Types.</a>
+      </h4>
+      <p class="overview_content"> All commands fall into the categories below. No command can have more than one type at any given time, though a command's type might be different depending on its current location and destination. For example, a "request" addressed to a remote client will be a "null command" when it's about to be sent outside of the current system so that it can't accidentally be executed. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="250" align="left" class="style_term"> server commands </td>
+          <td class="style_definition_short"> commands executed on a server </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Server commands are always sent by a client and are only executed by a server. Many of these commands are restricted to the local Resourcerver system. Any command that requires server action, such as registration or client listing, is a server command. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="250" align="left" class="style_term"> requests </td>
+          <td class="style_definition_short"> requests between clients </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Requests are sent by active clients (those that are registered as other-than monitor-only clients) to other active clients. They can almost always be addressed to locations outside of the local Resourcerver system. Requests normally require access to the client's internal execution interface to register messages in the terminal client's message queue. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="250" align="left" class="style_term"> responses </td>
+          <td class="style_definition_short"> general responses aimed at clients </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Responses are sent to clients by both the server and by other clients. They're intended to update the status of a request or server command sent by a client to notify it of success or failure. Responses can only be sent directly to the sender of an incoming request. They generally require access to the client's internal execution interface to update the status of their associated requests, although they're processed with different permissions than requests. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="250" align="left" class="style_term"> null commands </td>
+          <td class="style_definition_short"> other commands aimed at clients </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Commands that don't require any access to the client's internal execution interface are generally null commands. Normally null commands declare hook functions that client programs must define. A command executes the hook function upon arrival at it's target client. These commands are considered requests for the purposes of permission verification. </p>
+      <h4 class="overview_title">
+        <a name="IpC_ECaAC">Error Checking and Abuse Control.</a>
+      </h4>
+      <p class="overview_content"> Bad command usage could clog up an unprotected system, which would eventually deny its useful operation. <span class="style_command_line">rservr</span> protects its respective systems using error counters for all clients connected to them by monitoring attempted permission violations and nonsensical transmissions. The server disconnects any client that reaches a counter limit to protect the system. </p>
+      <ul class="feature_bullet_list">
+        <li class="overview_content"> <b>Invalid Command Counter.</b> Invalid commands are those that the sender doesn't have permission to send or to execute. This counter never decreases once increased, which means each client is limited to a finite number of invalid commands regardless of how long they're connected or how much data they send. One could say that the server loses patience with violators very quickly. Admin clients can send an infinite number of invalid requests to allow for system troubleshooting. The maximum limit for invalid commands is set in <span class="style_file_name">param.h</span>. <br />
+          <br />
+        </li>
+        <li class="overview_content"> <b>Erroneous Command Counter.</b> Erroneous commands are those that are addressed to invalid locations and those that can't be parsed in the first place. This counter is incremented each time an erroneous command is parsed or is executed by the server. The counter is decremented (not below 0) upon successful execution of each valid command associated with a client. This causes clients sending only garbage to be disconnected quickly, but allows clients sending a low percentage of erroneous commands a little more leeway. Just remember that too many bad commands and not enough good ones following will cause a client to be disconnected. The maximum limit for erroneous commands is set in <span class="style_file_name">param.h</span>. <br />
+          <br />
+        </li>
+        <li class="overview_content"> <b>Pending Commands.</b> Each client has a pending command counter that can't exceed its dynamic, client-specific limit. This counter directly reflects the number of commands a client has awaiting server execution. The server rejects incoming commands with a "retry" response when a client has reached the maximum number of pending commands. Each subsequent command received adds to the client's erroneous command count. For this reason, clients should slow the rate at which they send commands if they receive a "retry" response from the server. The pending command limit for a given client is the static limit set in <span class="style_file_name">param.h</span> minus the erroneous command counter for that client. This allows clients sending more erroneous commands a lesser number of commands pending on the server. One could say that the server punishes clients that send innocent, yet erroneous, information initially, but allows those clients to redeem themselves with valid command transmissions. <br />
+          <br />
+        </li>
+      </ul>
+      <h4 class="overview_title">
+        <a name="IpC_SCttS">Sending Commands to the Server.</a>
+      </h4>
+      <p class="overview_content"> All clients have permission to send at least one command to the server: the command to register itself. After that, the client's permissions are determined by the type it registered as and by certain restrictions set by the state of the server. All commands to be executed by the server are built in, so the extent of server command functionality is statically set when the Resourcerver project is installed. All commands executed on the server either change or retrieve internal information it maintains. Over all, server commands are used to control the behavior of the server when it receives commands intended to be passed on to other clients. The server itself has no function other than managing communication between clients, so the majority of commands passed through a Resourcerver system will be inter-client commands. </p>
+      <h4 class="overview_title">
+        <a name="IpC_SCtOC">Sending Commands to Other Clients.</a>
+      </h4>
+      <p class="overview_content"> Client commands will normally register a message with the receiving client, update the status of a request the receiving client sent, or execute a hook function that the receiving client defines. The most basic inter-client commands are built-in requests and responses that transmit generic text information. That type of communication isn't always appropriate, so all of the included command plug-in libraries allow the receiving client to define how it handles a specific command. A simple example is the plug-in library <span class="style_file_name">librsvp-ready.so</span>. This library provides a command for one client to indicate to another that it's "ready." "Ready" is greatly up to interpretation, so the receiving client defines a "ready-command handler" that gets executed with the "ready" command is received. </p>
+      <h4 class="overview_title">
+        <a name="IpC_CE">Command Execution.</a>
+      </h4>
+      <p class="overview_content"> Commands do nothing unless they're executed. Command execution permissions are based on the terminal location of the command, or the command's final destination. Normally if a client can create and send a command to the server then it has permission to execute it, but not always. </p>
+      <p class="overview_content"> Normally if a command makes it to the server and is meant to be executed there, it will be. That's only the first step, however. The command being executed will generally access the internal execution interface of the server, which may or may not block further action based on action vs. the client's type. The server will send a response to the sending client based on the outcome of the operation. </p>
+      <p class="overview_content"> The server will perform an in-depth comparison between sending and receiving clients when a command is meant to be executed by another client. See the next few sections for more information about that comparison. Individual clients don't generally check permissions before command execution: if the command makes it past the server then it's safe to execute. </p>
+      <p class="overview_content"> If a client or server receives a command that contains a remote target address (e.g. to be sent across a network,) it will generally parse the command inertly so that it can't be executed under any possible circumstances. Some response commands are an exception to this general rule, allowing a response to update the command status at multiple locations. </p>
+      <p class="overview_content"> Both individual clients and the server retain a local table of commands each recognizes (used for both sending and receiving,) but both behave differently when they encounter a command that isn't listed in that table. In both cases, however, a command containing a remote target address doesn't have to be listed in the local command table. This allows plug-in commands only known by the sender and the client at terminal location to be used. All commands use the same format, so although a command might not be known, it still must parse in the same manner as all other commands. </p>
+      <p class="overview_content"> If a server encounters a command that isn't in its command table, it will parse it as an inert command and treat it as an inter-client request (for permission purposes.) This is because the table of commands loaded on the server won't change as a result of plug-in commands, so no plug-in command will ever show up in the server's command table. </p>
+      <p class="overview_content"> If a client encounters a command that isn't in its command table, it will stop further parsing of the command. This is because clients rely on the server to filter out commands based on the sender's type, but the server doesn't provide any other checking. Secondly, commands that reach a client with no additional target address have nowhere to go, so an unrecognized command is a bad one. This means that all built-in commands are safe to execute if they arrive at the client, but a plug-in command must be listed in a client's command table at the terminal location for anything to happen with it. Because remotely-addressed commands are parsed intertly, they won't encounter these execution problems. </p>
+      <p class="overview_content"> Each client's command queue will ensure a given command is listed in the local command table before it queues it for transmission. This is because every command listed in the local command table has associated creation and parsing permissions: if the command isn't listed then the queue can't determine if the client meets the command's creation requirements. </p>
+      <p class="overview_content"> All built-in command creation API functions (used by the client programs) will return an error if the client doesn't have permission to create a command. Some plug-in commands may not perform this check, but normally the command queue will catch permission violations and prevent queueing. </p>
+      <h4 class="overview_title">
+        <a name="IpC_IcCR">Inter-client Communication Restrictions.</a>
+      </h4>
+      <p class="overview_content"> The diagrams below outline what client types can send commands to what other client types. These restrictions are strictly enforced and are a relatively permanent part of the project. These restrictions are enforced by <span class="style_command_line">rservr</span> at the time of transmission; therefore, a client might be able to send a command even without the appropriate permissions, but the server will respond with an error if the command can't be sent onward. </p>
+      <p class="overview_content"> "Service," as used in the diagrams below, means targeting a resource client using the name of a service it has registered. </p>
+      <h5 class="overview_title">
+        <a name="IpC_IcCR_SBiC">Sending Built-in Commands.</a>
+      </h5>
+      <div align="center">
+        <img alt="Sending Built-in Commands" src="sending-builtin.png" height="314" width="650" />
+      </div>
+      <h5 class="overview_title">
+        <a name="IpC_IcCR_SPiC">Sending Plug-in Commands.</a>
+      </h5>
+      <div align="center">
+        <img alt="Sending Plug-in Commands" src="sending-plugin.png" height="314" width="650" />
+      </div>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="SuO">Super-user Oversight.</a>
+      </h3>
+      <p class="overview_content"> The Resourcerver libraries periodically check the user and group IDs of running clients. Although the server will never start a super-user client, some client programs may have the suid/sgid flags set and might subsequently change effective IDs to root. In certain cases, the built-in client library will terminate the client program if it detects an effective user or group ID of root at certain execution points. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="RE">Regular Expressions.</a>
+      </h3>
+      <p class="overview_content"> Resourcerver extensively uses POSIX regular expressions. All regular expressions provided by the user may be matched to partial segments of relevant data. For example, the expression "<b>.</b>" will match any data with at least one character, whereas "<b>^.$</b>" must be used to match data with <i>exactly</i> one character. </p>
+      <p class="overview_content"> In most cases, regular expressions used with Resourcerver may be inverted by making the first character of the expression "<b>!</b>". This will effectively cause data that <i>doesn't</i> match the pattern itself to be considered matches. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a class="overview_link">Previous</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="assembly.html" class="overview_link">Next - Application Assembly</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

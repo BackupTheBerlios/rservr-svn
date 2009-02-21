@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver User's Guide - Application Administration</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver User's Guide </h1>
+      <h2 align="center" class="page_subtitle"> Application Administration </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="assembly.html" class="overview_link">Previous - Application Assembly</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="connections.html" class="overview_link">Next - Connecting Independent Systems</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#IDA" class="overview_link">Important Daemon Actions.</a>
+        </li>
+        <li>
+          <a href="#TaA" class="overview_link">Terminating an Application.</a>
+        </li>
+        <li>
+          <a href="#SL" class="overview_link">Security Levels.</a>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="IDA">Important Daemon Actions.</a>
+      </h3>
+      <p class="overview_content">
+        <span class="style_command_line">rservrd</span> has too many commands to outline in this document, but here are a few general comments regarding certain categories of administrative <span class="style_command_line">rservrd</span> commands. Please refer to <span class="style_command_line">rservrd -h</span> and the <a href="rservrd.html" class="general_link"><span class="style_command_line">rservrd</span> Program Guide</a> for calling methods and other information. </p>
+      <ul class="feature_bullet_list">
+        <li class="overview_content">
+          <span class="style_command_line">rservrd</span> can find and list all clients connected to a server as well as their complete permissions and process IDs. Certain permissions are masked for logging purposes and from non-admin clients, but all permissions are shown in the resulting search. See the <span class="style_command_line">find_client</span> command for more information. <br />
+          <br />
+        </li>
+        <li class="overview_content"> The <span class="style_command_line">ping</span> command is useful to see if a client's message queue is frozen. Normally this function will return right away with either an error or success. If it seems to freeze, that normally means the client's message queue is frozen, but <span class="style_command_line">rservrd</span> will return an error within a few seconds. <br />
+          <br />
+        </li>
+        <li class="overview_content"> The <span class="style_command_line">system</span> and <span class="style_command_line">execute</span> commands start new clients on the server based on a provided command line. The <span class="style_command_line">detached</span> command allows an <span class="style_command_line">rservrd</span> instance with the "server control" attribute to attach detached processes using a local socket that the process initiated for the specific purpose of connecting to an <span class="style_command_line">rservr</span>. <br />
+          <br />
+        </li>
+        <li class="overview_content"> The <span class="style_command_line">exit</span> command will cause <span class="style_command_line">rservrd</span> to remove itself from the server and exit. Remember that this may terminate the server if the <span class="style_command_line">x</span> option is used when starting the daemon. <br />
+          <br />
+        </li>
+        <li class="overview_content"> The <span class="style_command_line">term</span> command will terminate the named client(s) with a courtesy notification. The <span class="style_command_line">kill</span> command will terminate clients without giving them notice, and requires "server control" permissions. Both have <span class="style_command_line">find_</span>* variants which allow termination of clients based on a regular expression to match registered client names. None of these commands will take any action if the <span class="style_command_line">rservrd</span> making the request is included in the termination request. <br />
+          <br />
+        </li>
+        <li class="overview_content"> An <span class="style_command_line">rservrd</span> with the "server control" attribute can terminate its server using the <span class="style_command_line">server_term</span> command. <br />
+          <br />
+        </li>
+      </ul>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TaA">Terminating an Application.</a>
+      </h3>
+      <div align="center">
+        <div border="0" class="attention_box trivia_box">
+          <p>
+            <span class="trivia_box.title trivia_box_title">Trivia:</span> The second "e" in <span class="style_command_line">rservr</span> disappeared (it was originally <span class="style_command_line">rserver</span>) after the time, the <i>only</i> time, I typed <span class="style_command_line">pkill server</span> (shortening the program name by removing the "r",) killing my X-windows system along with the server. Hence the removal of the temptation to use "server" for short by removing the second "e". </p>
+        </div>
+      </div>
+      <p class="overview_content"> Normally server termination is achieved using a <span class="style_command_line">server_term</span> call via <span class="style_command_line">rservrd</span>. If this doesn't work or isn't available (if <span class="style_command_line">rservrd</span> isn't attached or doesn't have the "server control" attribute) you'll need to send the server a signal with the <span class="style_command_line">kill</span> program or something similar, or force the exit of all clients. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="SL">Security Levels.</a>
+      </h3>
+      <p class="overview_content"> Security levels determine what types clients can register as with the server. This does not actually determine the type of client being attached, just its maximum allowable permissions. Security levels are cumulatively-restrictive starting with 0. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="150" align="left" class="style_term"> Level 0 </td>
+          <td class="style_definition_short"> allow all client types </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This is the default level at the beginning of server configuration. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="150" align="left" class="style_term"> Level 1 </td>
+          <td class="style_definition_short"> disallow server control by admin clients </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This is the minimum security level of the server post-configuration. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="150" align="left" class="style_term"> Level 2 </td>
+          <td class="style_definition_short"> disallow connection of detached clients </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="150" align="left" class="style_term"> Level 3 </td>
+          <td class="style_definition_short"> disallow admin clients </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="150" align="left" class="style_term"> Level 4 </td>
+          <td class="style_definition_short"> disallow server monitoring by clients </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This is the level of security detached clients are held to. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="150" align="left" class="style_term"> Level 5 </td>
+          <td class="style_definition_short"> disallow control clients </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="150" align="left" class="style_term"> Level 6 </td>
+          <td class="style_definition_short"> disallow resource clients </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="150" align="left" class="style_term"> Level 7 </td>
+          <td class="style_definition_short"> disallow all clients </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="assembly.html" class="overview_link">Previous - Application Assembly</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="connections.html" class="overview_link">Next - Connecting Independent Systems</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
