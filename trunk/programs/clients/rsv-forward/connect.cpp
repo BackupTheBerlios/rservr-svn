@@ -298,9 +298,13 @@ static bool generate_serial_find(const char *aAddress, serial_find &fFind)
 
 	if ( getaddrinfo(working_copy.c_str(), NULL, NULL, &host_info) ||
 	     !host_info || !host_info->ai_addr )
+	 {
+	if (host_info) freeaddrinfo(host_info);
 	return false;
+	 }
 
 	fFind.address = inet_ntoa(((struct sockaddr_in*) host_info->ai_addr)->sin_addr);
+	freeaddrinfo(host_info);
 	}
 
 	if (actual_port.size()) (fFind.address += port_separator) += actual_port;
@@ -978,9 +982,13 @@ bool revise_address_split(std::string &aAddress, std::string &pPort)
 	struct addrinfo *host_info = NULL;
 
 	if (getaddrinfo(aAddress.c_str(), NULL, NULL, &host_info) != 0 || !host_info || !host_info->ai_addr)
+	 {
+	if (host_info) freeaddrinfo(host_info);
 	return false;
+	 }
 
 	aAddress = inet_ntoa(((struct sockaddr_in*) host_info->ai_addr)->sin_addr);
+	freeaddrinfo(host_info);
 	}
 
 	return true;
