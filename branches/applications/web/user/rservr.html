@@ -1,0 +1,839 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver User's Guide - rservr Program Guide</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver User's Guide </h1>
+      <h2 align="center" class="page_subtitle">
+        <span class="style_command_line">rservr</span> Program Guide </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="package.html" class="overview_link">Previous - Core Package Contents</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="rservrd.html" class="overview_link">Next - <span class="style_command_line">rservrd</span> Program Guide</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#SI" class="overview_link">Server Invocation.</a>
+        </li>
+        <li>
+          <a href="#SUSS" class="overview_link">Setting Up Super-user Servers.</a>
+        </li>
+        <li>
+          <a href="#CO" class="overview_link">Configuration Options.</a>
+        </li>
+        <li>
+          <a href="#CUCS" class="overview_link">Configuration Using Command Substitution.</a>
+        </li>
+        <li>
+          <a href="#SEV" class="overview_link">Server Environment Variables.</a>
+        </li>
+        <li>
+          <a href="#LFI" class="overview_link">Log File Interpretation.</a>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="SI">Server Invocation.</a>
+      </h3>
+      <p class="overview_content">
+        <span class="style_command_line">rservr</span> has a very limited command-line interface. You can start it using the following command format: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+<b>shell&gt;</b> rservr <b><i>&lt;name&gt; &lt;log file&gt; (config file) ...</i></b>
+</pre>
+      </div>
+      <p class="overview_content"> The name specified is used when passing server responses to clients and doesn't necessarily effect anything except for the server name clients are made aware of. An important exception to this is with the <span class="style_command_line">rservrd</span> client, which can only have instances running on one server with each unique name. In other words, you can't start two <span class="style_command_line">rservr</span> instances named "server" both having an <span class="style_command_line">rservrd</span> client connected. This is because <span class="style_command_line">rservrd</span> retains a global table on the local machine of all running <span class="style_command_line">rservrd</span> clients on your system. </p>
+      <p class="overview_content"> The log file can be any device writable using normal file-writing operations. All clients will inherit and use the specified log file unless otherwise specified. If the file can't be opened then logging will go to standard error. </p>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> When using super-user servers, the initial log file is created or opened using the default user and group IDs built into <span class="style_command_line">rservr</span>. This may cause a file opening problem when running <span class="style_command_line">rservr</span> from a location not writable by the default user. </p>
+        </div>
+      </div>
+      <p class="overview_content"> Configuration must be provided using a series of file names or via standard input. Configuration files are closed immediately after parsing is complete, allowing pipes to be used. </p>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> When providing configuration via standard input, the standard input file descriptor is replaced with <span class="style_file_name">/dev/null</span> before parsing takes place. This prevents clients started over the course of configuration parsing from inheriting the file descriptor that the configuration is being read from. </p>
+        </div>
+      </div>
+      <p class="overview_content"> An easy way to start a server is from a shell script without a configuration file: </p>
+      <div align="center">
+        <pre class="example_box code_box script_box">
+<b><i><u>example-server.sh</u></i></b>
+<b>#!/bin/bash</b>
+
+<i>#this script starts a server using its first argument as the server's name</i>
+
+if [ $# -ne 1 ]; then
+  echo "$0: [server name]"
+  exit 1
+fi
+
+( echo "execute_critical @<b>rservrd</b>@-dxr"
+  echo "register_all_wait" ) | \
+<b>rservr</b> "$1" "$1.log"
+</pre>
+      </div>
+      <p>
+      </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+<b>shell&gt;</b> ./example-server.sh example
+<b>shell&gt;</b> rservrd
+<b><u>example</u></b>
+<b>shell&gt;</b> rservrd example @server_term
+<b><u>{example} server exiting</u></b>
+</pre>
+      </div>
+      <p class="overview_content"> Unless the server is started as a session leader (normally by starting it with <span class="style_command_line">exec</span> from a shell or using it in a new <span class="style_command_line">xterm</span>,) the server will fork and will normally return to the shell right away. If your server requires terminal access, it must own the terminal it's started in by taking the place of the shell that starts it. Only servers that will be using clients that require the terminal will need to own a terminal. Use a script like this to ensure the server owns the terminal: </p>
+      <div align="center">
+        <pre class="example_box code_box script_box">
+<b><i><u>example-terminal-server.sh</u></i></b>
+<b>#!/bin/bash</b>
+
+<i>#this script starts a server using its first argument as the server's name</i>
+
+if [ $# -ne 1 ]; then
+  echo "$0: [server name]"
+  exit 1
+fi
+
+exec <b>rservr</b> "$1" "$1.log" \
+  &lt;( echo "execute_critical @<b>rservrd</b>@-dxr"
+     echo "execute @<b>rsv-console</b>@console" ) <i>#(&lt;-- as an example)</i>
+</pre>
+      </div>
+      <p>
+      </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+<b>shell&gt;</b> exec ./example-terminal-server.sh example
+<i>(the server now has control of the terminal)</i>
+</pre>
+      </div>
+      <p>
+      </p>
+      <p class="overview_content"> Upon success, the terminal will appear to be frozen until a client is given control of it by the server. Normally <b>[Ctrl]+C</b> will terminate the server. The server will not interact with a user via the terminal; therefore, you can't start new clients from the same terminal. Additional clients can be started at execution time by adding lines to the server configuration via the script, or by using <span class="style_command_line">rservrd</span> in a separate terminal or script. If a client is given terminal access from the server (per the client's own request,) it will interact with the user on the terminal that the server was started on even if <span class="style_command_line">rservrd</span> was called from another terminal. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="SUSS" class="overview_link">Setting Up Super-user Servers.</a>
+      </h3>
+      <p class="overview_content"> Super-user servers are essentially the same as servers run by normal users, but with one major exception. Super-user servers can run clients using different user and group IDs, but they won't access the file system as the super-user (except for read-only configuration file access.)  Super-user servers should therefore be set up in the following order: </p>
+      <ul class="other_bullet_list">
+        <li class="overview_content">
+          <b>Set user and group IDs for the log file.</b> Use the <span class="style_command_line">uid</span> and <span class="style_command_line">gid</span> configuration options (or <span class="style_command_line">user</span> and <span class="style_command_line">group</span>, respectively) as the first two in the configuration, then reopen the log file with the <span class="style_command_line">log_file</span> option (try <span class="style_command_line">log_file `echo $RSERVR_LOG`</span>.) These default IDs are set in <span class="style_file_name">param.h</span> and are normally both 'nobody', which almost always prevents writing to most directories. <br />
+          <br />
+        </li>
+        <li class="overview_content">
+          <b>Set user and group IDs for <span class="style_command_line">rservrd</span>.</b> Set the user and group IDs that <span class="style_command_line">rservrd</span> should run under, then start <span class="style_command_line">rservrd</span> with either <span class="style_command_line">execute</span> or <span class="style_command_line">system</span>. See the <a href="rservrd.html" class="general_link"><span class="style_command_line">rservrd</span> Program Guide</a> to help determine the user and group IDs to run the daemon under. <br />
+          <br />
+        </li>
+        <li class="overview_content">
+          <b>Set up the remaining initial clients.</b> Use <span class="style_command_line">uid</span>, <span class="style_command_line">gid</span>, and other options as appropriate and start any additional clients required upon initialization. Normally IPC forwarders will be the only other clients started from the configuration (if the created application requires them, see the <a href="socket-forward.html" class="general_link">IPC forwarder guide</a> for more information.) <br />
+          <br />
+        </li>
+        <li class="overview_content">
+          <b>Set the persistent security state.</b> After all initial clients are started, use the security options to set the persistent restrictions imposed by the server after configuration is complete. This doesn't need to include a change in the default user and group IDs because they can still be overridden, and <span class="style_command_line">rservrd</span> will always explicitly specify user and group IDs for new clients (though other admin clients might not.) <br />
+          <br />
+        </li>
+      </ul>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="CO">Configuration Options.</a>
+      </h3>
+      <p class="overview_content"> Use the following configuration options to initialize the server. These options are executed with full server permissions, so performing the same operations from an admin client might be disallowed in certain cases. </p>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> These options are persistent and are applied in the order they are used. The options that modify the server's state apply to clients started thereafter and the states of those settings stick even after configuration parsing is complete. Permission-related settings are locked in when the configuration stage of server startup ends. </p>
+        </div>
+      </div>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> Place a "<b>!</b>" at the beginning of a configuration line to allow that line to fail. This can prevent options with possible invalid values from aborting server startup. </p>
+        </div>
+      </div>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> When using super-user servers, command substitution with "<b>`</b>" will be executed under the current default user and group IDs. Command substitution will <i>never</i> be done as the super-user. </p>
+        </div>
+      </div>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> uid <i>&lt;id&gt;</i>
+          </td>
+          <td class="style_definition_short"> change user ID used by server </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> user <i>&lt;name&gt;</i>
+          </td>
+          <td class="style_definition_short"> look up a user ID to be used by server </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> <span class="style_command_line">uid</span> changes the persistent user ID used by the server when starting clients and opening log files. <span class="style_command_line">user</span> does the same thing, but takes a single string to specify the name of a non-root user account on the system. Every client started after the user ID is changed will assume that user ID. These options are only effective with super-user servers. The users must be valid on the system with both options.  A user ID of 0 will restore the built-in default user ID (this is set in <span class="style_file_name">param.h</span>.) </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> gid <i>&lt;id&gt;</i>
+          </td>
+          <td class="style_definition_short"> change group ID used by server </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> group <i>&lt;name&gt;</i>
+          </td>
+          <td class="style_definition_short"> look up a group ID to be used by server </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> <span class="style_command_line">gid</span> works identically to the <span class="style_command_line">uid</span> option, except it effects the group ID used. <span class="style_command_line">group</span> takes a single string to specify the name of a non-root group account on the system. These options don't change the group ID with non-super-user servers, even if the current user is a part of the given group. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> security <i>&lt;spec&gt;</i>
+          </td>
+          <td class="style_definition_short"> change server security restrictions </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> new_security <i>&lt;spec&gt;</i>
+          </td>
+          <td class="style_definition_short"> change security restrictions for clients started by admin clients </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> The security specification may be either a hexadecimal value to denote permission bits or one of the following: </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="50" align="left">
+            <b>sM</b>
+          </td>
+          <td> maximum allowed permissions </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>sD</b>
+          </td>
+          <td> default permissions </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>sA</b>
+          </td>
+          <td> maximum permissions of clients started by admin clients </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>sT</b>
+          </td>
+          <td> maximum permissions allowed by detached clients </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>s0-7</b>
+          </td>
+          <td> security levels 0 through 7 (low to high) </td>
+        </tr>
+      </table>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> You can use the command-line tool <a class="general_link style_command_line" href="package.html#SP_OP">rsvbits</a> to calculate a hexadecimal value using bit labels. You can use the same tool to convert hexadecimal values to bit labels, also (e.g. to interpret permissions shown in a log file.) </p>
+        </div>
+      </div>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> priority <i>&lt;value&gt;</i>
+          </td>
+          <td class="style_definition_short"> change the minimum command priority </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option sets the command priority value used by the server. All clients started after a change will use that priority value as their minimum. The priority value determines the order in which incoming commands are interpreted (and executed, if applicable) by the server. A lower priority value denotes a more important command. The server uses priorities from 0 to 255. The default value is 127. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> nice <i>&lt;offset&gt;</i>
+          </td>
+          <td class="style_definition_short"> set the niceness offset value for new clients </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This value must be positive or 0 for non-super-user servers. Super-user servers can use a negative value. Offsets must be within the system's limits, but a failed "nicing" won't prevent a client from being added to the server. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> execute <i>&lt;command&gt;</i>
+          </td>
+          <td class="style_definition_short"> execute a new client </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> execute_critical <i>&lt;command&gt;</i>
+          </td>
+          <td class="style_definition_short"> execute a critical new client </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> These options execute a new client using a command string. The first character of the string denotes that which separates the components of the command. The <span class="style_command_line">execute_critical</span> option will cause the server to exit if the client can't be started (<u>even</u> if "<b>!</b>" is used to allow the line to fail) or when the client process exits. Example: </p>
+      <div align="center">
+        <p class="style_definition_example">
+          <b>execute "@<i>&lt;program&gt;</i>@<i>&lt;argument1&gt;</i>@<i>&lt;argument2&gt;</i>"</b>
+        </p>
+      </div>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> system <i>&lt;command&gt;</i>
+          </td>
+          <td class="style_definition_short"> create a new shell command client </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> system_critical <i>&lt;command&gt;</i>
+          </td>
+          <td class="style_definition_short"> create a critical new shell command client </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> These options create a new client using a string interpreted by the default system shell. The <span class="style_command_line">system_critical</span> option will cause the server to exit if the client can't be started (<u>even</u> if "<b>!</b>" is used to allow the line to fail) or when the client process exits. Example: </p>
+      <div align="center">
+        <p class="style_definition_example">
+          <b>system "<i>&lt;program&gt;</i> <i>&lt;argument1&gt;</i> <i>&lt;argument2&gt;</i>"</b>
+        </p>
+      </div>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> device_on <i>&lt;spec&gt;</i>
+          </td>
+          <td class="style_definition_short"> allow inheritance of devices </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> device_off <i>&lt;spec&gt;</i>
+          </td>
+          <td class="style_definition_short"> disallow inheritance of devices </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> These options allow or disallow clients' inheritance of devices open by the server. All clients started after a change will be effected by this. This only applies to the inheritance of devices: it doesn't disable or enable the device within the server process. If you disable a device you can re-enable it again with a subsequent configuration line. The device specification is composed of the following characters, as applicable: </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="50" align="left">
+            <b>i</b>
+          </td>
+          <td> controls the inheritance of standard input </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>o</b>
+          </td>
+          <td> controls the inheritance of standard output </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>e</b>
+          </td>
+          <td> controls the inheritance of standard error </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>l</b>
+          </td>
+          <td> controls the inheritance of the currently-open log file </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>t</b>
+          </td>
+          <td> allows or disallows use of server-provided terminal access </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> log_file <i>&lt;file&gt;</i>
+          </td>
+          <td class="style_definition_short"> change the log file </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option changes the log output file used by the server. All logging done after this change goes to the new file and the previous file is annotated. All clients started before the log file change will retain their log files and all clients started after will use the new log file. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> log_mode <i>&lt;spec&gt;</i>
+          </td>
+          <td class="style_definition_short"> change the server's logging mode </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option changes the logging mode, and therefore the types of messages the server logs. </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="50" align="left">
+            <b>m</b>
+          </td>
+          <td> minimal messages </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>n</b>
+          </td>
+          <td> normal messags </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>e</b>
+          </td>
+          <td> extended messages </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>d</b>
+          </td>
+          <td> debugging messages </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>s</b>
+          </td>
+          <td> default ("standard") messages </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>a</b>
+          </td>
+          <td> all messages </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> manual_log <i>(message) ...</i>
+          </td>
+          <td class="style_definition_short"> send a message to the log manually </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option is mainly for debugging.  Every element provided to this option will be sent to the server's log on a separate line. The only requirement is that the line be parsable. The messages fall into the "minimal" logging category. Below is a useful way to record that user and group management is working properly: </p>
+      <div align="center">
+        <p class="style_definition_example">
+          <b>manual_log `echo 'user:' $( id -un );` `echo 'group:' $( id -gn );`</b>
+        </p>
+      </div>
+      <p class="overview_content style_definition_long"> While not related to this option, the same information can be rerouted to standard error for immediate viewing as follows (note the lack of an option being used, and also a lack of standard output): </p>
+      <div align="center">
+        <p class="style_definition_example">
+          <b>`( echo 'user:' $( id -un ); echo 'group:' $( id -gn ); ) >&2`</b>
+        </p>
+      </div>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> register_all_wait
+          </td>
+          <td class="style_definition_short"> wait for all clients to register before returning </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option is used when the server is started without already being a session leader. Normally the server would fork and continue as a daemon, but this option will force the original process to block until all clients are registered on the daemonized server. This will time out after a certain period of time, but you can change the time-out value by changing the <span class="style_command_line">register_all_wait</span> timing value using the <span class="style_command_line">timing</span> option. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> setenv <i>(&lt;var&gt;</i>=<i>"str") ...</i>
+          </td>
+          <td class="style_definition_short"> set environment variable(s) </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> unsetenv <i>(&lt;var&gt;) ...</i>
+          </td>
+          <td class="style_definition_short"> unset environment variable(s) </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> clearenv</i>
+          </td>
+          <td class="style_definition_short"> clear all environment variables </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> These options are used to alter the environment; mainly intended for communication with command substitution. The most useful purposes for these options are to set parameters in one location for use throughout the configuration, or to pass information on to clients. This information isn't directly available to the configuration file to use, but it can be accessed through command substitution. </p>
+      <div align="center">
+        <pre class="example_box code_box script_box">
+<i>#this is an example of consolidating parameters</i>
+
+setenv CLIENT_TYPE="<b>rsv-echo</b>"
+setenv CLIENT_NAME="echo"
+
+<i>#... much later in the file ...</i>
+
+execute `echo @$CLIENT_TYPE@$CLIENT_NAME`
+</pre>
+      </div>
+      <p class="overview_content style_definition_long"> This method can specifically be used to pass parameters to the <a href="socket-forward.html" class="general_link">socket-forwarder programs</a> for use at configuration time: </p>
+      <div align="center">
+        <pre class="example_box code_box script_box">
+<i>#<b>rservr</b> configuration file</i>
+
+setenv LISTEN_ALLOW="^204[0-9]$"
+execute @<b>rsv-netrelay</b>@relay@<u>security.conf</u>
+unsetenv LISTEN_ALLOW
+</pre>
+      </div>
+      <div align="center">
+        <pre class="example_box code_box script_box">
+<b><i><u>security.conf</u></i></b>
+listen_allow `echo "$LISTEN_ALLOW"`
+</pre>
+      </div>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> timing <i>&lt;name&gt;</i> <i>&lt;spec&gt;</i>
+          </td>
+          <td class="style_definition_short"> change a timing value </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option changes the value of a server or client timing specification. These specifications are used to control the cycles of specific server and client actions for both synchronization and security purposes. </p>
+      <p class="overview_content style_definition_long"> The specification consists of an operator followed by a value: </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="50" align="left">
+            <b>=</b>
+          </td>
+          <td> set the timing value to that provided (seconds) </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>*</b>
+          </td>
+          <td> multiply the current timing value by that provided </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>/</b>
+          </td>
+          <td> divide the current timing value by that provided </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>~</b>
+          </td>
+          <td> find a target value using the current scale (seconds) </td>
+        </tr>
+      </table>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> Timing scales are used when compiling the timing table for actual use. Certain timing values are scaled, in which case they are multiplied by the scale to calculate the actual timing value. Other values are static and retain their actual value despite changes in scales. </p>
+        </div>
+      </div>
+      <p class="overview_content style_definition_long"> The list of all timing values is too extensive to address here, but here are some important value names that might be useful: </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="300" align="left">
+            <b>scale</b>
+          </td>
+          <td> Use this to scale the entire server timing table. </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="300" align="left">
+            <b>input.scale</b>
+          </td>
+          <td> Use this to scale the IPC input cycling of the server. </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="300" align="left">
+            <b>output.scale</b>
+          </td>
+          <td> Use this to scale the IPC output cycling of the server. </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="300" align="left">
+            <b>client.scale</b>
+          </td>
+          <td> Use this to scale the entire timing table of all clients. </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="300" align="left">
+            <b>client.command_send_regulate</b>
+          </td>
+          <td> Reduce this if command sending is too slow and increase it if the server is getting overloaded. Consider "<b>*2.0</b>" when most commands will involve a network connection. </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="300" align="left">
+            <b>client.input.scale</b>
+          </td>
+          <td> Use this to scale the IPC input cycling of all clients. </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="300" align="left">
+            <b>client.input.underrun_retry_max<br /> client.output.write_retry_max</b>
+          </td>
+          <td> Increase these if you have problems with high-latency network connections when using IPC forwarders. </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="300" align="left">
+            <b>client.output.scale</b>
+          </td>
+          <td> Use this to scale the IPC output cycling of all clients. </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="300" align="left">
+            <b>client.default_cycle</b>
+          </td>
+          <td> Use this to adjust the default retry value. </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="300" align="left">
+            <b>client.default_slow_cycle</b>
+          </td>
+          <td> Use this to adjust the default slow retry value. </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="300" align="left">
+            <b>client.default_timeout</b>
+          </td>
+          <td> Use this to adjust the default timeout value. </td>
+        </tr>
+      </table>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="CUCS">Configuration Using Command Substitution.</a>
+      </h3>
+      <p class="overview_content"> Below is a basic example of how you can generate a configuration using line substitution. As a reminder, if the only thing on a line is command substitution then each output line produced will be meta-parsed; otherwise, each line of output will become a separate element on the line the substitution was on. If you choose to precede a line substitution with "<b>!</b>", that will allow failure of the command's execution itself; not the failure of any resulting output lines. </p>
+      <div align="center">
+        <pre class="example_box code_box script_box">
+<b><i><u>substitution.conf</u></i></b>
+execute_critical @rservrd@-dxr
+
+<i>#sequence parameters</i>
+setenv STEP=32 SEQUENCE="a b"
+
+<i>#sequence of different-priority clients (line substitution)</i>
+`echo <u>unsetenv STEP SEQUENCE</u> <i>#this prevents propagation into the clients</i>
+ seq $( expr $STEP - 1 ) $STEP 255 | while read priority; do
+   echo <u>priority $priority</u>
+   for spec in $SEQUENCE; do
+     echo <u>execute @<b>rsv-echo</b>@echo-$priority$spec</u>
+   done
+ done`
+
+<i>#terminal emulator (element substitution)</i>
+execute `echo @<b>rsv-terminal</b>@$HOME/terminal;`
+
+<i>#timing change (element substitution)</i>
+timing `echo register_all_wait; echo '~2.0';`
+
+register_all_wait
+</pre>
+      </div>
+      <p>
+      </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="SEV">Server Environment Variables.</a>
+      </h3>
+      <p class="overview_content"> The server exports several environment variables with information about the specific instance running.  These may be removed from the environment with <span class="style_command_line">unsetenv</span>; however, they will be exported again if they're updated. Changing these with <span class="style_command_line">setenv</span> will have no effect on the server's operation. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_NAME </td>
+          <td class="style_definition_short"> name of the server </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_LOG </td>
+          <td class="style_definition_short"> file used for logging (<i>exactly</i> as specified) </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_MAX_ERROR </td>
+          <td class="style_definition_short"> maximum command errors allowed per client </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_MAX_INVALID </td>
+          <td class="style_definition_short"> maximum invalid commands allowed per client </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_MAX_COMMANDS </td>
+          <td class="style_definition_short"> maximum pending commands allowed per client </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_MAX_QUEUED </td>
+          <td class="style_definition_short"> maximum pending commands allowed on the server </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_MAX_CLIENTS </td>
+          <td class="style_definition_short"> maximum attached clients </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_MAX_SERVICES </td>
+          <td class="style_definition_short"> maximum registered services </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_TIME_PRIORITY </td>
+          <td class="style_definition_short"> time/priority adjustment factor </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_DEFAULT_UID </td>
+          <td class="style_definition_short"> default uid (0 for non-super-user servers) </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_INITIAL_UID </td>
+          <td class="style_definition_short"> initial uid (0 for non-super-user servers) </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_DEFAULT_GID </td>
+          <td class="style_definition_short"> default gid (0 for non-super-user servers) </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_INITIAL_GID </td>
+          <td class="style_definition_short"> initial gid (0 for non-super-user servers) </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_MAX_PERM </td>
+          <td class="style_definition_short"> maximum client permissions </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_MAX_NEW_PERM </td>
+          <td class="style_definition_short"> maximum admin-started client permissions </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_MIN_PRIORITY </td>
+          <td class="style_definition_short"> minumum priority value </td>
+        </tr>
+        <tr>
+          <td width="350" align="left" class="style_term"> RSERVR_NEW_NICENESS </td>
+          <td class="style_definition_short"> niceness offset for new clients </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="LFI">Log File Interpretation.</a>
+      </h3>
+      <p class="overview_content"> Resourcerver uses a consistent logging format for both the server and clients so that all may log to the same destination. Logging is normally done on a line-per-event basis, with the particular events logged determined by both actions and outcomes of the processes involved, and by the logging mode. </p>
+      <p class="overview_content"> Most log entries made by the server will follow this format: </p>
+      <div align="center">
+        <table class="log_table">
+		    <tr style="font-size: 110%; font-weight: bold;">
+		      <td>[</td><td>2008</td><td>04</td><td>29</td><td>032313</td>
+		      <td> svr:</td><td> 'example'</td><td> (</td><td>rservr</td><td>)</td><td>] </td>
+		      <td>/n/</td><td> server started</td>
+          </tr>
+		    <tr>
+		      <td></td><td> year </td><td> month </td><td> day </td><td> time </td>
+		      <td> server-created </td><td> server name </td><td></td><td> program name </td><td></td><td></td>
+		      <td> message type ("normal") </td><td> message </td>
+          </tr>
+        </table>
+      </div>
+      <p class="overview_content"> Built-in log entries made by clients will follow this format: </p>
+      <div align="center">
+        <table class="log_table">
+		    <tr style="font-size: 110%; font-weight: bold;">
+		      <td>[</td><td>2008</td><td>04</td><td>29</td><td>032314</td>
+		      <td> cli:</td><td> 'rservrd'</td><td> (</td><td>rservrd</td><td> / </td><td>19996</td><td>)</td><td>] </td>
+		      <td>/n/</td><td> client registered: 'rservrd' (0x0028)</td>
+          </tr>
+		    <tr>
+		      <td></td><td> year </td><td> month </td><td> day </td><td> time </td>
+		      <td> client-created </td><td> client name </td><td></td><td> program name </td><td></td><td> process group </td><td></td><td></td>
+		      <td> message type ("normal") </td><td> message </td>
+          </tr>
+        </table>
+      </div>
+      <p class="overview_content"> Log entries made from within a client by the program itself or by a plug-in will follow this format: </p>
+      <div align="center">
+        <table class="log_table">
+		    <tr style="font-size: 110%; font-weight: bold;">
+		      <td>[</td><td>2008</td><td>04</td><td>29</td><td>032313</td>
+		      <td> cli:</td><td> '(none)'</td><td> (</td><td>rservrd</td><td> / </td><td>19996</td><td>)</td><td>] </td><td>{</td>
+		      <td>rsvp-netcntl</td><td>}</td><td> loading plug-in commands</td>
+          </tr>
+		    <tr>
+		      <td></td><td> year </td><td> month </td><td> day </td><td> time </td>
+		      <td> client-created </td><td> client name </td><td></td><td> program name </td><td></td><td> process group </td><td></td><td></td><td></td>
+		      <td> message origin </td><td></td><td> message </td>
+          </tr>
+        </table>
+      <p class="overview_content"> Most informational output from the server will be via the log file, with minimal messages sent to standard error in case the server cannot be started. The actual wording and format of built-in messages are controlled by the translation libraries (<span class="style_file_name">librservr-i18n-<span style="font-weight: normal;">*</span>.so</span>,) which are linked in when the project is built. The server and client libraries independently link to a single translation library each. </p>
+      </div>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="package.html" class="overview_link">Previous - Core Package Contents</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="rservrd.html" class="overview_link">Next - <span class="style_command_line">rservrd</span> Program Guide.</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

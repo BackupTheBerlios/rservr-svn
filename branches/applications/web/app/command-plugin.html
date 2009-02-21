@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver Application Developement Guide - Using Plug-in Commands</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver Application Developement Guide </h1>
+      <h2 align="center" class="page_subtitle"> Using Plug-in Commands </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="services.html" class="overview_link">Previous - Using the Services System</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="monitor.html" class="overview_link">Next - Monitoring the Server</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#PiLR" class="overview_link">Plug-in Loading Requirements.</a>
+        </li>
+        <li>
+          <a href="#IPiH" class="overview_link">Implementing Plug-in Hooks.</a>
+        </li>
+        <li>
+          <a href="#PiL2R" class="overview_link">Plug-in Linking Requirements.</a>
+        </li>
+        <li>
+          <a href="#CaSPiC" class="overview_link">Creating and Sending Plug-in Commands.</a>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="PiLR">Plug-in Loading Requirements.</a>
+      </h3>
+      <p class="overview_content"> All plug-in commands must be loaded in the client's local command table <i>before</i> they can be executed <i>or</i> queued for sending. Command plug-in libraries can either be hard-linked into the client program, or they can be loaded at run-time. In either case, they should be loaded as one of the first operations of the client program, but <i>only</i> after the client has been initialized. </p>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> Command plug-ins cannot be loaded while the message queue is running. This is done for security reasons to prevent a plug-in command <i>itself</i> from loading additional plug-ins when it's executed. </p>
+        </div>
+      </div>
+      <p>
+      </p>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> In order to use a plug-in command, the plug-in must be loaded by <i>both</i> the initiating client and the executing client. When sending plug-in commands remotely, intermediate command forwarders needn't have the plug-in loaded. </p>
+        </div>
+      </div>
+      <p class="overview_content"> Use the function below to load command plug-ins that are hard-linked into the program. If a client uses <i>more than one</i> hard-linked plug-in, use this function anyway but keep reading. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/load-plugin.h&gt;</u></b>
+
+<i>//call this function to load linked-in command plug-ins (<span class="style_inline_code">0</span> for success, &lt;<span class="style_inline_code">0</span> for error)</i>
+<b>int load_internal_plugins();</b>
+</pre>
+      </div>
+      <p>
+      </p>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> In order to use the function above, the plug-in library must occur <i>ahead</i> of <span class="style_file_name">librservr-client.so</span> when linking. If it doesn't, this call may result in no action other than an error in the client's log. </p>
+        </div>
+      </div>
+      <p class="overview_content"> If the client is hard-linked to more than one command plug-in library, it will need to redefine the function below. This must be redefined because each plug-in will also define it, but only one definition will be the one linked into the final program. Define this function to call each of the hard-linked plug-in's explicit load functions individually. Each of the <a href="plugin-table.html" class="general_link">standard plug-ins</a> has an explicit load function declared at the top of its header. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/plugin-dev/entry-point.h&gt;</u></b>
+
+<i>//define this function to pass the provided argument to the plug-in's load functions</i>
+<b>extern int load_all_commands(struct local_commands*);</b>
+</pre>
+      </div>
+      <p class="overview_content"> The example below demonstrates how you would define the above function to load both <span class="style_file_name">librsvp-netcntl.so</span> and <span class="style_file_name">librsvp-rqsrvc.so</span>. The only aspect you need to remember is to pass the argument provided to the explicit load functions. This function will be called internally at the time you call <span class="style_inline_code">load_internal_plugins</span>. </p>
+      <div align="center">
+        <pre class="example_box code_box source_box">
+<b><u>#include &lt;rservr/plugin-dev/entry-point.h&gt;</u></b>
+<b><u>#include &lt;rservr/plugins/rsvp-netcntl.h&gt;</u></b>
+<b><u>#include &lt;rservr/plugins/rsvp-rqsrvc.h&gt;</u></b>
+
+<b>int load_all_commands(struct local_commands *lLoader)</b>
+{
+	if (<b>rsvp_netcntl_load</b>(lLoader) &lt; 0) return -1;
+	if (<b>rsvp_rqsrvc_load</b>(lLoader) &lt; 0)  return -1;
+	return 0;
+}
+</pre>
+      </div>
+      <p class="overview_content"> Even when redefining <span class="style_inline_code">load_all_commands</span>, call the <span class="style_inline_code">load_internal_plugins</span> function as you would otherwise. </p>
+      <p class="overview_content"> Use the function below to load plug-ins that <i>aren't</i> hard-linked into the client program. The message queue must <i>also</i> be stopped when loading using this method. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/load-plugin.h&gt;</u></b>
+
+<i>//call this function to load external command plug-ins (<span class="style_inline_code">0</span> for success, &lt;<span class="style_inline_code">0</span> for error)</i>
+<b>int load_plugin_lib(text_info);</b>
+</pre>
+      </div>
+      <p class="overview_content"> The function above might require a fully-qualified path name if the library isn't in a conventional library directory. Standard Resourcerver plug-ins are stored in the same place as the other installed libraries, so this function shouldn't have a problem locating them. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="IPiH">Implementing Plug-in Hooks.</a>
+      </h3>
+      <p class="overview_content"> All of the standard command plug-in libraries use "hook functions" that are called by the commands when they're executed. These functions need to be defined by the client that will receive and execute a given command, otherwise nothing will happen. This allows greater flexibility over what operations take place when a command is sent. The standard plug-in commands are all merely shells that carry certain elements of data from one client to another. Each has an intended purpose and corresponding data elements, but they don't impose specific requirements on how that data is used. </p>
+      <p class="overview_content"> Each standard plug-in's set of hook functions can be found in a header named <span class="style_file_name">rservr/plugins/rsvp-<span style="font-weight:normal;">*</span>-hook.h</span>. Each plug-in library has close to a 1-to-1 correspondence between the command-creation functions and the hook functions. See the <a href="plugin-table.html" class="general_link">plug-in command table</a> for more information. </p>
+      <p class="overview_content"> Plug-in hook functions should <i>never</i> call <span class="style_inline_code">wait_command_event</span>, etc. since they're executed within the message queue's own thread. This prevents <i>any</i> command status from being updated while the hook function is being executed. Complex hook functions or those that need the status of commands updated should create a separate thread to perform the process and immediately return from the hook function. The standard command plug-in <span class="style_file_name">librsvp-ready.so</span> is useful for outcome notification after the original hook function returns. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="PiL2R">Plug-in Linking Requirements.</a>
+      </h3>
+      <p class="overview_content"> Plug-ins needn't be hard-linked into client programs that will only be <i>executing</i> the plug-in commands, but it does help at run-time by avoiding a search for the library's actual path. Clients initiating plug-in commands don't "technically" need to hard-link to a plug-in library to use its commands, but most of the time there won't be any way around it. </p>
+      <p class="overview_content"> Almost all command plug-in libraries will provide an API header used to create its commands. The included functions will generally vary greatly in their arguments, and therefore must be defined by the individual plug-in library. Incidentally, you will normally need to hard-link to the plug-in library in order for those functions to be defined. </p>
+      <p class="overview_content"> Some third-party command plug-in libraries might use the auto-generation interface (see below,) which allows commands to be created using a textual initializer string. This keeps the library from having to provide its own API header, and also generally prevents clients from having to link directly to the library. Not all third-party plug-ins will use this feature. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="CaSPiC">Creating and Sending Plug-in Commands.</a>
+      </h3>
+      <p class="overview_content"> Each command plug-in library should have its own API header for creating its commands. The standard command plug-ins have API headers patterned <span class="style_file_name">rservr/plugins/rsvp-<span style="font-weight:normal;">*</span>.h</span>. Each command requires a different set of arguments in order to build it, so check the headers for more specifics. Normally the commands will be added to the command queue upon creation and must be sent. Some plug-in commands restrict remote addressing. </p>
+      <p class="overview_content"> Some command plug-ins might use the auto-generation interface, in which case a common function can be called to create a new command. This function creates a command loaded by a plug-in using its name and a textual data string to initialize it. The data string's format is entirely up to interpretation and is merely intended to provide a uniform interface. This allows plug-in commands to be designed so that they don't need to be hard-linked into client programs. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/command-table.h&gt;</u></b>
+
+<i>//use the command's name to determine if it can be auto-generated</i>
+<b>result command_can_auto_generate(text_info);</b>
+
+<i>//use the command's name and initializer string and get a queued command in return</i>
+<b>command_handle command_auto_generate(text_info, text_info);</b>
+</pre>
+      </div>
+      <p>
+      </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="services.html" class="overview_link">Previous - Using the Services System</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="monitor.html" class="overview_link">Next - Monitoring the Server</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

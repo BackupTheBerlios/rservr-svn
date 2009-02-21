@@ -1,0 +1,12 @@
+STANDARD_INCLUDES=-I/usr/include -I/usr/local/include
+ALL_INCLUDES=$(STANDARD_INCLUDES) -I$(srcdir)/../.. -I$(srcdir)/../../include/rservr -I$(srcdir)/../../include -I$(srcdir)/../include
+AM_CPPFLAGS=-DENABLE_VIRT_ARRAY_ALL -DRSERVR_RESTRICT_COMMAND_INTERFACE $(ALL_INCLUDES)
+AM_CXXFLAGS=-ansi -Wall
+AM_CFLAGS=-Wall
+STANDARD_LIBS=-L/lib -L/usr/lib -L/usr/local/lib
+AM_LDFLAGS=--version-info 1:1:0 $(STANDARD_LIBS)
+lib_LTLIBRARIES=librsvp-rqsrvc.la librsvp-rqsrvc-auto.la
+librsvp_rqsrvc_la_SOURCES=api-rqsrvc.cpp plugin-rqsrvc.cpp api-rqsrvc.h plugin-rqsrvc.hpp
+librsvp_rqsrvc_la_LIBADD=../../libs/command/librservr-command.la
+librsvp_rqsrvc_auto_la_SOURCES=rqsrvc-auto.cpp
+librsvp_rqsrvc_auto_la_LIBADD=librsvp-rqsrvc.la ../../libs/client/librservr-client.la

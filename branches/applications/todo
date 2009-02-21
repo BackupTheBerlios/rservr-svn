@@ -1,0 +1,190 @@
+20dec08
+	- remove PARAM_AUTO_BLOCKING et. al. -OR- test it and make it work
+	- same thing with PARAM_CACHE_COMMAND_OUTPUT
+	document:
+	- message-queue pausing
+	- explicitly adress server $PATH vs. rservrd command-line
+		- maybe add 'path' field in execute/system admin commands?
+			- rservrd would extract it from the command-line? (inconsistent at best...)
+	- switch from 'signal' to sigaction
+
+16nov08 - change capsule module pattern to use single-use nested class instance and operator ()
+
+06dec08 - make command transmission and parsing more efficient!
+    - maybe change format, don't check labels every time...
+
+8aug08 - review docs starting with user:connections
+
+22:24 7th September 2008
+check timing-manager.c to make sure all timing fields show up in *4* functions each!
+	- default_timeout was missed and/or changed to default_short_timeout when it was added
+
+14:17 12th October 2008
+make an example with rsvp-dataref! similar in nature to ftp?
+
+
+- BEFORE RELEASE:
+	- redo README
+	- global-sentry (maybe), and hparser
+	- change license to BSD
+
+
+
+- create rsvf-gedit
+	- GTK logging/editing of commands
+	- don't create/work on until after initial release
+	- must be able to:
+		- passively log
+		- show list of intercepted commands
+		- automatically pause client while editing
+		- graphically edit the command
+		- save the command log
+		- limit logging to a certain amount of memory or # of commands
+		- allow command injection, possibly from command libs
+
+
+- add variable to makefiles to
+	- add extra plugins
+	- add extra locales
+	- use a different locale by default
+
+- server execute command needs to return a command_event
+	- rservrd command error needs one, too
+
+check macro use in proto-* to make sure tags aren't used with wrong command
+
+add to sec pol:
+	- rservr may use stdin for config, but then MUST set it to /dev/null but SHOULDN'T close it
+	  because then when it opens new files they might use fd 0
+
+
+change (or add?) rules for sending plugins, requests, responses, and null to sec pol
+	- plugins can send requests across or down
+		- admin -> admin, cont, res
+		- cont  -> cont,  res
+		- res   -> res
+		- mon   -> XXX
+
+	- "bypass" responses can be sent from anything that can receive requests to anything that can send them
+	- anything other than client_response will follow normal rules
+	- forwarded plugin commands follow normal request rules? no way to tell
+		- ANSWER: will work the same as other plugin requests
+
+	-outline the uses of create, parse, and execute permissions
+		- address what each is for
+		- address how they can be used to control where and between whom they can be used
+		- ex: execute perm applies to sender for commands executed on server and to
+		receiver when sent to another client. this prevents forwarding a server command to
+		something that can't execute it on its server and allows inter-client requests to
+		be passed through clients that can't execute them.
+		- ex2: can prevent forwarding a server command by not allowing a client to execute it
+
+
+change strdup to strings? will that work with strsep?
+
+
+add stat/performance hooks for a debugging library
+
+fix hparser tags to use std::string functions
+	- use std::string::npos in particular when finding?
+
+add to sec pol: parse errors above proto level need to increment input (i.e. rservr open tag parse)
+
+retest all daemon commands
+	- test remote clients
+
+
+add log points for all "waiting" points?
+
+
+need to redefine remote clients in security policy
+	- need to address forwarding of remotely-addressed commands
+	- rsv-pipe-fwd is capable of connecting outside clients to a server
+	- remote commands rejected by default: must manually enable
+	- allow clients to connect by providing a socket?
+		- socket will be mode 0600 not owned by root
+		- server will use user and group ownership of file as uid/gid
+		- need remote mask such as control/resource only
+		- no need to pause server and change mode
+		- will open socket non-blocking
+			- need an additional i/o class
+		- ***how will CLIENT use the socket? (need new api?)
+
+remove all refs to shared mem from sec pol
+	- update rservrd with sockets in pol
+
+check " < 0" errors to make sure they shouldn't be "!= 0"
+
+
+NOTE: 01 Jan 08 stats (*.h*, *.c*, Makefile.am, not including dependencies (clist, etc.)):
+	files:			192
+	non-empty lines:	17542
+	all lines:		23121
+	install size:		???
+
+NOTE: 24 Nov 07 stats (*.h*, *.c*, Makefile.am, not including dependencies (clist, etc.)):
+	files:			198
+	non-empty lines:	16535
+	all lines:		21625
+	install size:		14.6MB
+
+
+don't send things (even timing) to clients that aren't registered
+	- add to security
+
+only allow server commands to be atomic in the client api
+	- add to security policy
+
+add to security policy:
+	- only resource clients can find resource clients
+	- only resource clients can send requests to resource client names
+	- only control clients can find control clients
+	- server will allow any client to poll for others with its own flags (via built-in commands only)
+	- check the send_client_command object against security policy as far as request/response requirements
+
+add to sec: number of allowed errors set by parameters of server
+
+
+auto responses from clients to other clients won't work with no client name
+	- client auto response functions can't send response with no target name but server can
+
+
+-11. add crash prevention to security policy
+
+-10. take a look at null command forwarding/execution in security policy
+	- allow forwarding
+	- allow execution on client side only, but they don't get a client pointer!
+
+-4. check for security holes with remote commands: do they allow passing/eval of unauthorized commands?
+
+-2. rservrd commands to change server security?
+	- only if it can have server control, and only up to its own permissions
+		- must still mask with security_mask_admin
+	- can't change own max new client!!!
+	- can't change server max new client!!!
+	- ***add to security policy
+
+4. fix hparser tag comparisons to cut down on number of copies. maybe make them C?
+
+
+add security tags in source (i.e. //SECURITY:)
+make sure each place with timing has its own entry! also, standardize names and limit checks
+
+
+IMMEDIATE
+add security policy: servers will not send each other messages, even via remote clients. clients must interpret and send own message (but can forward messages 29OCT08)
+anything that can send must be able to parse command
+	- server commands that can't be passed on should exclude server parsing (will be parsed as requests; need to fix?)
+	- server commands which can't be executed by the server but can be passed on should be able to be parsed by it
+	- unknown commands will be parsed as null by server and rejected by clients
+	- scoped commands will be parsed as null except for responses (to prevent auto responses to auto responses)
+
+make all member access this->
+
+check all handle functions' running functionality
+give all headers a header block with description and intended visibility
+give sources a description block
+
+
+OTHERS
+?redefine security in terms of server/clients, explicitly define security interface for admin

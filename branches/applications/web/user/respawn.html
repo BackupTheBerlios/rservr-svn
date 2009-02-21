@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver User's Guide - rsv-respawn Program Guide</a></title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver User's Guide </h1>
+      <h2 align="center" class="page_subtitle">
+        <span class="style_command_line">rsv-respawn</span> Program Guide </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="socket-forward.html" class="overview_link">Previous - <span class="style_command_line">rsv-fs<span style="font-weight:normal;">*</span></span> and <span class="style_command_line">rsv-net<span style="font-weight:normal;">*</span></span> Program Guide</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a class="overview_link">Next</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#RCI" class="overview_link">Respawn Client Invocation.</a>
+        </li>
+        <li>
+          <a href="#RCC" class="overview_link">Respawn Client Configuration.</a>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="RCI">Respawn Client Invocation.</a>
+      </h3>
+      <p class="overview_content"> The <span class="style_command_line">rsv-respawn</span> program is an admin client that starts and monitors new clients on an <span class="style_command_line">rservr</span>, and subsequently restarts them if they exit or are disconnected (subject to specified configuration restrictions, summarized further down.)  Use the following command format to start the respawn program as an <span class="style_command_line">rservr</span> client: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+rsv-respawn <b><i>&lt;name&gt; &lt;config file&gt; ...</i></b>
+</pre>
+      </div>
+      <p class="overview_content"> This client requires at least one configuration file and it will not read configuration from standard input.  The configuration file(s) must contain at least one <span class="style_command_line">rservr</span>-like client-initialization option to indicate a new client program to start on the server.  Keep in mind that the clients will be started <i>after</i> the configuration of <span class="style_command_line">rservr</span> is complete; therefore, new clients started by <span class="style_command_line">rsv-respawn</span> will be subject to the restrictions imposed by <span class="style_command_line">rservr</span> at the end of its configuration stage.  For example, if you disallow admin clients at the end of the <span class="style_command_line">rservr</span> configuration then <span class="style_command_line">rsv-respawn</span> will not be able to start new admin clients.  Like <span class="style_command_line">rservr</span>, increases in security can be reduced at any point in the configuration.  Once configuration is complete, <span class="style_command_line">rsv-respawn</span> will not accept any new clients to monitor, and it will exit if it no longer has clients to monitor due to failure to restart them.
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> <span class="style_command_line">rsv-respawn</span> cannot take responsibility for clients started in the <span class="style_command_line">rservr</span> configuration; it will only monitor and restart clients originally started itself, as specified in its own configuration. </p>
+        </div>
+      </div>
+      <p class="overview_content"> Below is a simple example of a configuration file. </p>
+      <div align="center">
+        <pre class="example_box code_box script_box">
+<i>#this is a general example of a respawn configuration</i>
+
+limit 5                              <i>#limit to 5 respawns (including the first)</i>
+execute @<b>rsv-echo</b>@echoer1 'sleep 1;' <i>#sleep 1 second before respawning</i>
+
+priority 255 <i>#give all subsequent clients a minimum priority of 255</i>
+
+limit 0                   <i>#allow unlimited respawns</i>
+system "<b>rsv-echo</b> echoer2" <i>#don't execute a shell command between respawns</i>
+</pre>
+      </div>
+      <p>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="RCC">Respawn Client Configuration.</a>
+      </h3>
+      <p class="overview_content"> Use the configuration options below to set the client's list of new clients to start and monitor. </p>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> Place a "<b>!</b>" at the beginning of a configuration line to allow that line to fail. This can prevent options with possible invalid values from aborting forwarder startup. </p>
+        </div>
+      </div>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> execute <i>&lt;command&gt;</i> <i>(shell)</i>
+          </td>
+          <td class="style_definition_short"> execute a new client </td>
+        </tr>
+        <tr>
+          <td width="400" align="left" class="style_term"> execute_critical <i>&lt;command&gt;</i> <i>(shell)</i>
+          </td>
+          <td class="style_definition_short"> execute a critical new client </td>
+        </tr>
+        <tr>
+          <td width="400" align="left" class="style_term"> system <i>&lt;command&gt;</i> <i>(shell)</i>
+          </td>
+          <td class="style_definition_short"> create a new shell command client </td>
+        </tr>
+        <tr>
+          <td width="400" align="left" class="style_term"> system_critical <i>&lt;command&gt;</i> <i>(shell)</i>
+          </td>
+          <td class="style_definition_short"> create a critical new shell command client </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> These function almost identically to their <span class="style_command_line">rservr</span> counterparts, except they result in the sending of new-client requests for the server itself to start. The *<span class="style_command_line">_critical</span> variants will cause the <u>respawn client</u> to exit rather than the server itself.  If the respawn client itself was started as a critical client then this will incidentally cause <span class="style_command_line">rservr</span> to exit, as well. The optional argument indicates a shell command to execute <u>between</u> respawn attempts. The shell command will only be executed after the first exit of the corresponding client, and a failure of the shell command will result in the client not being restarted. This can be used to insert a short pause before restarting a client, or to check external information to determine if it should even be restarted.  If a client fails to be restarted for any reason then it will be removed from the list of clients to monitor. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> limit <i>&lt;number&gt;</i>
+          </td>
+          <td class="style_definition_short"> limit number of respawns </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option will limit the number of times subsequent clients will be repawned, to include the first time. A limit of zero will result in unlimited respawns (as long as the client doesn't fail to start.) Unlimited respawns is the default. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> security <i>&lt;spec&gt;</i>
+          </td>
+          <td class="style_definition_short"> change server security restrictions </td>
+        </tr>
+        <tr>
+          <td width="400" align="left" class="style_term"> priority <i>&lt;value&gt;</i>
+          </td>
+          <td class="style_definition_short"> change the minimum command priority </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> These directly correspond to their <span class="style_command_line">rservr</span> counterparts. These will set the limits for all subsequently-specified clients. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> log_mode <i>&lt;spec&gt;</i>
+          </td>
+          <td class="style_definition_short"> change the client's logging mode </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option changes the logging mode using the same pattern as <span class="style_command_line">rservr</span>. </p>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> <span class="style_command_line">rsv-respawn</span> has no environment-manipulation options to avoid confusion. All client specifications to be executed by <span class="style_command_line">rsv-respawn</span> are actually sent to the server as <i>requests</i> for execution; therefore, the respawn client's environment is never visible to the executed client. <span class="style_command_line">rsv-respawn</span> doesn't load external plug-ins; therefore, the only possible use for the environment would be for command substitution. </p>
+        </div>
+      </div>
+      <p>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="socket-forward.html" class="overview_link">Previous - <span class="style_command_socket-forward">rsv-fs<span style="font-weight:normal;">*</span></span> and <span class="style_command_line">rsv-net<span style="font-weight:normal;">*</span></span> Program Guide</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a class="overview_link">Next</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

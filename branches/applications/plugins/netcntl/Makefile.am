@@ -1,0 +1,10 @@
+STANDARD_INCLUDES=-I/usr/include -I/usr/local/include
+ALL_INCLUDES=$(STANDARD_INCLUDES) -I$(srcdir)/../.. -I$(srcdir)/../../include/rservr -I$(srcdir)/../include
+AM_CPPFLAGS=-DENABLE_VIRT_ARRAY_ALL -DRSERVR_RESTRICT_COMMAND_INTERFACE $(ALL_INCLUDES)
+AM_CXXFLAGS=-ansi -Wall
+AM_CFLAGS=-Wall
+STANDARD_LIBS=-L/lib -L/usr/lib -L/usr/local/lib
+AM_LDFLAGS=--version-info 1:1:0 $(STANDARD_LIBS)
+lib_LTLIBRARIES=librsvp-netcntl.la
+librsvp_netcntl_la_SOURCES=api-netcntl.cpp plugin-netcntl.cpp api-netcntl.h plugin-netcntl.hpp
+librsvp_netcntl_la_LIBADD=../../libs/command/librservr-command.la

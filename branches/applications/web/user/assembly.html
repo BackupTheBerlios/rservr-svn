@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver User's Guide - Application Assembly</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver User's Guide </h1>
+      <h2 align="center" class="page_subtitle"> Application Assembly </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="introduction.html" class="overview_link">Previous - Introduction</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="administration.html" class="overview_link">Next - Application Administration</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#UCFF" class="overview_link">Uniform Configuration File Format.</a>
+        </li>
+        <li>
+          <a href="#USCF" class="overview_link">Using Server Configuration Files.</a>
+        </li>
+        <li>
+          <a href="#TSID" class="overview_link">The Server Interface Daemon.</a>
+          <div>
+            <ul class="toc_list">
+              <li>
+                <a href="#TSID_PotD" class="overview_link">Purpose of the Daemon.</a>
+              </li>
+              <li>
+                <a href="#TSID_AtDtaS" class="overview_link">Attaching the Daemon to a Server.</a>
+              </li>
+              <li>
+                <a href="#TSID_SNC" class="overview_link">Starting New Clients.</a>
+              </li>
+              <li>
+                <a href="#TSID_CEPtC" class="overview_link">Converting Existing Processes to Clients.</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <a href="#PC" class="overview_link">Permissions Cascade.</a>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="UCFF">Uniform Configuration File Format.</a>
+      </h3>
+      <p class="overview_content"> All standard Resourcerver programs using configuration files use the same file format. This format is parsed a single line at a time with every line standing alone (though they can be extended by escaping the end of the line or leaving a quotation open.)  only 8-bit files will be parsed. Each line is broken apart into elements based on whitespace with the following specially-interpreted characters: </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="25" align="left" class="style_term"> " </td>
+          <td width="25" align="left" class="style_term"> ' </td>
+          <td class="style_definition_short"> everything in quotes is left alone (except for "<b>\</b>") </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Quotes only denote a new element if whitespace occurs between the previous or following element. Quotes <u>must</u> be closed, otherwise the line will not be processed. A line ending mid-quote will implicitly be continued onto the next line, to include the newline. If the end of the line is escaped with "<b>\</b>", however, the newline will not be included. Single quotes and double quotes are interchangeable, but while one type is open the other type is taken as a literal character. </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="200" align="left">
+            <b>value  "1 2"  3</b>
+          </td>
+          <td> three separate elements </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>value" 1 2 "3</b>
+          </td>
+          <td> one single element </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>value "" 3</b>
+          </td>
+          <td> three elements (center element is blank) </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="50" align="left" class="style_term"> ` </td>
+          <td class="style_definition_short"> everything enclosed is command substitution </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Everything enclosed between two "<b>`</b>" is parsed in the same manner as normally-quoted text. The resulting element is executed with the default shell and every line of output from the executed command becomes a new element (whitespace within the lines is left as-is.) <u>An important exception to this is if a line has no other text on it, in which case this will result in each line of output being parsed separately.</u> This is done in such a way that e.g. <span class="style_command_line">`cat config;`</span> will function the same as if "config" were specified as a file to parse. This is a very simple substitution method because the configuration parser isn't meant to be a shell or command interpreter; therefore, you must modify the command line being executed accordingly. This is meant to be a minimal interface only! </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="200" align="left">
+            <b>`echo user; id -un;`</b>
+          </td>
+          <td> two separate elements </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Everything resulting from command substitition is tabulated independently from any adjoining text. The command to execute is removed from the line and is considered a whitespace separator. This is to prevent ambiguous meta-parsing, and to prevent a requirement to allow enclosure of command substitution within other quotations; two dangerous invitations to turn the configuration parser into a shell. </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="200" align="left">
+            <b>left`echo center;`right</b>
+          </td>
+          <td> three separate elements </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Unlike a conventional shell, command substitution will never take place within other qotations; "<b>`</b>" will always be used literally when occurring within normally-quoted text. The semantics of command substitution will likely never change to retain simplicity, reliability, and security. Individual programs may turn off command substitution, in which case "<b>`</b>" will be treated like the normal qotation characters, to include merging adjoining data into a single element. </p>
+      <p class="overview_content style_definition_long"> <u>Command substitution will never be run as the super-user!</u> If your program is running as root, you must change at least the effective user <u>and</u> group to non-root before substitution will happen. </p>
+      <p class="overview_content style_definition_long"> If a command substitution ends with a <u>printed</u> escape character, that element will continue to the next element given. While this isn't particularly useful or even encouraged, I included it to entertain myself. Please note that the sematics will differ depending on whether you're using line or element substitution, and that any newline following the command will be included. </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="350" align="left">
+            <b>option `echo -n 'partial \\'` argument</b>
+          </td>
+          <td> taken as "<b>option</b>" and "<b>partial argument</b>" </td>
+        </tr>
+        <tr>
+          <td width="350" align="left">
+            <b>`echo -n '"option_\\'` `echo 'one"'`</b>
+          </td>
+          <td> taken as "<b>option_one</b>" </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="50" align="left" class="style_term"> # </td>
+          <td class="style_definition_short"> everything following this is removed as a comment </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This is only interpreted as the beginning of a comment if it's preceded by whitespace. </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="200" align="left">
+            <b>option value#1</b>
+          </td>
+          <td> the "<b>#</b>" is part of the argument </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>option "value #1"</b>
+          </td>
+          <td> the "<b>#</b>" is part of the argument </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>option value #1</b>
+          </td>
+          <td> the "<b>#</b>" starts a comment </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="50" align="left" class="style_term"> \ </td>
+          <td class="style_definition_short"> prevents interpretation of another character </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> All "<b>\</b>" are removed during parsing unless they're preceded by "<b>\</b>" themselves, i.e. "<b>\\</b>". Use a single "<b>\</b>" at the end of a line to continue to the next line. When a line ends mid quote, the newline will be included in the element. Line continuation will work with DOS, Unix, and Mac end-of-line formats, but included newline characters will reflect the file's end-of-line format when quoted. </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="200" align="left">
+            <b>your\ name</b>
+          </td>
+          <td> taken as "<b>your name</b>" </td>
+        </tr>
+      </table>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="200" align="left">
+            <b>"quote \" "</b>
+          </td>
+          <td> taken as "<b>quote " </b>" </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="50" align="left" class="style_term"> ! </td>
+          <td class="style_definition_short"> allows a line to fail (only if it's the first character) </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Normally a program is aborted when any configuration line fails. With this character as the first non-whitespace character, failure of the line will give an error message but won't abort the program. </p>
+      <p class="overview_content"> Here is an example line and how it would be interpreted: </p>
+      <div align="center">
+        <p class="style_definition_example">
+          <b>! option value "string \"value\"" split" value" #comment</b>
+        </p>
+      </div>
+      <p class="overview_content"> The line above would be allowed to fail ("<b>!</b>") and would have the following elements: "<b>option</b>", "<b>value</b>", "<b>string "value"</b>", and "<b>split value</b>". If this sounds confusing, just think of it as essentially the same way a shell splits up arguments on the command line. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="USCF">Using Server Configuration Files.</a>
+      </h3>
+      <p class="overview_content"> At least one client must be started from a configuration file when executing a new <span class="style_command_line">rservr</span>. If you were to only choose one, <span class="style_command_line">rservrd</span> would be the best choice since it will allow you to set up additional clients from the command line. Clients started via the configuration file are subject to lesser restrictions than those started after initial configuration is complete. </p>
+      <p class="overview_content"> When starting clients using the configuration file, each individual client is subject to the current restrictions of the server at the time that client is started. Each configuration line changing a specific aspect of the server's configuration changes the server's current state, and when clients are started they retain a snapshot of the server's state at that time. This allows you to raise and lower permissions based on the next client to be started as well as their user and group IDs (for super-user servers only.) </p>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> The configuration file is the only place you can lower security restrictions once they've been raised. </p>
+        </div>
+      </div>
+      <p class="overview_content"> All server configuration settings are reversible by subsequent configuration lines. The state of the server at the time of a client's execution sticks with that client until that client's process exits. This is your only chance to specifically identify permissions for a new client. Once configuration is complete, all permission settings are locked in within the server, so set them how you'd like them to stay at the end of your configuration file. User and group IDs aren't locked in, but the last IDs set are used as the defaults if no other IDs are provided when starting a new client (applies to super-user servers only.) </p>
+      <p class="overview_content"> In addition to locking in the configuration settings at the end of the configuration file, the server also imposes a few additional restrictions by default (disabling the "server control" attribute, discussed in the admin client section.) </p>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> <span class="style_command_line">rservr</span> can start new clients with arbitrary user and group IDs if it's run as the super-user. The server will allow arbitrary selection of those IDs from the configuration file <i>only</i>. New clients started by admin clients (see the next section) must be run under a user ID that is a member of the admin client's group, and that user ID must also be a member of the group the new client is to be run under. </p>
+        </div>
+      </div>
+      <p class="overview_content"> Refer to the <a href="rservr.html" class="general_link"><span class="style_command_line">rservr</span> Program Guide</a> section for a full description of all configuration options available when executing the server. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TSID">The Server Interface Daemon.</a>
+      </h3>
+      <h4 class="overview_title">
+        <a name="TSID_PotD">Purpose of the Daemon.</a>
+      </h4>
+      <p class="overview_content"> The <span class="style_command_line">rservrd</span> program is both an admin client and a command-line tool used to interface with a running <span class="style_command_line">rservr</span>. The <span class="style_command_line">rservrd</span> client must be attached to a server (normally using the configuration file) if you want users and scripts to be able communicate with the server using the command-line tool. </p>
+      <p class="overview_content"> The <span class="style_command_line">rservrd</span> client should be attached to all new servers. Its command-line interface allows control over the system for things such as adding and removing clients, making network connections, and terminating the application. Most of those actions are inconvenient to perform without <span class="style_command_line">rservrd</span> because they'd involve writing your own admin client program. </p>
+      <h4 class="overview_title">
+        <a name="TSID_AtDtaS">Attaching the Daemon to a Server.</a>
+      </h4>
+      <p class="overview_content"> Use the following command format to attach the daemon to the server: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+rservrd -d<b><i>(</i></b>x<b><i>)(</i></b>g<b><i>)(</i></b>r<b><i>)</i></b> <b><i>((priority)</i></b>:<b><i>(permission))</i></b>
+</pre>
+      </div>
+      <p class="overview_content"> This should be done using the configuration file. The following configuration line demonstrates the standard way of starting <span class="style_command_line">rservrd</span> from the <span class="style_command_line">rservr</span> configuration file: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+execute_critical @rservrd@-dxr
+</pre>
+      </div>
+      <p class="overview_content"> In brief, the <span class="style_command_line">x</span> option will cause the daemon to terminate the <span class="style_command_line">rservr</span> it's connected to when it exits itself (this only works when starting the daemon from a configuration file,) and the <span class="style_command_line">g</span> option allows the daemon's interface to be accessed by users who are a part of the same group as that of the daemon. The <span class="style_command_line">r</span> option causes a "new client" call to pause until that client registers with the server. See the <a href="rservrd.html" class="general_link"><span class="style_command_line">rservrd</span> Program Guide</a> for information about the priority and permission options. </p>
+      <p class="overview_content"> Although the <span class="style_command_line">x</span> option is normally used, you should also start <span class="style_command_line">rservrd</span> using <span class="style_command_line">execute_critical</span> or <span class="style_command_line">system_critical</span> to ensure server termination if for some reason <span class="style_command_line">rservrd</span> terminates without communicating with the server. </p>
+      <h4 class="overview_title">
+        <a name="TSID_SNC">Starting New Clients.</a>
+      </h4>
+      <p class="overview_content"> The <span class="style_command_line">rservrd</span> daemon can start new clients on a server it's attached to using its <span class="style_command_line">system</span> and <span class="style_command_line">execute</span> commands. Both of these commands specify a client program to execute and attach to the <span class="style_command_line">rservr</span>. See the <a href="rservrd.html" class="general_link"><span class="style_command_line">rservrd</span> Program Guide</a> for a full explanation of how to use those commands. </p>
+      <h4 class="overview_title">
+        <a name="TSID_CEPtC">Converting Existing Processes to Clients.</a>
+      </h4>
+      <p class="overview_content">
+        <span class="style_command_line">rservrd</span> must possess the "server control" attribute in order to attach detached clients. The existing process must also be explicitly designed as a detached client. See the <span class="style_command_line">detached</span> command in the <a href="rservrd.html" class="general_link"><span class="style_command_line">rservrd</span> Program Guide</a> section for more information. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="PC">Permissions Cascade.</a>
+      </h3>
+      <p class="overview_content"> A running <span class="style_command_line">rservr</span> has two distinct stages: configuration parsing and running the server loop. At a certain point between those stages, the server disables the "server control" attribute (see the section about <a href="introduction.html#AS_CC_AC" class="general_link">admin clients</a>,) preventing any client started after that from possessing it. This prevents admin clients (e.g. <span class="style_command_line">rservrd</span>, as used below) from starting clients that have access to certain critical administrative functionality (such as terminating the server.) </p>
+      <p class="overview_content"> At the configuration stage of server execution, the configuration options may reduce the level of security of the server after raising it, but the security state is locked in once configuration ends. This restricts new clients started by <span class="style_command_line">rservrd</span> in two ways. The first is by the current state of the server at the point where <span class="style_command_line">rservrd</span> was started. The configuration stage can restrict the permissions of clients started by admin clients, limiting permissions of new clients started by <span class="style_command_line">rservrd</span> to that state at the time <span class="style_command_line">rservrd</span> was started. The second restriction comes from the actual options used to execute <span class="style_command_line">rservrd</span>. If a limit is placed on <span class="style_command_line">rservrd</span> by starting it with either a priority or permission argument then new clients it starts will also have these restrictions. <span class="style_command_line">rservr</span> combines all restrictions into one when starting a new client, giving the maximum restrictions present at that time to the new client being started. This provides strong security control at the possible expense of convenience. </p>
+      <div align="center">
+        <img alt="Permissions Cascade" src="permission-cascade.png" height="291" width="650" />
+      </div>
+      <p class="overview_content"> In the diagram above, the static restrictions (shown in yellow) are built into the <span class="style_command_line">rservr</span> program during the installation process and can't be changed subsequently without reinstalling. The run-time restrictions (shown in red) come from security and priority command-line and configuration options (note that admin-started clients can have a lower minimum priority than their respective admin clients if the server allows it.) All of the restrictions to the left and above are applied when a client is connected in the given context (shown in blue.) The restrictions passed on from admin clients include both those applied to the admin client upon its own connection as well as any additional restrictions the admin client may add itself (see the <a href="rservrd.html" class="general_link"><span class="style_command_line">rservrd</span> Program Guide</a> for more information.) </p>
+      <p class="overview_content"> Super-user servers are able to start new clients with arbitrary user and group IDs; however, super-user servers <i>will not</i> allow admin clients to start new clients with arbitrary user and group IDs.  The user ID given for a new client started by an admin client <i>must</i> be a member of the group that the admin client was started under, and it must also be a member of the group that it will be started under itself.  Detached clients have the same requirements, except their user and group IDs originate from the ownership of the socket used to connect to them. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="introduction.html" class="overview_link">Previous - Introduction</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="administration.html" class="overview_link">Next - Application Administration</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
