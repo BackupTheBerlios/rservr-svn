@@ -1,3 +1,5 @@
+clean up and update this todo! actually, this is just for testing a commit
+
 20dec08
 	- remove PARAM_AUTO_BLOCKING et. al. -OR- test it and make it work
 	- same thing with PARAM_CACHE_COMMAND_OUTPUT
