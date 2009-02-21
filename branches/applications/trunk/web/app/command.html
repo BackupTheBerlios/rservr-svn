@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver Application Developement Guide - The command.h Header</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver Application Developement Guide </h1>
+      <h2 align="center" class="page_subtitle"> The <span class="style_command_line">command.h</span> Header </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a class="overview_link">Previous</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="basic.html" class="overview_link">Next - Basic Requirements of a Client</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#ITaV" class="overview_link">Important Types and Values.</a>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="ITaV">Important Types and Values.</a>
+      </h3>
+      <p class="overview_content"> The <span class="style_inline_code">&lt;rservr/api/command.h&gt;</span> header provides all of the <span class="style_inline_code">typedef</span>s and important constants necessary to build a client. This header has an extensive list of types and values, but below are some of the more important ones to understand: </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> result </td>
+          <td class="style_definition_short"> boolean result </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This always indicates a <span class="style_inline_code">true</span>/<span class="style_inline_code">false</span> (non-zero/zero) result. Most of the Resourcerver C functions returning <span class="style_inline_code">int</span> use the standard 0/-1 return values instead of this. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> multi_result </td>
+          <td class="style_definition_short"> tri-value result </td>
+        </tr>
+      </table>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="150" align="left">
+            <b>result_success</b>
+          </td>
+          <td> indicates success </td>
+        </tr>
+        <tr>
+          <td width="150" align="left">
+            <b>result_fail</b>
+          </td>
+          <td> indicates failure </td>
+        </tr>
+        <tr>
+          <td width="150" align="left">
+            <b>result_invalid</b>
+          </td>
+          <td> indicates exceptional failure (e.g. closed file) </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Success will always return zero. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> text_info </td>
+          <td class="style_definition_short"> standard <span class="style_inline_code">const</span> null-terminated C-string </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> binary_info </td>
+          <td class="style_definition_short"> set of raw binary data </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> binary_size </td>
+          <td class="style_definition_short"> size of a set of raw binary data </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> command_reference </td>
+          <td class="style_definition_short"> reference number denoting a sent command </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Reference numbers for commands sent by a client will always have a value greater than 0. Commands originating at the server not in response to a command from a client will generally have a reference value of 0. Otherwise, a value of 0 returned when sending a command indicates an error. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> command_priority </td>
+          <td class="style_definition_short"> execution priority of a command </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Lower values indicate higher execution priorities. These values range from 0 to 255, with the default server-imposed minimum value of 127. This minimum can be changed at server configuration time. Some commands will always bypass this minimum, such as client registration and deregistration. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> command_handle </td>
+          <td class="style_definition_short"> handle of a command waiting to be sent </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This handle is used internally to locate a queued command and should <u>never</u> be <span class="style_inline_code">free</span>d or used other than as an argument to command queue functions. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> message_handle </td>
+          <td class="style_definition_short"> handle of a message to be responded to </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This handle is used internally to locate a queued message and should <u>never</u> be <span class="style_inline_code">free</span>d or used other than as an argument to message queue functions or to respond to a message. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> command_type </td>
+          <td class="style_definition_short"> the intended execution type of a command </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This type also holds the values of several internally-used bits; therefore, it's important to check the following values against values in question using <span class="style_inline_code">&</span>. </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="200" align="left">
+            <b>command_server</b>
+          </td>
+          <td> executed by the server </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>command_request</b>
+          </td>
+          <td> executed by a client </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>command_response</b>
+          </td>
+          <td> executed by a client </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>command_remote</b>
+          </td>
+          <td> forwarded by a client without execution </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>command_null</b>
+          </td>
+          <td> executed by a client </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>command_all</b>
+          </td>
+          <td> mask used for extracting only command types </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> entity_type </td>
+          <td class="style_definition_short"> the type of a given client, or the server </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> permission_mask </td>
+          <td class="style_definition_short"> permissions allowed by a client </td>
+        </tr>
+      </table>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> security_level </td>
+          <td class="style_definition_short"> predefined <span class="style_inline_code">permission_mask</span>s </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> These are synonymous with <span class="style_inline_code">entity_type</span>. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> command_event </td>
+          <td class="style_definition_short"> status/outcome flags of a command </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> The flags below are combined to form the current status of a sent command at any given time. They're also used as the outcome values of command execution, etc. </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="200" align="left">
+            <b>event_received_server</b>
+          </td>
+          <td> received by any server </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>event_received_client</b>
+          </td>
+          <td> received by any client </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>event_error</b>
+          </td>
+          <td> failure due to error </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>event_rejected</b>
+          </td>
+          <td> rejected due to permissions </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>event_bad_target</b>
+          </td>
+          <td> rejected due to invalid target </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>event_retry</b>
+          </td>
+          <td> rejected due to too many pending </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>event_wait</b>
+          </td>
+          <td> rejected due to busy resources </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>event_discarded</b>
+          </td>
+          <td> rejected due to busy target client </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>event_complete</b>
+          </td>
+          <td> executed successfully </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>event_unavailable</b>
+          </td>
+          <td> status not available </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>event_unsent</b>
+          </td>
+          <td> not sent due to local error(s) </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> response_type </td>
+          <td class="style_definition_short"> type of response to a message </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This is similar to <span class="style_inline_code">command_event</span> except that these flags are used by client programs to indicate to the sender how complete the response given is. These can implicitly effect the <span class="style_inline_code">command_event</span> status of a command, but are generally only used by client programs via messages in the message queue. These are normally sent using the service response interface. </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="200" align="left">
+            <b>response_normal</b>
+          </td>
+          <td> response is all-inclusive </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>response_ignore</b>
+          </td>
+          <td> request ignored </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>response_error</b>
+          </td>
+          <td> response contains error information </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>response_rejected</b>
+          </td>
+          <td> response contains rejection information </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>response_wait</b>
+          </td>
+          <td> response contains wait information </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>response_group</b>
+          </td>
+          <td> indicates a group of responses follows </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>response_start</b>
+          </td>
+          <td> the start of several partial responses </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>response_partial</b>
+          </td>
+          <td> partial response data </td>
+        </tr>
+        <tr>
+          <td width="200" align="left">
+            <b>response_end</b>
+          </td>
+          <td> the end of several partial responses </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> monitor_event </td>
+          <td class="style_definition_short"> mask of server-monitoring types </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> The server-monitoring system's implementation isn't well defined yet. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a class="overview_link">Previous</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="basic.html" class="overview_link">Next - Basic Requirements of a Client</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

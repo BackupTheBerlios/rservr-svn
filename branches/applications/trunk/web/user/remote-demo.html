@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver User's Guide - Remote Service Demo</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver User's Guide </h1>
+      <h2 align="center" class="page_subtitle"> Remote Service Demo </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        Demo Script.
+      </h3>
+      <p class="overview_content"> Create and execute the script below in any *nix terminal to start the demo. This script assumes that you have write access to <span class="style_file_name">/tmp</span>. </p>
+      <p class="overview_content"> This script creates 3 separate Resourcerver systems connected through a series of local sockets placed in <span class="style_file_name">/tmp</span>. These sockets could just as easily be network ports if network forwarders were used instead of local forwarders. The script places an echoing client on one server, then a terminal-emulating client on the server on the opposite end. The objective of this demo is to "map" (used loosely) the echoing client's service to the terminal-emulating client's server and send a simple message to it. </p>
+      <div align="center">
+        <pre class="example_box code_box script_box">
+<b><i><u>remote-demo.sh</u></i></b>
+<b>#!/bin/bash</b>
+
+<i>#set an optional log file by providing a single argument to the script</i>
+
+output="/dev/null"
+
+if [ -n "$1" ]; then
+  output="$1"
+fi
+
+
+function clean_up()
+{
+  <b>rservrd</b> 'node[1-3]' @server_term
+  exit
+}
+
+trap clean_up SIGINT
+
+
+<i>#start 3 very basic server systems</i>
+
+echo "starting 'node3'..."
+
+{ echo "execute_critical @<b>rservrd</b>@-dxr";
+  echo "execute @<b>rsv-fsrelay</b>@relay3in";
+  echo "register_all_wait"; } | \
+<b>rservr</b> node3 "$output"
+
+echo "starting 'node2'..."
+
+{ echo "execute_critical @<b>rservrd</b>@-dx";
+  echo "execute @<b>rsv-fsrelay</b>@relay2out";
+  echo "execute @<b>rsv-fsrelay</b>@relay2in";
+  echo "register_all_wait"; } | \
+<b>rservr</b> node2 "$output"
+
+echo "starting 'node1'..."
+
+{ echo "execute_critical @<b>rservrd</b>@-dxr";
+  echo "execute @<b>rsv-fsrelay</b>@relay1out";
+  echo "register_all_wait"; } | \
+<b>rservr</b> node1 "$output"
+
+
+<i>#create connections between the systems</i>
+
+<b>rservrd</b> node3 @local_listen@relay3in@/tmp/relay3in
+connect_addr2=`<b>rservrd</b> node2 @local_connect@relay2out@/tmp/relay3in`
+<b>rservrd</b> node2 @local_listen@relay2in@/tmp/relay2in
+connect_addr1=`<b>rservrd</b> node1 @local_connect@relay1out@/tmp/relay2in`
+
+if [ -z "$connect_addr2" ] || [ -z "$connect_addr1" ]; then
+  echo "exiting because of failed connection(s)."
+  clean_up
+  exit 1
+fi
+
+
+<i>#start an echo client on one end and a terminal on the opposite end</i>
+
+echo "new clients..."
+
+echo_pid=`<b>rservrd</b> node3 @execute@<b>rsv-echo</b>@repeater`
+term_pid=`<b>rservrd</b> node1 @execute@<b>rsv-terminal</b>@/tmp/terminal`
+
+
+if [ -n "$echo_pid" ] && [ -n "$term_pid" ]; then
+
+  echo "terminal..."
+
+  <i>#start the terminal emulator <u>(point of user interaction)</u></i>
+  <i>#don't press <b>[Ctrl]+C</b> to exit; use <b>[Ctrl]+D</b></i>
+
+  <b>unsterm</b> /tmp/terminal
+
+fi
+
+
+<i>#shut down the 3 server systems</i>
+
+echo "exiting..."
+
+clean_up
+
+
+echo "application complete."
+</pre>
+      </div>
+      <p>
+      </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+<b>shell&gt;</b> ./remote-demo.sh
+<b><u>- '?' or 'help' for help / 'exit' to *terminate* emulator -</u></b>
+</pre>
+      </div>
+      <p class="overview_content"> If you see the message above (or similar,) you're ready to start the interactive demo. At this point you have servers named <span class="style_command_line">node1</span>, <span class="style_command_line">node2</span>, and <span class="style_command_line">node3</span>. <span class="style_command_line">node1</span> is where the terminal emulator is located and <span class="style_command_line">node3</span> is where the echoer is located. Using the steps below, you'll find your way through the network of server systems to eventually find the echoer. </p>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> You can track the log output of this demo by opening another terminal, typing in <span class="style_command_line">tty</span> to find that terminal's name, then using that name as the first argument of the script. </p>
+        </div>
+      </div>
+      <p class="overview_content"> Right now the echoer is available through explicit addressing, as demonstrated below: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+service_message repeater "hello, repeater!" \
+  relay1out?/tmp/relay2in|relay2out?/tmp/relay3in
+<b><u>hello, repeater!</u></b>
+</pre>
+      </div>
+      <p class="overview_content"> The addressing at the end can become quite burdensome, not to mention the fact that it's a simple thing to mess up and doesn't allow for the echoer to be located somewhere else. The steps below will allow you to "map" the echoer to the local server so that addressing isn't necessary. </p>
+      <p class="overview_content"> The first step is to find out what's available to you on <span class="style_command_line">node1</span>. To do so, type in <span class="style_command_line">find_services</span> and press <b>[Enter]</b> to list the services local to <span class="style_command_line">node1</span>. Note that you can shorten <i>any</i> command in the emulator by using part of its name. For example, you could type in <span class="style_command_line">find</span> instead of <span class="style_command_line">find_services</span> and the terminal would give you a choice of all commands that match. For clarity, I'll use full command names. </p>
+      <p class="overview_content"> The command you just entered should list one service: <span class="style_command_line">relay1out</span>. This is an <span class="style_command_line">fsrelay</span>-type service, as denoted by the second part of its line. This particular type of service is associated with the <span class="style_command_line">rsv-fsrelay</span> client, which is a local socket forwarder. </p>
+      <p class="overview_content"> Now that we have the name of a forwarder on the local server, we can list what connections it has. Type in <span class="style_command_line">list_local_connections relay1out</span> to find out what connections <span class="style_command_line">relay1out</span> has. Remember that the command can be shortened, so you should be able to type <span class="style_command_line">local relay1out</span> instead of the full command name. One connection should be listed: <span class="style_command_line">/tmp/relay2in;1</span> (Note that "<b>;1</b>" on the end of the address denotes the first connection to the given address, but that specification is entirely optional.) This means that <span class="style_command_line">relay1out</span> has a local socket connection to <span class="style_command_line">/tmp/relay2in;1</span>, which is owned by another forwarder of the same type. </p>
+      <p class="overview_content"> Using our locally-attached forwarder and its one known connection, we now have access to an entirely independent server sytem. We can now list the services that <i>that</i> server has registered using the command <span class="style_command_line">find_remote_services relay1out?/tmp/relay2in</span>. This lists 2 services: <span class="style_command_line">relay2out</span> and <span class="style_command_line">relay2in</span>. We "just so happen to know" that <span class="style_command_line">relay2in</span> is the forwarder that we just used the connection to, so we aren't concerned with that. Now we can request that <span class="style_command_line">relay2out</span> register its service with <span class="style_command_line">node1</span> so that we have quick access to it using the command <span class="style_command_line">request_service relay1out?/tmp/relay2in relay2out fsrelay</span>. You can verify that the service is now registered locally using <span class="style_command_line">find_services</span>. Notice that <span class="style_command_line">relay2out</span> is now available locally and that it's listed with a third component: the address the server uses to locate it. Also notice that this address <i>isn't the same</i> as the one we typed in to locate it initially. This is because the server itself "knows" where the service came from (<span class="style_command_line">relay1out</span>,) and therefore doesn't need to store that client's name as a part of the address. Don't bother trying to figure out this alternate address format: it will only ambiguate what you already know about addressing. </p>
+      <p class="overview_content"> Using the same methods we used to locate and "steal" <span class="style_command_line">relay2out</span>, find its connections and list the services available on <span class="style_command_line">node3</span> (output cleaned up for clarity.) </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+list_local_connections relay2out
+<b><u>/tmp/relay3in;1</u></b>
+
+find_remote_services relay2out?/tmp/relay3in
+<b><u>relay3in*fsrelay*</u></b>
+<b><u>repeater*echo*</u></b>
+
+request_service relay2out?/tmp/relay3in repeater echo
+
+find_services
+<b><u>relay1out*fsrelay*</u></b>
+<b><u>relay2out*fsrelay*relay2out?/tmp/relay2in;1</u></b>
+<b><u>repeater*echo*relay2out?/tmp/relay2in;1|echo?/tmp/relay3in;1</u></b>
+</pre>
+      </div>
+      <p class="overview_content"> Now that the echoer has a service registered locally, we can shorten the message call by skipping the address: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+service_message repeater "hello, repeater!"
+<b><u>hello, repeater!</u></b>
+</pre>
+      </div>
+      <p class="overview_content"> Press <b>[Ctrl]+D</b> to end the demo. If you've already exited another way, enter the command line <span class="style_command_line">rservrd 'node[1-3]' @server_term</span> to clean up. </p>
+      <h3 class="overview_title">
+        Connection Monitoring.
+      </h3>
+      <p class="overview_content"> You might wonder what happens if any one of the forwarders or servers exits when <span class="style_command_line">repeater</span> has a service registered on <span class="style_command_line">node1</span>. Although it would be easy to leave the service in place and require a command sent to it to fail before dealing with it, I've gone to great lengths to make sure Resourcerver automatically deregisters services upon connection failure. Though a small and rarely-seen part of the project, I find it to be the most difficult part to understand internally. </p>
+      <p class="overview_content"> To see what happens when a connection is lost using the demo script, open three terminal emulators. Type <span class="style_command_line">tty</span> in the first terminal to find out its name. This will be the log-output terminal. Run the demo script in the second terminal using the return of <span class="style_command_line">tty</span> from the other terminal as its only argument. </p>
+      <p class="overview_content"> Type the following into the second terminal once the emulator comes up: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+request_service relay1out?/tmp/relay2in|relay2out?/tmp/relay3in repeater echo
+
+find_services
+<b><u>relay1out*fsrelay*</u></b>
+<b><u>repeater*echo*relay2out?/tmp/relay2in;1|repeater?/tmp/relay3in;1</u></b>
+</pre>
+      </div>
+      <p class="overview_content"> Type <span class="style_command_line">rservrd</span> into the third terminal. This will show the three servers we created. Next, select <i>one</i> of the following lines and enter it into the third terminal. </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+rservrd node3 @term@repeater
+rservrd node2 @server_term
+rservrd node2 @term@relay2in
+</pre>
+      </div>
+      <p class="overview_content"> Please note that we use a <i>service</i> name with the <span class="style_command_line">rservrd</span> <span class="style_command_line">term</span> command. This is only possible because we started <span class="style_command_line">rservrd</span> from the <span class="style_command_line">rservr</span> configuration file, and it therefore has the "server control" attribute. </p>
+      <p class="overview_content"> Each of the <span class="style_command_line">rservrd</span> commands will destroy part of the connection between <span class="style_command_line">node1</span> and <span class="style_command_line">repeater</span>. Look at the log output in the first terminal to see the numerous actions taken as a result of the severed connection. Each of these actions is a result of the <span class="style_command_line">repeater</span> service registered on <span class="style_command_line">node1</span>, which requires a connection that crosses three servers and four forwarders. </p>
+      <p class="overview_content"> Next, enter the <span class="style_command_line">find_services</span> command into the emulator. If the collective system of servers functioned correctly, the <span class="style_command_line">repeater</span> service should no longer be there. </p>
+      <h3 class="overview_title">
+        Comments.
+      </h3>
+      <p class="overview_content"> This demo shows how easily remote connections can be used to make parts of other systems appear to be local. Normally a set of systems, even connected across a network, will only have a <i>single</i> layer of connections, e.g. <span class="style_command_line">node1</span> and <span class="style_command_line">node2</span> of this demo, with nothing comparable to <span class="style_command_line">node3</span>'s position relative to <span class="style_command_line">node1</span>. With <span class="style_command_line">node1</span> as the head of an "ideal" system distributed across multiple machines, it would have network connections to several separate Resourcerver systems comparable in relative location to <span class="style_command_line">node2</span>. Each of the <span class="style_command_line">node2</span>-like systems would host one or more resource clients that would provide the core services of the system, while <span class="style_command_line">node1</span> would facilitate user control over that collection of systems. </p>
+      <p class="overview_content"> Local forwarders provide an ideal structure for testing prospectively-networked systems. They're directly replaceable by network forwarders and only require changes in addressing and service type. Normally if you get a "networked" system working using local forwarders, you can quickly convert it to a truly-networked system. At that point it becomes a matter of adapting your firewall and system security to allow connections to be made. </p>
+      <p class="overview_content"> I'd like to explicitly point out that <span class="style_command_line">rsv-terminal</span> is a control client, whereas the other clients used in this demo are resource clients (with the exception of <span class="style_command_line">rservrd</span>, which is used to assemble the application.) All of the resource clients used here register anonymously (without using a name) and register exactly one service upon initialization. As the intended points of control over a system, control clients should generally only deal with registered services <i>instead</i> of actual client names. This allows the system to adapt over time, and also allows clients to identify the intended purpose of a service (i.e. it's type,) which isn't available with normal client names. </p>
+      <p class="overview_content"> As a control client, <span class="style_command_line">rsv-terminal</span> has visibility of only two types of entity: services and other control clients. It has indirect visibility of resource clients that choose to make themselves visible through registered services, but the actual identities of the corresponding clients are never known to <span class="style_command_line">rsv-terminal</span> (as with all other control clients.) Whether all services are associated with one client or all with separate clients, the appearance to control clients is exactly the same. This protects the resource clients from abuse, and also forces the user's attention to be focused on the actual services provided instead of the literal structure of the application. </p>
+      <p class="overview_content"> <span class="style_command_line">rsv-terminal</span> is only a debugging and testing tool, but control clients used in non-trivial applications should provide control over some sort of multi-client process. Setting up the internals of the system is only a single part of what a control client should do. Normally that should be taken care of upon application initialzation using a configuration unique to that application, then the control client should enter a "user interaction" mode in which a user can inject controlling actions and extract output. </p>
+      <p class="overview_content"> Not all applications need to be spread out across networks. In fact, <i>most</i> should be designed to run on a single system and be distributed across multiple machines only if resources are remotely located or if certain clients require intensive processor usage. Networking is only a minor part of the Resourcerver system as a whole. This demo, though primarily focused on remote connections, adequately demonstrates incremental application assembly and adaptation. The structure of the application can be modified <i>extremely</i> easily by changing a few lines in the script, which might've required rebuilding if it were a "conventional" single-program application. </p>
+      <p class="overview_content"> The Resourcerver system as a whole <i>isn't</i> intended for intensive raw data transfer. The main reason for concise client restrictions is to force each client to take care of its portion of processing <i>internally</i>, and only interact with other clients as required. This limits IPC traffic and forces clients to be highly specialized. </p>
+      <p class="overview_content"> Hopefully this demo gave you a clearer idea of how Resourcerver works. This demo is made up entirely of standard Resourcerver components and serves as a representative example of how an application is started incrementally and modified at run time. If I did my job adequately, you should be experimenting on your own at this point. If you come across errors or if you're having difficulties, feel free to send me an email or post a message at the project's <a href="https://developer.berlios.de/projects/rservr/" class="general_link">download site</a>. </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

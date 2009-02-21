@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver User's Guide - rservrd Program Guide</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver User's Guide </h1>
+      <h2 align="center" class="page_subtitle">
+        <span class="style_command_line">rservrd</span> Program Guide </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="rservr.html" class="overview_link">Previous - <span class="style_command_line">rservr</span> Program Guide</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="socket-forward.html" class="overview_link">Next - <span class="style_command_line">rsv-fs<span style="font-weight:normal;">*</span></span> and <span class="style_command_line">rsv-net<span style="font-weight:normal;">*</span></span> Program Guide</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#SDI" class="overview_link">Server Daemon Invocation.</a>
+        </li>
+        <li>
+          <a href="#UtDwSS" class="overview_link">Using the Daemon with Super-user Servers.</a>
+        </li>
+        <li>
+          <a href="#SIO" class="overview_link">Server Interface Invocation.</a>
+        </li>
+        <li>
+          <a href="#ICM" class="overview_link">Interface Message Commands.</a>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="SDI">Server Daemon Invocation.</a>
+      </h3>
+      <p class="overview_content"> The <span class="style_command_line">rservrd</span> program provides an administrative interface to a running <span class="style_command_line">rservr</span> using the command line. In order to make this interface available for a server you must start the <span class="style_command_line">rservrd</span> program as an <span class="style_command_line">rservr</span> client using the following command format: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+rservrd -d<b><i>(</i></b>x<b><i>)(</i></b>g<b><i>)(</i></b>r<b><i>)</i></b> <b><i>((priority)</i></b>:<b><i>(permission))</i></b>
+</pre>
+      </div>
+      <p class="overview_content"> The <span class="style_command_line">x</span> option forces the daemon to terminate the server it's connected to upon it's own termination. For this to work, the daemon must be started via the <span class="style_command_line">rservr</span> configuration file: it won't work if it's started by another admin client. </p>
+      <p class="overview_content"> The <span class="style_command_line">g</span> option will allow users who are a part of the <span class="style_command_line">rservrd</span> process' effective group (at the time of execution) to access the interface. By default, only the same user as the process can access the interface. </p>
+      <p class="overview_content"> The <span class="style_command_line">r</span> option forces the command-line interface to pause and wait for a client to register when executing a new client or attaching a detached process. This operation will time out after a certain amount of time if the client doesn't register, or will return with an error if the client tries to register in a way it isn't authorized or exits without registering. This corresponds to the <span class="style_command_line">register_all_wait</span> <span class="style_command_line">rservr</span> configuration option, but cause the daemon to wait for registration after each <i>individual</i> new-client request before moving on to the next command. </p>
+      <p class="overview_content"> The priority and permission arguments determine the minimum priority and maximum permissions of new clients started or attached by the daemon. See the <span class="style_command_line">rservr</span> <span class="style_command_line">priority</span> and <span class="style_command_line">security</span> configuration options for more information. You may use one or both, but the colon is mandatory when using either. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="UtDwSS" class="overview_link">Using the Daemon with Super-user Servers.</a>
+      </h3>
+      <p class="overview_content"> The most important consideration when running the <span class="style_command_line">rservrd</span> daemon on a super-user server is selection of the appropriate user and group IDs to run the daemon under because those IDs will dictate how <span class="style_command_line">rservrd</span> can start new clients. Unlike running a server as a normal user, you must pay attention to the current default IDs at the point <span class="style_command_line">rservrd</span> is executed from the configuration file. </p>
+      <p class="overview_content"> The user ID should be selected based on the user that should be able to access the daemon. This ID doesn't effect what IDs can be used to start new clients; just what users can contact the daemon via the command-line interface.  This user ID doesn't have to be associated with the group ID used in any way to start new clients, but if the user ID isn't a part of the group used then the damon will <i>never</i> be able to start new clients without explicitly specifying new IDs (see below.) </p>
+      <p class="overview_content"> <span class="style_command_line">rservrd</span> will start new clients using its own user and group IDs by default. These can always be overridden with <i>requested</i> IDs through <span class="style_command_line">execute_full</span> and <span class="style_command_line">system_full</span>, but both the defaults and any overrides are subject to the restrictions below. </p>
+      <p class="overview_content"> The group ID dictates what user IDs the daemon can use to start new clients. This restriction is hard-coded into the server; this can't be circumvented (ideally,) even by hacking the daemon's source code. The daemon may only start new clients (or connect detached clients) as users that are a part of the group specified, e.g. if the daemon is run as group 'users' then it can only start new clients with user IDs posessing that group (the group doesn't need to be the user's primary group.) Additionally, the new client's user ID must be a part of the group that client is being run under. </p>
+      <p class="overview_content"> The <span class="style_command_line">g</span> command-line option will allow any user posessing the group of the daemon to contact the daemon via the command-line interface. By extension, this means that if the <span class="style_command_line">g</span> option is used when starting <span class="style_command_line">rservrd</span> on a super-user server, all users in the group used can start new clients as any other user in that group (except for 'root', if 'root' happens to be a member of that group.) </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="SIO">Server Interface Invocation.</a>
+      </h3>
+      <p class="overview_content"> To access the interface, use the following command-line formats: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+<b>shell&gt;</b> rservrd
+<i>(lists all daemons available to the current user)</i>
+
+<b>shell&gt;</b> rservrd <b><i>&lt;daemon&gt;</i></b>
+<i>(returns a "true" result if the daemon is accessible)</i>
+
+<b>shell&gt;</b> rservrd <b><i>&lt;daemon&gt; &lt;command&gt; ...</i></b>
+<i>(executes the given commands on the daemon specified)</i>
+</pre>
+      </div>
+      <p></p>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> You can use a regular expression in place of the target daemon's name to target multiple daemons at once. The expression will target a single daemon if any daemon exists with that exact name, otherwise it will be treated like a regular expression. All expressions should be enclosed in <span class="style_command_line">''</span> to prevent shell interpretation. </p>
+        </div>
+      </div>
+      <p></p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="ICM">Interface Message Commands.</a>
+      </h3>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> <span class="style_command_line">rservrd -h</span> provides a full listing of commands and their formats. </p>
+        </div>
+      </div>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> You can check if a specific <span class="style_command_line">rservrd</span> instance possesses the "server control" attribute with the command line below: </p>
+        </div>
+      </div>
+      <div align="center">
+        <pre class="example_box shell_box">
+<b>shell&gt;</b> rservrd <b><i>&lt;daemon&gt;</i></b> @find_client@@@rservrd | sed 's/.*\*\(.*\)\*.*/\1/' | rsvbits e
+</pre>
+      </div>
+      <p class="overview_content"> <span class="style_command_line">rservrd</span> commands are <i>always</i> formatted using a delimiter as the first character, followed by the command name, followed by a delimiter-separated string of command arguments. The normal delimiter is "<b>@</b>", but any other character can be used. Multiple commands can be sent to a daemon on the same command line. All commands on a line are executed regardless of preceding commands' return statuses. </p>
+      <p class="overview_content"> Labels enclosed in <span class="style_command_line">[]</span> must be substituted with a relevant value. Those subsequently enclosed in <span class="style_command_line">()</span> may be left out, but the delimiting characters must still be there. The <span class="style_command_line">@</span> symbol represents a delimiter character that can be substituted with any other character. Parts of a command specification shown with <span class="style_command_line">@</span> within <span class="style_command_line">()</span> denote that those arguments and the delimiter may be skipped entirely. <span class="style_command_line">...</span> denotes that the preceding argument type may be repeated an indefinite number of times. In most cases this will replicate the command for each additional argument given, but failures in that case will generally terminate the rest of the applicable command. A specific exception to command replication is <span class="style_command_line">execute</span>, which uses all additional arguments as command-line arguments for the client being started. </p>
+      <p> Below are several (but not all) important <span class="style_command_line">rservrd</span> commands to remember: </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="200" align="left" class="style_term"> find_client
+          </td>
+          <td class="style_term"> @find_client(@([require types])@([exclude types])@[name regex]...) </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Use this command to find clients registered on the server. The required and excluded types are hexadecimal masks and are always optional. </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="450" align="left">
+            <b>rservrd server @find_client</b>
+          </td>
+          <td> find all clients on "server" </td>
+        </tr>
+        <tr>
+          <td width="450" align="left">
+            <b>rservrd server @find_client@@@one@two</b>
+          </td>
+          <td> find clients on "server" with names containing "one", then "two" </td>
+        </tr>
+        <tr>
+          <td width="450" align="left">
+            <b>rservrd '.' @find_client@$(rsvbits E type_service_client)</b>
+          </td>
+          <td> find all registered service clients on all accessible servers. </td>
+        </tr>
+      </table>
+      <p></p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="200" align="left" class="style_term"> ping
+          </td>
+          <td class="style_term"> @ping(@[client name]...) </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Ping a client or clients to determine if their message queues are responsive. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="200" align="left" class="style_term"> system
+          </td>
+          <td class="style_term"> @system(@[command line]...) </td>
+        </tr>
+        <tr>
+          <td width="200" align="left" class="style_term"> system_full
+          </td>
+          <td class="style_term"> @system_full@([uid])@([gid])@([priority])@([permissions])(@[command line]...) </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Create a new shell-interpreted client. This will wait for the new client to register if the <span class="style_command_line">r</span> option was used when <span class="style_command_line">rservrd</span> was attached to the server. The process ID(s) of the new client(s) will be sent to standard output. </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="500" align="left">
+            <b>rservrd server @system@"rsv-echo echo"</b>
+          </td>
+          <td> create a new <span class="style_command_line">rsv-echo</span> client named "echo" on "server" </td>
+        </tr>
+        <tr>
+          <td width="500" align="left">
+            <b>rservrd server @system_full@@@64@sM@"rsv-echo echo"</b>
+          </td>
+          <td> create a new <span class="style_command_line">rsv-echo</span> client named "echo" on "server" with the default user and group IDs, command priority of 64, with maximum allowable permissions </td>
+        </tr>
+      </table>
+      <p></p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="200" align="left" class="style_term"> execute
+          </td>
+          <td class="style_term"> @execute@[command](@[argument]...) </td>
+        </tr>
+        <tr>
+          <td width="200" align="left" class="style_term"> execute_full
+          </td>
+          <td class="style_term"> @execute_full@([uid])@([gid])@([priority])@([permissions])@[command](@[argument]...) </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Create a new executed client. This will wait for the new client to register if the <span class="style_command_line">r</span> option was used when <span class="style_command_line">rservrd</span> was attached to the server. The process ID of the new client will be sent to standard output. </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="500" align="left">
+            <b>rservrd server @execute@rsv-echo@echo</b>
+          </td>
+          <td> create a new <span class="style_command_line">rsv-echo</span> client named "echo" on "server" </td>
+        </tr>
+        <tr>
+          <td width="500" align="left">
+            <b>rservrd server @execute_full@@@64@sM@rsv-echo@echo</b>
+          </td>
+          <td> create a new <span class="style_command_line">rsv-echo</span> client named "echo" on "server" with the default user and group IDs, command priority of 64, with maximum allowable permissions </td>
+        </tr>
+      </table>
+      <p></p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="200" align="left" class="style_term"> exit
+          </td>
+          <td class="style_term"> @exit(@[exit message]...) </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Print the given messages on the daemon's standard error (normally the same as the server's) then exit the daemon. This may also cause the server to exit if the <span class="style_command_line">x</span> option was used when <span class="style_command_line">rservrd</span> was attached to the server. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="200" align="left" class="style_term"> term
+          </td>
+          <td class="style_term"> @term(@[client name]...) </td>
+        </tr>
+        <tr>
+          <td width="200" align="left" class="style_term"> kill
+          </td>
+          <td class="style_term"> @kill(@[client name]...) </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Terminate IPC (with warning) or kill IPC (without warning) with a client running on the server. This only disconnects the client, but leaves it running. The client will normally exit when disconnected. Only "server control" instances can call <span class="style_command_line">kill</span>. "Server control" instances of <span class="style_command_line">rservrd</span> can use service names in place of client names. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="200" align="left" class="style_term"> find_term
+          </td>
+          <td class="style_term"> @find_term(@[name regex]...) </td>
+        </tr>
+        <tr>
+          <td width="200" align="left" class="style_term"> find_kill
+          </td>
+          <td class="style_term"> @find_kill(@[name regex]...) </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Terminate or kill using a regular expression to match the client's name. Service names cannot be used here. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="200" align="left" class="style_term"> pid_term
+          </td>
+          <td class="style_term"> @pid_term(@[pid]...) </td>
+        </tr>
+        <tr>
+          <td width="200" align="left" class="style_term"> pid_kill
+          </td>
+          <td class="style_term"> @pid_kill(@[pid]...) </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Terminate or kill using a client's process ID. These cannot be used with a process ID of a process not attached to the server, of a detached client, or of <span class="style_command_line">rservrd</span> itself. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="200" align="left" class="style_term"> server_term
+          </td>
+          <td class="style_term"> @server_term(@[termination message]...) </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Print the given messages to the server's standard error then terminate the server. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="rservr.html" class="overview_link">Previous - <span class="style_command_line">rservr</span> Program Guide</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="socket-forward.html" class="overview_link">Next - <span class="style_command_line">rsv-fs<span style="font-weight:normal;">*</span></span> and <span class="style_command_line">rsv-net<span style="font-weight:normal;">*</span></span> Program Guide</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

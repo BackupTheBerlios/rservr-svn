@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver User's Guide - Core Package Contents</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver User's Guide </h1>
+      <h2 align="center" class="page_subtitle"> Core Package Contents </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="filters.html" class="overview_link">Previous - Filtering Communication</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="rservr.html" class="overview_link">Next - <span class="style_command_line">rservr</span> Program Guide</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#NC" class="overview_link">Naming Conventions.</a>
+        </li>
+        <li>
+          <a href="#SP" class="overview_link">Standard Programs.</a>
+          <div>
+            <ul class="toc_list">
+              <li>
+                <a href="#SP_TSP" class="overview_link">The Server Program.</a>
+              </li>
+              <li>
+                <a href="#SP_CP" class="overview_link">Client Programs.</a>
+              </li>
+              <li>
+                <a href="#SP_OP" class="overview_link">Other Programs.</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <a href="#SL" class="overview_link">Standard Libraries.</a>
+          <div>
+            <ul class="toc_list">
+              <li>
+                <a href="#SL_CL" class="overview_link">Core Libraries.</a>
+              </li>
+              <li>
+                <a href="#SL_CPiL" class="overview_link">Command Plug-in Libraries.</a>
+              </li>
+              <li>
+                <a href="#SL_SFPiL" class="overview_link">Security Filter Plug-in Libraries.</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="NC">Naming Conventions.</a>
+      </h3>
+      <p class="overview_content"> The naming conventions below are followed by all standard Resourverver programs and libraries, but <i>aren't required</i> of third-party programs and libraries. Third-party implementations should avoid using the names annotated with "[reserved]" below as part or all of a program or library name. General third-party libraries and programs for use by other developers in their own Resourcerver systems should abide by the remaining naming conventions for consistency, but programs and libraries only intended for use by the developer's own projects should use their own naming conventions. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="250" align="left" class="style_term"> rservr </td>
+          <td class="style_definition_short"> the server program proper [reserved] </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="250" align="left" class="style_term"> rservrd </td>
+          <td class="style_definition_short"> the server interface daemon program [reserved] </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="250" align="left" class="style_term"> rsv-<span style="font-weight:normal;">*</span>
+          </td>
+          <td class="style_definition_short"> included client programs </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="250" align="left" class="style_term"> rsvf-<span style="font-weight:normal;">*</span>
+          </td>
+          <td class="style_definition_short"> included IPC-filtering programs </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="250" align="left" class="style_term"> librservr-<span style="font-weight:normal;">*</span>.so </td>
+          <td class="style_definition_short"> built-in libraries [reserved] </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="250" align="left" class="style_term"> librsvp-<span style="font-weight:normal;">*</span>.so </td>
+          <td class="style_definition_short"> included command plug-in libraries </td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+          <td width="250" align="left" class="style_term"> librsvx-<span style="font-weight:normal;">*</span>.so </td>
+          <td class="style_definition_short"> included security filter plug-in libraries </td>
+        </tr>
+      </table>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="SP">Standard Programs.</a>
+      </h3>
+      <h4 class="overview_title">
+        <a name="SP_TSP">The Server Program.</a>
+      </h4>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> rservr </td>
+          <td class="style_definition_short"> the main server program </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This is the starting point for all Resourcerver systems. See the <a href="rservr.html" class="general_link"><span class="style_command_line">rservr</span> Program Guide</a> section for a full reference of executing this program. </p>
+      <h4 class="overview_title">
+        <a name="SP_CP">Client Programs.</a>
+      </h4>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> rservrd </td>
+          <td class="style_definition_short"> the server interface daemon </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This is both the client and interface component of the server interface daemon. It runs in the capacity of an admin client when attached to a server and in the capacity of a command-line interface when run from the command line. While it isn't entirely necessary to use this client, it provides extensive control over a running Resourcerver system. See the <a href="rservrd.html" class="general_link"><span class="style_command_line">rservrd</span> Program Guide</a> section for a full reference of executing this program. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> rsv-echo </td>
+          <td class="style_definition_short"> a simple echoing client </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This is a simple resource client that echoes messages back to the sender. It takes one argument to denote the client's name and can register an echoing service remotely when receiving a <span class="style_file_name">librsvp-rqsrvc.so</span> plug-in command.  Request messages sent to this client will be repeated back and info messages will be printed on the client's standard error. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> rsv-<span style="font-weight:normal;"><i>(</i></span>relay<span style="font-weight:normal;"><i>|</i></span>controller<span style="font-weight:normal;"><i>)</i></span>
+          </td>
+          <td class="style_definition_short"> pipe command forwarders </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> These clients forward commands to and from standard output and input, respectively. They take a single argument to denote the name of the client. This program should be used in conjunction with the <span class="style_command_line">pipexec</span> program. The forwarding address used when forwarding commands via these clients must match the second portion of the program name (the part following <span class="style_command_line">rsv-</span>.) <span class="style_command_line">rsv-relay</span> is the resource client version and <span class="style_command_line">rsv-controller</span> is the control client version of the forwarding client. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> rsv-<span style="font-weight:normal;"><i>(</i></span>fs<span style="font-weight:normal;"><i>|</i></span>net<span style="font-weight:normal;"><i>)</i></span><span style="font-weight:normal;"><i>(</i></span>relay<span style="font-weight:normal;"><i>|</i></span>controller<span style="font-weight:normal;"><i>)</i></span>
+          </td>
+          <td class="style_definition_short"> socket command forwarders </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> These clients are the socket-forwarding counterparts to the pipe command forwarders with the additional functionality of listening and connecting to local or network sockets. These clients provide Resourcerver systems with the ability to extend across networks. <span class="style_command_line">fs</span> variants will only use local sockets and <span class="style_command_line">net</span> variants will only use network sockets. See the <a href="socket-forward.html" class="general_link"><span class="style_command_line">rsv-fs<span style="font-weight:normal;">*</span></span> and <span class="style_command_line">rsv-net<span style="font-weight:normal;">*</span></span> Program Guide</a> section for a full reference of executing this program. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> rsv-terminal </td>
+          <td class="style_definition_short"> simple terminal-emulating client </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This is a simple control client that sets up a socket to emulate a terminal interface. The interface provides interactive command execution for basic control over the services of a Resourcerver system. This program takes one argument to denote a local socket to listen to. Only one instance of this client may exist on any <span class="style_command_line">rservr</span>. This client will always register with the client name "terminal." Use the <span class="style_command_line">unsterm</span> program to connect to the terminal. This program only allows a single connection to the emulator at a time. </p>
+      <p class="overview_content style_definition_long"> Once you connect to the terminal with <span class="style_command_line">unsterm</span>, you can type <span class="style_command_line">?</span> or <span class="style_command_line">help</span> for help. You can follow either by full or partial command names, to include regular expressions. You can also use part or all of a command name when specifying an operation. If more than one command name matches, you'll be given a choice. Input lines follow the <a href="assembly.html#UCFF" class="general_link">uniform configuration format</a>. This is a quickly-evolving utility, so the best reference will come from running the client and connecting to it. You <u>shouldn't</u> count on the interface being stringently-consistent across versions of this project; therefore, you <u>shouldn't</u> connect to the emulator with a script. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> rsv-console </td>
+          <td class="style_definition_short"> simple console client </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This program interfaces with the user identically to <span class="style_command_line">rsv-terminal</span> except it doesn't require the use of a socket or <span class="style_command_line">unsterm</span>. This client takes a single argument to denote its name, and requires the <span class="style_command_line">rservr</span> it's attached to to control a terminal. Once started, this client will interact with the user on the terminal that the <span class="style_command_line">rservr</span> owns. Example: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+<b>shell&gt;</b> exec rservr example /dev/null &lt;( echo "system \"rsv-console console\"" )
+<i>(console client is now available on this terminal)</i>
+</pre>
+      </div>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> rsv-respawn </td>
+          <td class="style_definition_short"> automatic client-respawning client </td>
+        </tr>
+      </table>
+      <p></p>
+      <p class="overview_content style_definition_long"> This admin client retains a list of other clients to monitor and restarts those clients if they terminate or disconnect from the server. Each monitored client has individual configuration properties to limit permissions and priority, as well as if the client is actually respawned if it exits. See the <a href="respawn.html" class="general_link"><span class="style_command_line">rsv-respawn</span> Program Guide</a> for more information. </p>
+      <p class="overview_content style_definition_long">  </p>
+      <h4 class="overview_title">
+        <a name="SP_OP">Other Programs.</a>
+      </h4>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> safexec </td>
+          <td class="style_definition_short"> wrapper program used by the server </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This program provides both execution and shell interpretation of client command lines and prevents them from being run as the super-user. You should not use this program directly. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> rsvbits </td>
+          <td class="style_definition_short"> bit translation program </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This program provides fast conversion between hexadecimal values and labels for the values of Resourcerver constants. This is a useful debugging tool since it can convert hexadecimal values into lists of the names of the bits it has set. </p>
+      <p class="overview_content style_definition_long"> This program takes a single-character argument as its first, then processes all remaining arguments based on that option. The value types given below are the labels used in the source code. </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="75" align="left">
+            <b>b</b> / <b>B</b>
+          </td>
+          <td> convert general values to/from bit positions (max = 64 bits) </td>
+        </tr>
+        <tr>
+          <td width="75" align="left">
+            <b>e</b> / <b>E</b>
+          </td>
+          <td> convert <span class="style_inline_code">entity_type</span> to/from labels </td>
+        </tr>
+        <tr>
+          <td width="75" align="left">
+            <b>c</b> / <b>C</b>
+          </td>
+          <td> convert <span class="style_inline_code">command_event</span> to/from labels </td>
+        </tr>
+        <tr>
+          <td width="75" align="left">
+            <b>r</b> / <b>R</b>
+          </td>
+          <td> convert <span class="style_inline_code">response_type</span> to/from labels </td>
+        </tr>
+        <tr>
+          <td width="75" align="left">
+            <b>t</b> / <b>T</b>
+          </td>
+          <td> convert <span class="style_inline_code">command_type</span> to/from labels </td>
+        </tr>
+        <tr>
+          <td width="75" align="left">
+            <b>l</b> / <b>L</b>
+          </td>
+          <td> convert <span class="style_inline_code">logging_mode</span> to/from labels </td>
+        </tr>
+        <tr>
+          <td width="75" align="left">
+            <b>i</b> / <b>I</b>
+          </td>
+          <td> convert <span class="style_inline_code">io_device</span> to/from labels </td>
+        </tr>
+        <tr>
+          <td width="75" align="left">
+            <b>m</b> / <b>M</b>
+          </td>
+          <td> convert <span class="style_inline_code">monitor_event</span> to/from labels </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Provide one or more arguments after the conversion option, or provide the arguments via standard input. Below are a few examples (the exact numerical output might differ depending on your Resourcerver version.) Some bit labels revealed aren't available via the Resourcerver API, but can still be used in their hexadecimal forms. </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+<b>shell&gt;</b> rsvbits B 1 2 4 8 16
+<b><u>0000000000010116</u></b>
+
+<b>shell&gt;</b> rsvbits b abcd
+<b><u>0 2 3 6 7 8 9 11 13 15</u></b>
+
+<b>shell&gt;</b> rsvbits E type_control_client type_service_client
+<b><u>00000090</u></b>
+
+<b>shell&gt;</b> rsvbits E security_5 | rsvbits e
+<b><u>type_any_client</u></b>
+<b><u>type_active_client</u></b>
+<b><u>type_service_client</u></b>
+<b><u>type_resource_client</u></b>
+</pre>
+      </div>
+      <p></p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> pipexec </td>
+          <td class="style_definition_short"> standard IO-replacment wrapper </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This program replaces standard input and/or standard output with new file descriptors based on the given files. This is meant to be used in conjunction with the pipe-forwarding clients. The first argument denotes the file to replace standard input with and second to replace standard output with. If a filename has zero-length then the previous descriptor is preserved. All arguments following the second are executed. </p>
+      <p class="overview_content style_definition_long"> To use this program with a pair of pipe-forwarding clients, use the following command format: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+pipexec <b><i>&lt;pipe1&gt; &lt;pipe2&gt; &lt;forwarder&gt; &lt;name1&gt;</i></b> <i>#on server 1</i>
+pipexec <b><i>&lt;pipe2&gt; &lt;pipe1&gt; &lt;forwarder&gt; &lt;name2&gt;</i></b> <i>#on server 2</i>
+</pre>
+      </div>
+      <p class="overview_content style_definition_long"> This will connect both clients to each other via a command-forwarding connection and clients on their respective servers can communicate with each other by addressing commands to a forwarder using the appropriate address. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> unsterm </td>
+          <td class="style_definition_short"> simple socket-to-terminal interface </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This program is intended for use with <span class="style_command_line">rsv-terminal</span>. It takes a single argument to denote a local socket, which it connects to and forwards everything between the socket and standard input and output. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> rsvf-log </td>
+          <td class="style_definition_short"> simple IPC-logging filter program </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This program logs commands intercepted from client/server and client/client IPC to a file. The file and logging mode are specified by the first argument. The first character denotes the mode and the remaining denote the log file's name. If the file name is zero-length then standard error is used. Specify the logging mode with one of the following: </p>
+      <table summary="example" class="style_definition_example">
+        <tr>
+          <td width="50" align="left">
+            <b>+</b>
+          </td>
+          <td> filter IPC headed away from the associated client </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>-</b>
+          </td>
+          <td> filter IPC headed toward the associated client </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>~</b>
+          </td>
+          <td> filter IPC in both directions </td>
+        </tr>
+        <tr>
+          <td width="50" align="left">
+            <b>!</b>
+          </td>
+          <td> don't filter any IPC (not really useful) </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> IPC logs can become very large, very quickly with high-intensity applications. They can grow by several MB per minute with constant IPC. You should only log IPC for troubleshooting purposes, or log to a pipe for immediate interpretation. </p>
+        </div>
+      </div>
+      <p class="overview_content style_definition_long"> To filter client/server IPC, prepend the program name and logging specification to the command to execute the client: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+rsvf-log <b><i>&lt;</i></b>+<b><i>|</i></b>-<b><i>|</i></b>~<b><i>|</i></b>!<b><i>&gt;&lt;log&gt; &lt;program&gt; (argument) ...</i></b>
+</pre>
+      </div>
+      <p class="overview_content style_definition_long"> For example, to create an echo client and filter IPC in both directions, use this command specification: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+rsvf-log ~"echo.log" rsv-echo "echo"
+</pre>
+      </div>
+      <p class="overview_content style_definition_long"> To filter client/client IPC for a remote connection provide the program name and logging specification to the forwarder executing the connection: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+rsvf-log <b><i>&lt;</i></b>+<b><i>|</i></b>-<b><i>|</i></b>~<b><i>|</i></b>!<b><i>&gt;&lt;log&gt;</i></b>
+</pre>
+      </div>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> Logging a remote connection that uses a security filter will generally result in an entirely useless log file. It's an effective way to ensure that data is actually being encrypted, however. </p>
+        </div>
+      </div>
+      <p class="overview_content style_definition_long"> To log different IPC directions to different files, use two pairs of program name + log specification in a row: </p>
+      <div align="center">
+        <pre class="example_box shell_box">
+rsvf-log -<b><i>&lt;log1&gt;</i></b> rsvf-log +<b><i>&lt;log2&gt; &lt;program&gt; (argument) ...</i></b>
+rsvf-log -<b><i>&lt;log1&gt;</i></b> rsvf-log +<b><i>&lt;log2&gt;</i></b>
+</pre>
+      </div>
+      <p class="overview_content style_definition_long"> You can log several IPC streams to the same log file. Command integrity should be retained by the filters, so even high-intensity IPC from several sources should provide a log of intact commands. For debugging purposes, you can check the integrity of a filter log using the following script: </p>
+      <div align="center">
+        <pre class="example_box code_box script_box">
+<b>#!/bin/sh</b>
+
+<i>#specify the log file with a single argument</i>
+if [ $# -ne 1 ]; then
+  echo $0: "[log file]"
+  exit 1
+fi
+
+<i>#check the integrity of command close tags</i>
+cat $1 | grep -n . | tr "\n" "%" | sed "s@&lt;/rservr&gt;%@&lt;/rservr&gt;@g" | tr "%" "\n" | \
+  egrep "^[0-9]+:&lt;/rservr&gt;" | egrep -v "^[0-9]+:&lt;/rservr&gt;($|[0-9]+:&lt;rservr [^&lt;]+&gt;)" | \
+  sed -r "s@^[0-9]+:&lt;/rservr&gt;@@" | sed -r "s@([^0-9])([0-9]+:)@\1\n\2@g" | grep .
+
+<i>#check the integrity of command open tags</i>
+cat $1 | grep -n . | tr "\n" "%" | sed -r "s@%([0-9]+:&lt;rservr [^&lt;]+&gt;)@\1@g" | \
+  tr "%" "\n" | egrep "[0-9]+:&lt;rservr [^&lt;]+&gt;$" | \
+  egrep -v "^([0-9]+:&lt;/rservr&gt;|)[0-9]+:&lt;rservr [^&lt;]+&gt;$" | \
+  sed -r "s@^[0-9]+:&lt;/rservr&gt;@@" | sed -r "s@[0-9]+:&lt;rservr [^&lt;]+&gt;\$@@" | grep .
+</pre>
+      </div>
+      <p class="overview_content style_definition_long"> The above script, though very cryptic, reveals commands interrupted by other commands and commands closing while another is open. The script reveals the lines where the errors occur. If you'd like, email me with the general context of the file (such as number of connections logged and IPC intensity) if you encounter logging errors revealed by the script. </p>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> Errors found in IPC log files aren't necessarily an indication of erroneous command transmissions. If you encounter errors when only filtering one direction of one connection then the errors are likely actual IPC errors, otherwise the errors are probably related to log file access. </p>
+        </div>
+      </div>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="SL">Standard Libraries.</a>
+      </h3>
+      <p class="overview_content"> Below is a rough layout of Resourcerver linking: </p>
+      <div align="center">
+        <img alt="Linking Diagram" src="link-diagram.png" height="482" width="350" />
+      </div>
+      <h4 class="overview_title">
+        <a name="SL_CL">Core Libraries.</a>
+      </h4>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librservr-protocol.so </td>
+          <td class="style_definition_short"> core communication protocol library </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librservr-command.so </td>
+          <td class="style_definition_short"> core command operations library </td>
+        </tr>
+      </table>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> Command plug-in libraries will link to this library. </p>
+        </div>
+      </div>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librservr-proto-<span style="font-weight:normal;">*</span>.so </td>
+          <td class="style_definition_short"> built-in command libraries </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librservr-server.so </td>
+          <td class="style_definition_short"> server core library </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librservr-client.so </td>
+          <td class="style_definition_short"> client core library </td>
+        </tr>
+      </table>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> Client programs will link to this library. </p>
+        </div>
+      </div>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librservr-filter.so </td>
+          <td class="style_definition_short"> IPC-filtering library </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librservr-i18n-<span style="font-weight:normal;">*</span>.so </td>
+          <td class="style_definition_short"> log message translation libraries </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <h4 class="overview_title">
+        <a name="SL_CPiL">Command Plug-in Libraries.</a>
+      </h4>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librsvp-netcntl.so </td>
+          <td class="style_definition_short"> command forwarder connection control </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librsvp-rqconfig.so </td>
+          <td class="style_definition_short"> request a client configure itself </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librsvp-rqsrvc.so </td>
+          <td class="style_definition_short"> request a client register its services </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librsvp-rqsrvc-auto.so </td>
+          <td class="style_definition_short"> automation of <span class="style_file_name">librsvp-rqsrvc.so</span>
+          </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librsvp-ready.so </td>
+          <td class="style_definition_short"> pass a client's own readiness state </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librsvp-dataref.so </td>
+          <td class="style_definition_short"> provide control of a parallel data source </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <h4 class="overview_title">
+        <a name="SL_SFPiL">Security Filter Plug-in Libraries.</a>
+      </h4>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librsvx-localhost.so </td>
+          <td class="style_definition_short"> only allows connections from <span class="style_address">localhost</span>
+          </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librsvx-ipregex.so </td>
+          <td class="style_definition_short"> restricts accepted IP addresses of incoming connections </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Provide a regular expression as the filter's parameter string when loading this plug-in. The requirements of the expression can be inverted by preceding it with "<b>!</b>". When multiple instances of this filter are loaded, the IP address of the incoming connection must pass checks against <u>all</u> of the loaded expressions. <span class="style_file_name">librsvx-localhost.so</span> will conflict with this filter because it only allows connections from a single IP address. This filter will not be applied to DNS names; only to IP addresses. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librsvx-dnsregex.so </td>
+          <td class="style_definition_short"> restricts accepted DNS host names of incoming connections </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> Provide a regular expression as the filter's parameter string when loading this plug-in. The host name associated with the incoming IP address will be checked against the expression via DNS lookup.  If no DNS information is available and the expression isn't inverted then the check fails.  If the expression is inverted and no DNS information is available then the check passes. Inverted expressions therefore aren't very secure unless you load a second instance of this filter with the expression "<b>.</b>" to require that all incoming connections have a DNS entry (only use if applicable.) The requirements of the expression can be inverted by preceding it with "<b>!</b>".  When multiple instances of this filter are loaded, the DNS host name of the incoming connection must pass checks against <u>all</u> of the loaded expressions. This filter will not be applied to IP addresses. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librsvx-penalty.so </td>
+          <td class="style_definition_short"> imposes a reconnection delay for error-disconnected hosts </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This filter imposes a reconnect delay for <u>incoming</u> connections from hosts previously disconnected for errors. This filter only works with network forwarding, and it won't record errors from connections initiated by the same forwarder that loads it. Once a connection is severed for errors (e.g. because of garbage transmissions,) it's added to this filter's internal table and the time specified as the filter's initializing argument (in seconds, floating point allowed) must elapse before connections from the disconnected host will be accepted again. The primary purpose of this filter is to mitigate the effects of port scanners which might connect to an open port and send garbage, then attempt to reconnect once the forwarder disconnects. When a host is blocked by this filter, no data will be sent or received. In an informal test without this filter, a single scan with the common port scanner <span class="style_command_line">nmap</span> connected 63 times across 3 ports listened to by a forwarder within a few seconds, but this filter with a penalty of 10.0 seconds limited it to a single connection on <u>one port</u> with only a few bytes transferred. Without this filter, most invalid connections will be severed by the forwarder within the first 4 bytes received, but programs such as <span class="style_command_line">nmap</span> will persist at reconnecting if any data was exchanged, possibly resending previous data received from the forwarder. This filter will cause such programs to give up after failing to transfer data after several attempts. This filter does not effect connections already existing with the error-causing host. This filter should be loaded after other address filters, otherwise this filter will start tracking addresses rejected by the other filters. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librsvx-inert.so </td>
+          <td class="style_definition_short"> inert security filter </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librsvx-testing.so </td>
+          <td class="style_definition_short"> trivial security filter for testing only </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="filters.html" class="overview_link">Previous - Filtering Communication</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="user-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="rservr.html" class="overview_link">Next - <span class="style_command_line">rservr</span> Program Guide</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Resourcerver Application Developement Guide - Basic Client Administration</title>
+    <meta name="generator" content="Bluefish 1.0.7"/>
+    <link href="../rservr.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body class="page_body">
+    <div align="center" class="page_title_frame">
+      <h1 align="center" class="page_title"> Resourcerver Application Developement Guide </h1>
+      <h2 align="center" class="page_subtitle"> Basic Client Administration </h2>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="message-queue.html" class="overview_link">Previous - Using the Message Queue</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="services.html" class="overview_link">Next - Using the Services System</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TOP">Table of Contents.</a>
+      </h3>
+      <ul class="toc_list">
+        <li>
+          <a href="#CL" class="overview_link">Client Logging.</a>
+        </li>
+        <li>
+          <a href="#TA" class="overview_link">Terminal Access.</a>
+        </li>
+        <li>
+          <a href="#RTGI" class="overview_link">Retrieving General Information.</a>
+        </li>
+        <li>
+          <a href="#BiT" class="overview_link">Built-in Tools.</a>
+          <div>
+            <ul class="toc_list">
+              <li>
+                <a href="#BiT_CP" class="overview_link">Configuration Parsing.</a>
+              </li>
+              <li>
+                <a href="#BiT_NC" class="overview_link">Number Conversion.</a>
+              </li>
+              <li>
+                <a href="#BiT_LTC" class="overview_link">Local Timing Changes.</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="CL">Client Logging.</a>
+      </h3>
+      <p class="overview_content"> Most logging will be done automatically by the built-in libraries. Clients and plug-ins can also add to the log file using the functions below. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/log-output.h&gt;</u></b>
+
+<i>//manually add a line to the log</i>
+<b>result client_log_output(logging_mode, const char*, const char*);</b>
+<i>//the first string is a source tag (such as "internal") and the second is the message</i>
+</pre>
+      </div>
+      <p class="overview_content"> The function below can be used to change the logging mode of the client. This can greatly reduce or greatly increase the amount of log output. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/log-output.h&gt;</u></b>
+
+<i>//change the local logging mode of the client</i>
+<b>result set_logging_mode(logging_mode);</b>
+<i>/* use a mask created by combining the modes below:
+     <b>logging_none</b>:     no logging type
+     <b>logging_minimal</b>:  only critical messages (should always be used)
+     <b>logging_normal</b>:   routine logging messages
+     <b>logging_extended</b>: ridiculously detailed messages (unhelpful to most)
+     <b>logging_debug</b>:    messages used only for debugging
+     <b>logging_default</b>:  default combination of modes (set in <span class="style_file_name">param.h</span>)
+     <b>logging_all</b>:      combination of all modes */</i>
+</pre>
+      </div>
+      <p></p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="TA">Terminal Access.</a>
+      </h3>
+      <p class="overview_content"> Terminal access is managed by <span class="style_command_line">rservr</span> itself, but <i>only</i> if it was started in a way that causes it to own a terminal. Terminal access is granted to clients by <span class="style_command_line">rservr</span> via explicit requests from each specific client. This is comparable to a background process started by a shell requesting to be brought to the foreground, except that <span class="style_command_line">rservr</span> doesn't interact with the user as a shell. See the <a href="../user/rservr.html" class="general_link"><span class="style_command_line">rservr</span> program reference</a> for more information about giving <span class="style_inline_code">rservr</span> a terminal. </p>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> The <span class="style_command_line">rservr</span> that the client is connected to must be the owner of the client's controlling terminal in order to access the terminal. </p>
+        </div>
+      </div>
+      <p>
+      </p>
+      <div align="center">
+        <div class="attention_box important_box">
+          <p>
+            <span class="important_box_title">Important:</span> Terminal control may be revoked by the server at any time, even to give the terminal to another client. </p>
+        </div>
+      </div>
+      <p class="overview_content"> Use the functions below to request and return control within a client program. Keep in mind that <span class="style_command_line">rservr</span> can be started with terminal inheritance disabled, so the client program may or may not be able to access the terminal from any given instance of the client. The requesting client must be a part of the same session as the server (i.e. can't have called <span class="style_inline_code">setsid</span>) and the actual client process can't have changed process groups since the server started it (default.) When a client is created using the <span class="style_command_line">system</span> option (with either <span class="style_command_line">rservr</span> configuration or <span class="style_command_line">rservrd</span> on the command line,) the client's group will differ from the client's process number, so setting the process' group to its process number will prevent it from using the terminal. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/client.h&gt;</u></b>
+
+<i>//the operations below are performed pseudo-atomically</i>
+
+<i>//request the server pass control of the terminal</i>
+<b>command_event request_terminal(int*);</b>
+<i>/* provide a pointer if you want the actual file descriptor for the terminal. this might
+   be necessary if the server was started using standard input for configuration so that
+   the client can <span class="style_inline_code">dup2</span> the terminal file over <span class="style_inline_code">STDIN_FILENO</span>. this also might be necessary
+   if the client counts on standard input, output, and error to be tied to a terminal
+   because the server can disable inheritance of any of those descriptors. <u>always</u> close
+   the descriptor provided (if terminal access is granted) before requesting terminal
+   access again.
+
+   possible returns (check with <span class="style_inline_code">&</span>):
+     <b>event_wait</b>:        the terminal is in use by a higher or equal priority client
+     <b>event_unsent</b>:      the client doesn't have permission and/or a controlling terminal
+     <b>event_unavailable</b>: timeout reached before a response was received
+     <b>event_complete</b>:    terminal control taken */</i>
+
+<i>//return control of the terminal to the server</i>
+<b>result return_terminal();</b>
+
+<i>//determine if the client controls the terminal</i>
+<b>result terminal_control();</b>
+</pre>
+      </div>
+      <p class="overview_content"> Terminal access may be revoked by <span class="style_command_line">rservr</span> at any time without notice. Normally this is done to give control to another client that is a higher priority. </p>
+      <div align="center">
+        <img alt="Terminal Priorities" src="term-priority.png" height="297" width="600" />
+      </div>
+      <p class="overview_content"> When two clients are registered as the same type, the client with the lower command priority will take or retain control of the terminal. If both priorities are equal, the current client will retain control of the terminal. </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="RTGI">Retrieving General Information.</a>
+      </h3>
+      <p class="overview_content"> The functions below retrieve information related to the client's registration with the server. This information could be different each time the client is evecuted, but should not change throughout the client's execution unless the client is deregistered then registered again. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/client.h&gt;</u></b>
+
+<i>//this returns the name registered on the server</i>
+<b>text_info get_client_name();</b>
+
+<i>//this returns the name of the connected server</i>
+<b>text_info get_server_name();</b>
+
+<i>//this returns the client's permissions</i>
+<b>permission_mask get_client_type();</b>
+</pre>
+      </div>
+      <p>
+      </p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="BiT">Built-in Tools.</a>
+      </h3>
+      <h4 class="overview_title">
+        <a name="BiT_CP">Configuration Parsing.</a>
+      </h4>
+      <p class="overview_content"> The Resourcerver API provides developers with the <i>exact</i> same interface used by <span class="style_command_line">rservr</span> (and other standard programs) to parse run-time configurations. This interface is the source of the <a href="../user/assembly.html#UCFF" class="general_link">uniform configuration file format</a>. You should use this interface whenever possible to retain consistency across all Resourcerver programs. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/config-parser.h&gt;</u></b>
+
+<i>//the macros below are returned by the line-loading functions only</i>
+
+<b>#define RSERVR_LINE_LOADED</b>   <i>//line loaded</i>
+<b>#define RSERVR_LINE_ERROR</b>    <i>//error encountered in line</i>
+<b>#define RSERVR_LINE_CONTINUE</b> <i>//line continued to the next with escape char</i>
+<b>#define RSERVR_LINE_FALLIBLE</b> <i>//line loaded ("allow failure" option used)</i>
+
+
+<i>//load the next configuration line into the parser</i>
+<b>int load_line(const char*);</b>
+<i>//this function doesn't allow the "allow failure" (<span class="style_command_line">!</span>) option</i>
+
+<i>//load the next configuration line into the parser</i>
+<b>int load_line_fail_check(const char*);</b>
+<i>//this function allows the "allow failure" (<span class="style_command_line">!</span>) option</i>
+
+
+<i>//enable (non-zero) or disable (zero) command substitution when using "<b>`</b>"</i>
+<b>void set_command_substitution(int);</b>
+<i>//this applies only to subsequent lines (the default state is "enabled")</i>
+
+<i>//return the current command-substitution state</i>
+<b>int command_substition_state();</b>
+
+<i>//check for additional lines resulting from substitution</i>
+<b>int extra_lines();</b>
+
+<i>//clear additional lines resulting from substitution</i>
+<b>void clear_extra_lines();</b>
+
+
+<i>//the functions below return <span class="style_inline_code">0</span> for success and <span class="style_inline_code">-1</span> for failure</i>
+
+<i>//assign the current argument to the pointer (required for the first element)</i>
+<b>int current_argument(const char**);</b>
+
+<i>//remove the current argument and assign the next</i>
+<b>int next_argument(const char**);</b>
+<i>//use <span class="style_inline_code">NULL</span> to just remove the current argument</i>
+
+<i>//remove the current argument and assign the next only if there's only one left</i>
+<b>int remaining_line(const char**);</b>
+
+<i>//get the number of arguments left <u>after</u> the current one</i>
+<b>unsigned int number_remaining();</b>
+</pre>
+      </div>
+      <p class="overview_content"> Below is a simple example of how to include parsing in a program. The <span class="style_inline_code">parse_file</span> function should require very little adaptation for most programs. </p>
+      <div align="center">
+        <pre class="example_box code_box source_box">
+<b><u>#include &lt;stdio.h&gt;</u></b>
+<b><u>#include &lt;errno.h&gt;</u></b>
+<b><u>#include &lt;string.h&gt;</u></b>
+<b><u>#include &lt;rservr/config-parser.h&gt;</u></b>
+
+
+static int process_line();
+
+
+static int parse_file(FILE *fFile)
+{
+	<i>//this function is a good example of a parser loop</i>
+
+	if (!fFile) return -1;
+
+	char buffer[1024];
+	int outcome = 0, parsed = 0, extra = 0;
+
+
+	while (<b>extra_lines</b>() || fgets(buffer, sizeof buffer, fFile))
+	{
+	if (!<b>extra_lines</b>())
+	 {
+	++parsed;  <i>//(this is trivial)</i>
+	extra = 0; <i>//(this is trivial)</i>
+	outcome = <b>load_line_fail_check</b>(buffer);
+	 }
+	else
+	 {
+	++extra; <i>//(this is trivial)</i>
+	outcome = <b>load_line_fail_check</b>(NULL);
+	 }
+
+	if (outcome == <b>RSERVR_LINE_CONTINUE</b>) continue;
+	if (outcome == <b>RSERVR_LINE_ERROR</b>)    return -1;
+
+	<i>//this should be a call to an option interpreter</i>
+	<i>//(an error message might be in order for allowed failure)</i>
+	if (process_line(parsed, extra) != 0 && outcome != <b>RSERVR_LINE_FALLIBLE</b>) return -1;
+	}
+
+
+	return (outcome == <b>RSERVR_LINE_CONTINUE</b>)? 1 : 0;
+}
+
+
+static int process_line(int lLine, int eExtra)
+{
+	<i>//this is a semantical example of how to process a line</i>
+
+	const char *current_data = NULL;
+
+	if (<b>current_argument</b>(&current_data) != 0 || !current_data) return 0;
+
+	<i>//example process --&gt;</i>
+	fprintf(stdout, "/%i/%i/option: [%s]", lLine, eExtra, current_data);
+
+	while (<b>next_argument</b>(&current_data) == 0)
+	{
+	<i>//(you must copy the data if you need more than one argument at once)</i>
+	char *copied_data = strdup(current_data);
+	fprintf(stdout, ", argument: [%s]", copied_data);
+	free(copied_data);
+	}
+
+	fprintf(stdout, "\n");
+	<i>//&lt;-- example process</i>
+
+	return 0;
+}
+
+
+int main(int argc, char *argv[])
+{
+	<i>//this just feeds the files to the parser one at a time</i>
+	
+	int outcome = 0, I;
+
+	for (I = 1; I &lt; argc && outcome &gt;= 0; I++)
+	{
+	FILE *next_file = fopen(argv[I], "r");
+
+	if (!next_file)
+	fprintf(stderr, "%s: can't open file '%s': %s\n", argv[0], argv[1], strerror(errno));
+
+	else
+	if ((outcome = parse_file(next_file)) < 0)
+	fprintf(stderr, "%s: parsing error in file '%s'\n", argv[0], argv[1]);
+	}
+
+	if (outcome == 1)
+	fprintf(stderr, "%s: missing continuation\n", argv[0]);
+}
+</pre>
+      </div>
+      <p class="overview_content"> Try the example configuration below (save as a file) with the program above for a demonstration of what happens when the input is parsed. </p>
+      <div align="center">
+        <pre class="example_box code_box script_box">
+<i>#this is a demo configuration that won't work with programs in this project</i>
+
+
+option1 arg1 arg2           <i>#<-- basic config line</i>
+option2 "arg 'one'" \
+        'arg "two"'         <i>#<-- a more complex config line</i>
+option3 `id -un;` `id -gn;` <i>#<-- an example of element substitution</i>
+`date;`                     #<-- an example of line substitution
+
+
+<i>#some randomness included for no reason... (most likely requires GNU/'bash')</i>
+`if [ $( expr $( date +%N ) % 2 ) -eq 1 ]; then
+   date -u
+ fi`
+
+
+<i>#several interesting/obscure cases</i>
+
+option4 "split
+argument"
+
+option5 "split \
+argument"
+
+`echo 'split "--> \
+<--" argument1'`
+
+`echo \\\`echo \\''split "--> \
+<--" argument2'\\'\\\``
+
+`echo -n '"merge \\'` `echo 'arguments1"'`
+
+other1 `echo -n 'merge \\'` `echo 'arguments'`
+
+other2 `echo -n 'merge \\'` arguments
+</pre>
+      </div>
+      <p>
+      </p>
+      <h4 class="overview_title">
+        <a name="BiT_NC">Number Conversion.</a>
+      </h4>
+      <p class="overview_content"> As with the configuration parsing interface, the entire numerical-conversion interface used internally by the entire Resourcerver project is provided to the developer. </p>
+      <div align="center">
+        <pre class="example_box code_box header_box">
+<b><u>#include &lt;rservr/api/tools.h&gt;</u></b>
+
+<i>/* use the macro <span class="style_inline_code">RSERVR_MAX_CONVERT_SIZE</span> to allocate a buffer before converting with the
+   functions below. the same pointer is returned upon success or <span class="style_inline_code">NULL</span> is returned for an
+   error. use <span class="style_inline_code">NULL</span> as an argument if you're not worried about re-entrancy. */</i>
+
+<i>//convert an integer decimal-format string</i>
+<b>text_info convert_integer10(int, char*);</b>
+<i>//this function should be used for signed integers</i>
+
+<i>//convert an integer hexadecimal-format string</i>
+<b>text_info convert_integer16(unsigned int, char*);</b>
+<i>//this function should be used when converting byte values, etc.</i>
+
+<i>//convert an floating point to a decimal-format string</i>
+<b>text_info convert_double(double, char*);</b>
+<i>//this function should be used for any non-integer real value.</i>
+
+<i>/* the functions below take the entire string into account for conversion; therefore, a
+   string not made up of exactly one number with leading or trailing whitespace will
+   return an error. this helps when parsing while tokenizing, but requires the text of the
+   number to be isolated first. */</i>
+
+<i>//convert a string to permissions (see the <span class="style_command_line">rservr security</span> option)</i>
+<b>result parse_permissions(text_info, permission_mask*);</b>
+
+<i>//convert a string to a logging mode (see the <span class="style_command_line">rservr log_mode</span> option)</i>
+<b>result parse_logging_mode(text_info, logging_mode*);</b>
+
+<i>//parse a decimal-format string into an integer</i>
+<b>result parse_integer10(text_info, int*);</b>
+
+<i>//parse a hexadecimal-format string into an integer</i>
+<b>result parse_integer16(text_info, unsigned int*);</b>
+
+<i>//parse a 64-bit hexadecimal-format string into an integer</i>
+<b>result parse_integer16l(text_info, unsigned long long*);</b>
+
+<i>//parse a decimal-format string into a floating point</i>
+<b>result parse_double(text_info, double*);</b>
+</pre>
+      </div>
+      <h4 class="overview_title">
+        <a name="BiT_LTC">Local Timing Changes.</a>
+      </h4>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> Explicit timing changes aren't currently supported for direct client use. <span class="style_command_line">rservr</span> will send a timing table to each client when it registers, making all clients run using the server's own timing table. The server's timing table can be controlled using its configuration file. </p>
+        </div>
+      </div>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <table style="width: 100%; table-layout: fixed;" summary="navigation">
+        <tr>
+          <td style="text-align: left;">
+            <a href="message-queue.html" class="overview_link">Previous - Using the Message Queue</a>
+          </td>
+          <td style="text-align: center;">
+            <a href="app-developer-guide.html" class="overview_link">Main</a>
+          </td>
+          <td style="text-align: right;">
+            <a href="services.html" class="overview_link">Next - Using the Services System</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <hr />
+    <table style="width: 100%; table-layout: fixed;" summary="footer info">
+      <tr>
+        <td class="signature" align="left"> &copy; 2008 - <a href="mailto:ta0kira@users.berlios.de?subject=Resourcerver&#32;Web&#32;Page" class="signature_text">Kevin P. Barry</a>
+        </td>
+        <td align="center">
+          <a href="http://developer.berlios.de" class="signature_text"><img src="http://developer.berlios.de/bslogo.php?group_id=10653" width="124" height="32" border="0" alt="BerliOS Logo" /></a>
+        </td>
+        <td class="signature" align="right">
+          <a href="http://rservr.berlios.de/" class="signature_text">The Resourcerver Project</a>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
