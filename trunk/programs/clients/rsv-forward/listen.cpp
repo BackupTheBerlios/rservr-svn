@@ -57,7 +57,6 @@ extern "C" {
 #include <time.h> //'nanosleep'
 
 #ifdef RSV_NET
-#include <netdb.h> //'getaddrinfo'
 #include <netinet/in.h> //socket macros
 #include <arpa/inet.h> //'inet_ntoa'
 #endif
