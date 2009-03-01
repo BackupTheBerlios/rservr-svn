@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2008, Kevin P. Barry
+ | Copyright (c) 2009, Kevin P. Barry
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without

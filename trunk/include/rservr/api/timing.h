@@ -11,7 +11,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2008, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
