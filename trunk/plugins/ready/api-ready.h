@@ -59,4 +59,4 @@ extern text_info PLUGIN_COMMAND_INFO(ready, system_ready_response)       ATTR_IN
 extern text_info PLUGIN_COMMAND_INFO(ready, system_not_ready_response)   ATTR_INT;
 extern text_info PLUGIN_COMMAND_INFO(ready, system_never_ready_response) ATTR_INT;
 
-#endif //api_ready_hpp
+#endif /*api_ready_h*/

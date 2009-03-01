@@ -160,7 +160,7 @@ static int parse_file(FILE *fFile, const char *nName)
 	if (outcome == RSERVR_LINE_CONTINUE) continue;
 	if (outcome == RSERVR_LINE_ERROR)
 	 {
-	//NOTE: buffer should still be the same with meta-lines
+	/*NOTE: buffer should still be the same with meta-lines*/
 	fprintf(stderr, "%s: parse error in line %i: '%s'\n", nName, line_number, buffer);
 	return -1;
 	 }

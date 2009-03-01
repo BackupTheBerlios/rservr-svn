@@ -96,8 +96,8 @@ INTEGRATED_DEFINE(find_client, "find and list clients", \
 	permission_mask required_types = 0x00;
 	permission_mask excluded_types = 0x00;
 
-	//NOTE: don't use 'parse_permissions' below because security levels are
-	//masks; they won't work as required/excluded values
+	/*NOTE: don't use 'parse_permissions' below because security levels are
+	  masks; they won't work as required/excluded values*/
 
 	if (NEXT_INPUT)
 	{

@@ -51,7 +51,7 @@
 
 static int exporting_profile = 0;
 
-//(defined for 'server.h')
+/*(defined for 'server.h')*/
 void profile_on()
 {
     log_server_profiling();
@@ -154,7 +154,7 @@ unsigned int calculate_execution(unsigned int tTotal)
 
 	if (new_point.delta_time != 0.0)
 	 {
-	//NOTE: small changes tend to result in ridiculous numbers, e.g. 15k
+	/*NOTE: small changes tend to result in ridiculous numbers, e.g. 15k*/
 
 	if (new_point.new_added > PARAM_BULK_EXECUTE_FLOOR)
 	new_point.new_added_per_delta_time =
@@ -175,7 +175,7 @@ unsigned int calculate_execution(unsigned int tTotal)
 	new_point.eta_load =
 	  copysignl(1.0, new_point.delta_total) *
 	  ( (derived_value) 1.0 - expl( -
-	//NOTE: don't use 1/'previous_taken_per_delta_time'; it might be zero
+	/*NOTE: don't use 1/'previous_taken_per_delta_time'; it might be zero*/
 	      expl( (derived_value) new_point.delta_time / last_point.current_taken -
 	            new_point.delta_time ) *
 	      (fabs(new_point.delta_total) / (derived_value) last_point.current_taken) *
@@ -184,7 +184,7 @@ unsigned int calculate_execution(unsigned int tTotal)
 	    ) );
 
 	else
-	//reduction of the equation with 'current_taken' equal to zero
+	/*reduction of the equation with 'current_taken' equal to zero*/
 	new_point.eta_load =
 	  copysignl(1.0, new_point.delta_total) *
 	  ( (derived_value) 1.0 - expl(
@@ -194,7 +194,7 @@ unsigned int calculate_execution(unsigned int tTotal)
 	    ) );
 	}
 
-	//NOTE: this could be 'S(1+n)', but this allows for a separate adjustment parameter
+	/*NOTE: this could be 'S(1+n)', but this allows for a separate adjustment parameter*/
 	new_point.delta_eta = (derived_value) PARAM_BULK_EXECUTE_CENTER +
 	  (derived_value) PARAM_BULK_EXECUTE_CENTER * new_point.eta_load;
 
@@ -216,9 +216,9 @@ unsigned int calculate_execution(unsigned int tTotal)
 #ifdef PARAM_ALLOW_DEBUG_LOOPHOLES
 	if (profile_status())
 	{
-	//TODO: convert to a profiling hook
+	/*TODO: convert to a profiling hook*/
 
-	//prints everything except for absolute time
+	/*prints everything except for absolute time*/
 	fprintf( stdout, "[%s]\t%e\t%e\t%u\t%u\t%i\t%i\t%i\t%i\t%e\t%e\t%e\t%e\t%e\t%e\n",
 	  entity_name(),
 	  (double) new_point.relative_time,

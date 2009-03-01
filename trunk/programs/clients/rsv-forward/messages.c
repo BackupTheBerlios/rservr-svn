@@ -41,8 +41,8 @@
 
 #ifdef RSV_SOCKET
     #ifdef RSV_NET
-#include <netinet/in.h> //'sockaddr_in'
-#include <arpa/inet.h> //'inet_ntoa'
+#include <netinet/in.h> /* 'sockaddr_in' */
+#include <arpa/inet.h> /* 'inet_ntoa' */
     #endif
 #endif
 

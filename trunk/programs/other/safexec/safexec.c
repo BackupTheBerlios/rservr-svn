@@ -73,7 +73,7 @@ int main(int argc, char *const argv[])
 
 
 	if (!getuid() || !getgid() || setegid(getgid()) != 0 || seteuid(getuid()) != 0)
-	//NOTE: failure is possible without an error return (e.g. euid != 0 when changing)
+	/*NOTE: failure is possible without an error return (e.g. euid != 0 when changing)*/
 	{
 	fprintf(stderr, "%s: cannot change from root\n", argv[0]);
 	return 1;

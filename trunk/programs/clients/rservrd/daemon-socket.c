@@ -332,7 +332,7 @@ int register_daemon(const char *nName, int gGroup)
 	return -1;
 	}
 
-	//NOTE: putting this here lets the daemon interface available for blocking
+	/*NOTE: putting this here lets the daemon interface available for blocking*/
 	if (listen(new_socket, PARAM_RSERVRD_MAX_WAITING) < 0)
 	{
 	fprintf(stderr, "%s: couldn't register new daemon '%s': %s\n", command_name,
@@ -393,7 +393,7 @@ static int connect_daemon(const char *nName)
 	}
 
 	if (access(nName, O_RDWR) != 0)
-	//this is required because 'connect' doesn't always fail on bad access
+	/*this is required because 'connect' doesn't always fail on bad access*/
 	{
     #ifndef PARAM_RSERVRD_TARGET_REGEX
 	fprintf(stderr, "%s: no match for daemon '%s'\n", command_name, nName);
@@ -441,7 +441,7 @@ static int connect_daemon(const char *nName)
 	unset_user();
 	 }
 
-	//print "no match" instead of error here
+	/*print "no match" instead of error here*/
 	fprintf(stderr, "%s: no match for daemon '%s'\n", command_name, nName);
 	return -2;
 	}

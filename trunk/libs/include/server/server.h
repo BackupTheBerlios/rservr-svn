@@ -36,23 +36,23 @@
 #include "api/command.h"
 #include "api/timing.h"
 
-#include <sys/types.h> //'uid_t', 'gid_t'
+#include <sys/types.h> /* 'uid_t', 'gid_t' */
 
 
-//(from 'constants.hpp')
+/*(from 'constants.hpp')*/
 extern const text_info null_device;
 
-//(from 'server-signal.h')
+/*(from 'server-signal.h')*/
 extern void set_controlling_pid(int);
 
-//(from 'server-command.hpp' and 'api/log-output.h')
+/*(from 'server-command.hpp' and 'api/log-output.h')*/
 extern result set_program_name(text_info);
 extern result set_log_file(text_info);
 extern result set_logging_mode(logging_mode);
 extern void log_from_configuration(text_info);
 extern result set_terminal();
 
-//(from 'server-command.hpp')
+/*(from 'server-command.hpp')*/
 extern result change_server_name(text_info);
 extern result start_logging();
 

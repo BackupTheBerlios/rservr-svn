@@ -75,7 +75,7 @@ static void *select_thread_loop(void *iIgnore)
 	fd_set input_set;
 	struct stat current_stats;
 
-	//this must be here because 'FD_ISSET' is called before filling the first time
+	/*this must be here because 'FD_ISSET' is called before filling the first time*/
 	FD_ZERO(&input_set);
 
 	do
@@ -172,7 +172,7 @@ static void daemon_loop(int sSocket)
 
 	select_condition_unblock();
 
-	//NOTE: allow blocking since the socket is protected by setuid
+	/*NOTE: allow blocking since the socket is protected by setuid*/
 	int current_state = fcntl(new_connection, F_GETFL);
 	fcntl(new_connection, F_SETFL, current_state & ~O_NONBLOCK);
 
@@ -219,18 +219,18 @@ static void daemon_loop(int sSocket)
 
 int daemon_main(int argc, char *argv[])
 {
-	//no error message if accidentally run *as* root
+	/*no error message if accidentally run *as* root*/
 	if (getuid() == 0 || getuid() == 0) return 1;
 
 	if (setuid(0) >= 0 || setgid(0) >= 0)
-	//NOTE: 'rservrd' *will not* run as a daemon if it can setuid to root!
+	/*NOTE: 'rservrd' *will not* run as a daemon if it can setuid to root!*/
 	{
 	root_setuid_notice(argv[0], PARAM_RSERVRD_UNAME, PARAM_RSERVRD_GNAME);
 	return 1;
 	}
 
 	if (argc < 2 || argc > 3)
-	//root check is more important than option check
+	/*root check is more important than option check*/
 	{
 	fprintf(stderr, "%s -d(gxr) ([max pri]:[max perm])\n", argv[0]);
 	return 1;

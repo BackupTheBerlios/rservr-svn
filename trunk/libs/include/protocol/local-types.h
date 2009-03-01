@@ -40,7 +40,7 @@
 
 extern entity_type  local_type();
 extern result       is_server();
-extern result       allow_builtin(); //TODO: not currently used
+extern result       allow_builtin(); /*TODO: not currently used*/
 extern text_info    entity_name();
 extern logging_mode local_log_mode();
 

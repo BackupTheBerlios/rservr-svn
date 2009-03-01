@@ -47,4 +47,4 @@ extern text_info PLUGIN_COMMAND_TAG(rqconfig, deconfigure) ATTR_INT;
 extern text_info PLUGIN_COMMAND_INFO(rqconfig, configure)   ATTR_INT;
 extern text_info PLUGIN_COMMAND_INFO(rqconfig, deconfigure) ATTR_INT;
 
-#endif //api_rqconfig_hpp
+#endif /*api_rqconfig_h*/

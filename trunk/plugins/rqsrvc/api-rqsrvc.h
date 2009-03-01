@@ -47,4 +47,4 @@ extern text_info PLUGIN_COMMAND_TAG(rqsrvc, deregister_services) ATTR_INT;
 extern text_info PLUGIN_COMMAND_INFO(rqsrvc, register_services)   ATTR_INT;
 extern text_info PLUGIN_COMMAND_INFO(rqsrvc, deregister_services) ATTR_INT;
 
-#endif //api_rqsrvc_hpp
+#endif /*api_rqsrvc_h*/

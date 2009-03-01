@@ -87,7 +87,7 @@ int set_priority_permission(char *sSpecs, int gGroup, int tTerminate)
 
 const char *retrieve_info(const char *fField)
 {
-	//NOTE: this isn't supported for "public use" at this time
+	/*NOTE: this isn't supported for "public use" at this time*/
 
 	static char buffer[PARAM_DEFAULT_FORMAT_BUFFER];
 

@@ -62,4 +62,4 @@ extern text_info PLUGIN_COMMAND_INFO(netcntl, disconnect)       ATTR_INT;
 extern text_info PLUGIN_COMMAND_INFO(netcntl, listen)           ATTR_INT;
 extern text_info PLUGIN_COMMAND_INFO(netcntl, unlisten)         ATTR_INT;
 
-#endif //api_netcntl_hpp
+#endif /*api_netcntl_h*/

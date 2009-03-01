@@ -62,4 +62,4 @@ extern text_info PLUGIN_COMMAND_INFO(dataref, write_data)          ATTR_INT;
 extern text_info PLUGIN_COMMAND_INFO(dataref, exchange_data)       ATTR_INT;
 extern text_info PLUGIN_COMMAND_INFO(dataref, alteration_response) ATTR_INT;
 
-#endif //api_dataref_hpp
+#endif /*api_dataref_h*/
