@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 	}
 
 
-	//NOTE: stop using standard error here and use logging only because of daemonizing
+	/*NOTE: stop using standard error here and use logging only because of daemonizing*/
 
 
 	start_server();
@@ -194,11 +194,11 @@ int main(int argc, char *argv[])
 	/*END setup~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-	//*scheduling setup~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	/*scheduling setup~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	struct sched_param parameters =
 	  { sched_priority: sched_get_priority_max(SCHED_RR) };
 	sched_setscheduler(getpid(), SCHED_RR, &parameters);
-	//*END scheduling setup~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	/*END scheduling setup~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 	/*config parsing~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -394,17 +394,17 @@ static int parse_option(const char *dData)
 
 
 	if (getuid() == 0)
-	//set effective IDs in case of command substitution
-	//TODO: add failure log point
+	/*set effective IDs in case of command substitution*/
+	/*TODO: add failure log point*/
 	if (setegid(get_default_gid()) != 0 || seteuid(get_default_uid()) != 0) return 1;
 
-	//NOTE: parsing shouldn't happen outside of this function, but this should be here anyway
+	/*NOTE: parsing shouldn't happen outside of this function, but this should be here anyway*/
 	set_command_substitution(1);
 	allow_fail = load_line_fail_check(extra_lines()? NULL : dData);
 	set_command_substitution(0);
 
 	if (getuid() == 0)
-	//unset effective IDs in case of command substitution
+	/*unset effective IDs in case of command substitution*/
 	if (seteuid(0) != 0 || setegid(0) != 0) return 1;
 
 	if (allow_fail == RSERVR_LINE_CONTINUE) return 2;
