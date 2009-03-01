@@ -86,7 +86,7 @@ extern "C" {
 
 /* entity and addressing filter regular expresions (don't change) */
 /* THESE INTERFERE WITH COMMAND PARSING/INTERNALS: !*()[]{}"<>? */
-#define PARAM_ENTITY_FILTER  "a-zA-Z0-9~`#$%^&-_+;:',./"
+#define PARAM_ENTITY_FILTER  "a-zA-Z0-9~`#$%^&\\-_+;:',./"
 #define PARAM_ADDRESS_FILTER PARAM_ENTITY_FILTER "@|"
 
 /* entity and addressing label limits */
