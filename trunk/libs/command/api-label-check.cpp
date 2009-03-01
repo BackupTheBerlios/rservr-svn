@@ -43,8 +43,7 @@ extern "C" {
 #include "protocol/constants.hpp"
 
 
-//NOTE: these are never freed
-static regex_t entity_expression, address_expression;
+static regex_t entity_expression = regex_t(), address_expression = regex_t();
 static int entity_initialized = 0, address_initialized = 0;
 
 
@@ -53,14 +52,29 @@ int initialize_label_check()
 	//TODO: add logging point here
 
 	if (!entity_initialized)
+	{
+	regfree(&entity_expression);
 	entity_initialized = regcomp(&entity_expression, "^[" PARAM_ENTITY_FILTER "]*$",
 	  REG_EXTENDED | REG_NOSUB) == 0;
+	}
 
 	if (!address_initialized)
+	{
+	regfree(&address_expression);
 	address_initialized = regcomp(&address_expression, "^[" PARAM_ADDRESS_FILTER "]*$",
 	  REG_EXTENDED | REG_NOSUB) == 0;
+	}
 
 	return entity_initialized && address_initialized;
+}
+
+
+void cleanup_label_check()
+{
+	regfree(&entity_expression);
+	regfree(&address_expression);
+	entity_initialized  = false;
+	address_initialized = false;
 }
 
 

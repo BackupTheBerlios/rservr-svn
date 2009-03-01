@@ -271,6 +271,7 @@ int daemon_main(int argc, char *argv[])
 	if (!set_program_name(argv[0]) || !initialize_client())
 	{
 	fprintf(stderr, "%s: could not initialize client\n", argv[0]);
+	client_cleanup();
 	return 1;
 	}
 
@@ -281,6 +282,7 @@ int daemon_main(int argc, char *argv[])
 	if (!start_message_queue())
 	{
 	fprintf(stderr, "%s: could not start message queue\n", argv[0]);
+	client_cleanup();
 	return 1;
 	}
 
@@ -289,6 +291,7 @@ int daemon_main(int argc, char *argv[])
 	{
 	fprintf(stderr, "%s: could not register client\n", argv[0]);
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	}
 
@@ -299,6 +302,7 @@ int daemon_main(int argc, char *argv[])
 	{
 	/*NOTE: 'check_table' will change working directories*/
 	if (check_table() >= 0) remove(get_server_name());
+	client_cleanup();
 	return 1;
 	}
 
@@ -311,6 +315,7 @@ int daemon_main(int argc, char *argv[])
 	stop_message_queue();
 	 }
 
+	client_cleanup();
 	return 1;
 	}
 
@@ -319,6 +324,7 @@ int daemon_main(int argc, char *argv[])
 	fprintf(stderr, "%s: could not update client status\n", argv[0]);
 	remove(get_server_name());
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	}
 
@@ -341,6 +347,7 @@ int daemon_main(int argc, char *argv[])
 	stop_message_queue();
 	 }
 
+	client_cleanup();
 	return 0;
 }
 
@@ -373,6 +380,8 @@ static void exit_handler(int sSignal)
 	handling_error = 1;
 	cleanup_routines();
 	}
+
+	client_cleanup();
 
 	signal(sSignal, SIG_DFL);
 	raise(sSignal);

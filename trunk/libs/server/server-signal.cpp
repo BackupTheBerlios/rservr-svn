@@ -42,6 +42,7 @@ extern "C" {
 #include <unistd.h> //'getpid'
 
 #include "server-command.hpp"
+#include "api-server.hpp"
 
 extern "C" {
 #include "lang/translation.h"
@@ -106,6 +107,8 @@ static void common_exit_handler(int sSignal, bool tType)
 	else
     log_server_uncontrolled_exit(getpid());
 
+	//NOTE: this disables logging; don't put it in 'cleanup_routines'
+	cleanup_server();
 
     #ifdef PARAM_NEW_SIG
 	signal(PARAM_NEW_SIG, SIG_DFL);

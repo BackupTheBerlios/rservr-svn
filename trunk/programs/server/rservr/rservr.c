@@ -101,10 +101,12 @@ int main(int argc, char *argv[])
 	return 1;
 	}
 
+	/*use 'clean_server_exit' below here (after initialization)*/
+
 	if (!initialize_server())
 	{
 	fprintf(stderr, "%s: couldn't initialize server (check log file)\n", argv[0]);
-	return 1;
+	clean_server_exit(1);
 	}
 
 
@@ -128,7 +130,7 @@ int main(int argc, char *argv[])
 	 {
     log_server_daemon_error(strerror(errno));
 	fprintf(stderr, "%s: daemon error (check log file)\n", argv[0]);
-	return 1;
+	clean_server_exit(1);
 	 }
 
 	if (daemon == 0)
@@ -144,7 +146,7 @@ int main(int argc, char *argv[])
 	  {
     log_server_session_error(strerror(errno));
 	fprintf(stderr, "%s: session error (check log file)\n", argv[0]);
-	return 1;
+	clean_server_exit(1);
 	  }
     #else
 	setpgid(0, 0);
@@ -170,7 +172,7 @@ int main(int argc, char *argv[])
 	 {
 	fprintf(stderr, "%s: internal error: %s\n", argv[0],
 	  (error < 0)? strerror(errno) : "unknown error");
-	_exit(1);
+	partial_server_exit(1);
 	 }
 
 	kill(daemon, SIGCONT);
@@ -178,7 +180,7 @@ int main(int argc, char *argv[])
 	struct timespec register_wait = server_register_all_wait();
 	nanosleep(&register_wait, NULL);
 
-	_exit(1);
+	partial_server_exit(1);
 	 }
 	}
 
@@ -216,7 +218,7 @@ int main(int argc, char *argv[])
     log_server_stdin_config_error_tty();
 	fprintf(stderr, "%s: configuration error (check log file)\n", argv[0]);
 	CANCEL_PARENT
-	return 1;
+	clean_server_exit(1);
 	  }
 
 	config_file = fdopen(dup(STDIN_FILENO), "r");
@@ -225,7 +227,7 @@ int main(int argc, char *argv[])
     log_server_stdin_config_error();
 	fprintf(stderr, "%s: configuration error (check log file)\n", argv[0]);
 	CANCEL_PARENT
-	return 1;
+	clean_server_exit(1);
 	  }
 
 	disable_input();
@@ -239,7 +241,7 @@ int main(int argc, char *argv[])
     log_server_stdin_config_error();
 	fprintf(stderr, "%s: configuration error (check log file)\n", argv[0]);
 	CANCEL_PARENT
-	return 1;
+	clean_server_exit(1);
 	 }
 
 	int current_state = fcntl(fileno(config_file), F_GETFD);
@@ -251,7 +253,7 @@ int main(int argc, char *argv[])
     log_server_stdin_config_error();
 	fprintf(stderr, "%s: configuration error (check log file)\n", argv[0]);
 	CANCEL_PARENT
-	return 1;
+	clean_server_exit(1);
 	 }
 
 	if (argc > 3)
@@ -285,7 +287,7 @@ int main(int argc, char *argv[])
     log_server_normal_exit(getpid());
 	fprintf(stderr, "%s: configuration error (check log file)\n", argv[0]);
 	CANCEL_PARENT
-	return outcome;
+	clean_server_exit(outcome);
 	   }
 
 	else
@@ -308,7 +310,7 @@ int main(int argc, char *argv[])
     log_server_normal_exit(getpid());
 	fprintf(stderr, "%s: configuration error (check log file)\n", argv[0]);
 	CANCEL_PARENT
-	return outcome;
+	clean_server_exit(outcome);
 	 }
 
 	clear_extra_lines();
@@ -339,7 +341,7 @@ int main(int argc, char *argv[])
 	/*END shutdown~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 	CONTINUE_PARENT
-	return outcome;
+	clean_server_exit(outcome);
 }
 
 #undef CANCEL_PARENT
@@ -352,11 +354,11 @@ static void parent_signal(int sSignal)
 	{
 	struct timespec register_latency = server_register_all_success_latency();
 	nanosleep(&register_latency, NULL);
-	_exit(0);
+	partial_server_exit(0);
 	}
 
-	if (sSignal == SIGUSR2) _exit(1);
-	if (sSignal == SIGHUP)  _exit(0);
+	if (sSignal == SIGUSR2) partial_server_exit(1);
+	if (sSignal == SIGHUP)  partial_server_exit(0);
 }
 
 

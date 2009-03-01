@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
 	if (!set_program_name(argv[0]) || !initialize_client())
 	{
 	fprintf(stderr, "%s: could not initialize client\n", argv[0]);
+	client_cleanup();
 	return 1;
 	}
 
@@ -72,6 +73,7 @@ int main(int argc, char *argv[])
 	if (!start_message_queue())
 	{
 	fprintf(stderr, "%s: could not start message queue\n", argv[0]);
+	client_cleanup();
 	return 1;
 	}
 
@@ -79,6 +81,7 @@ int main(int argc, char *argv[])
 	{
 	fprintf(stderr, "%s: could not register client\n", argv[0]);
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	}
 
@@ -92,6 +95,7 @@ int main(int argc, char *argv[])
 	if (new_monitor)    destroy_command(new_monitor);
 	if (monitor_status) clear_command_status(monitor_status);
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	}
 
@@ -109,6 +113,7 @@ int main(int argc, char *argv[])
 	 {
 	fprintf(stderr, "%s: can't open file '%s': %s\n", argv[0], argv[1], strerror(errno));
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	 }
 
@@ -117,6 +122,7 @@ int main(int argc, char *argv[])
 	 {
 	fprintf(stderr, "%s: parsing error in file '%s'\n", argv[0], argv[1]);
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	 }
 	}
@@ -129,6 +135,7 @@ int main(int argc, char *argv[])
 	while (block_for_respawn());
 	stop_message_queue();
 
+	client_cleanup();
 	return 0;
 }
 

@@ -120,6 +120,7 @@ int main(int argc, char *argv[])
 	if (!set_program_name(argv[0]) || !initialize_client())
 	{
 	fprintf(stderr, "%s: could not initialize client\n", argv[0]);
+	client_cleanup();
 	return 1;
 	}
 
@@ -135,6 +136,7 @@ int main(int argc, char *argv[])
 	                               PARAM_MESSAGE_PAUSE_TIMEOUT) )
 	{
 	fprintf(stderr, "%s: could not set message queue overload prevention\n", argv[0]);
+	client_cleanup();
 	return 1;
 	}
 
@@ -143,6 +145,7 @@ int main(int argc, char *argv[])
 	if (!start_message_queue())
 	{
 	fprintf(stderr, "%s: could not start message queue\n", argv[0]);
+	client_cleanup();
 	return 1;
 	}
 
@@ -155,6 +158,7 @@ int main(int argc, char *argv[])
 	{
 	fprintf(stderr, "%s: could not register client\n", argv[0]);
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	}
 
@@ -179,6 +183,7 @@ int main(int argc, char *argv[])
 	if (new_service)    destroy_command(new_service);
 	if (service_status) clear_command_status(service_status);
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	}
 
@@ -193,6 +198,7 @@ int main(int argc, char *argv[])
 	{
 	fprintf(stderr, "%s: could not register client\n", argv[0]);
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	}
     #endif
@@ -206,6 +212,7 @@ int main(int argc, char *argv[])
 	{
 	remove_sockets();
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	}
 
@@ -214,6 +221,7 @@ int main(int argc, char *argv[])
 	fprintf(stderr, "%s: could not update client status\n", argv[0]);
 	remove_sockets();
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	}
 #endif
@@ -225,6 +233,7 @@ int main(int argc, char *argv[])
 	remove_sockets();
 #endif
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	}
 
@@ -235,6 +244,7 @@ int main(int argc, char *argv[])
 	{
 	fprintf(stderr, "%s: can't create socket-listening thread\n", argv[0]);
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	}
 #endif
@@ -359,6 +369,7 @@ int main(int argc, char *argv[])
 
 	pthread_detach(current_thread);
 
+	client_cleanup();
 	return 0;
 }
 

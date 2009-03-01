@@ -58,6 +58,7 @@ int main(int argc, char *argv[])
 	if (!set_program_name(argv[0]) || !initialize_client())
 	{
 	fprintf(stderr, "%s: could not initialize client\n", argv[0]);
+	client_cleanup();
 	return 1;
 	}
 
@@ -66,6 +67,7 @@ int main(int argc, char *argv[])
 	if (!start_message_queue())
 	{
 	fprintf(stderr, "%s: could not start message queue\n", argv[0]);
+	client_cleanup();
 	return 1;
 	}
 
@@ -73,6 +75,7 @@ int main(int argc, char *argv[])
 	{
 	fprintf(stderr, "%s: could not register client\n", argv[0]);
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	}
 
@@ -86,6 +89,7 @@ int main(int argc, char *argv[])
 	if (new_service)    destroy_command(new_service);
 	if (service_status) clear_command_status(service_status);
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	}
 
@@ -94,11 +98,17 @@ int main(int argc, char *argv[])
 
 	set_log_client_name(argv[1]);
 
-	if (!stop_message_queue()) return 1;
+	if (!stop_message_queue())
+	{
+	client_cleanup();
+	return 1;
+	}
 
 	set_queue_event_hook(&message_queue_hook);
 
-	return inline_message_queue()? 0 : 1;
+	result outcome = inline_message_queue();
+	client_cleanup();
+	return outcome? 0 : 1;
 }
 
 

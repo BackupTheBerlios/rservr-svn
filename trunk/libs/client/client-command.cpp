@@ -151,6 +151,13 @@ result      allow_builtin() { return builtin_state; }       //from 'local-types.
 text_info   entity_name()   { return client_name.c_str(); } //from 'local-types.h'
 
 
+void cleanup_client_command()
+{
+	fclose(log_file);
+	log_file = NULL;
+}
+
+
 //(defined for 'client-log.h')
 result set_log_client_name(text_info nName)
 {

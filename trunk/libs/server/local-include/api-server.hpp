@@ -53,6 +53,7 @@ extern "C" {
 
 
 void set_fork_handlers() ATTR_INT;
+void cleanup_server() ATTR_INT;
 
 bool get_server_timing(struct server_timing_table*) ATTR_INT;
 //NOTE: not "set": this calculates and doesn't just copy

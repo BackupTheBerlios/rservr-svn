@@ -146,6 +146,8 @@ INTEGRATED_DEFINE(system_full, "request new system client(s)", \
 	STANDARD_PRIORITY_PARSE(system_full)
 	STANDARD_PERMISSION_PARSE(system_full)
 
+	/*NOTE: although lower priority values are allowed, 'rservrd' forces priorities >= its own*/
+
 	REGISTER_SEND_LOOP(system_full, create_new_system_client_pid(CURRENT_DATA, PARSED_UID, PARSED_GID, \
 	  (PARSED_PRIORITY < local_priority)? local_priority : PARSED_PRIORITY, \
 	  PARSED_PERMISSIONS & local_permissions, create_default))
@@ -182,6 +184,8 @@ INTEGRATED_DEFINE(execute_full, "request a new execute client", \
 	if (!REMAINING_LIST || !(*REMAINING_LIST))
 	ABORT_MISSING(execute_full, "command")
 
+	/*NOTE: although lower priority values are allowed, 'rservrd' forces priorities >= its own*/
+
 	REGISTER_SEND(execute_full, create_new_exec_client_pid((const text_info*) REMAINING_LIST, \
 	  PARSED_UID, PARSED_GID, (PARSED_PRIORITY < local_priority)? \
 	    local_priority : PARSED_PRIORITY, PARSED_PERMISSIONS & local_permissions, \
@@ -210,6 +214,8 @@ INTEGRATED_DEFINE(detached_full, "request connection to a detached client", \
 
 	STANDARD_PRIORITY_PARSE(detached_full)
 	STANDARD_PERMISSION_PARSE(detached_full)
+
+	/*NOTE: although lower priority values are allowed, 'rservrd' forces priorities >= its own*/
 
 	REGISTER_SEND_LOOP(detached_full, connect_detached_client(CURRENT_DATA, (PARSED_PRIORITY < local_priority)? \
 	  local_priority : PARSED_PRIORITY, PARSED_PERMISSIONS & local_permissions, create_default))

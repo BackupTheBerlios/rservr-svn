@@ -34,10 +34,6 @@
 
 #include "plugin-dev/external-command.hpp"
 
-extern "C" {
-#include "api/label-check.h"
-}
-
 #include <unistd.h> //'getuid', 'geteuid'
 #include <termios.h> //'isatty'
 #include <sys/stat.h> //'stat'
@@ -63,6 +59,7 @@ extern "C" {
 #include "protocol/local-check.h"
 #include "protocol/local-types.h"
 #include "command/api-command.h"
+#include "command/api-label-check.h"
 #include "lang/translation.h"
 }
 
@@ -71,6 +68,13 @@ bool check_su()
 {
 	kill_corrupt();
 	return getuid() == 0 || geteuid() == 0;
+}
+
+
+void client_cleanup()
+{
+	cleanup_label_check();
+	cleanup_client_command();
 }
 
 

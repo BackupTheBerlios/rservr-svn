@@ -102,6 +102,26 @@ result initialize_server()
 }
 
 
+void cleanup_server()
+{
+	cleanup_label_check();
+	cleanup_server_command();
+}
+
+
+void clean_server_exit(int eExit)
+{
+	cleanup_server();
+	exit(eExit);
+}
+
+void partial_server_exit(int eExit)
+{
+	cleanup_server();
+	_exit(eExit);
+}
+
+
 static pid_t register_process = 0;
 static bool  notify_status    = false;
 

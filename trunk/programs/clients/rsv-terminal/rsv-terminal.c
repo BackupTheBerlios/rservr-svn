@@ -78,10 +78,15 @@ int main(int argc, char *argv[])
 	if (!set_program_name(argv[0]) || !initialize_client())
 	{
 	fprintf(stderr, "%s: could not initialize client\n", argv[0]);
+	client_cleanup();
 	return 1;
 	}
 
-	if (setup_commands() < 0) return 1;
+	if (setup_commands() < 0)
+	{
+	client_cleanup();
+	return 1;
+	}
 
 #ifndef RSV_CONSOLE
 	int listen_socket = -1;
@@ -89,6 +94,7 @@ int main(int argc, char *argv[])
 	if ((listen_socket = create_socket(argv[1])) < 0)
 	{
 	fprintf(stderr, "%s: could not create socket '%s'\n", argv[0], argv[1]);
+	client_cleanup();
 	return 1;
 	}
 
@@ -96,6 +102,7 @@ int main(int argc, char *argv[])
 	{
 	fprintf(stderr, "%s: could not listen to socket '%s'\n", argv[0], argv[1]);
 	remove_socket();
+	client_cleanup();
 	return 1;
 	}
 #endif
@@ -110,6 +117,7 @@ int main(int argc, char *argv[])
 	if (!start_message_queue())
 	{
 	fprintf(stderr, "%s: could not start message queue\n", argv[0]);
+	client_cleanup();
 	return 1;
 	}
 
@@ -124,6 +132,7 @@ int main(int argc, char *argv[])
 #ifndef RSV_CONSOLE
 	remove_socket();
 #endif
+	client_cleanup();
 	return 1;
 	}
 
@@ -147,6 +156,7 @@ int main(int argc, char *argv[])
 	 {
 	fprintf(stderr, "%s: could not take control of the terminal\n", argv[0]);
 	stop_message_queue();
+	client_cleanup();
 	return 1;
 	 }
 
@@ -183,6 +193,7 @@ int main(int argc, char *argv[])
 	stop_message_queue();
 	}
 
+	client_cleanup();
 	return 0;
 }
 
@@ -195,6 +206,7 @@ static void message_queue_hook(int eEvent)
 #ifndef RSV_CONSOLE
 	remove_socket();
 #endif
+	client_cleanup();
 	exit(0);
 	}
 }
@@ -226,6 +238,7 @@ static void exit_handler(int sSignal)
 	cleanup_routines();
 	}
 
+	client_cleanup();
 	signal(sSignal, SIG_DFL);
 	raise(sSignal);
 }

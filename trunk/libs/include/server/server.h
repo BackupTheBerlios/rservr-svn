@@ -59,6 +59,8 @@ extern result start_logging();
 
 extern void set_initial_id();
 extern result initialize_server();
+extern void clean_server_exit(int);
+extern void partial_server_exit(int);
 
 extern void       set_register_notify(pid_t);
 extern result     register_notify_state();

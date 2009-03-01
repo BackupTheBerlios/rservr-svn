@@ -47,6 +47,7 @@ extern "C" {
 
 
 result load_server_commands() ATTR_INT;
+void cleanup_server_command() ATTR_INT;
 
 struct transmit_block;
 external_command *empty_server_command(transmit_block&, const text_data&) ATTR_INT;

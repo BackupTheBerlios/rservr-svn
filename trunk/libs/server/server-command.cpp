@@ -132,7 +132,14 @@ static logging_mode current_log_mode = logging_default;
 entity_type local_type()    { return type_server; }         //from 'local-types.h'
 result      is_server()     { return true; }                //from 'local-types.h'
 result      allow_builtin() { return true; }                //from 'local-types.h'
-text_info   entity_name()   { return server_name.c_str(); } //from "local-types.h"
+text_info   entity_name()   { return server_name.c_str(); } //from 'local-types.h'
+
+
+void cleanup_server_command()
+{
+	fclose(log_file);
+	log_file = NULL;
+}
 
 
 result local_log(logging_mode mMode, const char *sString)

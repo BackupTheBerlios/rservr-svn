@@ -71,6 +71,15 @@ extern "C" {
  */
 extern result initialize_client();
 
+/*! \brief Free client resources prior to exit.
+ *
+ * This isn't entirely necessary, but it will clean up certain one-time
+ * allocations (mostly to get rid of memory leak detections.) Call this just
+ * before exiting a client program if it was initialized.
+ * @see initialize_client
+ */
+extern void client_cleanup();
+
 /*! \brief Isolate a non-client fork.
  *
  * Isolate a fork of a client program from the client/server IPC of its parent

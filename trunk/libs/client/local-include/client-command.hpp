@@ -41,6 +41,9 @@ extern "C" {
 #include "api/load-plugin.h"
 #include "protocol/local-types.h"
 
+
+void cleanup_client_command() ATTR_INT;
+
 bool restrict_message_queue() ATTR_INT;
 
 //(from 'api/client.h')

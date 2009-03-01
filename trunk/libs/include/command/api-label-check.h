@@ -38,6 +38,7 @@
 
 
 extern int initialize_label_check();
+extern void cleanup_label_check();
 
 extern result check_next_to_address(text_info);
 extern result check_next_to_client(text_info);
