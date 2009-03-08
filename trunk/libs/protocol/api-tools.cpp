@@ -32,13 +32,13 @@
 
 #include "api-tools.hpp"
 
-extern "C" {
-#include "command/api-command.h"
-}
-
 #include <string.h> //'strcmp'
 #include <stdlib.h> //'strtoul'
 #include <stdio.h> //'snprintf'
+
+extern "C" {
+#include "command/api-command.h"
+}
 
 
 result parse_permissions(text_info dData, permission_mask *mMask)
