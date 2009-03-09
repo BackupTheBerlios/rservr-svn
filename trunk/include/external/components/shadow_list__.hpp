@@ -352,8 +352,8 @@ f_bind_extern_shadow(Type1 &lList, Type2&, Function2 fFunction2)
 //Function f_bind_convert_shadow------------------------------------------------
 //Automatically binds a list to a shadow and a functor for converting
 template <class Type1, class Type2, class Function1> inline
-  const f_convert_binder <Type1, Type2, Function1>
-&f_bind_convert_shadow(Type1 &lList, Type2&, Function1 fFunction1)
+  f_convert_binder <Type1, Type2, Function1>
+f_bind_convert_shadow(Type1 &lList, Type2&, Function1 fFunction1)
 { return f_convert_binder <Type1, Type2, Function1> (lList, fFunction1); }
 //END---------------------------------------------------------------------------
 }
