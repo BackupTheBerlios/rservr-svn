@@ -938,7 +938,7 @@ public:
 
         clist
     &keep_all_duplicated(int = first, int = last + 1);
-    //Keep all_ duplicated elements
+    //Keep all duplicated elements
     //Start position, stop position
 
     template <class Type2>
@@ -957,6 +957,31 @@ public:
     template <class SortFunction2, class FindFunction2, class Type2>
         clist
     &f_keep_all_duplicated(clist <Type2>&, SortFunction2, FindFunction2,
+      int = first, int = last + 1);
+    //Keep all duplicated elements and record positions with functors
+    //List to store positions, sort functor, find functor
+
+        clist
+    &remove_all_duplicated(int = first, int = last + 1);
+    //Keep all duplicated elements
+    //Start position, stop position
+
+    template <class Type2>
+        clist
+    &remove_all_duplicated(clist <Type2>&, int = first, int = last + 1);
+    //Keep all duplicated elements and record positions
+    //List to store positions, start position, stop position
+
+    template <class SortFunction2, class FindFunction2>
+        clist
+    &f_remove_all_duplicated(SortFunction2, FindFunction2, int = first,
+      int = last + 1);
+    //Keep all duplicated elements with functors
+    //sort functor, find functor
+
+    template <class SortFunction2, class FindFunction2, class Type2>
+        clist
+    &f_remove_all_duplicated(clist <Type2>&, SortFunction2, FindFunction2,
       int = first, int = last + 1);
     //Keep all duplicated elements and record positions with functors
     //List to store positions, sort functor, find functor
@@ -1560,14 +1585,14 @@ protected:
     //Position container
 
         unsigned int
-    find_duplicates(position_container&, int, int, bool, bool);
+    find_duplicates(position_container&, int, int, bool, bool, bool);
     //Finds duplicate elements
     //Position array, start position, stop position, returns number of elements
 
     template <class SortFunction2, class FindFunction2>
         int
     f_find_duplicates(position_container&, int, int, SortFunction2,
-      FindFunction2, bool, bool);
+      FindFunction2, bool, bool, bool);
     //Finds duplicate elements
     //Position array, start position, stop position, sort functor, find functor,
     //returns number of elements
@@ -3178,7 +3203,7 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = find_duplicates(Temp, sStart, sStop, false, false);
+  int P = find_duplicates(Temp, sStart, sStop, true, false, true);
   fast_remove(Temp.begin(), P);
   return *this;
   }
@@ -3189,7 +3214,7 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = find_duplicates(Temp, sStart, sStop, false, false);
+  int P = find_duplicates(Temp, sStart, sStop, true, false, true);
   pPos.copy_from(fast_remove(Temp.begin(), P), P);
   return *this;
   }
@@ -3202,7 +3227,7 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, false, false);
+  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, true, false, true);
   fast_remove(Temp.begin(), P);
   return *this;
   }
@@ -3215,7 +3240,7 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, false, false);
+  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, true, false, true);
   pPos.copy_from(fast_remove(Temp.begin(), P), P);
   return *this;
   }
@@ -3226,7 +3251,7 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = find_duplicates(Temp, sStart, sStop, true, false);
+  int P = find_duplicates(Temp, sStart, sStop, true, false, false);
   fast_remove(Temp.begin(), P);
   return *this;
   }
@@ -3237,7 +3262,7 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = find_duplicates(Temp, sStart, sStop, true, false);
+  int P = find_duplicates(Temp, sStart, sStop, true, false, false);
   pPos.copy_from(fast_remove(Temp.begin(), P), P);
   return *this;
   }
@@ -3250,7 +3275,7 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, true, false);
+  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, true, false, false);
   fast_remove(Temp.begin(), P);
   return *this;
   }
@@ -3263,7 +3288,7 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, true, false);
+  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, true, false, false);
   pPos.copy_from(fast_remove(Temp.begin(), P), P);
   return *this;
   }
@@ -3274,7 +3299,7 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = find_duplicates(Temp, sStart, sStop, false, true);
+  int P = find_duplicates(Temp, sStart, sStop, false, true, false);
   fast_remove(Temp.begin(), P);
   return *this;
   }
@@ -3285,7 +3310,7 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = find_duplicates(Temp, sStart, sStop, false, true);
+  int P = find_duplicates(Temp, sStart, sStop, false, true, false);
   pPos.copy_from(fast_remove(Temp.begin(), P), P);
   return *this;
   }
@@ -3298,7 +3323,7 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, false, true);
+  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, false, true, false);
   fast_remove(Temp.begin(), P);
   return *this;
   }
@@ -3311,7 +3336,7 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, false, true);
+  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, false, true, false);
   pPos.copy_from(fast_remove(Temp.begin(), P), P);
   return *this;
   }
@@ -3322,7 +3347,7 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = find_duplicates(Temp, sStart, sStop, true, true);
+  int P = find_duplicates(Temp, sStart, sStop, true, true, false);
   fast_remove(Temp.begin(), P);
   return *this;
   }
@@ -3333,7 +3358,7 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = find_duplicates(Temp, sStart, sStop, true, true);
+  int P = find_duplicates(Temp, sStart, sStop, true, true, false);
   pPos.copy_from(fast_remove(Temp.begin(), P), P);
   return *this;
   }
@@ -3346,7 +3371,7 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, true, true);
+  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, true, true, false);
   fast_remove(Temp.begin(), P);
   return *this;
   }
@@ -3359,7 +3384,55 @@ private:
   {
   if (index.size() == 0) return *this;
   position_container Temp;
-  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, true, true);
+  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, true, true, false);
+  pPos.copy_from(fast_remove(Temp.begin(), P), P);
+  return *this;
+  }
+
+  template <class Type> clist <Type>
+  &clist <Type> ::remove_all_duplicated(int sStart, int sStop)
+  //Keep all duplicated elements
+  {
+  if (index.size() == 0) return *this;
+  position_container Temp;
+  int P = find_duplicates(Temp, sStart, sStop, false, false, true);
+  fast_remove(Temp.begin(), P);
+  return *this;
+  }
+
+  template <class Type> template <class Type2> clist <Type>
+  &clist <Type> ::remove_all_duplicated(clist <Type2> &pPos, int sStart, int sStop)
+  //Keep all duplicated elements and record positions
+  {
+  if (index.size() == 0) return *this;
+  position_container Temp;
+  int P = find_duplicates(Temp, sStart, sStop, false, false, true);
+  pPos.copy_from(fast_remove(Temp.begin(), P), P);
+  return *this;
+  }
+
+  template <class Type> template <class SortFunction2, class FindFunction2>
+    clist <Type>
+  &clist <Type> ::f_remove_all_duplicated(SortFunction2 sSort, FindFunction2 fFind,
+    int sStart, int sStop)
+  //Keep all duplicated elements with functors
+  {
+  if (index.size() == 0) return *this;
+  position_container Temp;
+  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, false, false, true);
+  fast_remove(Temp.begin(), P);
+  return *this;
+  }
+
+  template <class Type> template <class SortFunction2, class FindFunction2, class Type2>
+    clist <Type>
+  &clist <Type> ::f_remove_all_duplicated(clist <Type2> &pPos, SortFunction2 sSort,
+    FindFunction2 fFind, int sStart, int sStop)
+  //Keep all duplicated elements and record positions with functors
+  {
+  if (index.size() == 0) return *this;
+  position_container Temp;
+  int P = f_find_duplicates(Temp, sStart, sStop, sSort, fFind, false, false, true);
   pPos.copy_from(fast_remove(Temp.begin(), P), P);
   return *this;
   }
@@ -4485,7 +4558,7 @@ private:
 
   template <class Type> unsigned int
   clist <Type> ::find_duplicates(position_container &pPos, int sStart, int sStop,
-    bool eExclusive, bool aAll)
+    bool fFirst, bool sSubsequent, bool uUnique)
   //Finds duplicate elements
   {
   if (index.size() < 2) return 0;
@@ -4511,17 +4584,16 @@ private:
 
   while (P2 < SIZE)
    {
-  if ((eExclusive && !(Temp[P2] == Temp[P1])) || (!eExclusive && aAll))
+  if ((Temp[P2] == Temp[P1])? (!fFirst) : (!uUnique))
   Temp[P1].deletable = true;
 
   while (Temp[P2] == Temp[P1])
     {
-  if (eExclusive || !aAll) Temp[P2].deletable = !aAll || !eExclusive;
+  if (!sSubsequent) Temp[P2].deletable = true;
   if (++P2 >= SIZE) break;
     }
 
-  if ((eExclusive || (!eExclusive && aAll)) && P2 == SIZE - 1)
-  Temp[P2].deletable = true;
+  if (!uUnique && P2 == SIZE - 1) Temp[P2].deletable = true;
   P1 = P2++;
    }
 
@@ -4545,7 +4617,8 @@ private:
 
   template <class Type> template <class SortFunction2, class FindFunction2> int
   clist <Type> ::f_find_duplicates(position_container &pPos, int sStart, int sStop,
-    SortFunction2 sSort, FindFunction2 fFind, bool eExclusive, bool aAll)
+    SortFunction2 sSort, FindFunction2 fFind, bool fFirst, bool sSubsequent,
+    bool uUnique)
   //Finds duplicate elements
   {
   if (index.size() < 2) return 0;
@@ -4571,18 +4644,17 @@ private:
 
   while (P2 < SIZE)
    {
-  if ( (eExclusive && !EVALUATE_2(fFind, safety_convert(Temp[P2]),
-          safety_convert(Temp[P1]))) || (!eExclusive && aAll) )
+  if ( EVALUATE_2(fFind, safety_convert(Temp[P2]), safety_convert(Temp[P1]))?
+       (!fFirst) : (!uUnique) )
   Temp[P1].deletable = true;
 
   while (EVALUATE_2(fFind, safety_convert(Temp[P2]), safety_convert(Temp[P1])))
     {
-  if (eExclusive || !aAll) Temp[P2].deletable = !aAll || !eExclusive;
+  if (!sSubsequent) Temp[P2].deletable = true;
   if (++P2 >= SIZE) break;
     }
 
-  if ((eExclusive || (!eExclusive && aAll)) && P2 == SIZE - 1)
-  Temp[P2].deletable = true;
+  if (!uUnique && P2 == SIZE - 1) Temp[P2].deletable = true;
   P1 = P2++;
    }
 
