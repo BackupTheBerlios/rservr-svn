@@ -323,7 +323,7 @@ bind_find_shadow(Type1 &lList, Type2&)
 template <class Type1, class Type2> inline dup_binder <Type1, Type2>
 bind_dup_shadow(Type1 &lList, Type2&)
 { return dup_binder <Type1, Type2> (lList); }
-//END bind_dup-_shadow----------------------------------------------------------
+//END bind_dup_shadow-----------------------------------------------------------
 
 //Function bind_convert_shadow--------------------------------------------------
 //Automatically binds a list to a shadow for converting
@@ -339,7 +339,7 @@ template <class Type1, class Type2, class Function2> inline
   f_intern_binder <Type1, Type2, Function2>
 f_bind_intern_shadow(Type1 &lList, Type2&, Function2 fFunction2)
 { return f_intern_binder <Type1, Type2, Function2> (lList, fFunction2); }
-//END---------------------------------------------------------------------------
+//END f_bind_intern_shadow------------------------------------------------------
 
 //Function f_bind_extern_shadow-------------------------------------------------
 //Automatically binds a list to a shadow and a functor for external comparison
@@ -347,7 +347,7 @@ template <class Type1, class Type2, class Function2> inline
   f_extern_binder <Type1, Type2, Function2>
 f_bind_extern_shadow(Type1 &lList, Type2&, Function2 fFunction2)
 { return f_extern_binder <Type1, Type2, Function2> (lList, fFunction2); }
-//END---------------------------------------------------------------------------
+//END f_bind_extern_shadow------------------------------------------------------
 
 //Function f_bind_convert_shadow------------------------------------------------
 //Automatically binds a list to a shadow and a functor for converting
@@ -355,7 +355,7 @@ template <class Type1, class Type2, class Function1> inline
   f_convert_binder <Type1, Type2, Function1>
 f_bind_convert_shadow(Type1 &lList, Type2&, Function1 fFunction1)
 { return f_convert_binder <Type1, Type2, Function1> (lList, fFunction1); }
-//END---------------------------------------------------------------------------
+//END f_bind_convert_shadow-----------------------------------------------------
 }
 
 #endif
