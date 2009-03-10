@@ -2031,7 +2031,8 @@ private:
   {
   int S1, S2;
   find_range(S1, S2, sStart, sStop);
-  for (int I = S1; I < S2; I++) EVALUATE_1(fFunction, list_reference(short_modulo(I)));
+  for (int I = S1; I < S2; I++)
+  EVALUATE_1(fFunction, const_cast <return_type> ( list_reference(short_modulo(I)) ));
   return *this;
   }
 
