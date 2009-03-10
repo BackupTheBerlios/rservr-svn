@@ -287,6 +287,18 @@ public:
     //Set all elements equal to a default
     //--------------------------------------------------------------------------
 
+    //group processing----------------------------------------------------------
+    template <class Function1>
+        clist
+    &f_set_group(Function1, int = first, int = last + 1);
+    //Set a group of elements using a functor
+
+    template <class Function1>
+        clist
+    &f_check_group(Function1, int = first, int = last + 1) const;
+    //Checks a group of elements using a functor
+    //--------------------------------------------------------------------------
+
     //Remove elements-----------------------------------------------------------
 
     /*____________________________________________________________________*
@@ -2008,6 +2020,29 @@ private:
   //for const element lists
   for (int I = 0; I < (signed) index.size(); I++)
   const_cast <return_type> (list_reference(I)) = base_type();
+  return *this;
+  }
+  //----------------------------------------------------------------------------
+
+  //group processing------------------------------------------------------------
+  template <class Type> template <class Function1> clist <Type>
+  &clist <Type> ::f_set_group(Function1 fFunction, int sStart, int sStop)
+  //Set a group of elements using a functor
+  {
+  int S1, S2;
+  find_range(S1, S2, sStart, sStop);
+  for (int I = S1; I < S2; I++) EVALUATE_1(fFunction, list_reference(short_modulo(I)));
+  return *this;
+  }
+
+  template <class Type> template <class Function1> clist <Type>
+  &clist <Type> ::f_check_group(Function1 fFunction, int sStart, int sStop) const
+    //Checks a group of elements using a functor
+  {
+  int S1, S2;
+  find_range(S1, S2, sStart, sStop);
+  for (int I = S1; I < S2; I++)
+  EVALUATE_1(fFunction, safety_convert( list_reference(short_modulo(I)) ));
   return *this;
   }
   //----------------------------------------------------------------------------

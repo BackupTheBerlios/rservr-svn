@@ -180,7 +180,7 @@ clist_sigma(const clist <Type>&, int = first, int = last + 1);
 
 template <class Type, class Function1>
     typename FUNCTION_1 <Function1> ::NO_REF_RETURN
-clist_f_sigma(const clist <Type>&, Function1, int = first, int = last + 1);
+f_clist_sigma(const clist <Type>&, Function1, int = first, int = last + 1);
 //Calculate sum of all elements
 
 template <class Type1, class Type2>
@@ -786,7 +786,7 @@ clist_sigma(const clist <Type> &lList, int sStart, int eEnd)
 }
 
 template <class Type, class Function1> typename FUNCTION_1 <Function1> ::NO_REF_RETURN
-clist_f_sigma(const clist <Type> &lList, Function1 fFunction, int sStart, int eEnd)
+f_clist_sigma(const clist <Type> &lList, Function1 fFunction, int sStart, int eEnd)
 //Calculate sum of all elements
 {
   int END = lList.section_size(sStart, eEnd) + sStart;
