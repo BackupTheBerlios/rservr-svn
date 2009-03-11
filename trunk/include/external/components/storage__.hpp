@@ -152,6 +152,10 @@ template <class Type> class internal_storage <Type, true>
     //Direct use of the macro keeps this separate from list_container
     typedef CLIST_CONTAINER_TYPE(Type*) container;
 
+    //use the same allocator type as the container itself uses
+    typedef typename CLIST_CONTAINER_TYPE(Type)::allocator_type allocator_type;
+    static allocator_type allocator;
+
     typedef Type *interim_type;
     typedef fast_iterator iterator;
     static const bool is_virtual = true;
@@ -172,7 +176,7 @@ template <class Type> class internal_storage <Type, true>
     for (int I = 0; I < (signed) eEqual.virt_storage.size(); I++)
      {
     Type *&Hold = this->add_new();
-    Hold = new Type(*eEqual.virt_storage[I]);
+    allocator.construct( Hold = allocator.allocate(1), *eEqual.virt_storage[I] );
      }
     }
 
@@ -194,7 +198,7 @@ template <class Type> class internal_storage <Type, true>
     for (int I = 0; I < (signed) eEqual.virt_storage.size(); I++)
      {
     Type *&Hold = this->add_new();
-    Hold = new Type(*eEqual.virt_storage[I]);
+    allocator.construct( Hold = allocator.allocate(1), *eEqual.virt_storage[I] );
      }
 
     return *this;
@@ -205,7 +209,7 @@ template <class Type> class internal_storage <Type, true>
     {
     if (this->size() <= pPos) return false;
     if (this->actual_value(pPos)) return true;
-    this->actual_value(pPos) = new Type();
+    allocator.construct( this->actual_value(pPos) = allocator.allocate(1), Type() );
     return true;
     }
 
@@ -215,7 +219,11 @@ template <class Type> class internal_storage <Type, true>
     if (!this->actual_value(pPos)) return true;
     Type *Hold = this->actual_value(pPos);
     this->actual_value(pPos) = NULL;
-    if (!is_a_slave) delete Hold;
+    if (!is_a_slave)
+     {
+    allocator.destroy(Hold);
+    allocator.deallocate(Hold, 1);
+     }
     return true;
     }
 
@@ -231,7 +239,8 @@ template <class Type> class internal_storage <Type, true>
     if (is_a_slave)
      {
     for (int I = 0; I < (signed) virt_storage.size(); I++)
-    virt_storage[I] = virt_storage[I]? new Type(*virt_storage[I]) : NULL;
+    if (virt_storage[I])
+    allocator.construct( virt_storage[I] = allocator.allocate(1), *virt_storage[I] );
 
     is_a_slave = false;
      }
@@ -381,7 +390,11 @@ template <class Type> class internal_storage <Type, true>
     if (!virt_storage.size()) return;
     Type *Hold = *(virt_storage.end() - 1);
     virt_storage.erase(virt_storage.end() - 1);
-    if (!is_a_slave && Hold) delete Hold;
+    if (!is_a_slave && Hold)
+     {
+    allocator.destroy(Hold);
+    allocator.deallocate(Hold, 1);
+     }
     }
 
 
@@ -402,7 +415,11 @@ template <class Type> class internal_storage <Type, true>
     if (pPos > virt_storage.size()) return;
     Type *Hold = *(virt_storage.begin() + pPos);
     *(virt_storage.begin() + pPos) = NULL;
-    if (!is_a_slave) delete Hold;
+    if (!is_a_slave)
+     {
+    allocator.destroy(Hold);
+    allocator.deallocate(Hold, 1);
+     }
     }
 
     void clear_element(unsigned int pPos)
@@ -483,6 +500,9 @@ public:
     typedef typename storage_type::iterator       iterator;
     typedef typename storage_type::const_iterator const_iterator;
 };
+
+template <class Type> typename internal_storage <Type, true> ::allocator_type
+internal_storage <Type, true> ::allocator;
 //END auto_storage--------------------------------------------------------------
 }
 

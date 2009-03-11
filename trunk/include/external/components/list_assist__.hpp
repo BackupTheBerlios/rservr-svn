@@ -200,7 +200,7 @@ template <class Type>
 class n_shell
 {
     template <class> friend class clist;
-    friend class list_container <n_shell> ::type;
+    friend class list_container <n_shell> ::container_type;
 
 public:
     inline
@@ -236,7 +236,7 @@ template <class Iterator>
 class i_n_shell
 {
     template <class> friend class clist;
-    friend class list_container <i_n_shell> ::type;
+    friend class list_container <i_n_shell> ::container_type;
 
 public:
     typedef typename std::iterator_traits <Iterator> ::value_type Type;
@@ -274,7 +274,7 @@ template <class Type>
 class v_n_shell
 {
     template <class> friend class clist;
-    friend class list_container <v_n_shell> ::type;
+    friend class list_container <v_n_shell> ::container_type;
 
 public:
     inline
@@ -321,7 +321,7 @@ template <class Type>
 class d_n_shell
 {
     template <class> friend class clist;
-    friend class list_container <d_n_shell> ::type;
+    friend class list_container <d_n_shell> ::container_type;
 
 public:
     inline
@@ -384,7 +384,7 @@ template <class Type>
 class vd_n_shell
 {
     template <class> friend class clist;
-    friend class list_container <vd_n_shell> ::type;
+    friend class list_container <vd_n_shell> ::container_type;
 
 public:
     inline
