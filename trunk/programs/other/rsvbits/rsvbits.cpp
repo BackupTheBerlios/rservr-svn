@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 		if ( (error = !parse_integer16l(current_data, &hex_data)) ) break;
 		find_set_bits(hex_data, number_data);
 		break;
-		  
+
 	case 'B':
 		if ( !parse_integer10(current_data, &position) || position < 0 ||
 		     position >= (int) sizeof(bit_set) * 8 )
@@ -296,7 +296,7 @@ static const char *input_argument(const char *pProgram)
 	else
 	 {
 	do line_outcome = fgets(buffer, PARAM_MAX_INPUT_SECTION, stdin);
-	while ((load_outcome = load_line(buffer)) == RSERVR_LINE_CONTINUE);
+	while ((load_outcome = load_line(buffer, NULL)) == RSERVR_LINE_CONTINUE);
 
 	if (load_outcome == RSERVR_LINE_ERROR)
 	  {

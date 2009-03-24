@@ -208,12 +208,15 @@ int main(int argc, char *argv[])
 	int current = 2;
 
 	while (current < argc)
-	if (parse_config_file(argv[current++]) < 0)
 	{
+	if (parse_config_file(argv[current]) < 0)
+	 {
 	remove_sockets();
 	stop_message_queue();
 	client_cleanup();
 	return 1;
+	 }
+	++current;
 	}
 
 	if (!manual_indicate_ready())

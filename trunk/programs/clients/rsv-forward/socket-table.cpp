@@ -50,6 +50,7 @@ extern "C" {
 #include <errno.h> //'errno'
 #include <fcntl.h> //'fcntl'
 #include <stdlib.h> //environment
+#include <libgen.h> //'dirname'
 
 #include "listen.hpp"
 #include "connect.hpp"
@@ -62,7 +63,7 @@ extern "C" {
 
 //configuration file feeder-----------------------------------------------------
 
-static int parse_config_line(const char*);
+static int parse_config_line(const char*, const char*);
 
 int parse_config_file(const char *fFile)
 {
@@ -84,7 +85,13 @@ int parse_config_file(const char *fFile)
 
 	while (extra_lines() || fgets(holding, sizeof holding, config_file))
 	{
-	outcome = extra_lines()? parse_config_line(NULL) : parse_config_line(holding);
+	char *directory = strlen(fFile)? strdup(fFile) : NULL;
+
+	outcome = extra_lines()?
+	  parse_config_line(NULL, directory? dirname(directory) : NULL) :
+	  parse_config_line(holding, directory? dirname(directory) : NULL);
+
+	if (directory) free(directory);
 
 	if (outcome == 2) continue;
 
@@ -116,7 +123,7 @@ int parse_config_file(const char *fFile)
 	}
 
 	clear_extra_lines();
-	load_line_fail_check(NULL);
+	load_line_fail_check(NULL, NULL);
 	fclose(config_file);
 
 	return 0;
@@ -129,11 +136,11 @@ int parse_config_file(const char *fFile)
 
 static bool socket_action = false;
 
-static int parse_config_line(const char *lLine)
+static int parse_config_line(const char *lLine, const char *pPath)
 {
 	int allow_fail = 0;
 
-	allow_fail = load_line_fail_check(extra_lines()? NULL : lLine);
+	allow_fail = load_line_fail_check(extra_lines()? NULL : lLine, pPath);
 
 	if (allow_fail == RSERVR_LINE_CONTINUE) return 2;
 	if (allow_fail == RSERVR_LINE_ERROR)    return 1;

@@ -51,7 +51,7 @@ int show_prompt(FILE *fFile)
 int interpret_line(FILE *fFile, char *lLine)
 {
 	int was_extra = extra_lines();
-	int outcome = load_line(was_extra? NULL : lLine);
+	int outcome = load_line(was_extra? NULL : lLine, NULL);
 
 	if (outcome == RSERVR_LINE_CONTINUE) return 1;
 

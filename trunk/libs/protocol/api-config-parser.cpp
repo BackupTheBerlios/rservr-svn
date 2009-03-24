@@ -40,7 +40,7 @@ extern "C" {
 
 #include <string.h> //'strlen', 'strsep'
 #include <stdio.h> //'FILE'
-#include <unistd.h> //'fork', 'pipe', 'dup2', '_exit'
+#include <unistd.h> //'fork', 'pipe', 'dup2', '_exit', 'chdir'
 #include <signal.h> //'raise', 'kill'
 #include <fcntl.h> //standard files
 #include <sys/wait.h> //'waitpid'
@@ -187,7 +187,7 @@ static void set_meta_lines()
 }
 
 
-static bool execute_meta(const std::string &cCommand)
+static bool execute_meta(const std::string &cCommand, const char *pPath)
 {
 	//TODO: add logging points for errors!
 
@@ -210,6 +210,7 @@ static bool execute_meta(const std::string &cCommand)
 	close(pipes[0]);
 	if (dup2(pipes[1], STDOUT_FILENO) < 0) _exit(1);
 	raise(SIGSTOP);
+	if (pPath && chdir(pPath) != 0) _exit(1);
 	_exit(execvp(command[0], command));
 	}
 
@@ -260,7 +261,7 @@ static bool execute_meta(const std::string &cCommand)
 }
 
 
-static int load_line_common(const char *dData, bool fFail)
+static int load_line_common(const char *dData, const char *pPath, bool fFail)
 {
 	if ((!dData && !meta_lines.size()) || !next_line)
 	{
@@ -441,7 +442,7 @@ static int load_line_common(const char *dData, bool fFail)
 	if (meta_quote && holding_execute.size())
 	  {
 	meta_quote = false;
-	if (!execute_meta(holding_execute)) return RSERVR_LINE_ERROR;
+	if (!execute_meta(holding_execute, pPath)) return RSERVR_LINE_ERROR;
 	else holding_execute.erase();
 	  }
 	 }
@@ -529,12 +530,12 @@ static int load_line_common(const char *dData, bool fFail)
 #undef EXECUTE_QUOTE
 
 
-int load_line(const char *dData)
-{ return load_line_common(dData, false); }
+int load_line(const char *dData, const char *pPath)
+{ return load_line_common(dData, pPath, false); }
 
 
-int load_line_fail_check(const char *dData)
-{ return load_line_common(dData, true); }
+int load_line_fail_check(const char *dData, const char *pPath)
+{ return load_line_common(dData, pPath, true); }
 
 
 static int next_value(const char **dData)

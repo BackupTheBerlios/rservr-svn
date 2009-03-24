@@ -50,7 +50,7 @@
 #include "server.h"
 
 #include <errno.h> /* 'errno' */
-#include <string.h> /* 'strerror', 'strcmp', 'strtok' */
+#include <string.h> /* 'strerror', 'strcmp', 'strtok', strdup' */
 #include <unistd.h> /* 'getpid', 'getppid', 'getpgid', 'setpgid', 'setsid', 'fork', 'dup2', 'isatty', '_exit' */
 #include <stdio.h> /* 'fprintf', 'fopen', 'fileno', 'setlinebuf' */
 #include <stdlib.h> /* 'malloc' */
@@ -59,9 +59,10 @@
 #include <sys/wait.h> /* 'waitid' */
 #include <time.h> /* 'nanosleep' */
 #include <sched.h> /* scheduling */
+#include <libgen.h> /* 'dirname' */
 
 
-static int parse_option(const char*);
+static int parse_option(const char*, char*);
 
 static void disable_input();
 
@@ -268,12 +269,17 @@ int main(int argc, char *argv[])
 
 	while (extra_lines() || fgets(holding, PARAM_MAX_INPUT_SECTION, config_file))
 	 {
+	char *directory = (argc > 3 && strlen(argv[current]))?
+	  strdup(argv[current]) : NULL;
+
 	if (!extra_lines())
 	  {
 	current_line++;
-	outcome = parse_option(holding);
+	outcome = parse_option(holding, directory? dirname(directory) : NULL);
 	  }
-	else outcome = parse_option(NULL);
+	else outcome = parse_option(NULL, directory? dirname(directory) : NULL);
+
+	if (directory) free(directory);
 
 	if (outcome == 2) continue;
 
@@ -314,7 +320,7 @@ int main(int argc, char *argv[])
 	 }
 
 	clear_extra_lines();
-	load_line_fail_check(NULL);
+	load_line_fail_check(NULL, NULL);
 	fclose(config_file);
 
 	}
@@ -342,6 +348,8 @@ int main(int argc, char *argv[])
 
 	CONTINUE_PARENT
 	clean_server_exit(outcome);
+
+	return 0; /*(never reached)*/
 }
 
 #undef CANCEL_PARENT
@@ -390,7 +398,7 @@ static int system_common(int cCritical)
 }
 
 
-static int parse_option(const char *dData)
+static int parse_option(const char *dData, char *fFile)
 {
 	int allow_fail = 0;
 
@@ -402,7 +410,8 @@ static int parse_option(const char *dData)
 
 	/*NOTE: parsing shouldn't happen outside of this function, but this should be here anyway*/
 	set_command_substitution(1);
-	allow_fail = load_line_fail_check(extra_lines()? NULL : dData);
+	allow_fail = load_line_fail_check(extra_lines()? NULL : dData,
+	  fFile? dirname(fFile) : NULL);
 	set_command_substitution(0);
 
 	if (getuid() == 0)

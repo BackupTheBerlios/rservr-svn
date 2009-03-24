@@ -45,11 +45,12 @@
 #include <stdlib.h> /* 'exit' */
 #include <string.h> /* 'strcmp', 'strlen', 'strerror' */
 #include <errno.h> /* 'errno' */
+#include <libgen.h> /* 'dirname' */
 
 #include "respawn-load.h"
 
 
-static int parse_file(FILE*, const char*);
+static int parse_file(FILE*, const char*, const char*);
 static void message_queue_hook(int);
 
 
@@ -111,19 +112,27 @@ int main(int argc, char *argv[])
 
 	if (!next_file)
 	 {
-	fprintf(stderr, "%s: can't open file '%s': %s\n", argv[0], argv[1], strerror(errno));
+	fprintf(stderr, "%s: can't open file '%s': %s\n", argv[0], argv[I], strerror(errno));
 	stop_message_queue();
 	client_cleanup();
 	return 1;
 	 }
 
 	else
-	if ((outcome = parse_file(next_file, argv[0])) < 0)
 	 {
-	fprintf(stderr, "%s: parsing error in file '%s'\n", argv[0], argv[1]);
+	char *directory = strlen(argv[I])? strdup(argv[I]) : NULL;
+
+	if ( (outcome = parse_file(next_file, argv[0],
+	    directory? dirname(directory) : NULL)) < 0 )
+	  {
+	fprintf(stderr, "%s: parsing error in file '%s'\n", argv[0], argv[I]);
+	if (directory) free(directory);
 	stop_message_queue();
 	client_cleanup();
 	return 1;
+	  }
+
+	if (directory) free(directory);
 	 }
 	}
 
@@ -147,7 +156,7 @@ static void message_queue_hook(int eEvent)
 static int process_line();
 
 
-static int parse_file(FILE *fFile, const char *nName)
+static int parse_file(FILE *fFile, const char *nName, const char *pPath)
 {
 	if (!fFile) return -1;
 
@@ -160,9 +169,9 @@ static int parse_file(FILE *fFile, const char *nName)
 	if (!extra_lines())
 	 {
 	++line_number;
-	outcome = load_line_fail_check(buffer);
+	outcome = load_line_fail_check(buffer, pPath);
 	 }
-	else outcome = load_line_fail_check(NULL);
+	else outcome = load_line_fail_check(NULL, NULL);
 
 	if (outcome == RSERVR_LINE_CONTINUE) continue;
 	if (outcome == RSERVR_LINE_ERROR)

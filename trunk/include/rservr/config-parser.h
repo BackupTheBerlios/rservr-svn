@@ -70,10 +70,11 @@ extern "C" {
  * the buffered line. Call using NULL to clear the buffer after the last line.
  *
  * \param Line from a file line
+ * \param Path optional path to execute substitution
  * \return parsed (RSERVR_LINE_LOADED), line error (RSERVR_LINE_ERROR), or
  * continued to the next line (RSERVR_LINE_CONTINUE)
  */
-extern int load_line(const char *Line);
+extern int load_line(const char *Line, const char *Path);
 
 /*! \brief Load a configuration line.
  *
@@ -85,7 +86,7 @@ extern int load_line(const char *Line);
  * (RSERVR_LINE_FALLIBLE), line error (RSERVR_LINE_ERROR), or continued to the
  * next line (RSERVR_LINE_CONTINUE)
  */
-extern int load_line_fail_check(const char *Line);
+extern int load_line_fail_check(const char *Line, const char *Path);
 
 /*! \brief Set command substitution state.
  *
