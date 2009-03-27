@@ -198,12 +198,14 @@
 <b>#define RSERVR_LINE_FALLIBLE</b> <i>//line loaded ("allow failure" option used)</i>
 
 
+<i>//the functions below take a second path argument for command substitution</i>
+
 <i>//load the next configuration line into the parser</i>
-<b>int load_line(const char*);</b>
+<b>int load_line(const char*, const char*);</b>
 <i>//this function doesn't allow the "allow failure" (<span class="style_command_line">!</span>) option</i>
 
 <i>//load the next configuration line into the parser</i>
-<b>int load_line_fail_check(const char*);</b>
+<b>int load_line_fail_check(const char*, const char*);</b>
 <i>//this function allows the "allow failure" (<span class="style_command_line">!</span>) option</i>
 
 
@@ -265,12 +267,12 @@ static int parse_file(FILE *fFile)
 	 {
 	++parsed;  <i>//(this is trivial)</i>
 	extra = 0; <i>//(this is trivial)</i>
-	outcome = <b>load_line_fail_check</b>(buffer);
+	outcome = <b>load_line_fail_check</b>(buffer, NULL);
 	 }
 	else
 	 {
 	++extra; <i>//(this is trivial)</i>
-	outcome = <b>load_line_fail_check</b>(NULL);
+	outcome = <b>load_line_fail_check</b>(NULL, NULL);
 	 }
 
 	if (outcome == <b>RSERVR_LINE_CONTINUE</b>) continue;
@@ -278,7 +280,7 @@ static int parse_file(FILE *fFile)
 
 	<i>//this should be a call to an option interpreter</i>
 	<i>//(an error message might be in order for allowed failure)</i>
-	if (process_line(parsed, extra) != 0 && outcome != <b>RSERVR_LINE_FALLIBLE</b>) return -1;
+	if (process_line(parsed, extra) != 0 &amp;&amp; outcome != <b>RSERVR_LINE_FALLIBLE</b>) return -1;
 	}
 
 
@@ -292,12 +294,12 @@ static int process_line(int lLine, int eExtra)
 
 	const char *current_data = NULL;
 
-	if (<b>current_argument</b>(&current_data) != 0 || !current_data) return 0;
+	if (<b>current_argument</b>(&amp;current_data) != 0 || !current_data) return 0;
 
 	<i>//example process --&gt;</i>
 	fprintf(stdout, "/%i/%i/option: [%s]", lLine, eExtra, current_data);
 
-	while (<b>next_argument</b>(&current_data) == 0)
+	while (<b>next_argument</b>(&amp;current_data) == 0)
 	{
 	<i>//(you must copy the data if you need more than one argument at once)</i>
 	char *copied_data = strdup(current_data);
@@ -315,10 +317,10 @@ static int process_line(int lLine, int eExtra)
 int main(int argc, char *argv[])
 {
 	<i>//this just feeds the files to the parser one at a time</i>
-	
+
 	int outcome = 0, I;
 
-	for (I = 1; I &lt; argc && outcome &gt;= 0; I++)
+	for (I = 1; I &lt; argc &amp;&amp; outcome &gt;= 0; I++)
 	{
 	FILE *next_file = fopen(argv[I], "r");
 
@@ -326,7 +328,7 @@ int main(int argc, char *argv[])
 	fprintf(stderr, "%s: can't open file '%s': %s\n", argv[0], argv[1], strerror(errno));
 
 	else
-	if ((outcome = parse_file(next_file)) < 0)
+	if ((outcome = parse_file(next_file)) &lt; 0)
 	fprintf(stderr, "%s: parsing error in file '%s'\n", argv[0], argv[1]);
 	}
 
@@ -335,17 +337,18 @@ int main(int argc, char *argv[])
 }
 </pre>
       </div>
+      <p class="overview_content"> The example above uses <span class="style_inline_code">NULL</span> as the second argument for <span class="style_inline_code">load_line_fail_check</span>; however, you can use an execution path instead, which will be used for command substitution.  All of the Resourcerver programs use the path of the current configuration file so that command substitution takes place in the same path as the file it originates from. </p>
       <p class="overview_content"> Try the example configuration below (save as a file) with the program above for a demonstration of what happens when the input is parsed. </p>
       <div align="center">
         <pre class="example_box code_box script_box">
 <i>#this is a demo configuration that won't work with programs in this project</i>
 
 
-option1 arg1 arg2           <i>#<-- basic config line</i>
+option1 arg1 arg2           <i>#&lt;-- basic config line</i>
 option2 "arg 'one'" \
-        'arg "two"'         <i>#<-- a more complex config line</i>
-option3 `id -un;` `id -gn;` <i>#<-- an example of element substitution</i>
-`date;`                     #<-- an example of line substitution
+        'arg "two"'         <i>#&lt;-- a more complex config line</i>
+option3 `id -un;` `id -gn;` <i>#&lt;-- an example of element substitution</i>
+`date;`                     #&lt;-- an example of line substitution
 
 
 <i>#some randomness included for no reason... (most likely requires GNU/'bash')</i>
@@ -362,11 +365,11 @@ argument"
 option5 "split \
 argument"
 
-`echo 'split "--> \
-<--" argument1'`
+`echo 'split "--&gt; \
+&lt;--" argument1'`
 
-`echo \\\`echo \\''split "--> \
-<--" argument2'\\'\\\``
+`echo \\\`echo \\''split "--&gt; \
+&lt;--" argument2'\\'\\\``
 
 `echo -n '"merge \\'` `echo 'arguments1"'`
 
