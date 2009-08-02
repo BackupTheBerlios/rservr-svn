@@ -34,6 +34,7 @@
 #define regex_check_hpp
 
 #include <string>
+#include <string.h>
 
 #include <regex.h> //regular expressions
 
