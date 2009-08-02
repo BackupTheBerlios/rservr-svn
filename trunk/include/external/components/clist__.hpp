@@ -4756,7 +4756,7 @@ private:
   return pPos;
   }
 
-  template <class Type> template <class Iterator2> Iterator2
+template <class Type> template <class Iterator2> Iterator2
   clist <Type> ::fast_keep(Iterator2 pPos, unsigned int sSize)
   //Keeps elements
   {
@@ -4768,13 +4768,13 @@ private:
 
   for (int I = 0; I < NewSize && Keep < (signed) sSize; I++)
    {
-  if (pPos[Keep] <= index) Offset++;
+  if (pPos[Keep] < index) Offset++;
 
   if (Keep < (signed) sSize - 1)
   while (pPos[Keep] == pPos[Keep + 1])
     {
-  if (++Keep >= (signed) sSize - 1) break;
   NewSize--;
+  if (++Keep >= (signed) sSize - 1) break;
     }
 
   if (Write != pPos[Keep])
