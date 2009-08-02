@@ -404,8 +404,8 @@ static int load_line_common(const char *dData, const char *pPath, bool fFail)
 			   meta_quote = (quoted & EXECUTE_QUOTE) && command_substition_state();
 			   (meta_quote? holding_execute : holding_line)
 			     += buffered_line.substr(0, I);
-			   buffered_line.erase(0, I + 1);
 			   blank = I == buffered_line.size() && !meta_quote;
+			   buffered_line.erase(0, I + 1);
 			   if ( !buffered_line.size() ||
 			        buffered_line[0] == ' '  ||
 			        buffered_line[0] == '\t' ||
