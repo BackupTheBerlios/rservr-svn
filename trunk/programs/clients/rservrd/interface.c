@@ -80,32 +80,33 @@ int interface_main(int argc, char *argv[])
 
 	int I;
 	for (I = 2; I < argc; I++)
-	 {
 	fprintf(new_stream, "%s\n", argv[I]);
 
+	fflush(new_stream);
+	shutdown(*current_socket, SHUT_WR);
+
 	while (fgets(input_data, PARAM_MAX_INPUT_SECTION, new_stream))
-	  {
+	 {
 	current = input_data;
 
 	if (!(working = strsep(&current, " "))) continue;
 
 	if (strcmp(working, "\\") == 0)
-	   {
+	  {
 	fprintf(stdout, "%s", current);
 	fflush(stdout);
-	   }
+	  }
 
 	else if (parse_integer16(working, &single_value))
-	   {
+	  {
 	return_value |= single_value;
 	if (!current) continue;
 	fprintf(stderr, "%s", current);
 	fflush(stderr);
-	break; /*NOTE: this is important since it moves on to the next message*/
-	   }
+	if (!--I) break;
+	  }
 
 	else if (strcmp(working, "\n") != 0) fprintf(stderr, "(bad response data received)\n");
-	  }
 	 }
 
 	shutdown(*current_socket, SHUT_RDWR);

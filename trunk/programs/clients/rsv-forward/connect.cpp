@@ -192,8 +192,8 @@ struct socket_set
 	inline bool ATTR_INL operator == (const socket_set &eEqual) const
 	{ return socket == eEqual.socket; }
 
-	int              socket;
-	int              listen;
+	long             socket;
+	long             listen;
 	socket_reference reference;
 };
 
@@ -468,8 +468,8 @@ private:
     log_message_disconnect(object->get_element(position).value().socket_address.c_str());
 
 	if ( object->get_element(position).key().socket !=
-	     (int) object->get_element(position).key().reference )
-	shutdown((int) object->get_element(position).key().reference, SHUT_RDWR);
+	     (long) object->get_element(position).key().reference )
+	shutdown((long) object->get_element(position).key().reference, SHUT_RDWR);
 	shutdown(object->get_element(position).key().socket, SHUT_RDWR);
 
     #ifdef RSV_RELAY
@@ -502,8 +502,8 @@ private:
 	 {
 	remove_listen_connection(object->first_element().key().listen);
 	if ( object->first_element().key().socket !=
-	     (int) object->first_element().key().reference )
-	shutdown((int) object->first_element().key().reference, SHUT_RDWR);
+	     (long) object->first_element().key().reference )
+	shutdown((long) object->first_element().key().reference, SHUT_RDWR);
 	shutdown(object->p_first_element().key().socket, SHUT_RDWR);
 	 }
 

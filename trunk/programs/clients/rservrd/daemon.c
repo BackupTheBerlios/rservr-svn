@@ -159,9 +159,11 @@ static void daemon_loop(int sSocket)
 
 	while (message_queue_status() && stat(get_server_name(), &current_stats) >= 0)
 	{
+	/*NOTE: keep this after the call to 'shutdown' (i.e. at the top)*/
+	select_condition_unblock();
+
 	new_length = sizeof new_address;
 
-	/*NOTE: using 'select' with a timeout will use an immense amount of system time*/
 	while ((new_connection = accept(sSocket, (struct sockaddr*) &new_address, &new_length)) < 0)
 	 {
 	if (!message_queue_status() || stat(get_server_name(), &current_stats) < 0) return;
@@ -170,11 +172,8 @@ static void daemon_loop(int sSocket)
 	nanosleep(&connect_cycle, NULL);
 	 }
 
-	select_condition_unblock();
-
-	/*NOTE: allow blocking since the socket is protected by setuid*/
 	int current_state = fcntl(new_connection, F_GETFL);
-	fcntl(new_connection, F_SETFL, current_state & ~O_NONBLOCK);
+	fcntl(new_connection, F_SETFL, current_state | O_NONBLOCK);
 
 	FILE *new_stream = fdopen(new_connection, "r+");
 	if (!new_stream)
@@ -185,7 +184,15 @@ static void daemon_loop(int sSocket)
 
 	input_data[0] = 0x00;
 
-	while (fgets(input_data, PARAM_MAX_INPUT_SECTION, new_stream))
+	fd_set input_set;
+	short_time timeout = local_default_connect_timeout();
+
+	FD_ZERO(&input_set);
+	FD_SET(new_connection, &input_set);
+
+	while ( select(FD_SETSIZE, &input_set, NULL, NULL, &timeout) >= 0 &&
+	  FD_ISSET(new_connection, &input_set) &&
+	  fgets(input_data, PARAM_MAX_INPUT_SECTION, new_stream) )
 	 {
 	input_data[ strlen(input_data) - 1 ] = 0x00;
 	if ((outcome = process_message(input_data, new_stream)) != 0)
@@ -199,6 +206,9 @@ static void daemon_loop(int sSocket)
 	return;
 	  }
 	input_data[0] = 0x00;
+
+	FD_ZERO(&input_set);
+	FD_SET(new_connection, &input_set);
 	 }
 
 	/*NOTE: this needs to be in the same thread as the processing functions*/
