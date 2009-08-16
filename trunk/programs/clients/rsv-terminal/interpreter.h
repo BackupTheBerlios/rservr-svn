@@ -36,7 +36,13 @@
 #include <stdio.h> /* 'FILE' */
 
 
+#ifdef HAVE_READLINE_READLINE_H
+int initialize_readline();
+int readline_input(int, char*, unsigned int, FILE*); /* true/false */
+#else
 int show_prompt(FILE*); /* true/false */
+#endif
+
 int interpret_line(FILE*, char*); /* 0/<0 */
 
 #endif /*interpreter_h*/

@@ -80,6 +80,12 @@ AC_HEADER_STAT
 AC_HEADER_TIME
 AC_CHECK_HEADERS_ONCE([arpa/inet.h dlfcn.h errno.h fcntl.h grp.h libgen.h math.h netdb.h netinet/in.h pthread.h pwd.h regex.h signal.h stddef.h stdint.h stdio.h stdlib.h string.h sys/ipc.h sys/select.h sys/socket.h sys/stat.h sys/types.h sys/wait.h termios.h time.h unistd.h], [], [AC_MSG_ERROR([system header missing!])])
 AC_CHECK_HEADERS_ONCE([hparser/formats/descriptor-output.hpp hparser/formats/tagged-input.hpp hparser/impl-defined.hpp hparser/linked-section.hpp hparser/multi-destination.hpp hparser/multi-source.hpp hparser/output-manager.hpp hparser/structure-base.hpp], [], [AC_MSG_ERROR(['hparser' header missing!])], [])
+AC_CHECK_HEADERS([readline/readline.h], [READLINE=true], [], []) #not _ONCE!
+AC_CHECK_HEADERS([readline/history.h], [HISTORY=true], [], [])   #not _ONCE!
+
+# Set custom build flags.
+AM_CONDITIONAL([LINK_READLINE], [test x$READLINE = xtrue])
+AM_CONDITIONAL([LINK_HISTORY], [test x$HISTORY = xtrue])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -108,7 +114,7 @@ AC_FUNC_SETVBUF_REVERSED
 AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([dup2 ftruncate getcwd inet_ntoa mkdir regcomp select socket strdup strerror strtoul])
+AC_CHECK_FUNCS([dup2 ftruncate getcwd inet_ntoa mkdir regcomp select socket strdup strerror strtoul endgrent readline putenv setenv strtol strtoull])
 
 #other flags
 m4_pattern_allow(AM_PROG_CC_C_O)

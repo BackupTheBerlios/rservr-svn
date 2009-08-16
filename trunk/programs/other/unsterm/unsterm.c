@@ -32,18 +32,26 @@
 
 #include "param.h"
 
-#include <stdio.h> /* 'fprintf' */
+#include <stdio.h> /* 'fprintf', 'fgets', 'fdopen' */
 #include <sys/socket.h> /* sockets */
 #include <sys/wait.h> /* 'waitpid' */
 #include <sys/un.h> /* socket macros */
 #include <sys/select.h> /* 'select' */
-#include <stdio.h> /* 'fgets', 'fdopen' */
+#include <stdlib.h> /* 'free' */
 #include <stddef.h> /* 'offsetof' */
 #include <signal.h> /* 'signal', 'kill' */
 #include <string.h> /* 'strerror' */
 #include <errno.h> /* 'errno' */
 #include <unistd.h> /* 'fork' */
 #include <fcntl.h> /* 'fcntl' */
+
+#ifdef HAVE_READLINE_READLINE_H
+#include <readline/readline.h> /* 'readline' */
+#endif
+
+#ifdef HAVE_READLINE_HISTORY_H
+#include <readline/history.h> /* 'add_history' */
+#endif
 
 
 static void register_handlers();
@@ -111,7 +119,6 @@ int main(int argc, char *argv[])
 	return 1;
 	}
 
-
 	socket_stream = fdopen(socket_file, "r+");
 
 	if (!socket_stream)
@@ -140,11 +147,35 @@ int main(int argc, char *argv[])
 	current_state = fcntl(STDIN_FILENO, F_GETFL);
 	fcntl(STDIN_FILENO, F_SETFL, current_state & ~O_NONBLOCK);
 
+
+#ifdef HAVE_READLINE_READLINE_H
+
+    #ifdef HAVE_READLINE_HISTORY_H
+	using_history();
+    #endif
+
+	char *new_line = NULL;
+
+	while ((new_line = readline(NULL)))
+	 {
+    #ifdef HAVE_READLINE_HISTORY_H
+	add_history(new_line);
+    #endif
+	fprintf(socket_stream, "%s\n", new_line);
+	free(new_line);
+	fflush(socket_stream);
+	 }
+
+#else
+
 	while (fgets(input_data, PARAM_MAX_INPUT_SECTION, stdin))
-	{
+	 {
 	fprintf(socket_stream, "%s", input_data);
 	fflush(socket_stream);
-	}
+	 }
+
+#endif
+
 
 	shutdown(socket_file, SHUT_RDWR);
 	fclose(socket_stream);

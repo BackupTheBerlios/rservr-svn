@@ -116,6 +116,10 @@ int start_terminal(int fFile)
 {
 	/*NOTE: only return < 1 to exit client*/
 
+#if defined(HAVE_READLINE_READLINE_H) && defined(RSV_CONSOLE)
+	initialize_readline();
+#endif
+
 #ifndef RSV_CONSOLE
 	int current_state = fcntl(fFile, F_GETFL);
 	fcntl(fFile, F_SETFL, current_state & ~O_NONBLOCK);
@@ -138,10 +142,15 @@ int start_terminal(int fFile)
 #endif
 
 #ifdef RSV_CONSOLE
-	while ( extra_lines() || (terminal_control() && (continued || show_prompt(terminal_file)) &&
-	          fgets(input_data, PARAM_MAX_INPUT_SECTION, terminal_file)) )
+	while ( extra_lines() || (terminal_control() &&
 #else
-	while ( extra_lines() || ((continued || show_prompt(terminal_file)) &&
+	while ( extra_lines() || (
+#endif
+#if defined(HAVE_READLINE_READLINE_H) && defined(RSV_CONSOLE)
+	          readline_input(!continued, input_data, PARAM_MAX_INPUT_SECTION,
+	            terminal_file)) )
+#else
+	          (continued || show_prompt(terminal_file)) &&
 	          fgets(input_data, PARAM_MAX_INPUT_SECTION, terminal_file)) )
 #endif
 	{

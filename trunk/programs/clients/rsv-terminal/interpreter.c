@@ -36,13 +36,65 @@
 #include "config-parser.h"
 
 #include <string.h>
+#include <stdlib.h>
+
+#if defined(HAVE_READLINE_READLINE_H) && defined(RSV_CONSOLE)
+#include <readline/readline.h> /* 'readline' */
+#endif
+
+#if defined(HAVE_READLINE_HISTORY_H) && defined(RSV_CONSOLE)
+#include <readline/history.h> /* 'add_history' */
+#endif
 
 #include "commands.h"
 
+#define PROMPT_TEXT "- '?' or 'help' for help / 'exit' to *terminate* emulator -\n"
+
+
+#if defined(HAVE_READLINE_READLINE_H) && defined(RSV_CONSOLE)
+
+static int show_prompt(FILE*);
+
+static int readline_initialized = 0;
+
+int initialize_readline()
+{
+	if (readline_initialized) return 1;
+    #ifdef HAVE_READLINE_HISTORY_H
+	using_history();
+    #endif
+	return readline_initialized = 1;
+}
+
+int readline_input(int pPrompt, char *bBuffer, unsigned int sSize, FILE *fFile)
+{
+	if (readline_initialized)
+	{
+	char *new_line = readline(pPrompt? PROMPT_TEXT : NULL);
+	if (!new_line) return 0;
+	memcpy(bBuffer, new_line, (sSize < strlen(new_line))?
+	  sSize : strlen(new_line));
+    #ifdef HAVE_READLINE_HISTORY_H
+	add_history(new_line);
+    #endif
+	free(new_line);
+	return 1;
+	}
+
+	else
+	{
+	if (pPrompt) show_prompt(fFile);
+	return fgets(bBuffer, sSize, fFile)? 1 : 0;
+	}
+}
+
+static /*(prepended to 'show_prompt')*/
+
+#endif
 
 int show_prompt(FILE *fFile)
 {
-	int outcome = fprintf(fFile, "- '?' or 'help' for help / 'exit' to *terminate* emulator -\n");
+	int outcome = fprintf(fFile, "%s", PROMPT_TEXT);
 	if (outcome > 0) fflush(fFile);
 	return (outcome > 0)? 1 : 0;
 }

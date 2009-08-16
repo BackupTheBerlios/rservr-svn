@@ -46,7 +46,8 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_unsterm_OBJECTS = unsterm.$(OBJEXT)
 unsterm_OBJECTS = $(am_unsterm_OBJECTS)
-unsterm_DEPENDENCIES =
+am__DEPENDENCIES_1 =
+unsterm_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -180,8 +181,10 @@ AM_CPPFLAGS = $(ALL_INCLUDES)
 AM_CXXFLAGS = -ansi -Wall
 AM_CFLAGS = -Wall
 AM_LDFLAGS = 
+@LINK_READLINE_TRUE@USE_READLINE = -lreadline -lncurses
+@LINK_HISTORY_TRUE@USE_HISTORY = -lhistory
 unsterm_SOURCES = unsterm.c
-unsterm_LDADD = 
+unsterm_LDADD = $(USE_READLINE) $(USE_HISTORY)
 all: all-am
 
 .SUFFIXES:
