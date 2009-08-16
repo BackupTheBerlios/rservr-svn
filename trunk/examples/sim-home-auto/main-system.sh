@@ -6,7 +6,7 @@
 #the main system uses 'rservrd' for admin control, 'rsv-fsrelay' to connect to
 #the servers for each virtual floor, and 'system-status' to update the status of
 #the system as a whole.
-{ echo "execute @rservrd@-dxr";
+{ echo "execute_critical @rservrd@-dxr";
   echo "execute @rsv-fsrelay@system-connect";
   echo "execute @system-status@status";
   echo "register_all_wait"; } | \

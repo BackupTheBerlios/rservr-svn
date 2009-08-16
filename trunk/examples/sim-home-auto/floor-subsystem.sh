@@ -3,7 +3,7 @@
 # This script creates a server system for each virtual floor with one client for
 # each room on the floor.
 
-{ echo "execute @rservrd@-dxr";
+{ echo "execute_critical @rservrd@-dxr";
   echo "execute @rsv-fsrelay@$1-connect";
   echo "register_all_wait"; } | \
 rservr "$1" /dev/null

@@ -40,10 +40,11 @@
 #include "api/load-plugin.h"
 #include "api/client-timing.h"
 
+#define _GNU_SOURCE /* for 'fcntl' macros */
+
 #include <sys/socket.h> /* 'accept', 'shutdown' */
 #include <sys/select.h> /* 'select' */
 #include <pthread.h> /* pthreads */
-#include <sys/stat.h> /* 'stat' */
 #include <fcntl.h> /* 'fcntl' */
 #include <string.h> /* 'strlen' */
 #include <time.h> /* 'nanosleep' */
@@ -51,7 +52,7 @@
 #include <signal.h> /* 'signal', 'raise' */
 #include <libgen.h> /* 'basename' */
 #include <errno.h> /* 'errno' */
-#include <unistd.h> /* 'close' */
+#include <unistd.h> /* 'close', 'access' */
 
 #include "static-auto-conditions.h"
 
@@ -77,7 +78,6 @@ static void *select_thread_loop(void *iIgnore)
 	if (!accept_condition_active() || !select_condition_activate()) return NULL;
 
 	fd_set input_set;
-	struct stat current_stats;
 
 	/*this must be here because 'FD_ISSET' is called before filling the first time*/
 	FD_ZERO(&input_set);
@@ -116,9 +116,7 @@ static void *select_thread_loop(void *iIgnore)
 	return NULL;
 	 }
 	}
-	while ( (select(FD_SETSIZE, &input_set, NULL, NULL, NULL) >= 0 || errno == EINTR) &&
-                fstat(select_socket, &current_stats) >= 0 &&
-	        stat(get_server_name(), &current_stats) >= 0 );
+	while (select(FD_SETSIZE, &input_set, NULL, NULL, NULL) >= 0 || errno == EINTR);
 
 	pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 	select_condition_deactivate();
@@ -148,8 +146,6 @@ static void daemon_loop(int sSocket)
 	struct timespec connect_cycle = local_default_cycle();
 	static char input_data[PARAM_MAX_INPUT_SECTION];
 
-	struct stat current_stats;
-
 	accept_condition_activate();
 	set_queue_event_hook(&message_queue_hook);
 
@@ -161,14 +157,13 @@ static void daemon_loop(int sSocket)
 	select_socket = -1;
 	}
 
-	while (message_queue_status() && stat(get_server_name(), &current_stats) >= 0)
+	while (message_queue_status())
 	{
 	new_length = sizeof new_address;
 
 	while ((new_connection = accept(sSocket, (struct sockaddr*) &new_address, &new_length)) < 0)
 	 {
-	if ( !accept_condition_active() || !message_queue_status() ||
-	  stat(get_server_name(), &current_stats) < 0 )
+	if (!accept_condition_active() || !message_queue_status())
 	return;
 
 	/*NOTE: keep this just before blocking again*/
@@ -191,7 +186,9 @@ static void daemon_loop(int sSocket)
 	input_data[0] = 0x00;
 
 	fd_set input_set;
-	short_time timeout = local_default_connect_timeout();
+	struct timeval timeout =
+	  { .tv_sec  = local_default_connect_timeout().tv_sec,
+	    .tv_usec = local_default_connect_timeout().tv_nsec / 1000 };
 
 	FD_ZERO(&input_set);
 	FD_SET(new_connection, &input_set);
@@ -405,6 +402,19 @@ static void exit_handler(int sSignal)
 }
 
 
+#ifdef SIGIO
+static void directory_handler(int sSignal)
+{
+	/*this terminates the client if the socket is removed*/
+	if (access(get_server_name(), R_OK | W_OK) != 0)
+	{
+    client_log_output(logging_minimal, "access", strerror(errno));
+	raise(SIGTERM);
+	}
+}
+#endif
+
+
 static void register_handlers()
 {
     #ifdef SIGFPE
@@ -504,7 +514,8 @@ static void register_handlers()
     #endif
 
     #ifdef SIGUSR1
-	signal(SIGUSR1, &ignore_handler);
+	/*(see 'daemon-socket.c')*/
+	signal(SIGUSR1, &directory_handler);
     #endif
 
     #ifdef SIGUSR2

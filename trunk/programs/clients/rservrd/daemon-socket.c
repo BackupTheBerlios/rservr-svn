@@ -48,6 +48,7 @@
 #include <sys/socket.h> /* sockets */
 #include <sys/un.h> /* socket macros */
 #include <dirent.h> /* 'scandir' */
+#include <signal.h> /* 'SIGUSR1' */
 
 #ifdef PARAM_RSERVRD_TARGET_REGEX
 #include <regex.h> /* regular expressions */
@@ -283,6 +284,13 @@ int register_daemon(const char *nName, int gGroup)
 	unset_user();
 	return -1;
 	}
+
+	/*monitor the socket directory for changes*/
+	int socket_dir = open(".", O_RDONLY);
+
+	if (fcntl(socket_dir, F_NOTIFY, DN_DELETE | DN_RENAME | DN_ATTRIB |
+	    DN_MULTISHOT) == 0)
+	fcntl(socket_dir, F_SETSIG, SIGUSR1);
 
 	unset_user();
 

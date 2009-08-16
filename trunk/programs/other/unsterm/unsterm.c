@@ -42,7 +42,7 @@
 #include <signal.h> /* 'signal', 'kill' */
 #include <string.h> /* 'strerror' */
 #include <errno.h> /* 'errno' */
-#include <unistd.h> /* 'fork' */
+#include <unistd.h> /* 'fork', 'isatty' */
 #include <fcntl.h> /* 'fcntl' */
 
 #ifdef HAVE_READLINE_READLINE_H
@@ -150,6 +150,8 @@ int main(int argc, char *argv[])
 
 #ifdef HAVE_READLINE_READLINE_H
 
+	if (isatty(STDIN_FILENO))
+	 {
     #ifdef HAVE_READLINE_HISTORY_H
 	using_history();
     #endif
@@ -157,23 +159,30 @@ int main(int argc, char *argv[])
 	char *new_line = NULL;
 
 	while ((new_line = readline(NULL)))
-	 {
+	  {
     #ifdef HAVE_READLINE_HISTORY_H
 	add_history(new_line);
     #endif
 	fprintf(socket_stream, "%s\n", new_line);
 	free(new_line);
 	fflush(socket_stream);
+	  }
+
 	 }
 
-#else
+	else
+	 {
+
+#endif
 
 	while (fgets(input_data, PARAM_MAX_INPUT_SECTION, stdin))
-	 {
+	  {
 	fprintf(socket_stream, "%s", input_data);
 	fflush(socket_stream);
-	 }
+	  }
 
+#ifdef HAVE_READLINE_READLINE_H
+	 }
 #endif
 
 
