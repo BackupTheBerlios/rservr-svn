@@ -534,11 +534,11 @@ text_info extract_remote_command(command_handle hHandle)
 
 
 multi_result send_stream_command(int fFile, command_handle hHandle)
-{ return filtered_send_stream_command(fFile, hHandle, NULL, NULL, NULL); }
+{ return filtered_send_stream_command(fFile, hHandle, NULL, NULL); }
 
 
 multi_result filtered_send_stream_command(remote_connection fFile, command_handle hHandle,
-socket_reference sSocket, encode_short_func fFilter, send_short_func sSend)
+socket_reference sSocket, send_short_func sSend)
 {
 	if (!hHandle) return result_fail;
 	forward_command new_forward(&queued_client_commands);
@@ -548,7 +548,6 @@ socket_reference sSocket, encode_short_func fFilter, send_short_func sSend)
 
 	common_output new_output(fFile);
 	new_output.socket        = sSocket;
-	new_output.encode_filter = fFilter;
 	new_output.output_sender = sSend;
 
     #ifdef PARAM_CACHE_COMMAND_OUTPUT
@@ -675,19 +674,18 @@ result residual_stream_input()
 
 multi_result buffered_receive_stream_command(command_handle *cCommand, int fFile,
 text_info nName, text_info aAddress, external_buffer *bBuffer)
-{ return filtered_receive_stream_command(cCommand, fFile, nName, aAddress, bBuffer, 0, NULL, NULL); }
+{ return filtered_receive_stream_command(cCommand, fFile, nName, aAddress, bBuffer, 0, NULL); }
 
 
 multi_result filtered_receive_stream_command(command_handle *cCommand, remote_connection fFile,
 text_info nName, text_info aAddress, external_buffer *bBuffer, socket_reference sSocket,
-receive_short_func rReceive, decode_short_func fFilter)
+receive_short_func rReceive)
 {
 	if (!aAddress || !check_entity_label(aAddress) || !bBuffer || !cCommand) return result_fail;
 
 	buffered_common_input buffered_stream_input(fFile, bBuffer);
 	buffered_stream_input.socket         = sSocket;
 	buffered_stream_input.input_receiver = rReceive;
-	buffered_stream_input.decode_filter  = fFilter;
 	local_command_finder local_finder;
 	transmit_block *new_command          = NULL;
 	const transmit_block *queued_command = NULL;

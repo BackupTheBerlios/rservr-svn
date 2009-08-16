@@ -304,7 +304,7 @@ int main(int argc, char *argv[])
 
 	if ( get_next_address(RSERVR_REMOTE_COMMAND(message), next_address, PARAM_DEFAULT_FORMAT_BUFFER) &&
 	     (forward_file = find_socket(next_address)) >= 0 && (forward_reference = find_reference(forward_file)) &&
-	     (send_status = filtered_send_stream_command(forward_file, RSERVR_REMOTE_COMMAND(message), forward_reference, encode_command_filter(), send_command_filter())) ==
+	     (send_status = filtered_send_stream_command(forward_file, RSERVR_REMOTE_COMMAND(message), forward_reference, send_command_filter())) ==
 	       result_success ) /*send is complete*/;
 #endif
 
@@ -485,11 +485,11 @@ static void *input_receive(void *iIgnore)
     #ifdef RSV_RELAY
 	outcome = filtered_receive_stream_command(&new_command, current_file,
 	  client_name, current_address, current_buffer, current_reference,
-	  receive_command_filter(), decode_command_filter());
+	  receive_command_filter());
     #else
 	outcome = filtered_receive_stream_command(&new_command, current_file,
 	  NULL, current_address, current_buffer, current_reference,
-	  receive_command_filter(), decode_command_filter());
+	  receive_command_filter());
     #endif
 	if (outcome == result_invalid)
 	/*remove completely if EOF is reached*/

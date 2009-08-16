@@ -37,7 +37,6 @@
 #include <stdio.h> //'fileno', 'setvbuf'
 #include <errno.h> //'errno'
 
-#include "label-output.hpp"
 #include "constants.hpp"
 #include "common-input.hpp"
 #include "retry-limit.hpp"
@@ -49,7 +48,7 @@ extern "C" {
 
 
 	common_output::common_output(int pPipe) :
-	socket((socket_reference) 0x00), encode_filter(NULL), output_sender(NULL),
+	socket((socket_reference) 0x00), output_sender(NULL),
     #ifndef PARAM_CACHE_COMMAND_OUTPUT
 	total_transmission(0),
     #endif
@@ -132,31 +131,8 @@ extern "C" {
 	unsigned int  output_size = 0;
 	output_section output_copy;
 
-	if (!encode_filter)
-	 {
 	output_data = oOutput.c_str();
 	output_size = oOutput.size();
-	 }
-
-	else
-	 {
-	output_copy = oOutput;
-    #ifdef PARAM_CACHE_COMMAND_OUTPUT
-	if ((*encode_filter)(socket, 0, &output_copy[0], output_copy.size()) < 0)
-    #else
-	if ((*encode_filter)(socket, total_transmission, &output_copy[0], output_copy.size()) < 0)
-    #endif
-	  {
-	//TODO: add logging point
-	return false;
-	  }
-
-	if (!insert_output_tag(output_copy)) return false;
-
-	output_data = output_copy.c_str();
-	output_size = output_copy.size();
-	 }
-
 
 	ssize_t sent_size = 0, current_size = 0;
 

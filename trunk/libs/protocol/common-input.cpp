@@ -43,7 +43,6 @@ extern "C" {
 
 #include <hparser/formats/tag-properties.hpp>
 
-#include "label-output.hpp"
 #include "constants.hpp"
 #include "retry-limit.hpp"
 
@@ -167,7 +166,7 @@ extern "C" {
 
 	bool input_base::next_input(input_count cCount)
 	{
-	if (cCount > buffer->current_data.size()) return false;
+	if (cCount > (signed) buffer->current_data.size()) return false;
 
 	unsigned int next_size = cCount? cCount : buffer->current_data.size();
 
@@ -235,7 +234,7 @@ extern "C" {
 
 	buffered_common_input::buffered_common_input(int fFile, external_buffer *bBuffer) :
 	input_base(bBuffer), socket((socket_reference) 0x00), input_receiver(NULL),
-	decode_filter(NULL), input_pipe(fFile), input_underrun(false), eof_reached(false),
+	input_pipe(fFile), input_underrun(false), eof_reached(false),
 	total_decode(0), required_section(0), read_cancel(-1) { }
 
 
@@ -254,7 +253,6 @@ extern "C" {
 
 	bool buffered_common_input::read_line_input()
 	{
-	if (decode_filter && buffer->decode_marker && !input_underrun) return true;
 	if (eof_reached) return false;
 
 	input_underrun = false;
@@ -287,7 +285,6 @@ extern "C" {
 
 	if (read_size != (ssize_t) -1 && read_size != 0)
 	  {
-	if (decode_filter) buffer->decode_marker += read_size;
 	data_read = true;
 	buffer->loaded_data.resize(read_size + current);
 	  }
@@ -330,60 +327,15 @@ extern "C" {
 
 
 	unsigned int buffered_common_input::decoded_size() const
-	{ return decode_filter? (buffer->loaded_data.size() - buffer->decode_marker) : buffer->loaded_data.size(); }
+	{ return buffer->loaded_data.size(); }
 
 
 	bool buffered_common_input::decode_next()
 	{
-	if (!decode_filter)
-	 {
 	input_underrun = !buffer->decode_marker;
 	buffer->decode_marker = 0;
 	total_decode          = 0;
 	return !input_underrun;
-	 }
-
-	if ((input_underrun = !buffer->decode_marker)) return false;
-
-	if (buffer->decode_marker > buffer->loaded_data.size())
-	 {
-	buffer->decode_marker = 0;
-	total_decode          = 0;
-	//TODO: add error logging point
-	this->clear_buffer();
-	return false;
-	 }
-
-
-	if (!required_section)
-	 {
-	unsigned int current_size = buffer->loaded_data.size();
-
-	required_section = remove_output_tag(buffer->loaded_data,
-	  buffer->loaded_data.size() - buffer->decode_marker);
-
-	buffer->decode_marker -= current_size - buffer->loaded_data.size();
-
-	if ((input_underrun = !required_section)) return false;
-	 }
-
-
-	if (required_section > buffer->decode_marker)
-	 {
-	input_underrun = true;
-	return false;
-	 }
-
-
-	if ((*decode_filter)(socket, total_decode,
-	  &buffer->loaded_data[ buffer->loaded_data.size() - buffer->decode_marker ],
-	  required_section) < 0)
-	return false;
-
-	buffer->decode_marker -= required_section;
-	total_decode          += required_section;
-	required_section       = 0;
-	return true;
 	}
 
 

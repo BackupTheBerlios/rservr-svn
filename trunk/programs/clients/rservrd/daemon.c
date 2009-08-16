@@ -68,6 +68,10 @@ static int select_socket = -1;
 
 static void *select_thread_loop(void *iIgnore)
 {
+	/*this thread is necessary so the 'select' call can be canceled when the
+	  client is disconnected, without killing the thread of control, which
+	  must clean up for exit*/
+
 	if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) return NULL;
 
 	if (!accept_condition_active() || !select_condition_activate()) return NULL;
@@ -159,14 +163,16 @@ static void daemon_loop(int sSocket)
 
 	while (message_queue_status() && stat(get_server_name(), &current_stats) >= 0)
 	{
-	/*NOTE: keep this after the call to 'shutdown' (i.e. at the top)*/
-	select_condition_unblock();
-
 	new_length = sizeof new_address;
 
 	while ((new_connection = accept(sSocket, (struct sockaddr*) &new_address, &new_length)) < 0)
 	 {
-	if (!message_queue_status() || stat(get_server_name(), &current_stats) < 0) return;
+	if ( !accept_condition_active() || !message_queue_status() ||
+	  stat(get_server_name(), &current_stats) < 0 )
+	return;
+
+	/*NOTE: keep this just before blocking again*/
+	select_condition_unblock();
 
 	if (!accept_condition_block())
 	nanosleep(&connect_cycle, NULL);
@@ -190,9 +196,10 @@ static void daemon_loop(int sSocket)
 	FD_ZERO(&input_set);
 	FD_SET(new_connection, &input_set);
 
-	while ( select(FD_SETSIZE, &input_set, NULL, NULL, &timeout) >= 0 &&
+	while ( fgets(input_data, PARAM_MAX_INPUT_SECTION, new_stream) ||
+	  (select(FD_SETSIZE, &input_set, NULL, NULL, &timeout) >= 0 &&
 	  FD_ISSET(new_connection, &input_set) &&
-	  fgets(input_data, PARAM_MAX_INPUT_SECTION, new_stream) )
+	  fgets(input_data, PARAM_MAX_INPUT_SECTION, new_stream)) )
 	 {
 	input_data[ strlen(input_data) - 1 ] = 0x00;
 	if ((outcome = process_message(input_data, new_stream)) != 0)

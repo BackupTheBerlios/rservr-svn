@@ -100,42 +100,6 @@ remote_connection sSocket, const struct sockaddr *rReference1, socklen_t rRefere
 }
 
 
-static int encode_command(load_reference lLoad, socket_reference rReference,
-encoding_index pPosition, char *dData, ssize_t sSize)
-{
-	/*NOTE: this is not a good example of an encoding function*/
-
-	if (!loaded_filters[lLoad].size()) return 0;
-	if (!dData) return -1;
-
-	while (sSize--)
-	{
-	*dData = (*dData ^ loaded_filters[lLoad][0]) ^ (char) pPosition++;
-	dData++;
-	}
-
-	return 0;
-}
-
-
-static int decode_command(load_reference lLoad, socket_reference rReference,
-encoding_index pPosition, char *dData, ssize_t sSize)
-{
-	/*NOTE: this is not a good example of a decoding function*/
-
-	if (!loaded_filters[lLoad].size()) return 0;
-	if (!dData) return -1;
-
-	while (sSize--)
-	{
-	*dData = (*dData ^ loaded_filters[lLoad][0]) ^ (char) pPosition++;
-	dData++;
-	}
-
-	return 0;
-}
-
-
 static int send_command(load_reference lLoad, socket_reference rReference,
 remote_connection sSocket, const char *dData, ssize_t sSize)
 { return write(sSocket, dData, sSize); }
@@ -154,8 +118,6 @@ static const struct remote_security_filter internal_filter =
    connect_from_host: &connect_general,
      connect_to_host: &connect_general,
   disconnect_general: NULL,
-      encode_command: &encode_command,
-      decode_command: &decode_command,
         send_command: &send_command,
      receive_command: &receive_command };
 

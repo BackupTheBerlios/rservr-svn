@@ -275,7 +275,7 @@ extern result set_target_to_server_of(command_handle Command, text_info Client,
 extern text_info extract_remote_command(command_handle);
 extern multi_result send_stream_command(int, command_handle);
 extern multi_result filtered_send_stream_command(int, command_handle,
-socket_reference, encode_short_func, send_short_func);
+socket_reference, send_short_func);
 
 extern command_handle insert_remote_command(text_info, text_info, text_info);
 extern multi_result receive_stream_command(command_handle*, int, text_info,
@@ -288,7 +288,7 @@ text_info, text_info,
 struct external_buffer*);
 extern multi_result filtered_receive_stream_command(command_handle*,
 remote_connection, text_info, text_info, struct external_buffer*,
-socket_reference, receive_short_func, decode_short_func);
+socket_reference, receive_short_func);
 extern result buffered_residual_stream_input(struct external_buffer*);
 
 extern text_info get_next_address(command_handle, char*, unsigned int);

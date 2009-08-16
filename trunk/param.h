@@ -86,8 +86,9 @@ extern "C" {
 
 /* entity and addressing filter regular expresions (don't change) */
 /* THESE INTERFERE WITH COMMAND PARSING/INTERNALS: !*()[]{}"<>? */
-#define PARAM_ENTITY_FILTER  "a-zA-Z0-9~`#$%^&\\-_+;:',./"
-#define PARAM_ADDRESS_FILTER PARAM_ENTITY_FILTER "@|"
+/* "-" MUST STAY FIRST FOR BOTH PATTERNS */
+#define PARAM_ENTITY_FILTER  "-a-zA-Z0-9~`#$%^&_+;:',./@"
+#define PARAM_ADDRESS_FILTER PARAM_ENTITY_FILTER "?|"
 
 /* entity and addressing label limits */
 #define PARAM_ENTITY_LIMIT  128
@@ -95,7 +96,7 @@ extern "C" {
 #define PARAM_SCOPE_LIMIT   2048
 
 /* log file timestamp format (see 'strftime' in <time.h>) */
-#define PARAM_LOG_TIME_FORMAT "%C%g%m%d%H%M%S" /* YYYYMMDDHHMMSS (numerical) */
+#define PARAM_LOG_TIME_FORMAT "%C%g%j%H%M%S" /* YYYYJJJHHMMSS (numerical) */
 
 /* cache command output until command is complete before sending */
 /* DEFINE FOR RELEASE VERSIONS! */

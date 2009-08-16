@@ -60,9 +60,8 @@ public:
 
 	void close_output_pipe();
 
-	socket_reference  socket;
-	encode_short_func encode_filter;
-	send_short_func   output_sender;
+	socket_reference socket;
+	send_short_func  output_sender;
 
 private:
 	bool common_send(const output_section&);

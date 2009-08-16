@@ -53,8 +53,6 @@ extern "C" {
 
 typedef struct { load_reference number; address_func function; } address_spec;
 typedef struct { load_reference number; error_func   function; } error_spec;
-typedef struct { load_reference number; encode_func  function; } encode_spec;
-typedef struct { load_reference number; decode_func  function; } decode_spec;
 
 
 struct filter_list
@@ -67,9 +65,6 @@ struct filter_list
 	struct { load_reference number; connect_func function; }    connect_from_host;
 	struct { load_reference number; connect_func function; }    connect_to_host;
 	struct { load_reference number; disconnect_func function; } disconnect_general;
-
-	std::list <encode_spec> encode_commands;
-	std::list <decode_spec> decode_commands;
 
 	struct { load_reference number; send_func function; }    send_command;
 	struct { load_reference number; receive_func function; } receive_command;
@@ -114,12 +109,6 @@ static void load_filter(const struct remote_security_filter *fFilter)
 
 	error_spec error = { number: current_reference, function: fFilter->error_recorder };
 	if (fFilter->error_recorder) filter_table.error_filters.push_back(error);
-
-	encode_spec encode = { number: current_reference, function: fFilter->encode_command };
-	if (fFilter->encode_command) filter_table.encode_commands.push_back(encode);
-
-	decode_spec decode = { number: current_reference, function: fFilter->decode_command };
-	if (fFilter->decode_command) filter_table.decode_commands.push_back(decode);
 }
 
 
@@ -274,57 +263,6 @@ int disconnect_general(socket_reference rReference, remote_connection sSocket)
 	return (filter_table.disconnect_general.function != (disconnect_func) NULL)?
 	  (*filter_table.disconnect_general.function)(filter_table.disconnect_general.number, rReference, sSocket) : 0;
 }
-
-
-static int encode_command_internal(socket_reference rReference,
-encoding_index pPosition, char *dData, ssize_t sSize)
-{
-	if (!filter_table.encode_commands.size()) return 0;
-
-	int outcome = 0;
-
-	std::list <encode_spec> ::const_iterator
-	  current = filter_table.encode_commands.begin(),
-	  last    = filter_table.encode_commands.end();
-
-	while (current != last)
-	{
-	if (current->function == (encode_func) NULL) return -1;
-	if ((outcome = (*current->function)(current->number, rReference, pPosition, dData, sSize)) != 0) break;
-	current++;
-	}
-
-	return outcome;
-}
-
-encode_short_func encode_command_filter()
-{ return filter_table.encode_commands.size()? &encode_command_internal : NULL; }
-
-
-static int decode_command_internal(socket_reference rReference,
-encoding_index pPosition, char *dData, ssize_t sSize)
-{
-	if (!filter_table.decode_commands.size()) return 0;
-
-	int outcome = 0;
-
-	std::list <decode_spec> ::const_reverse_iterator
-	  current = filter_table.decode_commands.rbegin(),
-	  last    = filter_table.decode_commands.rend();
-
-	while (current != last)
-	{
-	if (current->function == (decode_func) NULL) return -1;
-	if ( (outcome = (*current->function)(current->number, rReference,
-	         pPosition, dData, sSize) ) != 0 ) break;
-	current++;
-	}
-
-	return outcome;
-}
-
-decode_short_func decode_command_filter()
-{ return filter_table.decode_commands.size()? &decode_command_internal : NULL; }
 
 
 static int send_command_internal(socket_reference rReference,

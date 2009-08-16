@@ -62,8 +62,6 @@ static const struct remote_security_filter internal_filter =
    connect_from_host: NULL,
      connect_to_host: NULL,
   disconnect_general: NULL,
-      encode_command: NULL,
-      decode_command: NULL,
         send_command: NULL,
      receive_command: NULL };
 
@@ -76,8 +74,6 @@ static const struct remote_security_filter inert_filter =
    connect_from_host: NULL,
      connect_to_host: NULL,
   disconnect_general: NULL,
-      encode_command: NULL,
-      decode_command: NULL,
         send_command: NULL,
      receive_command: NULL };
 

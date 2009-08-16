@@ -60,8 +60,6 @@ typedef int          (*address_func)    (load_reference, socket_reference, socke
 typedef void         (*error_func)      (load_reference, socket_reference, int);
 typedef int          (*connect_func)    (load_reference, socket_reference, remote_connection, const struct sockaddr*, socklen_t);
 typedef int          (*disconnect_func) (load_reference, socket_reference, remote_connection);
-typedef int          (*encode_func)     (load_reference, socket_reference, encoding_index, char*, ssize_t);
-typedef int          (*decode_func)     (load_reference, socket_reference, encoding_index, char*, ssize_t);
 typedef int          (*send_func)       (load_reference, socket_reference, remote_connection, const char*, ssize_t);
 typedef ssize_t      (*receive_func)    (load_reference, socket_reference, remote_connection, char*,       ssize_t);
 
@@ -76,15 +74,11 @@ struct remote_security_filter
 	connect_func    connect_from_host;  /*request authentication*/
 	connect_func    connect_to_host;    /*provide authentication*/
 	disconnect_func disconnect_general; /*(no specific purpose)*/
-	encode_func     encode_command;     /*encode all-or-none (0 or -1)*/
-	decode_func     decode_command;     /*decode all-or-none (0 or -1)*/
 	send_func       send_command;       /*send over socket (preserve 'write' 'errno')*/
 	receive_func    receive_command;    /*receive from socket (preserve 'read' 'errno')*/
 } __attribute__ ((packed));
 
 
-typedef int     (*encode_short_func)  (socket_reference, encoding_index, char*, ssize_t);
-typedef int     (*decode_short_func)  (socket_reference, encoding_index, char*, ssize_t);
 typedef int     (*send_short_func)    (socket_reference, remote_connection, const char*, ssize_t);
 typedef ssize_t (*receive_short_func) (socket_reference, remote_connection, char*,       ssize_t);
 

@@ -92,7 +92,6 @@ public:
 
 	socket_reference   socket;
 	receive_short_func input_receiver;
-	decode_short_func  decode_filter;
 
 private:
 	bool read_line_input();

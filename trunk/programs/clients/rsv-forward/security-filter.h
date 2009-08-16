@@ -48,8 +48,6 @@ void report_connection_error(socket_reference, int) ATTR_INT;
 int connect_from_host(socket_reference, remote_connection, const struct sockaddr*, socklen_t) ATTR_INT;
 int connect_to_host(socket_reference, remote_connection, const struct sockaddr*, socklen_t) ATTR_INT;
 int disconnect_general(socket_reference, remote_connection) ATTR_INT;
-encode_short_func encode_command_filter() ATTR_INT;
-decode_short_func decode_command_filter() ATTR_INT;
 send_short_func send_command_filter() ATTR_INT;
 receive_short_func receive_command_filter() ATTR_INT;
 
