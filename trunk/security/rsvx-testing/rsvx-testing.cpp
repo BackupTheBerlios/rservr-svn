@@ -52,7 +52,7 @@ static std::map <load_reference, std::string> loaded_filters;
 
 
 static int connect_general(load_reference lLoad, socket_reference rReference,
-remote_connection sSocket, const struct sockaddr *rReference1, socklen_t rReference2)
+remote_connection sSocket, const struct sockaddr *aAddress, socklen_t lLength)
 {
 	/*NOTE: this is not a good example of an authentication function*/
 
@@ -119,7 +119,8 @@ static const struct remote_security_filter internal_filter =
      connect_to_host: &connect_general,
   disconnect_general: NULL,
         send_command: &send_command,
-     receive_command: &receive_command };
+     receive_command: &receive_command,
+             cleanup: NULL };
 
 
 const struct remote_security_filter *load_security_filter(int tType, const char *dData, load_reference lLoad)

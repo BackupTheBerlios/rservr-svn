@@ -214,6 +214,7 @@ int main(int argc, char *argv[])
 	remove_sockets();
 	stop_message_queue();
 	client_cleanup();
+	cleanup_filters();
 	return 1;
 	 }
 	++current;
@@ -225,6 +226,7 @@ int main(int argc, char *argv[])
 	remove_sockets();
 	stop_message_queue();
 	client_cleanup();
+	cleanup_filters();
 	return 1;
 	}
 #endif
@@ -237,6 +239,9 @@ int main(int argc, char *argv[])
 #endif
 	stop_message_queue();
 	client_cleanup();
+#ifdef RSV_SOCKET
+	cleanup_filters();
+#endif
 	return 1;
 	}
 
@@ -248,6 +253,7 @@ int main(int argc, char *argv[])
 	fprintf(stderr, "%s: can't create socket-listening thread\n", argv[0]);
 	stop_message_queue();
 	client_cleanup();
+	cleanup_filters();
 	return 1;
 	}
 #endif
@@ -373,6 +379,9 @@ int main(int argc, char *argv[])
 	pthread_detach(current_thread);
 
 	client_cleanup();
+#ifdef RSV_SOCKET
+	cleanup_filters();
+#endif
 	return 0;
 }
 
@@ -568,6 +577,7 @@ void cleanup_routines()
 {
 #ifdef RSV_SOCKET
 	remove_sockets();
+	cleanup_filters();
 #endif
 
 	stop_message_queue();

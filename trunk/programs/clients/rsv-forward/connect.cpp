@@ -80,7 +80,6 @@ extern "C" {
 #include "security-filter.h"
 #include "remote-filter.h"
 #include "select-breaker.h"
-#include "socket-check.h"
 }
 
 
@@ -1073,8 +1072,7 @@ const char *aAddress, const char *pPort, std::string &rRevised)
 	}
 
 	if ( connect_to_host(rReference, new_socket,
-	       (struct sockaddr*) &new_address, sizeof new_address) < 0 ||
-	     check_connection(new_socket, rReference) < 0 )
+	       (struct sockaddr*) &new_address, sizeof new_address) < 0 )
 	{
     log_message_connect_deny(aAddress);
 	shutdown(new_socket, SHUT_RDWR);
@@ -1187,8 +1185,7 @@ static int try_connection(socket_reference rReference, const char *nName, std::s
 	}
 
 	if ( connect_to_host(rReference, new_socket,
-	       (struct sockaddr*) &new_address, new_length) < 0 ||
-	     check_connection(new_socket, rReference) < 0 )
+	       (struct sockaddr*) &new_address, new_length) < 0 )
 	{
     log_message_connect_deny(nName);
 	shutdown(new_socket, SHUT_RDWR);

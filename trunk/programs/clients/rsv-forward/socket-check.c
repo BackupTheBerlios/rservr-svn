@@ -47,6 +47,8 @@ static const unsigned char send_check[] = { 0x01, 0x23, 0x45, 0x67 };
 
 int check_connection(int sSocket, socket_reference rReference)
 {
+	/*this is very minimal default authentication (more like a mutual head nod)*/
+
 	struct timespec connect_latency = local_default_cycle();
 	nanosleep(&connect_latency, NULL);
 

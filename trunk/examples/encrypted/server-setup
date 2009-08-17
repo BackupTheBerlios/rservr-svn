@@ -1,0 +1,9 @@
+execute_critical @rservrd@-dxr
+
+setenv RELAY=2047
+execute_critical @rsv-netrelay@relay1@relay-setup
+
+setenv RELAY=2048
+execute_critical @rsv-netrelay@relay2@relay-setup
+
+register_all_wait

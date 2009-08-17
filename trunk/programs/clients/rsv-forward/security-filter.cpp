@@ -48,8 +48,11 @@ extern "C" {
 
 extern "C" {
 #include "messages.h"
+#include "socket-check.h"
 }
 
+
+typedef std::map <load_reference, const struct remote_security_filter*> filter_structs;
 
 typedef struct { load_reference number; address_func function; } address_spec;
 typedef struct { load_reference number; error_func   function; } error_spec;
@@ -57,7 +60,7 @@ typedef struct { load_reference number; error_func   function; } error_spec;
 
 struct filter_list
 {
-	std::map <load_reference, const struct remote_security_filter*> filters;
+	filter_structs filters;
 
 	std::list <address_spec> address_filters;
 	std::list <error_spec>   error_filters;
@@ -109,6 +112,19 @@ static void load_filter(const struct remote_security_filter *fFilter)
 
 	error_spec error = { number: current_reference, function: fFilter->error_recorder };
 	if (fFilter->error_recorder) filter_table.error_filters.push_back(error);
+}
+
+
+void cleanup_filters()
+{
+	filter_structs::const_iterator
+	  current = filter_table.filters.begin(),
+	  last    = filter_table.filters.end();
+
+	while (current != last)
+	if (current->second && current->second->cleanup)
+	(*current++->second->cleanup)();
+	else ++current;
 }
 
 
@@ -230,7 +246,7 @@ const struct sockaddr *aAddress, socklen_t lLength)
 	else return 0;
 	}
 
-	else return 0;
+	else return check_connection(sSocket, rReference);
 }
 
 
@@ -254,7 +270,7 @@ const struct sockaddr *aAddress, socklen_t lLength)
 	else return 0;
 	}
 
-	else return 0;
+	else return check_connection(sSocket, rReference);
 }
 
 

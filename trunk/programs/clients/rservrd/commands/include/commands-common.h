@@ -195,7 +195,7 @@ if (strlen(CURRENT_DATA)) \
   else \
   { block_messages(); \
     clear_command_status(message_number); \
-    ABORT_RESPONSE_ERROR_ACTION(name, action) } }
+    action; return 0; } }
 
 #define REGISTER_SEND(name, command) REGISTER_SEND_ACTION(name, command,)
 #define REGISTER_SEND_ACTION(name, command, action) \

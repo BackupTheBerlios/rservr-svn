@@ -69,7 +69,8 @@ static const struct remote_security_filter internal_filter =
      connect_to_host: NULL,
   disconnect_general: NULL,
         send_command: NULL,
-     receive_command: NULL };
+     receive_command: NULL,
+             cleanup: NULL };
 
 
 static const struct remote_security_filter inert_filter =
@@ -81,7 +82,8 @@ static const struct remote_security_filter inert_filter =
      connect_to_host: NULL,
   disconnect_general: NULL,
         send_command: NULL,
-     receive_command: NULL };
+     receive_command: NULL,
+             cleanup: NULL };
 
 
 const struct remote_security_filter *load_security_filter(int tType, const char *dData, load_reference lLoad)

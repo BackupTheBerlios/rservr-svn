@@ -1166,8 +1166,7 @@ static void *select_thread_loop(void *iIgnore)
 	if ( (filter_result = filter_incoming_address((socket_reference) set_sockets[I],
 	        new_reference, (struct sockaddr*) &new_address, new_length)) < 0 ||
 	     (connect_result = connect_from_host(new_reference, new_connection,
-	        (struct sockaddr*) &new_address, new_length)) < 0 ||
-	     (connect_result = check_connection(new_connection, new_reference)) < 0 )
+	        (struct sockaddr*) &new_address, new_length)) < 0 )
 	//filter address and run connection filter
 	    {
 #ifdef RSV_NET

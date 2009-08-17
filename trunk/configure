@@ -795,6 +795,8 @@ ac_header_list=
 ac_subst_vars='LTLIBOBJS
 POW_LIB
 LIBOBJS
+LINK_GNUTLS_FALSE
+LINK_GNUTLS_TRUE
 LINK_HISTORY_FALSE
 LINK_HISTORY_TRUE
 LINK_READLINE_FALSE
@@ -2566,7 +2568,7 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 
 
 
-ac_config_files="$ac_config_files Makefile include/Makefile lang/Makefile lang/us-english/Makefile libs/Makefile libs/protocol/Makefile libs/command/Makefile libs/proto/Makefile libs/proto/proto-server/Makefile libs/proto/proto-common/Makefile libs/proto/proto-admin/Makefile libs/proto/proto-service/Makefile libs/proto/proto-control/Makefile libs/proto/proto-resource/Makefile libs/proto/proto-monitor/Makefile libs/server/Makefile libs/client/Makefile libs/filter/Makefile plugins/Makefile plugins/netcntl/Makefile plugins/rqsrvc/Makefile plugins/rqconfig/Makefile plugins/ready/Makefile plugins/dataref/Makefile security/Makefile security/rsvx-localhost/Makefile security/rsvx-ipregex/Makefile security/rsvx-dnsregex/Makefile security/rsvx-penalty/Makefile security/rsvx-inert/Makefile security/rsvx-testing/Makefile programs/Makefile programs/server/Makefile programs/server/rservr/Makefile programs/clients/Makefile programs/clients/rservrd/Makefile programs/clients/rsv-forward/Makefile programs/clients/rsv-echo/Makefile programs/clients/rsv-terminal/Makefile programs/clients/rsv-respawn/Makefile programs/filters/Makefile programs/filters/rsvf-log/Makefile programs/other/Makefile programs/other/safexec/Makefile programs/other/rsvbits/Makefile programs/other/pipexec/Makefile programs/other/unsterm/Makefile"
+ac_config_files="$ac_config_files Makefile include/Makefile lang/Makefile lang/us-english/Makefile libs/Makefile libs/protocol/Makefile libs/command/Makefile libs/proto/Makefile libs/proto/proto-server/Makefile libs/proto/proto-common/Makefile libs/proto/proto-admin/Makefile libs/proto/proto-service/Makefile libs/proto/proto-control/Makefile libs/proto/proto-resource/Makefile libs/proto/proto-monitor/Makefile libs/server/Makefile libs/client/Makefile libs/filter/Makefile plugins/Makefile plugins/netcntl/Makefile plugins/rqsrvc/Makefile plugins/rqconfig/Makefile plugins/ready/Makefile plugins/dataref/Makefile security/Makefile security/rsvx-localhost/Makefile security/rsvx-ipregex/Makefile security/rsvx-dnsregex/Makefile security/rsvx-penalty/Makefile security/rsvx-tls/Makefile security/rsvx-inert/Makefile programs/Makefile programs/server/Makefile programs/server/rservr/Makefile programs/clients/Makefile programs/clients/rservrd/Makefile programs/clients/rsv-forward/Makefile programs/clients/rsv-echo/Makefile programs/clients/rsv-terminal/Makefile programs/clients/rsv-respawn/Makefile programs/filters/Makefile programs/filters/rsvf-log/Makefile programs/other/Makefile programs/other/safexec/Makefile programs/other/rsvbits/Makefile programs/other/pipexec/Makefile programs/other/unsterm/Makefile"
 
 
 
@@ -6942,7 +6944,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6945 "configure"' > conftest.$ac_ext
+  echo '#line 6947 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -9059,11 +9061,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9062: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9064: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9066: \$? = $ac_status" >&5
+   echo "$as_me:9068: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9349,11 +9351,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9352: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9354: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9356: \$? = $ac_status" >&5
+   echo "$as_me:9358: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9453,11 +9455,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9456: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9458: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9460: \$? = $ac_status" >&5
+   echo "$as_me:9462: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11853,7 +11855,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11856 "configure"
+#line 11858 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11953,7 +11955,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11956 "configure"
+#line 11958 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14362,11 +14364,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14365: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14367: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14369: \$? = $ac_status" >&5
+   echo "$as_me:14371: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14466,11 +14468,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14469: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14471: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14473: \$? = $ac_status" >&5
+   echo "$as_me:14475: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16049,11 +16051,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16052: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16054: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16056: \$? = $ac_status" >&5
+   echo "$as_me:16058: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16153,11 +16155,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16156: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16158: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16160: \$? = $ac_status" >&5
+   echo "$as_me:16162: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18368,11 +18370,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18371: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:18373: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:18375: \$? = $ac_status" >&5
+   echo "$as_me:18377: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -18658,11 +18660,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18661: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:18663: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:18665: \$? = $ac_status" >&5
+   echo "$as_me:18667: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -18762,11 +18764,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18765: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:18767: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:18769: \$? = $ac_status" >&5
+   echo "$as_me:18771: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -22876,7 +22878,158 @@ _ACEOF
 fi
 
 done
-   #not _ONCE!
+ #not _ONCE!
+
+for ac_header in gnutls/gnutls.h
+do
+as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
+  { $as_echo "$as_me:$LINENO: checking for $ac_header" >&5
+$as_echo_n "checking for $ac_header... " >&6; }
+if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
+  $as_echo_n "(cached) " >&6
+fi
+ac_res=`eval 'as_val=${'$as_ac_Header'}
+		 $as_echo "$as_val"'`
+	       { $as_echo "$as_me:$LINENO: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+else
+  # Is the header compilable?
+{ $as_echo "$as_me:$LINENO: checking $ac_header usability" >&5
+$as_echo_n "checking $ac_header usability... " >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <$ac_header>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_header_compiler=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+$as_echo "$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ $as_echo "$as_me:$LINENO: checking $ac_header presence" >&5
+$as_echo_n "checking $ac_header presence... " >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <$ac_header>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null && {
+	 test -z "$ac_c_preproc_warn_flag$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       }; then
+  ac_header_preproc=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ $as_echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+$as_echo "$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
+  yes:no: )
+    { $as_echo "$as_me:$LINENO: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&5
+$as_echo "$as_me: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the compiler's result" >&5
+$as_echo "$as_me: WARNING: $ac_header: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { $as_echo "$as_me:$LINENO: WARNING: $ac_header: present but cannot be compiled" >&5
+$as_echo "$as_me: WARNING: $ac_header: present but cannot be compiled" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: $ac_header:     check for missing prerequisite headers?" >&5
+$as_echo "$as_me: WARNING: $ac_header:     check for missing prerequisite headers?" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: $ac_header: see the Autoconf documentation" >&5
+$as_echo "$as_me: WARNING: $ac_header: see the Autoconf documentation" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: $ac_header:     section \"Present But Cannot Be Compiled\"" >&5
+$as_echo "$as_me: WARNING: $ac_header:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the preprocessor's result" >&5
+$as_echo "$as_me: WARNING: $ac_header: proceeding with the preprocessor's result" >&2;}
+    { $as_echo "$as_me:$LINENO: WARNING: $ac_header: in the future, the compiler will take precedence" >&5
+$as_echo "$as_me: WARNING: $ac_header: in the future, the compiler will take precedence" >&2;}
+    ( cat <<\_ASBOX
+## -------------------------------------------------------- ##
+## Report this to Kevin P. Barry (ta0kira@users.berlios.de) ##
+## -------------------------------------------------------- ##
+_ASBOX
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+{ $as_echo "$as_me:$LINENO: checking for $ac_header" >&5
+$as_echo_n "checking for $ac_header... " >&6; }
+if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
+  $as_echo_n "(cached) " >&6
+else
+  eval "$as_ac_Header=\$ac_header_preproc"
+fi
+ac_res=`eval 'as_val=${'$as_ac_Header'}
+		 $as_echo "$as_val"'`
+	       { $as_echo "$as_me:$LINENO: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+
+fi
+as_val=`eval 'as_val=${'$as_ac_Header'}
+		 $as_echo "$as_val"'`
+   if test "x$as_val" = x""yes; then
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+ GNUTLS=true
+fi
+
+done
+ #not _ONCE!
 
 # Set custom build flags.
  if test x$READLINE = xtrue; then
@@ -22893,6 +23046,14 @@ fi
 else
   LINK_HISTORY_TRUE='#'
   LINK_HISTORY_FALSE=
+fi
+
+ if test x$GNUTLS = xtrue; then
+  LINK_GNUTLS_TRUE=
+  LINK_GNUTLS_FALSE='#'
+else
+  LINK_GNUTLS_TRUE='#'
+  LINK_GNUTLS_FALSE=
 fi
 
 
@@ -26377,6 +26538,13 @@ $as_echo "$as_me: error: conditional \"LINK_HISTORY\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
+if test -z "${LINK_GNUTLS_TRUE}" && test -z "${LINK_GNUTLS_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"LINK_GNUTLS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"LINK_GNUTLS\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 
 : ${CONFIG_STATUS=./config.status}
 ac_write_fail=0
@@ -26893,8 +27061,8 @@ do
     "security/rsvx-ipregex/Makefile") CONFIG_FILES="$CONFIG_FILES security/rsvx-ipregex/Makefile" ;;
     "security/rsvx-dnsregex/Makefile") CONFIG_FILES="$CONFIG_FILES security/rsvx-dnsregex/Makefile" ;;
     "security/rsvx-penalty/Makefile") CONFIG_FILES="$CONFIG_FILES security/rsvx-penalty/Makefile" ;;
+    "security/rsvx-tls/Makefile") CONFIG_FILES="$CONFIG_FILES security/rsvx-tls/Makefile" ;;
     "security/rsvx-inert/Makefile") CONFIG_FILES="$CONFIG_FILES security/rsvx-inert/Makefile" ;;
-    "security/rsvx-testing/Makefile") CONFIG_FILES="$CONFIG_FILES security/rsvx-testing/Makefile" ;;
     "programs/Makefile") CONFIG_FILES="$CONFIG_FILES programs/Makefile" ;;
     "programs/server/Makefile") CONFIG_FILES="$CONFIG_FILES programs/server/Makefile" ;;
     "programs/server/rservr/Makefile") CONFIG_FILES="$CONFIG_FILES programs/server/rservr/Makefile" ;;

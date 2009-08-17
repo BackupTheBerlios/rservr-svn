@@ -187,8 +187,8 @@ static void daemon_loop(int sSocket)
 
 	fd_set input_set;
 	struct timeval timeout =
-	  { .tv_sec  = local_default_connect_timeout().tv_sec,
-	    .tv_usec = local_default_connect_timeout().tv_nsec / 1000 };
+	  {  tv_sec: local_default_connect_timeout().tv_sec,
+	    tv_usec: local_default_connect_timeout().tv_nsec / 1000 };
 
 	FD_ZERO(&input_set);
 	FD_SET(new_connection, &input_set);

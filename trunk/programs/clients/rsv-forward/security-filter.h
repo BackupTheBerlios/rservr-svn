@@ -40,6 +40,7 @@
 
 
 int set_security_filter(const char*, const char*) ATTR_INT;
+void cleanup_filters() ATTR_INT;
 
 socket_reference get_new_reference() ATTR_INT;
 
