@@ -73,10 +73,10 @@ struct remote_security_filter
 	error_func      error_recorder;     /*record disconnections due to errors*/
 	connect_func    connect_from_host;  /*request authentication*/
 	connect_func    connect_to_host;    /*provide authentication*/
-	disconnect_func disconnect_general; /*(no specific purpose)*/
+	disconnect_func disconnect_general; /*connection cleanup*/
 	send_func       send_command;       /*send over socket (preserve 'write' 'errno')*/
 	receive_func    receive_command;    /*receive from socket (preserve 'read' 'errno')*/
-	void (*cleanup)();
+	void (*cleanup)();                  /*general cleanup*/
 } __attribute__ ((packed));
 
 

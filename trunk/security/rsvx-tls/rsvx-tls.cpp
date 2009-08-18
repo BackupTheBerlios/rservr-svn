@@ -138,8 +138,9 @@ const struct sockaddr *aAddress, socklen_t lLength)
 
 	if (forwarder_type == RSERVR_REMOTE_NET)
 	{
-	//first try IP lookup...
 	if (!aAddress || lLength != sizeof(struct sockaddr_in)) return;
+
+	//first try IP lookup...
 	address = inet_ntoa(((const struct sockaddr_in*) aAddress)->sin_addr);
 	position = srp_clients.f_find(address.c_str(), &check_srp_key_regex);
 
@@ -336,8 +337,12 @@ static void cleanup()
 {
 	if (!initialized) return;
 
-	gnutls_srp_free_server_credentials (srp_server);
+	if (use_srp_auth)
+	gnutls_srp_free_server_credentials(srp_server);
+
+	else
 	gnutls_anon_free_server_credentials(credentials);
+
 	gnutls_global_deinit();
 
 	initialized = false;

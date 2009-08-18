@@ -177,14 +177,14 @@
       <h4 class="overview_title">
         <a name="GS_I">Installation.</a>
       </h4>
-      <p class="overview_content"> Resourcerver depends on one external project. This project provides the structure of the IPC system and provides the ability to expand the set of IPC commands extremely easily. Though used by Resourcerver to create and parse XML-style commands, it can be used to create all types of hierarchical data representations. </p>
+      <p class="overview_content"> Resourcerver requires one external project. This project provides the structure of the IPC system and provides the ability to expand the set of IPC commands extremely easily. Though used by Resourcerver to create and parse XML-style commands, it can be used to create all types of hierarchical data representations. </p>
       <p align="center">
         <a href="http://hparser.berlios.de/" target="_blank" class="dependency_link general_link">hparser 1.0.0</a><span class="dependency_text"> - C++ Hierarchical Data Framework</span>
         <br />
         <br />
       </p>
-      <p class="overview_content"> I also wrote and maintain the <b>hparser</b> project.  Some of its minor functionality is a result of this project, but in general this project was developed around the <b>hparser</b> project. Don't be fooled by its primitive (or lack of) documentation and front page. </p>
       <p class="overview_content"> The <b>hparser</b> package must be installed prior to configuring the Resourcerver package. Don't deviate from the version indicated above unless the documentation contained in the Resourcerver package you downloaded specifies another. </p>
+      <p class="overview_content"> Optionally, the GNU readline and <a href="http://www.gnu.org/software/gnutls/" class="general_link">GNU TLS</a> libraries should be installed to enable additional features. Most Linux systems should already have these installed; however, you might need to install development headers. Resourcerver will build and install correctly without any of these present, but at a slight loss of functionality. </p>
       <p class="overview_content"> Resourcerver builds with a standard <span class="style_command_line">./configure</span> script. Normally the following works fine for installation: </p>
       <div align="center">
         <pre class="example_box shell_box">

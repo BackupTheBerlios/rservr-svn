@@ -176,7 +176,7 @@
         </tr>
       </table>
       <p class="overview_content style_definition_long"> This is a simple control client that sets up a socket to emulate a terminal interface. The interface provides interactive command execution for basic control over the services of a Resourcerver system. This program takes one argument to denote a local socket to listen to. Only one instance of this client may exist on any <span class="style_command_line">rservr</span>. This client will always register with the client name "terminal." Use the <span class="style_command_line">unsterm</span> program to connect to the terminal. This program only allows a single connection to the emulator at a time. </p>
-      <p class="overview_content style_definition_long"> Once you connect to the terminal with <span class="style_command_line">unsterm</span>, you can type <span class="style_command_line">?</span> or <span class="style_command_line">help</span> for help. You can follow either by full or partial command names, to include regular expressions. You can also use part or all of a command name when specifying an operation. If more than one command name matches, you'll be given a choice. Input lines follow the <a href="assembly.html#UCFF" class="general_link">uniform configuration format</a>. This is a quickly-evolving utility, so the best reference will come from running the client and connecting to it. You <u>shouldn't</u> count on the interface being stringently-consistent across versions of this project; therefore, you <u>shouldn't</u> connect to the emulator with a script. </p>
+      <p class="overview_content style_definition_long"> Once you connect to the terminal with <span class="style_command_line">unsterm</span>, you can type <span class="style_command_line">?</span> or <span class="style_command_line">help</span> for help. You can follow either by full or partial command names, to include regular expressions. You can also use part or all of a command name when specifying an operation. If more than one command name matches, you'll be given a choice. Input lines follow the <a href="assembly.html#UCFF" class="general_link">uniform configuration format</a>. This is a quickly-evolving utility, so the best reference will come from running the client and connecting to it. You <u>shouldn't</u> count on the interface being stringently-consistent across versions of this project. </p>
       <table summary="definition" class="overview_content">
         <tr>
           <td width="350" align="left" class="style_term"> rsv-console </td>
@@ -574,6 +574,21 @@ cat $1 | grep -n . | tr "\n" "%" | sed -r "s@%([0-9]+:&lt;rservr [^&lt;]+&gt;)@\
       <p class="overview_content style_definition_long"> Provide a regular expression as the filter's parameter string when loading this plug-in. The host name associated with the incoming IP address will be checked against the expression via DNS lookup.  If no DNS information is available and the expression isn't inverted then the check fails.  If the expression is inverted and no DNS information is available then the check passes. Inverted expressions therefore aren't very secure unless you load a second instance of this filter with the expression "<b>.</b>" to require that all incoming connections have a DNS entry (only use if applicable.) The requirements of the expression can be inverted by preceding it with "<b>!</b>".  When multiple instances of this filter are loaded, the DNS host name of the incoming connection must pass checks against <u>all</u> of the loaded expressions. This filter will not be applied to IP addresses. </p>
       <table summary="definition" class="overview_content">
         <tr>
+          <td width="350" align="left" class="style_term"> librsvx-tls.so </td>
+          <td class="style_definition_short"> TLS encryption and authentication filter </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This filter should be present if the <a href="http://www.gnu.org/software/gnutls/" class="general_link">GNU TLS library</a> (to include headers) is installed when you build <span class="style_command_line">rservr</span>. This filter will provide anonymous authentication if the initializing string is blank, otherwise it will use the string to set up <a href="http://www.gnu.org/software/gnutls/manual/gnutls.html#Authentication-using-SRP" class="general_link">SRP authentication</a>. Encrypted connections are provided in both cases. </p>
+      <p class="overview_content style_definition_long"> The initializing string must be subsequently delimited by the first character of the string. The first token specifies a file containing client passwords, the second specifies the <span class="style_file_name">tpasswd</span> file, and the third specifies the <span class="style_file_name">tpasswd.conf</span> file. The latter two can be created using <a href="http://www.gnu.org/software/gnutls/manual/gnutls.html#Invoking-srptool" class="general_link"><span class="style_command_line">srptool</span></a>. The client-password file contains a list of user-names and corresponding passwords where each line is subsequently delimited by the first character. The first token is a regular expression used to match the connection address and the subsequent two tokens are the user-name and password, respectively. For example: </p>
+      <div align="center">
+        <pre class="example_box code_box script_box">
+:127\.0.\0.\1:username:password
+:berlios\.de:user:passwd
+</pre>
+      </div>
+      <p class="overview_content style_definition_long"> Upon attempting to make a connection, the first matching line is used for the credentials to be passed to the listening forwarder. When using network forwarders, the IP address is looked up first and only if it fails is the host name looked up (in the case of a host name loookup, the DNS-provided name is looked at regardless of if a host name is provided to the forwarder when making the connection.) The file name passed to the forwarder is checked if the connection to be made is to a local socket. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
           <td width="350" align="left" class="style_term"> librsvx-penalty.so </td>
           <td class="style_definition_short"> imposes a reconnection delay for error-disconnected hosts </td>
         </tr>
@@ -583,14 +598,6 @@ cat $1 | grep -n . | tr "\n" "%" | sed -r "s@%([0-9]+:&lt;rservr [^&lt;]+&gt;)@\
         <tr>
           <td width="350" align="left" class="style_term"> librsvx-inert.so </td>
           <td class="style_definition_short"> inert security filter </td>
-        </tr>
-      </table>
-      <p>
-      </p>
-      <table summary="definition" class="overview_content">
-        <tr>
-          <td width="350" align="left" class="style_term"> librsvx-testing.so </td>
-          <td class="style_definition_short"> trivial security filter for testing only </td>
         </tr>
       </table>
       <p>
