@@ -38,7 +38,7 @@ extern "C" {
 #include <map>
 
 #include <netinet/in.h> //'sockaddr_in'
-#include <netdb.h> //'gethostbyaddr'
+#include <netdb.h> //'getnameinfo'
 
 #include "global/regex-check.hpp"
 

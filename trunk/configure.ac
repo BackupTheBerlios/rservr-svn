@@ -83,11 +83,12 @@ AC_CHECK_HEADERS_ONCE([hparser/formats/descriptor-output.hpp hparser/formats/tag
 AC_CHECK_HEADERS([readline/readline.h], [READLINE=true], [], []) #not _ONCE!
 AC_CHECK_HEADERS([readline/history.h], [HISTORY=true], [], []) #not _ONCE!
 AC_CHECK_HEADERS([gnutls/gnutls.h], [GNUTLS=true], [], []) #not _ONCE!
+AC_CHECK_HEADERS([gnutls/extra.h], [EXTRA=true], [], []) #not _ONCE!
 
 # Set custom build flags.
 AM_CONDITIONAL([LINK_READLINE], [test x$READLINE = xtrue])
 AM_CONDITIONAL([LINK_HISTORY], [test x$HISTORY = xtrue])
-AM_CONDITIONAL([LINK_GNUTLS], [test x$GNUTLS = xtrue])
+AM_CONDITIONAL([LINK_GNUTLS], [test x$GNUTLS = xtrue && test x$EXTRA = xtrue])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL

@@ -30,6 +30,9 @@
  | POSSIBILITY OF SUCH DAMAGE.
  +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#include "global/regex-check.hpp"
+#include "external/clist.hpp"
+
 extern "C" {
 #include "param.h"
 #include "config-parser.h"
@@ -39,22 +42,50 @@ extern "C" {
 }
 
 #include <map>
+#include <string>
 
 #include <fcntl.h> //'fcntl'
 #include <errno.h> //'errno'
 #include <string.h> //'strerror'
+#include <stdio.h> //'fopen', etc.
 #include <sys/select.h> //'select'
+#include <netinet/in.h> //'sockaddr_in'
+#include <netdb.h> //'getnameinfo'
+#include <arpa/inet.h> //'inet_ntoa'
+#include <sys/un.h> //'sockaddr_un'
 
 #include <gnutls/gnutls.h>
-#include <gnutls/openpgp.h>
+#include <gnutls/extra.h>
 
 
-static bool initialized = false;
+struct srp_identity
+{
+	srp_identity(const char *uUser = "", const char *pPasswd = "") :
+	user(uUser), passwd(pPasswd) { }
+
+	std::string user;
+	std::string passwd;
+};
+
+
+typedef data::keylist <regex_check, srp_identity> srp_client_list;
+
+
+static bool initialized  = false;
+static bool use_srp_auth = false;
+
+static int forwarder_type = 0;
 
 static std::map <socket_reference, gnutls_session_t> sessions;
 static std::map <int, bool> socket_setup;
+
 static gnutls_anon_server_credentials_t credentials;
 static gnutls_dh_params_t dh_params;
+
+static gnutls_srp_server_credentials_t srp_server;
+
+static srp_client_list srp_clients;
+
 
 
 static ssize_t write_wrapper(int sSocket, const char *dData, size_t sSize)
@@ -93,16 +124,119 @@ static ssize_t read_wrapper(int sSocket, char *dData, size_t sSize)
 }
 
 
-static gnutls_session_t initialize_tls_session(bool sServer)
+static bool parse_passwd(const char *pPasswd)
+{
+	FILE *passwd_file = fopen(pPasswd, "r");
+	if (!passwd_file)
+	{
+    client_log_output(logging_minimal, "rsvx-tls:passwd", strerror(errno));
+	return false;
+	}
+
+	std::string buffer;
+	buffer.resize(PARAM_MAX_INPUT_SECTION);
+
+	while (fgets(&buffer[0], buffer.size(), passwd_file))
+	{
+	buffer[ strlen(buffer.c_str()) - 1 ] = 0x00;
+	char **next_line = NULL, **current = NULL;
+
+	if (argument_delim_split(buffer.c_str(), &next_line) < 0 ||
+	  !(current = next_line))
+	continue;
+
+	const char *pattern = (*current)? *current++ : NULL;
+	const char *user    = (*current)? *current++ : NULL;
+	const char *passwd  = (*current)? *current++ : NULL;
+
+	regex_check new_regex;
+
+	if (passwd && (new_regex = pattern))
+	srp_clients.add_element( srp_client_list::new_element(
+	    new_regex, srp_identity(user, passwd)) );
+
+	free_delim_split(next_line);
+	}
+
+	fclose(passwd_file);
+	return true;
+}
+
+
+static bool check_srp_key_regex(srp_client_list::const_return_type eElement,
+const char *aAddress)
+{ return eElement.key() == aAddress; }
+
+
+static void set_client_passwd(gnutls_srp_client_credentials_t &cCredentials,
+const struct sockaddr *aAddress, socklen_t lLength)
+{
+	gnutls_srp_allocate_client_credentials(&cCredentials);
+
+	std::string address;
+
+	int position = data::not_found;
+
+
+	if (forwarder_type == RSERVR_REMOTE_NET)
+	{
+	if (!aAddress || lLength != sizeof(struct sockaddr_in)) return;
+	address = inet_ntoa(((const struct sockaddr_in*) aAddress)->sin_addr);
+	position = srp_clients.f_find(address.c_str(), &check_srp_key_regex);
+
+	if (position == data::not_found)
+	 {
+	char name_buffer[PARAM_DEFAULT_FORMAT_BUFFER];
+	if (getnameinfo(aAddress, lLength, name_buffer, sizeof name_buffer, NULL, 0, 0x00))
+	position = srp_clients.f_find(name_buffer, &check_srp_key_regex);
+	 }
+	}
+
+	else if (forwarder_type == RSERVR_REMOTE_LOCAL)
+	{
+	if (!aAddress) return;
+	address.resize(lLength);
+	strncpy(&address[0], ((const struct sockaddr_un*) aAddress)->sun_path,
+	  lLength);
+	position = srp_clients.f_find(address.c_str(), &check_srp_key_regex);
+	}
+
+	else return;
+
+
+	if (position != data::not_found)
+	gnutls_srp_set_client_credentials(cCredentials,
+	  srp_clients[position].value().user.c_str(),
+	  srp_clients[position].value().passwd.c_str());
+}
+
+
+static gnutls_session_t initialize_tls_session(bool sServer,
+gnutls_srp_client_credentials_t &cClient, const struct sockaddr *aAddress,
+socklen_t lLength)
 {
 	gnutls_session_t session;
 
 	gnutls_init(&session, sServer? GNUTLS_SERVER : GNUTLS_CLIENT);
 
+	if (use_srp_auth)
+	{
+	gnutls_priority_set_direct(session, sServer?
+	  "NORMAL:+SRP" : "PERFORMANCE:+SRP", NULL);
+
+	if (!sServer)
+	set_client_passwd(cClient, aAddress, lLength);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_SRP, sServer?
+	  (void*) srp_server : (void*) cClient);
+	}
+
+	else
+	{
 	gnutls_priority_set_direct(session, sServer?
 	  "NORMAL:+ANON-DH" : "PERFORMANCE:+ANON-DH", NULL);
-
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, credentials);
+	}
 
 	gnutls_dh_set_prime_bits(session, 1024);
 
@@ -114,9 +248,12 @@ static gnutls_session_t initialize_tls_session(bool sServer)
 
 
 static int common_connect(socket_reference rReference, remote_connection sSocket,
-bool sServer)
+const struct sockaddr *aAddress, socklen_t lLength, bool sServer)
 {
-	sessions[rReference] = initialize_tls_session(sServer);
+	gnutls_srp_client_credentials_t srp_client;
+
+	sessions[rReference] = initialize_tls_session(sServer, srp_client,
+	  aAddress, lLength);
 	gnutls_transport_set_ptr(sessions[rReference],
 	  (gnutls_transport_ptr_t) sSocket);
 
@@ -138,12 +275,12 @@ bool sServer)
 
 static int connect_from_host(load_reference lLoad, socket_reference rReference,
 remote_connection sSocket, const struct sockaddr *aAddress, socklen_t lLength)
-{ return common_connect(rReference, sSocket, true); }
+{ return common_connect(rReference, sSocket, aAddress, lLength, true); }
 
 
 static int connect_to_host(load_reference lLoad, socket_reference rReference,
 remote_connection sSocket, const struct sockaddr *aAddress, socklen_t lLength)
-{ return common_connect(rReference, sSocket, false); }
+{ return common_connect(rReference, sSocket, aAddress, lLength, false); }
 
 
 int disconnect_general(load_reference lLoad, socket_reference rReference,
@@ -178,6 +315,7 @@ static void cleanup()
 {
 	if (!initialized) return;
 
+	gnutls_srp_free_server_credentials (srp_server);
 	gnutls_anon_free_server_credentials(credentials);
 	gnutls_global_deinit();
 
@@ -219,12 +357,51 @@ const struct remote_security_filter *load_security_filter(int tType, const char 
 
 	gnutls_global_init();
 
+	forwarder_type = tType;
+
+	const char *passwd = NULL, *srp_passwd = NULL, *srp_passwd_conf = NULL;
+
+	char **initializers = NULL, **current = NULL;
+	int argument_count;
+
+	if ((argument_count = argument_delim_split(dData, &initializers)) > 0 &&
+	  (current = initializers))
+	{
+	use_srp_auth = true;
+
+	if (*current) passwd          = *current++;
+	if (*current) srp_passwd      = *current++;
+	if (*current) srp_passwd_conf = *current++;
+
+	if (passwd && strlen(passwd) && !parse_passwd(passwd))
+	 {
+	free_delim_split(initializers);
+	gnutls_global_deinit();
+	return NULL;
+	 }
+
+	gnutls_global_init_extra();
+
+	if (srp_passwd && strlen(srp_passwd) && srp_passwd_conf &&
+	  strlen(srp_passwd_conf))
+	 {
+	gnutls_srp_allocate_server_credentials(&srp_server);
+	gnutls_srp_set_server_credentials_file(srp_server, srp_passwd,
+	  srp_passwd_conf);
+	 }
+
+	free_delim_split(initializers);
+	}
+
+	else
+	{
 	gnutls_anon_allocate_server_credentials(&credentials);
 
 	gnutls_dh_params_init(&dh_params);
 	gnutls_dh_params_generate2(dh_params, 1024);
 
 	gnutls_anon_set_server_dh_params(credentials, dh_params);
+	}
 
 	return &internal_filter;
 }

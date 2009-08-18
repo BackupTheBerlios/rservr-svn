@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
 	while ((new_line = readline(NULL)))
 	  {
     #ifdef HAVE_READLINE_HISTORY_H
-	add_history(new_line);
+	if (strlen(new_line)) add_history(new_line);
     #endif
 	fprintf(socket_stream, "%s\n", new_line);
 	free(new_line);

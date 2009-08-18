@@ -7,4 +7,4 @@ STANDARD_LIBS=-L/lib -L/usr/lib -L/usr/local/lib
 AM_LDFLAGS=--version-info 1:1:0 $(STANDARD_LIBS)
 lib_LTLIBRARIES=librsvx-tls.la
 librsvx_tls_la_SOURCES=rsvx-tls.cpp
-librsvx_tls_la_LIBADD=-lgnutls
+librsvx_tls_la_LIBADD=-lgnutls -lgnutls-extra

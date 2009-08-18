@@ -75,7 +75,7 @@ int readline_input(int pPrompt, char *bBuffer, unsigned int sSize, FILE *fFile)
 	memcpy(bBuffer, new_line, (sSize < strlen(new_line))?
 	  sSize : strlen(new_line));
     #ifdef HAVE_READLINE_HISTORY_H
-	add_history(new_line);
+	if (strlen(new_line)) add_history(new_line);
     #endif
 	free(new_line);
 	return 1;
