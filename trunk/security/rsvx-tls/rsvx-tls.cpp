@@ -127,7 +127,7 @@ const char *aAddress)
 
 
 static void set_client_passwd(gnutls_srp_client_credentials_t &cCredentials,
-const struct sockaddr *aAddress, socklen_t lLength)
+const struct sockaddr *aAddress, socklen_t lLength, const char *aActual)
 {
 	gnutls_srp_allocate_client_credentials(&cCredentials);
 
@@ -135,9 +135,15 @@ const struct sockaddr *aAddress, socklen_t lLength)
 
 	int position = data::not_found;
 
+	//try the verbatim request first
+	if (aActual)
+	position = srp_clients.f_find(aActual, &check_srp_key_regex);
 
-	if (forwarder_type == RSERVR_REMOTE_NET)
+
+	if (position == data::not_found)
 	{
+	if (forwarder_type == RSERVR_REMOTE_NET)
+	 {
 	if (!aAddress || lLength != sizeof(struct sockaddr_in)) return;
 
 	//first try IP lookup...
@@ -146,23 +152,24 @@ const struct sockaddr *aAddress, socklen_t lLength)
 
 	if (position == data::not_found)
 	//otherwise try DNS lookup
-	 {
+	  {
 	char name_buffer[PARAM_DEFAULT_FORMAT_BUFFER];
 	if (getnameinfo(aAddress, lLength, name_buffer, sizeof name_buffer, NULL, 0, 0x00))
 	position = srp_clients.f_find(name_buffer, &check_srp_key_regex);
+	  }
 	 }
-	}
 
 	else if (forwarder_type == RSERVR_REMOTE_LOCAL)
-	{
+	 {
 	if (!aAddress) return;
 	address.resize(lLength);
 	strncpy(&address[0], ((const struct sockaddr_un*) aAddress)->sun_path,
 	  lLength);
 	position = srp_clients.f_find(address.c_str(), &check_srp_key_regex);
-	}
+	 }
 
 	else return;
+	}
 
 
 	if (position != data::not_found)
@@ -222,7 +229,7 @@ static ssize_t read_wrapper(int sSocket, char *dData, size_t sSize)
 //general tls stuff-------------------------------------------------------------
 static gnutls_session_t initialize_tls_session(bool sServer,
 gnutls_srp_client_credentials_t &cClient, const struct sockaddr *aAddress,
-socklen_t lLength)
+socklen_t lLength, const char *aActual)
 {
 	gnutls_session_t session;
 
@@ -234,7 +241,7 @@ socklen_t lLength)
 	  "NORMAL:+SRP" : "PERFORMANCE:+SRP", NULL);
 
 	if (!sServer)
-	set_client_passwd(cClient, aAddress, lLength);
+	set_client_passwd(cClient, aAddress, lLength, aActual);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_SRP, sServer?
 	  (void*) srp_server : (void*) cClient);
@@ -270,12 +277,13 @@ static void gnutls_logging(int lLevel, const char *mMessage)
 
 
 static int common_connect(socket_reference rReference, remote_connection sSocket,
-const struct sockaddr *aAddress, socklen_t lLength, bool sServer)
+const struct sockaddr *aAddress, socklen_t lLength, bool sServer,
+const char *aActual)
 {
 	gnutls_srp_client_credentials_t srp_client;
 
 	sessions[rReference] = initialize_tls_session(sServer, srp_client,
-	  aAddress, lLength);
+	  aAddress, lLength, aActual);
 	gnutls_transport_set_ptr(sessions[rReference],
 	  (gnutls_transport_ptr_t) sSocket);
 
@@ -296,13 +304,15 @@ const struct sockaddr *aAddress, socklen_t lLength, bool sServer)
 
 
 static int connect_from_host(load_reference lLoad, socket_reference rReference,
-remote_connection sSocket, const struct sockaddr *aAddress, socklen_t lLength)
-{ return common_connect(rReference, sSocket, aAddress, lLength, true); }
+remote_connection sSocket, const struct sockaddr *aAddress, socklen_t lLength,
+const char *aActual)
+{ return common_connect(rReference, sSocket, aAddress, lLength, true, aActual); }
 
 
 static int connect_to_host(load_reference lLoad, socket_reference rReference,
-remote_connection sSocket, const struct sockaddr *aAddress, socklen_t lLength)
-{ return common_connect(rReference, sSocket, aAddress, lLength, false); }
+remote_connection sSocket, const struct sockaddr *aAddress, socklen_t lLength,
+const char *aActual)
+{ return common_connect(rReference, sSocket, aAddress, lLength, false, aActual); }
 
 
 int disconnect_general(load_reference lLoad, socket_reference rReference,

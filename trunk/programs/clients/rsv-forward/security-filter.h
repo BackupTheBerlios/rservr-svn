@@ -46,8 +46,10 @@ socket_reference get_new_reference() ATTR_INT;
 
 int filter_incoming_address(socket_reference, socket_reference, const struct sockaddr*, socklen_t) ATTR_INT;
 void report_connection_error(socket_reference, int) ATTR_INT;
-int connect_from_host(socket_reference, remote_connection, const struct sockaddr*, socklen_t) ATTR_INT;
-int connect_to_host(socket_reference, remote_connection, const struct sockaddr*, socklen_t) ATTR_INT;
+int connect_from_host(socket_reference, remote_connection, const struct sockaddr*,
+socklen_t) ATTR_INT;
+int connect_to_host(socket_reference, remote_connection, const struct sockaddr*, socklen_t,
+const char*) ATTR_INT;
 int disconnect_general(socket_reference, remote_connection) ATTR_INT;
 send_short_func send_command_filter() ATTR_INT;
 receive_short_func receive_command_filter() ATTR_INT;

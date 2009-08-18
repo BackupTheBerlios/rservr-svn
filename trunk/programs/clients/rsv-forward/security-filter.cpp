@@ -233,7 +233,7 @@ const struct sockaddr *aAddress, socklen_t lLength)
 	{
 	int result = 0;
 	if ( (result = (*filter_table.connect_from_host.function)(filter_table.connect_from_host.number,
-	       rReference, sSocket, aAddress, lLength)) < 0 )
+	       rReference, sSocket, aAddress, lLength, NULL)) < 0 )
 	 {
     log_message_authenticate_fail(aAddress,
       filter_table.filters[filter_table.connect_from_host.number],
@@ -251,13 +251,13 @@ const struct sockaddr *aAddress, socklen_t lLength)
 
 
 int connect_to_host(socket_reference rReference, remote_connection sSocket,
-const struct sockaddr *aAddress, socklen_t lLength)
+const struct sockaddr *aAddress, socklen_t lLength, const char *aActual)
 {
 	if (filter_table.connect_to_host.function != (connect_func) NULL)
 	{
 	int result = 0;
 	if ( (result = (*filter_table.connect_to_host.function)(filter_table.connect_to_host.number,
-	       rReference, sSocket, aAddress, lLength)) < 0 )
+	       rReference, sSocket, aAddress, lLength, aActual)) < 0 )
 	 {
     log_message_authenticate_fail(aAddress,
       filter_table.filters[filter_table.connect_to_host.number],

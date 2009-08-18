@@ -586,7 +586,7 @@ cat $1 | grep -n . | tr "\n" "%" | sed -r "s@%([0-9]+:&lt;rservr [^&lt;]+&gt;)@\
 :berlios\.de:user:passwd
 </pre>
       </div>
-      <p class="overview_content style_definition_long"> Upon attempting to make a connection, the first matching line is used for the credentials to be passed to the listening forwarder. When using network forwarders, the IP address is looked up first and only if it fails is the host name looked up (in the case of a host name loookup, the DNS-provided name is looked at regardless of if a host name is provided to the forwarder when making the connection.) The file name passed to the forwarder is checked if the connection to be made is to a local socket. </p>
+      <p class="overview_content style_definition_long"> Upon attempting to make a connection, the first matching line is used for the credentials to be passed to the listening forwarder. The verbatim address specified for the connection (not including the port number) is checked first. When using network forwarders, the IP address corresponding to the provided address is checked if there is no match for the verbatim address. Lastly, if there is no match for the IP address, a DNS lookup is performed. For example, you might be on a LAN and request to connect to <span class="style_address">hostname</span>. If <span class="style_address">hostname</span> has no matching pattern, its IP address will be checked (e.g. <span class="style_address">192.168.2.2</span>.) If there isn't a match for the IP address, the actual DNS name is used, e.g. <span class="style_address">hostname.domain.com</span>. </p>
       <table summary="definition" class="overview_content">
         <tr>
           <td width="350" align="left" class="style_term"> librsvx-penalty.so </td>

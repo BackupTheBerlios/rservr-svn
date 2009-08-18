@@ -58,7 +58,7 @@ typedef int                           remote_connection; /*for connection access
 typedef unsigned int                  encoding_index;
 typedef int          (*address_func)    (load_reference, socket_reference, socket_reference, const struct sockaddr*, socklen_t);
 typedef void         (*error_func)      (load_reference, socket_reference, int);
-typedef int          (*connect_func)    (load_reference, socket_reference, remote_connection, const struct sockaddr*, socklen_t);
+typedef int          (*connect_func)    (load_reference, socket_reference, remote_connection, const struct sockaddr*, socklen_t, const char*);
 typedef int          (*disconnect_func) (load_reference, socket_reference, remote_connection);
 typedef int          (*send_func)       (load_reference, socket_reference, remote_connection, const char*, ssize_t);
 typedef ssize_t      (*receive_func)    (load_reference, socket_reference, remote_connection, char*,       ssize_t);

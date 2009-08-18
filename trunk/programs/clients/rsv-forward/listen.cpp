@@ -821,9 +821,11 @@ static int create_socket(const char *pPort, std::string &rRevised)
         new_address.sin_port = binary_port; //NOTE: don't call 'htons' here
         new_address.sin_addr.s_addr = htonl(INADDR_ANY);
 
+    #if defined(SOL_SOCKET) && defined(SO_REUSEADDR)
 	int value = 1;
 	setsockopt(new_socket, SOL_SOCKET, SO_REUSEADDR, (void*) &value,
 	  sizeof value);
+    #endif
 
 	if (bind(new_socket, (struct sockaddr*) &new_address, sizeof new_address) < 0)
 	{
