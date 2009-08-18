@@ -58,6 +58,16 @@ extern "C" {
 #include <gnutls/extra.h>
 
 
+static bool initialized = false;
+static int forwarder_type = 0;
+
+static std::map <socket_reference, gnutls_session_t> sessions;
+static std::map <int, bool> socket_setup;
+
+
+//srp authentication------------------------------------------------------------
+static bool use_srp_auth = false;
+
 struct srp_identity
 {
 	srp_identity(const char *uUser = "", const char *pPasswd = "") :
@@ -67,61 +77,9 @@ struct srp_identity
 	std::string passwd;
 };
 
-
 typedef data::keylist <regex_check, srp_identity> srp_client_list;
-
-
-static bool initialized  = false;
-static bool use_srp_auth = false;
-
-static int forwarder_type = 0;
-
-static std::map <socket_reference, gnutls_session_t> sessions;
-static std::map <int, bool> socket_setup;
-
-static gnutls_anon_server_credentials_t credentials;
-static gnutls_dh_params_t dh_params;
-
 static gnutls_srp_server_credentials_t srp_server;
-
 static srp_client_list srp_clients;
-
-
-
-static ssize_t write_wrapper(int sSocket, const char *dData, size_t sSize)
-{
-	ssize_t result = write(sSocket, dData, sSize);
-	if (result < 0 && errno != EAGAIN && errno != EINTR)
-    client_log_output(logging_normal, "rsvx-tls:write", strerror(errno));
-	return result;
-}
-
-
-static ssize_t read_wrapper(int sSocket, char *dData, size_t sSize)
-{
-	if (socket_setup[sSocket])
-	//protect the forwarder from a dead connection left open
-	{
-	fd_set server_socket;
-	struct timeval timeout =
-	  {  tv_sec: local_default_connect_timeout().tv_sec,
-	    tv_usec: local_default_connect_timeout().tv_nsec / 1000 };
-
-	FD_ZERO(&server_socket);
-	FD_SET(sSocket, &server_socket);
-
-	if (select(FD_SETSIZE, &server_socket, NULL, NULL, &timeout) < 0)
-	 {
-    client_log_output(logging_normal, "rsvx-tls:setup", strerror(errno));
-	return -1;
-	 }
-	}
-
-	ssize_t result = read(sSocket, dData, sSize);
-	if (result < 0 && errno != EAGAIN && errno != EINTR)
-    client_log_output(logging_normal, "rsvx-tls:read", strerror(errno));
-	return result;
-}
 
 
 static bool parse_passwd(const char *pPasswd)
@@ -180,11 +138,13 @@ const struct sockaddr *aAddress, socklen_t lLength)
 
 	if (forwarder_type == RSERVR_REMOTE_NET)
 	{
+	//first try IP lookup...
 	if (!aAddress || lLength != sizeof(struct sockaddr_in)) return;
 	address = inet_ntoa(((const struct sockaddr_in*) aAddress)->sin_addr);
 	position = srp_clients.f_find(address.c_str(), &check_srp_key_regex);
 
 	if (position == data::not_found)
+	//otherwise try DNS lookup
 	 {
 	char name_buffer[PARAM_DEFAULT_FORMAT_BUFFER];
 	if (getnameinfo(aAddress, lLength, name_buffer, sizeof name_buffer, NULL, 0, 0x00))
@@ -209,8 +169,56 @@ const struct sockaddr *aAddress, socklen_t lLength)
 	  srp_clients[position].value().user.c_str(),
 	  srp_clients[position].value().passwd.c_str());
 }
+//END srp authentication--------------------------------------------------------
 
 
+//anonymouns authentication-----------------------------------------------------
+static gnutls_anon_server_credentials_t credentials;
+static gnutls_dh_params_t dh_params;
+//END anonymouns authentication-------------------------------------------------
+
+
+//read/write wrappers-----------------------------------------------------------
+static ssize_t write_wrapper(int sSocket, const char *dData, size_t sSize)
+{
+	ssize_t result = write(sSocket, dData, sSize);
+	if (result < 0 && errno != EAGAIN && errno != EINTR)
+    client_log_output(logging_normal, "rsvx-tls:write", strerror(errno));
+	return result;
+}
+
+
+static ssize_t read_wrapper(int sSocket, char *dData, size_t sSize)
+{
+	if (socket_setup[sSocket])
+	{
+	//protect the forwarder from a dead connection left open; the handshake
+	//requires blocking
+
+	fd_set server_socket;
+	struct timeval timeout =
+	  {  tv_sec: local_default_connect_timeout().tv_sec,
+	    tv_usec: local_default_connect_timeout().tv_nsec / 1000 };
+
+	FD_ZERO(&server_socket);
+	FD_SET(sSocket, &server_socket);
+
+	if (select(FD_SETSIZE, &server_socket, NULL, NULL, &timeout) < 0)
+	 {
+    client_log_output(logging_normal, "rsvx-tls:setup", strerror(errno));
+	return -1;
+	 }
+	}
+
+	ssize_t result = read(sSocket, dData, sSize);
+	if (result < 0 && errno != EAGAIN && errno != EINTR)
+    client_log_output(logging_normal, "rsvx-tls:read", strerror(errno));
+	return result;
+}
+//END read/write wrappers-------------------------------------------------------
+
+
+//general tls stuff-------------------------------------------------------------
 static gnutls_session_t initialize_tls_session(bool sServer,
 gnutls_srp_client_credentials_t &cClient, const struct sockaddr *aAddress,
 socklen_t lLength)
@@ -245,6 +253,19 @@ socklen_t lLength)
 
 	return session;
 }
+
+
+static void gnutls_logging(int lLevel, const char *mMessage)
+{
+	logging_mode use_mode = logging_extended;
+
+	if      (lLevel <= 1) use_mode = logging_minimal;
+	else if (lLevel <= 3) use_mode = logging_normal;
+	else if (lLevel <= 6) use_mode = logging_debug;
+
+	client_log_output(use_mode, "rsvx-tls:gnutls", mMessage);
+}
+//END general tls stuff---------------------------------------------------------
 
 
 static int common_connect(socket_reference rReference, remote_connection sSocket,
@@ -323,18 +344,6 @@ static void cleanup()
 }
 
 
-static void gnutls_logging(int lLevel, const char *mMessage)
-{
-	logging_mode use_mode = logging_extended;
-
-	if      (lLevel <= 1) use_mode = logging_minimal;
-	else if (lLevel <= 3) use_mode = logging_normal;
-	else if (lLevel <= 6) use_mode = logging_debug;
-
-	client_log_output(use_mode, "rsvx-tls:gnutls", mMessage);
-}
-
-
 static const struct remote_security_filter internal_filter =
 {               name: "rsvx-tls",
                 info: "GNU TLS encryption and authentication filter",
@@ -359,19 +368,18 @@ const struct remote_security_filter *load_security_filter(int tType, const char 
 
 	forwarder_type = tType;
 
-	const char *passwd = NULL, *srp_passwd = NULL, *srp_passwd_conf = NULL;
-
 	char **initializers = NULL, **current = NULL;
 	int argument_count;
 
 	if ((argument_count = argument_delim_split(dData, &initializers)) > 0 &&
 	  (current = initializers))
+	//srp initialization
 	{
 	use_srp_auth = true;
 
-	if (*current) passwd          = *current++;
-	if (*current) srp_passwd      = *current++;
-	if (*current) srp_passwd_conf = *current++;
+	const char *passwd          = (*current)? *current++ : NULL;
+	const char *srp_passwd      = (*current)? *current++ : NULL;
+	const char *srp_passwd_conf = (*current)? *current++ : NULL;
 
 	if (passwd && strlen(passwd) && !parse_passwd(passwd))
 	 {
@@ -394,6 +402,7 @@ const struct remote_security_filter *load_security_filter(int tType, const char 
 	}
 
 	else
+	//anonymouns initialization
 	{
 	gnutls_anon_allocate_server_credentials(&credentials);
 

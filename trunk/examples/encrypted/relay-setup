@@ -1,3 +1,5 @@
 security_filter librsvx-tls.so @passwords@tpasswd@tpasswd.conf
+security_filter librsvx-penalty.so 120.0
+
 listen `echo $RELAY`
 connect_allow '^127\\.0\\.0\\.1:'
