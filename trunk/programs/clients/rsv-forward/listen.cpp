@@ -52,7 +52,7 @@ extern "C" {
 #include <string.h> //'strerror', 'strcmp', 'strtok', 'strdup', 'strlen'
 #include <errno.h> //'errno'
 #include <pthread.h> //pthreads
-#include <sys/socket.h> //'socket'
+#include <sys/socket.h> //'socket', 'setsockopt'
 #include <fcntl.h> //'fcntl'
 #include <time.h> //'nanosleep'
 
@@ -820,6 +820,10 @@ static int create_socket(const char *pPort, std::string &rRevised)
         new_address.sin_family = AF_INET;
         new_address.sin_port = binary_port; //NOTE: don't call 'htons' here
         new_address.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	int value = 1;
+	setsockopt(new_socket, SOL_SOCKET, SO_REUSEADDR, (void*) &value,
+	  sizeof value);
 
 	if (bind(new_socket, (struct sockaddr*) &new_address, sizeof new_address) < 0)
 	{

@@ -52,6 +52,7 @@ extern "C" {
 static bool initialized = false;
 
 static std::map <socket_reference, gnutls_session_t> sessions;
+static std::map <int, bool> socket_setup;
 static gnutls_anon_server_credentials_t credentials;
 static gnutls_dh_params_t dh_params;
 
@@ -67,6 +68,24 @@ static ssize_t write_wrapper(int sSocket, const char *dData, size_t sSize)
 
 static ssize_t read_wrapper(int sSocket, char *dData, size_t sSize)
 {
+	if (socket_setup[sSocket])
+	//protect the forwarder from a dead connection left open
+	{
+	fd_set server_socket;
+	struct timeval timeout =
+	  {  tv_sec: local_default_connect_timeout().tv_sec,
+	    tv_usec: local_default_connect_timeout().tv_nsec / 1000 };
+
+	FD_ZERO(&server_socket);
+	FD_SET(sSocket, &server_socket);
+
+	if (select(FD_SETSIZE, &server_socket, NULL, NULL, &timeout) < 0)
+	 {
+    client_log_output(logging_normal, "rsvx-tls:setup", strerror(errno));
+	return -1;
+	 }
+	}
+
 	ssize_t result = read(sSocket, dData, sSize);
 	if (result < 0 && errno != EAGAIN && errno != EINTR)
     client_log_output(logging_normal, "rsvx-tls:read", strerror(errno));
@@ -101,23 +120,7 @@ bool sServer)
 	gnutls_transport_set_ptr(sessions[rReference],
 	  (gnutls_transport_ptr_t) sSocket);
 
-	if (sServer)
-	//protect the forwarder from a dead connection left open
-	{
-	fd_set server_socket;
-	struct timeval timeout =
-	  {  tv_sec: local_default_connect_timeout().tv_sec,
-	    tv_usec: local_default_connect_timeout().tv_nsec / 1000 };
-
-	FD_ZERO(&server_socket);
-	FD_SET(sSocket, &server_socket);
-
-	if (select(FD_SETSIZE, &server_socket, NULL, NULL, &timeout) < 0) return -1;
-	}
-
-	//set to blocking just for authentication
-	int current_state = fcntl(sSocket, F_GETFL);
-	fcntl(sSocket, F_SETFL, current_state & ~O_NONBLOCK);
+	socket_setup[sSocket] = true;
 
 	int handshake = gnutls_handshake(sessions[rReference]);
 	if (handshake < 0)
@@ -127,7 +130,7 @@ bool sServer)
 	return -1;
 	}
 
-	fcntl(sSocket, F_SETFL, current_state);
+	socket_setup[sSocket] = false;
 
 	return 0;
 }
