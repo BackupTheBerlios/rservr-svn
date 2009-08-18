@@ -135,6 +135,7 @@ const struct sockaddr *aAddress, socklen_t lLength, const char *aActual)
 
 	int position = data::not_found;
 
+fprintf(stderr, "A: %s\n",aActual);
 	//try the verbatim request first
 	if (aActual)
 	position = srp_clients.f_find(aActual, &check_srp_key_regex);
