@@ -1,11 +1,20 @@
 security_filter librsvx-tls.so @passwords@tpasswd@tpasswd.conf
-security_filter librsvx-ipregex.so '^127\\.0\\.0\\.1$'
-security_filter librsvx-penalty.so 10.0
 
+#this restricts incoming connections to the local machine
+security_filter librsvx-ipregex.so '^127\\.0\\.0\\.1$'
+
+#this penalizes hosts attempting invalid connections for 60s
+security_filter librsvx-penalty.so 60.0
+
+#this prevents post-config listen requests: the regex is blank, meaning *all*
+#locations will match, and the ! inverts it, meaning all locations are rejected
 listen_require '!'
+
+#at least one 'connect_allow' is required if outgoing net connections are needed
+connect_allow '^127\\.0\\.0\\.1:'
+
+#this limits the total connections held by the forwarder
 total_limit 10
 
 listen 2047
 listen 2048
-
-connect_allow '^127\\.0\\.0\\.1:'

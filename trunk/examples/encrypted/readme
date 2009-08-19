@@ -1,0 +1,99 @@
+This is a basic example of using SRP TLS authentication and encryption. The
+three relevant security files are:
+
+	- passwords: This file contains a list of address patterns with
+	  corresponding user-names and passwords. This is in a format specific
+	  to the 'librsvx-tls.so' security filter.
+
+	- tpasswd.conf: This was generated using 'srptool' and is used by the
+	  GNU TLS library. You can/should create a new instance of this file for
+	  your own authentication system using the command below:
+
+	  > srptool --create-conf tpasswd.conf
+
+	  This will be used for all subsequent SRP actions.
+
+	- tpasswd: This is similar to /etc/passwd in that it contains a list of
+	  users and their hashed passwords. New users can be added and/or a file
+	  can be created using the command below:
+
+	  > srptool --passwd-conf tpasswd.conf --passwd tpasswd -u <user>
+
+	  Substitute a user-name for <user> above. This will prompt you for a
+	  password, which won't be confirmed. For this example, I used the user-
+	  name 'username' and typed 'mypassword' for the password.
+
+	  Authentication can and should be verified when adding a new user by
+	  subsequently appending the '--verify' flag to the same coomand used to
+	  add the user.
+
+The 'rservr' system in this example can be initialized with the line below. It
+only uses clients provided by the core 'rservr' package.
+
+	> rservr encrypted encrypted.log server-setup
+
+This will start a system named 'encrypted' with a single network forwarder named
+'relay'. The relay will listen to ports 2047 and 2048 and will be set up for SRP
+authentication (as specified in its config file 'relay-setup'.) The forwarder is
+also set up with a few additional security parameters to prevent incoming
+connections from a different machine and outgoing connections to a different
+machine. Additionally, network forwarders must be configured to explicitly allow
+outgoing connections, otherwise they can't be made.
+
+You can verify that the system is running by typing 'rservrd'. The name of the
+system should be displayed, among other accessible systems if any are running.
+
+The first test is to connect the forwarder to itself via port 2048. Because the
+'passwords' file contains a match for a localhost connection to port 2048, the
+corresponding user-name and password are passed during authentication.
+
+	> rservrd encrypted @net_connect@relay@localhost:2048
+
+If the line above is successful (which it should be,) an IP address should be
+displayed. The next line, which is demonstrates authentication failure, will use
+a username and password not present in 'tpasswd'.
+
+	> rservrd encrypted @net_connect@relay@localhost:2047
+
+Although the forwarder is listening to port 2047, a valid username and password
+aren't present in the 'passwords' file for the connection location. The
+attempted connection should fail, and the incoming address should be penalized
+for the invalid attempt because the 'librsvx-penalty.so' security filter was
+used in 'relay-setup'. This will disallow future connection attempts from the
+offending address for the time specified. Within the penalty time period
+specified in 'relay-setup', try the previously-successful connection attempt to
+see how the address is filtered out:
+
+	> rservrd encrypted @net_connect@relay@localhost:2048
+
+If you attempt this within the penalty time period, the connection should fail.
+After the penalty time period, the line above should work again. The actions of
+the filters can be reviewed by looking at 'encrypted.log'.
+
+An additional filtering test can be performed if you have the 'nmap' program.
+This is a networking tool used to scan IPs for open ports. Realistically, a port
+with an 'rservr' IPC forwarder listening should be protected by a firewall
+(except for authorized IP address); however, in some cases the port scan might
+come from an otherwise-acceptable IP address. A port scan can be performed with
+the line below:
+
+	> nmap -A -T4 localhost
+
+The port scan will still show the open ports, which is inevitable if the
+firewall doesn't block access; however, the IP address of the scanner is
+recorded and future connection attempts from that address are blocked (with no
+user-space data transfered) by 'librsvx-penalty.so'.
+
+The system can be terminated with the command below:
+
+	> rservrd encrypted @server_term
+
+The security demonstrated in this example will allow secure data transmission
+between two 'rservr' systems across an open network; however, a kernel-space
+firewall should also be used to limit the load placed on the forwarder itself.
+Your firewall should implement the most secure settings that still allow your
+system to make its required connections. Security filters such as 'librsvx-
+ipregex.so', plus the restriction options allowed in the forwarder config file,
+should be used to impose more specific restrictions that aren't practical or
+possible with a firewall.
+Kevin P. Barry
