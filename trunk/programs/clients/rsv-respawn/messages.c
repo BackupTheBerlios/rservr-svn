@@ -61,7 +61,7 @@ void log_message_change_priority(unsigned int pPriority)
 void log_message_change_permissions(unsigned int pPerms)
 {
 	char message_string[PARAM_DEFAULT_FORMAT_BUFFER];
-	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "max permissions changed to %.8x", pPerms);
+	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "max permissions changed to 0x.4x", pPerms);
 	client_log_output(logging_minimal, local_source, message_string);
 }
 
