@@ -5,7 +5,7 @@ AM_CXXFLAGS=-ansi -Wall
 AM_CFLAGS=-Wall
 AM_LDFLAGS=
 bin_PROGRAMS=rservrd
-rservrd_SOURCES=daemon-commands.c daemon-socket.c daemon.c interface.c rservrd.c commands/general.c commands/clients.c commands/control.c commands/netcntl.c static-auto-conditions.cpp daemon-commands.h daemon-socket.h daemon.h interface.h commands/include/commands-common.h commands/include/general.h commands/include/clients.h commands/include/control.h commands/include/netcntl.h static-auto-conditions.h
+rservrd_SOURCES=daemon-commands.c daemon-socket.c daemon.c interface.c rservrd.c commands/general.c commands/clients.c commands/control.c commands/netcntl.c daemon-commands.h daemon-socket.h daemon.h interface.h commands/include/commands-common.h commands/include/general.h commands/include/clients.h commands/include/control.h commands/include/netcntl.h
 rservrd_LDADD=-lpthread ../../../plugins/netcntl/librsvp-netcntl.la ../../../plugins/rqconfig/librsvp-rqconfig.la ../../../libs/client/librservr-client.la
 EXTRA_DIST=NOTICE
 

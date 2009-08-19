@@ -1,5 +1,11 @@
 security_filter librsvx-tls.so @passwords@tpasswd@tpasswd.conf
-security_filter librsvx-penalty.so 120.0
+security_filter librsvx-ipregex.so '^127\\.0\\.0\\.1$'
+security_filter librsvx-penalty.so 10.0
 
-listen `echo $RELAY`
+listen_require '!'
+total_limit 10
+
+listen 2047
+listen 2048
+
 connect_allow '^127\\.0\\.0\\.1:'

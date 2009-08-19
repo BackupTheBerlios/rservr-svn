@@ -50,13 +50,9 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 /*! For internal use only.*/
 struct external_buffer
 {
-	inline external_buffer() : decode_marker(0) { }
-
 	input_section current_data;
 	input_section current_line;
 	input_section loaded_data;
-
-	unsigned int decode_marker;
 };
 
 #endif //rservr_external_buffer_hpp

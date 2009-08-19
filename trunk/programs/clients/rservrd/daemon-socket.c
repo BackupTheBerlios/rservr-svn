@@ -285,13 +285,6 @@ int register_daemon(const char *nName, int gGroup)
 	return -1;
 	}
 
-	/*monitor the socket directory for changes*/
-	int socket_dir = open(".", O_RDONLY);
-
-	if (fcntl(socket_dir, F_NOTIFY, DN_DELETE | DN_RENAME | DN_ATTRIB |
-	    DN_MULTISHOT) == 0)
-	fcntl(socket_dir, F_SETSIG, SIGUSR1);
-
 	unset_user();
 
 	struct stat current_stats;
@@ -365,6 +358,14 @@ int register_daemon(const char *nName, int gGroup)
 
 	int current_state = fcntl(new_socket, F_GETFL);
 	fcntl(new_socket, F_SETFL, current_state | O_NONBLOCK);
+
+
+	/*monitor the socket directory for changes*/
+	int socket_dir = open(".", O_RDONLY);
+
+	if (fcntl(socket_dir, F_NOTIFY, DN_DELETE | DN_RENAME | DN_ATTRIB |
+	    DN_MULTISHOT) == 0)
+	fcntl(socket_dir, F_SETSIG, SIGUSR1);
 
 	return new_socket;
 }

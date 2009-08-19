@@ -80,11 +80,12 @@ struct srp_identity
 typedef data::keylist <regex_check, srp_identity> srp_client_list;
 static gnutls_srp_server_credentials_t srp_server;
 static srp_client_list srp_clients;
+static std::string srp_file;
 
 
-static bool parse_passwd(const char *pPasswd)
+static bool parse_passwd()
 {
-	FILE *passwd_file = fopen(pPasswd, "r");
+	FILE *passwd_file = fopen(srp_file.c_str(), "r");
 	if (!passwd_file)
 	{
     client_log_output(logging_minimal, "rsvx-tls:passwd", strerror(errno));
@@ -129,48 +130,67 @@ const char *aAddress)
 static void set_client_passwd(gnutls_srp_client_credentials_t &cCredentials,
 const struct sockaddr *aAddress, socklen_t lLength, const char *aActual)
 {
+	//check for updates, but use previous if the file is inaccessible
+	parse_passwd();
+
 	gnutls_srp_allocate_client_credentials(&cCredentials);
 
 	std::string address;
 
 	int position = data::not_found;
 
-fprintf(stderr, "A: %s\n",aActual);
-	//try the verbatim request first
+
+	if (forwarder_type == RSERVR_REMOTE_NET)
+	{
+	if (!aAddress || lLength != sizeof(struct sockaddr_in)) return;
+
+	char address_buffer[PARAM_DEFAULT_FORMAT_BUFFER];
+	int port = ntohs(((const struct sockaddr_in*) aAddress)->sin_port);
+
+	//try the verbatim request first...
+	if (aActual)
+	 {
+	snprintf(address_buffer, sizeof address_buffer, "%s:%i", aActual, port);
+	position = srp_clients.f_find(address_buffer, &check_srp_key_regex);
+	 }
+
+	//then try IP lookup...
+	if (position == data::not_found)
+	 {
+	address = inet_ntoa(((const struct sockaddr_in*) aAddress)->sin_addr);
+	snprintf(address_buffer, sizeof address_buffer, "%s:%i", address.c_str(), port);
+	position = srp_clients.f_find(address_buffer, &check_srp_key_regex);
+	 }
+
+	if (position == data::not_found)
+	//then try DNS lookup
+	 {
+	char name_buffer[PARAM_DEFAULT_FORMAT_BUFFER];
+	if (getnameinfo(aAddress, lLength, name_buffer, sizeof name_buffer, NULL, 0, 0x00))
+	snprintf(address_buffer, sizeof address_buffer, "%s:%i", name_buffer, port);
+	position = srp_clients.f_find(address_buffer, &check_srp_key_regex);
+	 }
+	}
+
+	else if (forwarder_type == RSERVR_REMOTE_LOCAL)
+	{
+	if (!aAddress) return;
+
+	//try the verbatim request first...
 	if (aActual)
 	position = srp_clients.f_find(aActual, &check_srp_key_regex);
 
-
 	if (position == data::not_found)
-	{
-	if (forwarder_type == RSERVR_REMOTE_NET)
+	//then try DNS lookup
 	 {
-	if (!aAddress || lLength != sizeof(struct sockaddr_in)) return;
-
-	//first try IP lookup...
-	address = inet_ntoa(((const struct sockaddr_in*) aAddress)->sin_addr);
-	position = srp_clients.f_find(address.c_str(), &check_srp_key_regex);
-
-	if (position == data::not_found)
-	//otherwise try DNS lookup
-	  {
-	char name_buffer[PARAM_DEFAULT_FORMAT_BUFFER];
-	if (getnameinfo(aAddress, lLength, name_buffer, sizeof name_buffer, NULL, 0, 0x00))
-	position = srp_clients.f_find(name_buffer, &check_srp_key_regex);
-	  }
-	 }
-
-	else if (forwarder_type == RSERVR_REMOTE_LOCAL)
-	 {
-	if (!aAddress) return;
 	address.resize(lLength);
 	strncpy(&address[0], ((const struct sockaddr_un*) aAddress)->sun_path,
 	  lLength);
 	position = srp_clients.f_find(address.c_str(), &check_srp_key_regex);
 	 }
+	}
 
 	else return;
-	}
 
 
 	if (position != data::not_found)
@@ -397,11 +417,16 @@ const struct remote_security_filter *load_security_filter(int tType, const char 
 	const char *srp_passwd      = (*current)? *current++ : NULL;
 	const char *srp_passwd_conf = (*current)? *current++ : NULL;
 
-	if (passwd && strlen(passwd) && !parse_passwd(passwd))
+	if (passwd && strlen(passwd))
 	 {
+	srp_file = passwd;
+
+	if (!parse_passwd())
+	  {
 	free_delim_split(initializers);
 	gnutls_global_deinit();
 	return NULL;
+	  }
 	 }
 
 	gnutls_global_init_extra();

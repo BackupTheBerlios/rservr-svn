@@ -65,10 +65,7 @@ public:
 private:
 	virtual bool read_line_input() = 0;
 	virtual bool read_binary_input() = 0;
-	virtual unsigned int decoded_size() const = 0;
-	virtual bool decode_next() = 0;
 	virtual void reset_underrun() = 0;
-	virtual void reset_decode() = 0;
 	virtual void clear_cancel() = 0;
 
 protected:
@@ -96,16 +93,13 @@ public:
 private:
 	bool read_line_input();
 	bool read_binary_input();
-	unsigned int decoded_size() const;
-	bool decode_next();
 	void reset_underrun();
-	void reset_decode();
 	void clear_cancel();
 
 protected:
 	int input_pipe;
 	unsigned char input_underrun, eof_reached;
-	unsigned int total_decode, required_section;
+	unsigned int required_section;
 	int read_cancel;
 };
 
@@ -140,13 +134,5 @@ private:
 
 
 extern int check_input_waiting(protected_input*);
-
-
-extern "C" {
-//(also in 'api/message-queue.h')
-extern void auto_blocking_off();
-extern void auto_blocking_on();
-extern result auto_blocking_state();
-}
 
 #endif //common_input_hpp

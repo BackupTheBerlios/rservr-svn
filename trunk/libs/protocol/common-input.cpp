@@ -80,7 +80,7 @@ extern "C" {
 
 	while (!buffer->current_line.size())
 	  {
-	unsigned int check_limit = this->decoded_size();
+	unsigned int check_limit = this->buffer->loaded_data.size();
 	unsigned int position = 0;
 	while (position < check_limit && buffer->loaded_data[position] != '\n')
 	//NOTE: don't use 'find' here because of possible null characters
@@ -112,7 +112,7 @@ extern "C" {
 	return buffer->current_data;
 	   }
 
-	else if (!this->decode_next() && !this->read_line_input()) return buffer->current_data;
+	else if (!this->read_line_input()) return buffer->current_data;
 	  }
 
 	//extract the next tag or non-tag and return it
@@ -138,19 +138,19 @@ extern "C" {
 
 	if (!(current_mode & input_null))
 	  {
-	if (!this->decoded_size() && !this->decode_next() && !this->read_line_input())
+	if (!this->buffer->loaded_data.size() && !this->read_line_input())
 	return buffer->current_data;
 
-	use_limit = this->decoded_size();
+	use_limit = this->buffer->loaded_data.size();
 	buffer->current_data.assign(buffer->loaded_data, 0, use_limit);
 	  }
 
 	else
 	  {
-	if (!this->decode_next() && !this->read_line_input())
+	if (!this->read_line_input())
 	return buffer->current_data;
 
-	use_limit = this->decoded_size();
+	use_limit = this->buffer->loaded_data.size();
 	buffer->current_data += buffer->loaded_data.substr(0, use_limit);
 	  }
 
@@ -216,10 +216,7 @@ extern "C" {
 	//----------------------------------------------------------------------
 
 	void input_base::reset_transmission_limit()
-	{
-	total_transmission = 0;
-	this->reset_decode();
-	}
+	{ total_transmission = 0; }
 
 
 	void input_base::clear_buffer() const
@@ -227,7 +224,6 @@ extern "C" {
 	buffer->current_data.clear();
 	buffer->current_line.clear();
 	buffer->loaded_data.clear();
-	buffer->decode_marker = 0;
 	}
 
 
@@ -235,7 +231,7 @@ extern "C" {
 	buffered_common_input::buffered_common_input(int fFile, external_buffer *bBuffer) :
 	input_base(bBuffer), socket((socket_reference) 0x00), input_receiver(NULL),
 	input_pipe(fFile), input_underrun(false), eof_reached(false),
-	total_decode(0), required_section(0), read_cancel(-1) { }
+	required_section(0), read_cancel(-1) { }
 
 
 	//from 'data_input'-----------------------------------------------------
@@ -326,25 +322,8 @@ extern "C" {
 	{ return this->read_line_input(); }
 
 
-	unsigned int buffered_common_input::decoded_size() const
-	{ return buffer->loaded_data.size(); }
-
-
-	bool buffered_common_input::decode_next()
-	{
-	input_underrun = !buffer->decode_marker;
-	buffer->decode_marker = 0;
-	total_decode          = 0;
-	return !input_underrun;
-	}
-
-
 	void buffered_common_input::reset_underrun()
 	{ input_underrun = false; }
-
-
-	void buffered_common_input::reset_decode()
-	{ total_decode = 0; }
 
 
 	void buffered_common_input::clear_cancel()

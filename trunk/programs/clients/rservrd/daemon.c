@@ -40,8 +40,6 @@
 #include "api/load-plugin.h"
 #include "api/client-timing.h"
 
-#define _GNU_SOURCE /* for 'fcntl' macros */
-
 #include <sys/socket.h> /* 'accept', 'shutdown' */
 #include <sys/select.h> /* 'select' */
 #include <pthread.h> /* pthreads */
@@ -49,12 +47,11 @@
 #include <string.h> /* 'strlen' */
 #include <time.h> /* 'nanosleep' */
 #include <stdio.h> /* 'printf', 'fdopen', 'remove' */
+#include <stdlib.h> /* 'exit' */
 #include <signal.h> /* 'signal', 'raise' */
 #include <libgen.h> /* 'basename' */
 #include <errno.h> /* 'errno' */
 #include <unistd.h> /* 'close', 'access' */
-
-#include "static-auto-conditions.h"
 
 #include "daemon-socket.h"
 #include "daemon-commands.h"
@@ -62,80 +59,22 @@
 
 static void register_handlers();
 
-
-static pthread_t select_thread = (pthread_t) NULL;
-
-static int select_socket = -1;
-
-static void *select_thread_loop(void *iIgnore)
-{
-	/*this thread is necessary so the 'select' call can be canceled when the
-	  client is disconnected, without killing the thread of control, which
-	  must clean up for exit*/
-
-	if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) return NULL;
-
-	if (!accept_condition_active() || !select_condition_activate()) return NULL;
-
-	fd_set input_set;
-
-	/*this must be here because 'FD_ISSET' is called before filling the first time*/
-	FD_ZERO(&input_set);
-
-	do
-	{
-	pthread_testcancel(); /*in case 'select' gets by when canceling*/
-
-	if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0)
-	 {
-	accept_condition_deactivate();
-	select_condition_deactivate();
-	return NULL;
-	 }
-
-	if (select_socket < 0)
-	 {
-	accept_condition_deactivate();
-	select_condition_deactivate();
-	return NULL;
-	 }
-
-	if (FD_ISSET(select_socket, &input_set))
-	 {
-	accept_condition_unblock();
-	select_condition_block();
-	 }
-
-	FD_ZERO(&input_set);
-	FD_SET(select_socket, &input_set);
-
-	if (pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) != 0)
-	 {
-	accept_condition_deactivate();
-	select_condition_deactivate();
-	return NULL;
-	 }
-	}
-	while (select(FD_SETSIZE, &input_set, NULL, NULL, NULL) >= 0 || errno == EINTR);
-
-	pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
-	select_condition_deactivate();
-	accept_condition_deactivate();
-	return NULL;
-}
+int daemon_socket = -1;
 
 
 static void message_queue_hook(int eEvent)
 {
 	if (eEvent == RSERVR_QUEUE_STOP)
 	{
-	select_condition_deactivate();
-	accept_condition_deactivate();
+	signal(SIGUSR1, SIG_IGN);
+	remove(get_server_name());
+	close(daemon_socket);
+	client_cleanup();
+
+	/*NOTE: 'exit' is required because the main thread is blocked for 'accept'*/
+	exit(0);
 	}
 }
-
-
-int daemon_socket = -1;
 
 
 static void daemon_loop(int sSocket)
@@ -143,37 +82,22 @@ static void daemon_loop(int sSocket)
 	int new_connection, outcome;
 	struct sockaddr new_address;
 	socklen_t new_length;
-	struct timespec connect_cycle = local_default_cycle();
 	static char input_data[PARAM_MAX_INPUT_SECTION];
 
-	accept_condition_activate();
 	set_queue_event_hook(&message_queue_hook);
 
-	select_socket = sSocket;
+	int current_state = fcntl(sSocket, F_GETFL);
+	fcntl(sSocket, F_SETFL, sSocket & ~O_NONBLOCK);
 
-	if (pthread_create(&select_thread, NULL, &select_thread_loop, NULL) != 0)
-	{
-	set_queue_event_hook(NULL);
-	select_socket = -1;
-	}
 
 	while (message_queue_status())
 	{
 	new_length = sizeof new_address;
 
 	while ((new_connection = accept(sSocket, (struct sockaddr*) &new_address, &new_length)) < 0)
-	 {
-	if (!accept_condition_active() || !message_queue_status())
-	return;
+	if (!message_queue_status() || errno != EINTR) return;
 
-	/*NOTE: keep this just before blocking again*/
-	select_condition_unblock();
-
-	if (!accept_condition_block())
-	nanosleep(&connect_cycle, NULL);
-	 }
-
-	int current_state = fcntl(new_connection, F_GETFL);
+	current_state = fcntl(new_connection, F_GETFL);
 	fcntl(new_connection, F_SETFL, current_state | O_NONBLOCK);
 
 	FILE *new_stream = fdopen(new_connection, "r+");
@@ -205,7 +129,6 @@ static void daemon_loop(int sSocket)
 	fclose(new_stream);
 
 	set_queue_event_hook(NULL);
-	select_socket = -1;
 
 	return;
 	  }
@@ -225,9 +148,6 @@ static void daemon_loop(int sSocket)
 	}
 
 	set_queue_event_hook(NULL);
-	select_socket = -1;
-
-	/*NOTE: select thread doesn't exit here: it should wait until the socket closes*/
 }
 
 
@@ -314,6 +234,7 @@ int daemon_main(int argc, char *argv[])
 	daemon_socket = register_daemon(get_server_name(), group);
 	if (!start_message_queue())
 	{
+	signal(SIGUSR1, SIG_IGN);
 	/*NOTE: 'check_table' will change working directories*/
 	if (check_table() >= 0) remove(get_server_name());
 	client_cleanup();
@@ -336,6 +257,7 @@ int daemon_main(int argc, char *argv[])
 	if (!manual_indicate_ready())
 	{
 	fprintf(stderr, "%s: could not update client status\n", argv[0]);
+	signal(SIGUSR1, SIG_IGN);
 	remove(get_server_name());
 	stop_message_queue();
 	client_cleanup();
@@ -344,16 +266,10 @@ int daemon_main(int argc, char *argv[])
 
 
 	daemon_loop(daemon_socket);
+
+	signal(SIGUSR1, SIG_IGN);
 	remove(get_server_name());
 	close(daemon_socket);
-
-	if (select_thread != (pthread_t) NULL)
-	{
-	select_condition_deactivate();
-	accept_condition_deactivate();
-	pthread_cancel(select_thread);
-	pthread_detach(select_thread);
-	}
 
 	if (message_queue_status())
 	 {
@@ -402,7 +318,6 @@ static void exit_handler(int sSignal)
 }
 
 
-#ifdef SIGIO
 static void directory_handler(int sSignal)
 {
 	/*this terminates the client if the socket is removed*/
@@ -412,7 +327,6 @@ static void directory_handler(int sSignal)
 	raise(SIGTERM);
 	}
 }
-#endif
 
 
 static void register_handlers()
