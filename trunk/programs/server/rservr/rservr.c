@@ -536,7 +536,7 @@ static int parse_option(const char *dData, char *fFile)
 	}
 
 
-	else if (strcmp(config_segment, "system") == 0)
+	else if (strcmp(config_segment, "system_critical") == 0)
 	{
 	if (system_common(0) < 0) return allow_fail;
 	}
