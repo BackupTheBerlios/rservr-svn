@@ -92,6 +92,8 @@ static bool parse_passwd()
 	return false;
 	}
 
+	srp_clients.reset_list();
+
 	std::string buffer;
 	buffer.resize(PARAM_MAX_INPUT_SECTION);
 
