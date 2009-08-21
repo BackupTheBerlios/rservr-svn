@@ -183,7 +183,7 @@ const struct sockaddr *aAddress, socklen_t lLength, const char *aActual)
 	position = srp_clients.f_find(aActual, &check_srp_key_regex);
 
 	if (position == data::not_found)
-	//then try DNS lookup
+	//then try the socket specs (probably the same file name)
 	 {
 	address.resize(lLength);
 	strncpy(&address[0], ((const struct sockaddr_un*) aAddress)->sun_path,
