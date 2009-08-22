@@ -83,7 +83,7 @@ INTEGRATED_DEFINE(local_connection_list, "list local connections",
 
 
 INTEGRATED_DEFINE(net_connect, "connect to a network address",
-                               "@[client](@[address]:[port name/number]...)")
+                               "@[client](@[address]:[port number]...)")
 { NETCNTL_FULL_RESPONSE(net_connect, netcntl_net_connect_cut(copy_target, CURRENT_DATA, ":")) }
 
 
@@ -93,7 +93,7 @@ INTEGRATED_DEFINE(local_connect, "connect to a local socket",
 
 
 INTEGRATED_DEFINE(net_filtered_connect, "connect to a network address (filtered)",
-                                        "@[client]@%[filter command](%[arguments]...)(@[address]:[port name/number])")
+                                        "@[client]@%[filter command](%[arguments]...)(@[address]:[port number])")
 {
 	PROCESS_START
 
@@ -149,7 +149,7 @@ INTEGRATED_DEFINE(local_listen_list, "list listening local sockets",
 
 
 INTEGRATED_DEFINE(net_listen, "listen to network port",
-                               "@[client](@[port name/number]...)")
+                               "@[client](@[port number]...)")
 { NETCNTL_SIMPLE_TARGET(net_listen, netcntl_net_listen) }
 
 
@@ -159,7 +159,7 @@ INTEGRATED_DEFINE(local_listen, "listen to local socket",
 
 
 INTEGRATED_DEFINE(net_unlisten, "stop listening to network port",
-                                "@[client](@[port name/number]...)")
+                                "@[client](@[port number]...)")
 { NETCNTL_SIMPLE_TARGET(net_unlisten, netcntl_net_unlisten) }
 
 
