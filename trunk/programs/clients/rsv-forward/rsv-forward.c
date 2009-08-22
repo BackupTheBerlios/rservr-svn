@@ -245,7 +245,6 @@ int main(int argc, char *argv[])
 	return 1;
 	}
 
-
 #ifdef RSV_SOCKET
 	if (!start_select_thread())
 	/*NOTE: this shouldn't start a thread if no sockets are bound but should return success*/
@@ -257,6 +256,7 @@ int main(int argc, char *argv[])
 	return 1;
 	}
 #endif
+
 
 #ifdef RSV_PIPE
 	struct stat current_status;

@@ -57,6 +57,12 @@ extern "C" {
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 
+#ifdef HAVE_GCRYPT_H
+#include <gcrypt.h>
+
+GCRY_THREAD_OPTION_PTHREAD_IMPL;
+#endif
+
 
 static bool initialized = false;
 static int forwarder_type = 0;
@@ -398,6 +404,18 @@ static const struct remote_security_filter internal_filter =
 const struct remote_security_filter *load_security_filter(int tType, const char *dData, load_reference lLoad)
 {
 	if (initialized) return NULL;
+
+#ifdef HAVE_GCRYPT_H
+	if (!gcry_control(GCRYCTL_ANY_INITIALIZATION_P))
+	{
+	gcry_control(GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
+
+	gcry_check_version(NULL); //no need to check as of now
+
+	gcry_control(GCRYCTL_INIT_SECMEM, 16384, 0);
+	gcry_control(GCRYCTL_DISABLE_SECMEM_WARN);
+	}
+#endif
 
 	gnutls_global_set_log_function(&gnutls_logging);
 	gnutls_global_set_log_level(1);
