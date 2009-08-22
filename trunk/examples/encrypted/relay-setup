@@ -1,7 +1,7 @@
 security_filter librsvx-tls.so @passwords@tpasswd@tpasswd.conf
 
 #this restricts incoming connections to the local machine
-security_filter librsvx-ipregex.so '^127\\.0\\.0\\.1$'
+security_filter librsvx-localhost.so
 
 #this penalizes hosts attempting invalid connections for 60s
 security_filter librsvx-penalty.so 60.0
