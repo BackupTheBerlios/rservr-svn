@@ -1109,8 +1109,13 @@ static bool internal_queue_loop()
 }
 
 
+static auto_mutex queue_exit_mutex;
+
+
 static void *message_queue_thread(void*)
 {
+	if (!queue_exit_mutex.valid()) return NULL;
+
 	exit_state = false;
 
 	message_sync_resume.activate();
@@ -1119,12 +1124,17 @@ static void *message_queue_thread(void*)
 	internal_queue_loop();
 	exit_state = true;
 
-	if (internal_thread && !inline_queue) pthread_detach(pthread_self());
-	internal_thread = (pthread_t) NULL;
-
 	message_sync_resume.deactivate();
 
 	message_queue_event(RSERVR_QUEUE_STOP);
+
+	if (pthread_mutex_trylock(queue_exit_mutex) == 0)
+	{
+	if (internal_thread && !inline_queue) pthread_detach(pthread_self());
+	internal_thread = (pthread_t) NULL;
+	pthread_mutex_unlock(queue_exit_mutex);
+	}
+
 	return NULL;
 }
 
@@ -1194,6 +1204,9 @@ result stop_message_queue()
 	}
 
 	if (internal_thread == (pthread_t) NULL) return false;
+
+	bool have_lock = pthread_mutex_trylock(queue_exit_mutex) == 0;
+
 	pthread_t temp_thread = internal_thread;
 	internal_thread = (pthread_t) NULL;
 	exit_state = true;
@@ -1204,7 +1217,12 @@ result stop_message_queue()
 	message_queue_unpause();
 
 	//NOTE: this is the only way to resume when thread is blocked for input
+
+	if (have_lock)
+	{
 	if (pthread_cancel(temp_thread) == 0) pthread_detach(temp_thread);
+	pthread_mutex_unlock(queue_exit_mutex);
+	}
 
 	message_sync_resume.deactivate();
 

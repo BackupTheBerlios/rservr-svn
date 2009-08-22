@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 	set_queue_event_hook(&message_queue_hook);
 
 	while (block_for_respawn());
-	stop_message_queue();
+	if (message_queue_status()) stop_message_queue();
 
 	client_cleanup();
 	return 0;
