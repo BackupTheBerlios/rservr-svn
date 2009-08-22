@@ -67,6 +67,8 @@ static int parse_config_line(const char*, const char*);
 
 int parse_config_file(const char *fFile)
 {
+	//TODO: model this after 'rsv-respawn'! (is continuation allowed across files?)
+
 	FILE *config_file = fopen(fFile, "r");
 
 	if (!config_file)
@@ -87,9 +89,12 @@ int parse_config_file(const char *fFile)
 	{
 	char *directory = strlen(fFile)? strdup(fFile) : NULL;
 
-	outcome = extra_lines()?
-	  parse_config_line(NULL, directory? dirname(directory) : NULL) :
-	  parse_config_line(holding, directory? dirname(directory) : NULL);
+	if (!extra_lines())
+	 {
+	outcome = parse_config_line(holding, directory? dirname(directory) : NULL);
+	holding[ strlen(holding) - 1 ] = 0x00;
+	 }
+	else outcome = parse_config_line(NULL, directory? dirname(directory) : NULL);
 
 	if (directory) free(directory);
 
@@ -97,7 +102,6 @@ int parse_config_file(const char *fFile)
 
 	if (outcome > 0)
 	 {
-	holding[ strlen(holding) - 1 ] = 0x00;
 	fprintf(stderr, "%s: error in configuration line (%s): '%s'\n", client_name,
 	  fFile, holding);
 	fclose(config_file);
@@ -106,7 +110,6 @@ int parse_config_file(const char *fFile)
 
 	if (outcome < 0)
 	 {
-	holding[ strlen(holding) - 1 ] = 0x00;
 	fprintf(stderr, "%s: error in configuration line ignored (%s): '%s'\n", client_name,
 	  fFile, holding);
 	continue;
@@ -115,7 +118,7 @@ int parse_config_file(const char *fFile)
 	holding[0] = 0x00;
 	}
 
-	if (outcome > 0)
+	if (outcome == 2)
 	{
 	fprintf(stderr, "%s: missing continuation line (%s)\n", client_name, fFile);
 	fclose(config_file);
@@ -311,7 +314,7 @@ static int parse_config_line(const char *lLine, const char *pPath)
 	}
 
 
-	else return 1;
+	else return allow_fail;
 
 	return 0;
 }

@@ -62,6 +62,10 @@ extern "C" {
 /* COMMENT OUT FOR RELEASE VERSIONS! */
 #define PARAM_ALLOW_DEBUG_LOOPHOLES
 
+/* set logging level for GNU TLS in 'librsvx-tls.so' */
+/* SET TO 0 OR 1 FOR RELEASE VERSIONS! */
+#define PARAM_RSVX_TLS_LOGGING 1
+
 /* ~~~~~~~~~~~~~~~~~~~~~~~~ END DEBUGGING PARAMETERS ~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 

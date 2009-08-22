@@ -415,6 +415,9 @@ extern void allow_remote();
 extern result block_remote_status();
 
 
+/*! Callback function to be hooked into the message queue.*/
+typedef void(*queue_event_hook)(int);
+
 /*! \brief Set a message queue hook.
  *
  * Hook a callback function into the message queue. The queue calls this
@@ -428,8 +431,9 @@ extern result block_remote_status();
  * @see RSERVR_QUEUE_UNPAUSE
  *
  * \param Callback callback function to be called for queue events
+ * \return previous callback function
  */
-extern void(*set_queue_event_hook(void(*Callback)(int)))(int);
+extern queue_event_hook set_queue_event_hook(queue_event_hook Callback);
 
 /*! The message queue has started.*/
 #define RSERVR_QUEUE_START   1

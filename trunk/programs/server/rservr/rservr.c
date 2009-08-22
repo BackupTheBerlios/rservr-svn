@@ -276,6 +276,7 @@ int main(int argc, char *argv[])
 	  {
 	current_line++;
 	outcome = parse_option(holding, directory? dirname(directory) : NULL);
+	holding[ strlen(holding) - 1 ] = 0x00;
 	  }
 	else outcome = parse_option(NULL, directory? dirname(directory) : NULL);
 
@@ -287,7 +288,6 @@ int main(int argc, char *argv[])
 	  {
 	if (outcome > 0)
 	   {
-	holding[ strlen(holding) - 1 ] = 0x00;
     log_server_config_line_error(holding, current_line);
 	abort_clients();
     log_server_normal_exit(getpid());
@@ -298,7 +298,6 @@ int main(int argc, char *argv[])
 
 	else
 	   {
-	holding[ strlen(holding) - 1 ] = 0x00;
     log_server_config_line_ignore_error(holding, current_line);
 	   }
 	  }

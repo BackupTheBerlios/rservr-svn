@@ -1274,10 +1274,18 @@ command_event __rsvp_netcntl_hook_local_listen(const struct netcntl_source_info 
 	if (!sSource) return event_rejected;
 
     log_message_incoming_listen(sSource, lLocation);
-	if (!screen_listen(lLocation)) return event_rejected;
+	if (!screen_listen(lLocation))
+	{
+    log_message_listen_deny(lLocation);
+	return event_rejected;
+	}
 
     #ifdef PARAM_SELF_TRUSTING_FORWARDER
-	if (!trusted_remote_check(sSource)) return event_rejected;
+	if (!trusted_remote_check(sSource))
+	{
+    log_message_listen_deny(lLocation);
+	return event_rejected;
+	}
     #endif
 
 	int new_socket = -1;
@@ -1288,9 +1296,9 @@ command_event __rsvp_netcntl_hook_local_listen(const struct netcntl_source_info 
 	     listen(new_socket, PARAM_FORWARD_MAX_WAITING) < 0 ||
 	     !add_bound_socket(new_socket, revised_address) )
 	{
+    log_message_listen_deny(lLocation);
 	if (new_socket >= 0)
 	 {
-    log_message_listen_deny(lLocation);
 #ifdef RSV_LOCAL
 	remove(lLocation);
 #endif
@@ -1330,7 +1338,11 @@ command_event __rsvp_netcntl_hook_local_unlisten(const struct netcntl_source_inf
     log_message_incoming_unlisten(sSource, lLocation);
 
     #ifdef PARAM_SELF_TRUSTING_FORWARDER
-	if (!trusted_remote_check(sSource)) return event_rejected;
+	if (!trusted_remote_check(sSource))
+	{
+    log_message_unlisten_deny(lLocation);
+	return event_rejected;
+	}
     #endif
 
 	return remove_server_socket(lLocation)? event_complete : event_error;

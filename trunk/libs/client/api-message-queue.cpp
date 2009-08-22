@@ -144,11 +144,11 @@ result block_remote_status()
 { return block_remote_flag; }
 
 
-static void(*message_queue_hook)(int) = NULL;
+static queue_event_hook message_queue_hook = NULL;
 
-void(*set_queue_event_hook(void(*hHook)(int)))(int)
+queue_event_hook set_queue_event_hook(queue_event_hook hHook)
 {
-	void(*previous)(int) = message_queue_hook;
+	queue_event_hook previous = message_queue_hook;
 	message_queue_hook = hHook;
 	return previous;
 }

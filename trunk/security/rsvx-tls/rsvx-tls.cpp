@@ -414,13 +414,13 @@ const struct remote_security_filter *load_security_filter(int tType, const char 
 
 	gcry_check_version(NULL); //no need to check as of now
 
-	gcry_control(GCRYCTL_INIT_SECMEM, 16384, 0);
-	gcry_control(GCRYCTL_DISABLE_SECMEM_WARN);
+	gcry_control(GCRYCTL_DISABLE_SECMEM, 0);
+	gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
 	}
 #endif
 
 	gnutls_global_set_log_function(&gnutls_logging);
-	gnutls_global_set_log_level(1);
+	gnutls_global_set_log_level(PARAM_RSVX_TLS_LOGGING);
 
 	gnutls_global_init();
 

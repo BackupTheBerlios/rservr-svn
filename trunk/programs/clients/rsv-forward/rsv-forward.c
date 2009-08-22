@@ -391,8 +391,6 @@ static void *input_receive(void *iIgnore)
 {
 	if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) return NULL;
 
-	/*NOTE: don't take auto-blocking state into account here*/
-
 	fd_set input_set;
 
 #ifdef RSV_PIPE

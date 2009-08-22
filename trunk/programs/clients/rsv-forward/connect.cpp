@@ -1346,15 +1346,27 @@ command_event __rsvp_netcntl_hook_local_connect(const struct netcntl_source_info
 
 #ifdef RSV_NET
     log_message_incoming_connect(sSource, aAddress, pPort);
-	if (!screen_connect(aAddress, pPort)) return event_rejected;
+	if (!screen_connect(aAddress, pPort))
+	{
+    log_message_connect_deny(aAddress);
+	return event_rejected;
+	}
 #endif
 #ifdef RSV_LOCAL
     log_message_incoming_connect(sSource, aAddress);
-	if (!screen_connect(aAddress)) return event_rejected;
+	if (!screen_connect(aAddress))
+	{
+    log_message_connect_deny(aAddress);
+	return event_rejected;
+	}
 #endif
 
     #ifdef PARAM_SELF_TRUSTING_FORWARDER
-	if (!trusted_remote_check(sSource)) return event_rejected;
+	if (!trusted_remote_check(sSource))
+	{
+    log_message_connect_deny(aAddress);
+	return event_rejected;
+	}
     #endif
 
 	int new_socket = -1;
@@ -1372,6 +1384,7 @@ command_event __rsvp_netcntl_hook_local_connect(const struct netcntl_source_info
 	     !add_initiated_connection(new_socket, new_reference,
 	        revised_address.c_str(), rResponse) )
 	{
+    log_message_connect_deny(aAddress);
 	if (new_socket >= 0) shutdown(new_socket, SHUT_RDWR);
 	return event_error;
 	}
@@ -1391,18 +1404,34 @@ command_event __rsvp_netcntl_hook_local_filtered_connect(const struct netcntl_so
 
 #ifdef RSV_NET
     log_message_incoming_filtered_connect(sSource, aAddress, pPort, fFilter);
-	if (!screen_connect(aAddress, pPort)) return event_rejected;
+	if (!screen_connect(aAddress, pPort))
+	{
+    log_message_connect_deny(aAddress);
+	return event_rejected;
+	}
 #endif
 #ifdef RSV_LOCAL
     log_message_incoming_filtered_connect(sSource, aAddress, fFilter);
-	if (!screen_connect(aAddress)) return event_rejected;
+	if (!screen_connect(aAddress))
+	{
+    log_message_connect_deny(aAddress);
+	return event_rejected;
+	}
 #endif
 
     #ifdef PARAM_SELF_TRUSTING_FORWARDER
-	if (!trusted_remote_check(sSource)) return event_rejected;
+	if (!trusted_remote_check(sSource))
+	{
+    log_message_connect_deny(aAddress);
+	return event_rejected;
+	}
     #endif
 
-	if (strlen(sSource->address)) return event_rejected;
+	if (strlen(sSource->address))
+	{
+    log_message_connect_deny(aAddress);
+	return event_rejected;
+	}
 
 	int new_socket = -1, extra_socket = -1;
 	std::string revised_address;
@@ -1420,6 +1449,7 @@ command_event __rsvp_netcntl_hook_local_filtered_connect(const struct netcntl_so
 	     !add_initiated_connection(extra_socket, new_reference,
 	       revised_address.c_str(), rResponse) )
 	{
+    log_message_connect_deny(aAddress);
 	if (new_socket >= 0)   shutdown(new_socket, SHUT_RDWR);
 	if (extra_socket >= 0) shutdown(extra_socket, SHUT_RDWR);
 	return event_error;
@@ -1441,7 +1471,11 @@ command_event __rsvp_netcntl_hook_local_disconnect(const struct netcntl_source_i
     log_message_incoming_disconnect(sSource, aAddress);
 
     #ifdef PARAM_SELF_TRUSTING_FORWARDER
-	if (!trusted_remote_check(sSource)) return event_rejected;
+	if (!trusted_remote_check(sSource))
+	{
+    log_message_disconnect_deny(aAddress);
+	return event_rejected;
+	}
     #endif
 
 	int file_number = -1;
