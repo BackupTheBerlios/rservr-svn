@@ -188,7 +188,7 @@
       <p class="overview_content"> Resourcerver builds with a standard <span class="style_command_line">./configure</span> script. Normally the following works fine for installation: </p>
       <div align="center">
         <pre class="example_box shell_box">
-<b>shell&gt;</b> ./configure && make && sudo make install
+<b>shell&gt;</b> ./configure --prefix=/usr && make && sudo make install
 </pre>
       </div>
       <p class="overview_content"> You'll need to install as the super user so the <span class="style_command_line">rservrd</span> program functions correctly. This program is one of the most important components of the package and super-user privileges are required to set its user and group ownership and the suid/sgid flags. <u>On non-Linux systems, you might need to add the user and group "rservrd" to your system manually, set the ownership of <span class="style_command_line">rservrd</span> to both, and set its permissions to <span class="style_command_line">6755</span>.</u> </p>
