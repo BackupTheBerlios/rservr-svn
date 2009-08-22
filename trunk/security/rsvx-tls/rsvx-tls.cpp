@@ -60,7 +60,9 @@ extern "C" {
 #ifdef HAVE_GCRYPT_H
 #include <gcrypt.h>
 
+extern "C" {
 GCRY_THREAD_OPTION_PTHREAD_IMPL;
+}
 #endif
 
 
