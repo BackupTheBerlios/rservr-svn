@@ -164,12 +164,13 @@ static int parse_file(FILE *fFile, const char *nName, const char *pPath)
 	int outcome = 0, line_number = 0;
 
 
-	while (extra_lines() || fgets(buffer, sizeof buffer, fFile))
+	while (extra_lines() || (fgets(buffer, sizeof buffer, fFile)))
 	{
 	if (!extra_lines())
 	 {
 	++line_number;
 	outcome = load_line_fail_check(buffer, pPath);
+	buffer[ strlen(buffer) - 1 ] = 0x00;
 	 }
 	else outcome = load_line_fail_check(NULL, NULL);
 
