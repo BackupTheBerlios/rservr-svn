@@ -39,6 +39,7 @@ extern "C" {
 #include <vector>
 
 #include <string.h> //'strlen', 'strsep'
+#include <stdlib.h> //'free'
 #include <stdio.h> //'FILE'
 #include <unistd.h> //'fork', 'pipe', 'dup2', '_exit', 'chdir'
 #include <signal.h> //'raise', 'kill'
