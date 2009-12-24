@@ -41,6 +41,8 @@ extern "C" {
 #include "plugins/rsvp-dataref-hook.h"
 }
 
+#include <string.h> //'strlen', etc.
+
 #include "plugin-macro.hpp"
 #include "plugin-dataref.hpp"
 

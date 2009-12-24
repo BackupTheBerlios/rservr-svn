@@ -35,6 +35,8 @@
 #include "command-macro.hpp"
 #include "proto/proto-service-client.hpp"
 
+#include <string.h> //'strlen', etc.
+
 
 command_handle service_request(text_info nName, text_info mMessage)
 { DEFAULT_QUEUE_CLIENT_COMMAND(nName, section_releaser(new proto_service_request(mMessage))) }

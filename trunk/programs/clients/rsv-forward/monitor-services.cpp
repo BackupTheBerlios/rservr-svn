@@ -43,6 +43,8 @@ extern "C" {
 
 #include <string>
 
+#include <string.h> //'strlen', etc.
+
 #include "external/clist.hpp"
 
 extern "C" {

@@ -41,6 +41,7 @@ extern "C" {
 }
 
 #include <stdio.h> //'fdopen', 'remove', 'ctermid'
+#include <string.h> //'strlen', etc.
 #include <unistd.h> //'dup2', 'getuid', etc., 'open', 'nanosleep', 'setsid', 'getpid', 'tcsetpgrp', 'tcgetsid'
 #include <fcntl.h> //open modes
 #include <time.h> //'time'

@@ -40,6 +40,7 @@ extern "C" {
 
 #include <signal.h> //'signal', 'raise'
 #include <unistd.h> //'getpid'
+#include <string.h> //'strsignal'
 
 #include "server-command.hpp"
 #include "api-server.hpp"

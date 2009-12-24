@@ -41,6 +41,8 @@ extern "C" {
 #include "plugins/rsvp-rqsrvc-hook.h"
 }
 
+#include <string.h> //'strlen', etc.
+
 #include "plugin-macro.hpp"
 #include "plugin-rqsrvc.hpp"
 

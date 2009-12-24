@@ -36,6 +36,8 @@ extern "C" {
 #include "api/message-queue.h"
 }
 
+#include <string.h> //'strlen', etc.
+
 #include "client-output.hpp"
 #include "client-command.hpp"
 #include "protocol/conversion.hpp"

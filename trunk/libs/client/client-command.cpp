@@ -52,6 +52,7 @@ extern "C" {
 #include <signal.h> //'signal', etc.
 #include <time.h> //'strftime'
 #include <regex.h> //regular expressions
+#include <string.h> //'strlen', etc.
 
 #include "external/clist.hpp"
 
