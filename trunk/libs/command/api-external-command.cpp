@@ -39,6 +39,8 @@ extern "C" {
 #include "api-command.h"
 }
 
+#include <string.h> //'strlen', etc.
+
 #include <hparser/formats/tag-properties.hpp>
 #include <hparser/classes/string-input.hpp>
 #include <hparser/classes/string-output.hpp>
