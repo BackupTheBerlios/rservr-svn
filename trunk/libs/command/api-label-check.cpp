@@ -38,7 +38,8 @@ extern "C" {
 #include "param.h"
 }
 
-#include <regex.h> /* regular expressions */
+#include <regex.h> //regular expressions
+#include <string.h> //'strlen', etc.
 
 #include "protocol/constants.hpp"
 
