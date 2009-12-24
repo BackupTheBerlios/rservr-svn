@@ -37,6 +37,7 @@ extern "C" {
 }
 
 #include <regex.h> //regular expressions
+#include <string.h> //'strsep', etc.
 
 extern "C" {
 #include "timing-manager.h"
