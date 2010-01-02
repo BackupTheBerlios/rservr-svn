@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # This script sets up the main server system, then a system for each floor of
 # the virtual building based on a list contained in one or more config files.
@@ -8,7 +8,7 @@
 #the system as a whole.
 { echo "execute_critical @rservrd@-dxr";
   echo "execute @rsv-fsrelay@system-connect";
-  echo "execute @system-status@status";
+  echo "execute @./system-status@status";
   echo "register_all_wait"; } | \
 rservr system /dev/null
 
@@ -20,4 +20,4 @@ cat $* | while read line; do
 done
 
 #execute the configuration-initiation client
-rservrd system @execute@system-control@control@status@rooms > /dev/null
+rservrd system @execute@./system-control@control@status@rooms > /dev/null

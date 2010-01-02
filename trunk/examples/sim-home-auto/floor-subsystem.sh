@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # This script creates a server system for each virtual floor with one client for
 # each room on the floor.
@@ -17,7 +17,7 @@ for room in $*; do
   fans=$( echo "$room" | cut -d: -f3 )
   vents=$( echo "$room" | cut -d: -f4 )
 
-  rservrd "$server" @execute@separate-room@$name@$lights@$fans@$vents > /dev/null
+  rservrd "$server" @execute@./separate-room@$name@$lights@$fans@$vents > /dev/null
 done
 
 #connect the virtual floor's server system to the main system
