@@ -4,3 +4,4 @@ export AM_CXXFLAGS=-Wall
 export AM_CFLAGS=-Wall
 export STANDARD_INCLUDES=-I/usr/include -I/usr/local/include
 export STANDARD_LIBRARIES=-L/usr/lib -L/usr/local/lib
+export AM_LDFLAGS=-version-info 3:0:3
