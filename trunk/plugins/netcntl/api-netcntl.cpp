@@ -56,7 +56,7 @@ PLUGIN_DEFAULT_RESPONSE(netcntl, struct netcntl_source_info)
 
 PLUGIN_BASIC_DEFINITIONS(netcntl)
 
-extern ATTR_PROT int rsvp_netcntl_load(struct local_commands *lLoader)
+extern int rsvp_netcntl_load(struct local_commands *lLoader)
 {
 	PLUGIN_LOAD_START(netcntl, lLoader)
 

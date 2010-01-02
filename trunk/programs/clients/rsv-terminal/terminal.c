@@ -44,6 +44,7 @@
 #include <stdio.h> /* 'fgets', 'fdopen' */
 #include <stddef.h> /* 'offsetof' */
 #include <fcntl.h> /* 'fcntl' */
+#include <string.h> /* 'strncpy', 'strlen' */
 
 #include "interpreter.h"
 

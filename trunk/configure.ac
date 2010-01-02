@@ -4,6 +4,8 @@
 AC_PREREQ(2.61)
 AC_INIT(rservr-core, gamma.3, [Kevin P. Barry (ta0kira@users.berlios.de)])
 AM_INIT_AUTOMAKE([dist-bzip2])
+PACKAGE=rservr-core
+VERSION=gamma.3
 
 AC_CONFIG_FILES([ Makefile
                   include/Makefile
@@ -64,13 +66,12 @@ AC_PROG_AWK
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
 AC_PROG_LIBTOOL
 AC_PROG_MKDIR_P
 
 # Checks for libraries.
-AC_CHECK_LIB([dl], [dlopen])
-AC_CHECK_LIB([pthread], [pthread_create])
+AC_CHECK_LIB([dl], [dlopen], [LIBDL=true], [], [])
+AC_CHECK_LIB([pthread], [pthread_create], [LIBPTHREAD=true], [], [])
 
 # Checks for header files.
 AC_HEADER_DIRENT
@@ -89,6 +90,8 @@ AC_CHECK_HEADERS([gnutls/extra.h], [EXTRA=true], [], []) #not _ONCE!
 AM_CONDITIONAL([LINK_READLINE], [test x$READLINE = xtrue])
 AM_CONDITIONAL([LINK_HISTORY], [test x$HISTORY = xtrue])
 AM_CONDITIONAL([LINK_GNUTLS], [test x$GNUTLS = xtrue && test x$EXTRA = xtrue])
+AM_CONDITIONAL([LINK_LIBDL], [test x$LIBDL = xtrue])
+AM_CONDITIONAL([LINK_LIBPTHREAD], [test x$LIBPTHREAD = xtrue])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -117,10 +120,11 @@ AC_FUNC_SETVBUF_REVERSED
 AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([dup2 ftruncate getcwd inet_ntoa mkdir regcomp select socket strdup strerror strtoul endgrent readline putenv setenv strtol strtoull])
+AC_CHECK_FUNCS([dup2 ftruncate getcwd inet_ntoa mkdir regcomp select socket strdup strerror strtoul endgrent readline putenv setenv strtol strtoull clearenv])
 
 #other flags
 m4_pattern_allow(AM_PROG_CC_C_O)
 AM_PROG_CC_C_O
+AC_CONFIG_MACRO_DIR([m4])
 
 AC_OUTPUT

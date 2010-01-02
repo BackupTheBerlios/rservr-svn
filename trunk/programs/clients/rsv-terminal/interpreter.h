@@ -36,7 +36,7 @@
 #include <stdio.h> /* 'FILE' */
 
 
-#ifdef HAVE_READLINE_READLINE_H
+#if defined(HAVE_READLINE_READLINE_H) && defined(RSV_CONSOLE)
 int initialize_readline();
 int readline_input(int, char*, unsigned int, FILE*); /* true/false */
 #else

@@ -54,6 +54,7 @@ extern "C" {
 #include <pthread.h> //pthreads
 #include <sys/socket.h> //'socket', 'setsockopt'
 #include <fcntl.h> //'fcntl'
+#include <sys/stat.h> //'stat'
 #include <time.h> //'nanosleep'
 
 #ifdef RSV_NET

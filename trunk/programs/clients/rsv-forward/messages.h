@@ -54,6 +54,8 @@ void log_message_filter_load(text_info, text_info, int) ATTR_INT;
 void log_message_using_connect_filter(text_info, int) ATTR_INT;
 void log_message_using_data_filter(text_info, int) ATTR_INT;
 
+void log_message_clearenv_error() ATTR_INT;
+
 void log_message_address_fail(const struct sockaddr*, const struct remote_security_filter*, int) ATTR_INT;
 void log_message_authenticate_fail(const struct sockaddr*, const struct remote_security_filter*, int) ATTR_INT;
 

@@ -76,7 +76,7 @@ static const struct remote_security_filter internal_filter =
 static const struct remote_security_filter inert_filter =
 {               name: "rsvx-dnsregex",
                 info: "filter is inert when not used for network connections",
-      address_filter: &address_filter,
+      address_filter: NULL,
       error_recorder: NULL,
    connect_from_host: NULL,
      connect_to_host: NULL,

@@ -238,6 +238,9 @@ int log_server_start_error(text_string mMessage)
 	return local_log(logging_normal, message_string);
 }
 
+int log_server_clearenv_error()
+{ return local_log(logging_normal, "/n/ can't clear environment: system doesn't support clearenv"); }
+
 int log_server_exit()
 { return local_log(logging_normal, "/n/ server initiating exit"); }
 

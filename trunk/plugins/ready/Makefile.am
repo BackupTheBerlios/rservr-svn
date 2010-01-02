@@ -1,10 +1,5 @@
-STANDARD_INCLUDES=-I/usr/include -I/usr/local/include
 ALL_INCLUDES=$(STANDARD_INCLUDES) -I$(srcdir)/../.. -I$(srcdir)/../../include/rservr -I$(srcdir)/../include
 AM_CPPFLAGS=-DENABLE_VIRT_ARRAY_ALL -DRSERVR_RESTRICT_COMMAND_INTERFACE $(ALL_INCLUDES)
-AM_CXXFLAGS=-ansi -Wall
-AM_CFLAGS=-Wall
-STANDARD_LIBS=-L/lib -L/usr/lib -L/usr/local/lib
-AM_LDFLAGS=--version-info 1:1:0 $(STANDARD_LIBS)
 lib_LTLIBRARIES=librsvp-ready.la
 librsvp_ready_la_SOURCES=api-ready.cpp plugin-ready.cpp api-ready.h plugin-ready.hpp
 librsvp_ready_la_LIBADD=../../libs/command/librservr-command.la

@@ -393,7 +393,7 @@ void isolate_client()
 }
 
 
-result ATTR_PROT check_ipc_status()
+result check_ipc_status()
 {
 	bool input_fail = false, output_fail = false;
 	struct stat file_status;

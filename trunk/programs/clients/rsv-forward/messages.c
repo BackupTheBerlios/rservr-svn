@@ -72,6 +72,9 @@ void log_message_using_data_filter(text_info nName, int fFilter)
 	client_log_output(logging_normal, local_source, message_string);
 }
 
+void log_message_clearenv_error()
+{ client_log_output(logging_normal, local_source, "can't clear environment: system doesn't support clearenv"); }
+
 void log_message_address_fail(const struct sockaddr *aAddress,
 const struct remote_security_filter *fFilter, int nNumber)
     #ifdef RSV_NET

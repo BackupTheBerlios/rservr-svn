@@ -1,9 +1,5 @@
-STANDARD_INCLUDES=-I/usr/include -I/usr/local/include
 ALL_INCLUDES=$(STANDARD_INCLUDES) -I$(srcdir)/../../.. -I$(srcdir)/../../../include/rservr -I$(srcdir)/../../../include
-AM_CPPFLAGS=$(ALL_INCLUDES)
-AM_CXXFLAGS=-DENABLE_VIRT_ARRAY_ALL -ansi -Wall
-AM_CFLAGS=-Wall
-AM_LDFLAGS=
+AM_CPPFLAGS=-DENABLE_VIRT_ARRAY_ALL $(ALL_INCLUDES)
 bin_PROGRAMS=rsv-respawn
 
 rsv_respawn_CPPFLAGS=$(ALL_INCLUDES)

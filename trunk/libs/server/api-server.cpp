@@ -924,7 +924,14 @@ result unset_environment(text_info nName)
 }
 
 result clear_environment()
+#if defined(HAVE_CLEARENV) && HAVE_CLEARENV
 { return clearenv() == 0; }
+#else
+{
+    log_server_clearenv_error();
+	return false;
+}
+#endif
 
 //END server parameter setup----------------------------------------------------
 

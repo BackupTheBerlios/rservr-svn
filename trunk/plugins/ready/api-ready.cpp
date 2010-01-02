@@ -55,7 +55,7 @@ PLUGIN_DEFAULT_RESPONSE(ready, struct ready_source_info)
 
 PLUGIN_BASIC_DEFINITIONS(ready)
 
-extern ATTR_PROT int rsvp_ready_load(struct local_commands *lLoader)
+extern int rsvp_ready_load(struct local_commands *lLoader)
 {
 	PLUGIN_LOAD_START(ready, lLoader)
 

@@ -32,6 +32,7 @@
 
 #include "remote/security.h"
 
+#include <stdlib.h> /* 'NULL' */
 #include <stdint.h> /* 'uint32_t' */
 #include <netinet/in.h> /* 'sockaddr_in', 'INADDR_LOOPBACK' */
 
@@ -41,7 +42,10 @@ socket_reference rReference, const struct sockaddr *aAddress, socklen_t lLength)
 {
 	if (!aAddress || lLength != sizeof(struct sockaddr_in)) return -1;
 	uint32_t address = *(uint32_t*) &((const struct sockaddr_in*) aAddress)->sin_addr;
+    /*(this fixes misbehaving 'INADDR_LOOPBACK' on FreeBSD)*/
+    #define u_int32_t uint32_t
 	return (address == htonl((uint32_t) INADDR_LOOPBACK))? 0 : -1;
+    #undef u_int32_t
 }
 
 

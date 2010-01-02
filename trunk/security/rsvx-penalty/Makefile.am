@@ -1,10 +1,9 @@
-STANDARD_INCLUDES=-I/usr/include -I/usr/local/include
+if LINK_LIBPTHREAD
+  USE_LIBPTHREAD=-lpthread
+endif
+
 ALL_INCLUDES=$(STANDARD_INCLUDES) -I$(srcdir)/../.. -I$(srcdir)/../../include/rservr -I$(srcdir)/../../include
-AM_CPPFLAGS=-DENABLE_VIRT_ARRAY_ALL -DRSERVR_RESTRICT_COMMAND_INTERFACE $(ALL_INCLUDES)
-AM_CXXFLAGS=-ansi -Wall
-AM_CFLAGS=-Wall
-STANDARD_LIBS=-L/lib -L/usr/lib -L/usr/local/lib
-AM_LDFLAGS=--version-info 1:1:0 $(STANDARD_LIBS)
+AM_CPPFLAGS=-DENABLE_VIRT_ARRAY_ALL $(ALL_INCLUDES)
 lib_LTLIBRARIES=librsvx-penalty.la
 librsvx_penalty_la_SOURCES=rsvx-penalty.cpp
-librsvx_penalty_la_LIBADD=-lpthread
+librsvx_penalty_la_LIBADD=$(USE_LIBPTHREAD)

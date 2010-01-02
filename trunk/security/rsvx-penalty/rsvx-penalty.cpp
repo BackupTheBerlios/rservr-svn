@@ -38,7 +38,7 @@ extern "C" {
 #include <map>
 
 #include <netinet/in.h> //'sockaddr_in'
-#include <sys/timex.h> //'ntp_gettime'
+#include <sys/time.h> //'gettimeofday'
 
 #include "global/condition-block.hpp"
 
@@ -70,11 +70,11 @@ socket_reference rReference, const struct sockaddr *aAddress, socklen_t lLength)
 {
 	if (!aAddress || lLength != sizeof(struct sockaddr_in)) return -1;
 
-	struct ntptimeval current_time;
-	ntp_gettime(&current_time);
+	struct timeval current_time;
+	gettimeofday(&current_time, NULL);
 
-	time_reference initial_time = (time_reference) current_time.time.tv_sec +
-	                              (time_reference) current_time.time.tv_usec /
+	time_reference initial_time = (time_reference) current_time.tv_sec +
+	                              (time_reference) current_time.tv_usec /
 	                              (time_reference) (1000.0 * 1000.0);
 
 	uint32_t new_address = ((const struct sockaddr_in*) aAddress)->sin_addr.s_addr;
@@ -109,11 +109,11 @@ socket_reference rReference, const struct sockaddr *aAddress, socklen_t lLength)
 
 static void error_recorder(load_reference lLoad, socket_reference rReference, int eError)
 {
-	struct ntptimeval current_time;
-	ntp_gettime(&current_time);
+	struct timeval current_time;
+	gettimeofday(&current_time, NULL);
 
-	time_reference error_time = (time_reference) current_time.time.tv_sec +
-	                            (time_reference) current_time.time.tv_usec /
+	time_reference error_time = (time_reference) current_time.tv_sec +
+	                            (time_reference) current_time.tv_usec /
 	                            (time_reference) (1000.0 * 1000.0);
 
 	if (!table_mutex.valid() || pthread_mutex_lock(table_mutex) < 0) return;

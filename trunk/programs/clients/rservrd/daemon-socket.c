@@ -360,12 +360,25 @@ int register_daemon(const char *nName, int gGroup)
 	fcntl(new_socket, F_SETFL, current_state | O_NONBLOCK);
 
 
+#if defined(F_NOTIFY) && defined(F_SETSIG)
 	/*monitor the socket directory for changes*/
 	int socket_dir = open(".", O_RDONLY);
 
-	if (fcntl(socket_dir, F_NOTIFY, DN_DELETE | DN_RENAME | DN_ATTRIB |
-	    DN_MULTISHOT) == 0)
-	fcntl(socket_dir, F_SETSIG, SIGUSR1);
+	if (fcntl(socket_dir, F_NOTIFY, 0
+    #ifdef DN_DELETE
+	  | DN_DELETE
+    #endif
+    #ifdef DN_RENAME
+	  | DN_RENAME
+    #endif
+    #ifdef DN_ATTRIB
+	  | DN_ATTRIB
+    #endif
+    #ifdef DN_MULTISHOT
+	  | DN_MULTISHOT
+    #endif
+	  ) == 0) fcntl(socket_dir, F_SETSIG, SIGUSR1);
+#endif
 
 	return new_socket;
 }
@@ -468,6 +481,7 @@ static int connect_daemon(const char *nName)
 static regex_t compiled_expression;
 static int inverse_regex = 0;
 
+/*(a warning might occur because of the 'const' in the argument)*/
 static int regex_table_entry(const struct dirent *eEntry)
 {
 	if ( eEntry && eEntry->d_type == DT_SOCK &&
@@ -588,6 +602,7 @@ int *find_daemon(const char *pPattern)
 }
 
 
+/*(a warning might occur because of the 'const' in the argument)*/
 static int show_table_entry(const struct dirent *eEntry)
 {
 	if (eEntry && eEntry->d_type == DT_SOCK)

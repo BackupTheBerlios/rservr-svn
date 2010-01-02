@@ -33,7 +33,7 @@
 #include "server-load.h"
 
 #include <math.h> /* math functions */
-#include <sys/timex.h> /* 'ntp_gettime' */
+#include <sys/time.h> /* 'gettimeofday' */
 
 #include "param.h"
 #include "attributes.h"
@@ -64,13 +64,14 @@ static int profile_status()
 #endif
 
 typedef long double derived_value;
+typedef struct timeval precise_time;
 
 struct profile_point
 {
 	unsigned int total_load;
 	unsigned int current_taken;
 
-	struct ntptimeval current_time;
+	precise_time current_time;
 
 	derived_value relative_time;
 	derived_value delta_time;
@@ -91,9 +92,8 @@ static struct profile_point last_point =
   {                    total_load: 0,
                     current_taken: 0,
                      current_time:
-                       { time:
-                           {  tv_sec: 0,
-                             tv_usec: 0  } },
+                       { tv_sec: 0,
+                        tv_usec: 0  },
                        delta_time: 0.0,
                       delta_total: 0,
                         new_added: 0,
@@ -114,10 +114,10 @@ unsigned int calculate_execution(unsigned int tTotal)
 
 	if (!initized_time)
 	{
-	struct ntptimeval start_time;
-	ntp_gettime(&start_time);
-	initial_time = (derived_value) start_time.time.tv_sec +
-	               (derived_value) start_time.time.tv_usec /
+	precise_time start_time;
+	gettimeofday(&start_time, NULL);
+	initial_time = (derived_value) start_time.tv_sec +
+	               (derived_value) start_time.tv_usec /
 	               (derived_value) (1000.0 * 1000.0);
 	}
 
@@ -136,14 +136,14 @@ unsigned int calculate_execution(unsigned int tTotal)
 	                         eta_load: 0.0,
 	                        delta_eta: 0.0     };
 
-	ntp_gettime(&new_point.current_time);
+	gettimeofday(&new_point.current_time, NULL);
 
 	if (!initized_time) initized_time = 1;
 
 	else
 	{
-	derived_value current = (derived_value) new_point.current_time.time.tv_sec +
-	                      (derived_value) new_point.current_time.time.tv_usec /
+	derived_value current = (derived_value) new_point.current_time.tv_sec +
+	                      (derived_value) new_point.current_time.tv_usec /
 	                      (derived_value) (1000.0 * 1000.0);
 
 	new_point.relative_time = current - initial_time;
@@ -174,9 +174,9 @@ unsigned int calculate_execution(unsigned int tTotal)
 	if (last_point.current_taken)
 	new_point.eta_load =
 	  copysignl(1.0, new_point.delta_total) *
-	  ( (derived_value) 1.0 - expl( -
+	  ( (derived_value) 1.0 - exp( -
 	/*NOTE: don't use 1/'previous_taken_per_delta_time'; it might be zero*/
-	      expl( (derived_value) new_point.delta_time / last_point.current_taken -
+	      exp( (derived_value) new_point.delta_time / last_point.current_taken -
 	            new_point.delta_time ) *
 	      (fabs(new_point.delta_total) / (derived_value) last_point.current_taken) *
 	      ( (derived_value) PARAM_MAX_COMMANDS /
@@ -187,7 +187,7 @@ unsigned int calculate_execution(unsigned int tTotal)
 	/*reduction of the equation with 'current_taken' equal to zero*/
 	new_point.eta_load =
 	  copysignl(1.0, new_point.delta_total) *
-	  ( (derived_value) 1.0 - expl(
+	  ( (derived_value) 1.0 - exp(
 	      -fabs(new_point.delta_total) *
 	      ( (derived_value) PARAM_MAX_COMMANDS /
 	        (derived_value) (PARAM_MAX_COMMANDS - new_point.total_load) )
@@ -198,7 +198,7 @@ unsigned int calculate_execution(unsigned int tTotal)
 	new_point.delta_eta = (derived_value) PARAM_BULK_EXECUTE_CENTER +
 	  (derived_value) PARAM_BULK_EXECUTE_CENTER * new_point.eta_load;
 
-	derived_value ratio = expl(-new_point.delta_time * fabs(new_point.delta_eta));
+	derived_value ratio = exp(-new_point.delta_time * fabs(new_point.delta_eta));
 
 	new_point.delta_eta *= (derived_value) 1.0 - ratio;
 	new_point.delta_eta += ratio * last_point.delta_eta;

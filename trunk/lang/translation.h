@@ -121,6 +121,8 @@ extern int log_server_manual_log(text_string);
 extern int log_server_start();
 extern int log_server_start_error(text_string);
 
+extern int log_server_clearenv_error();
+
 extern int log_server_exit();
 extern int log_server_exit_error(text_string);
 extern int log_server_admin_exit(int, text_string);

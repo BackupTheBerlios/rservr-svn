@@ -310,7 +310,14 @@ static int parse_config_line(const char *lLine, const char *pPath)
 	else if (strcmp(config_segment, "clearenv") == 0)
 	{
 	if (next_argument(&config_segment) >= 0) return allow_fail;
+    #if defined(HAVE_CLEARENV) && HAVE_CLEARENV
 	if (clearenv() != 0) return allow_fail;
+    #else
+	 {
+    log_message_clearenv_error();
+	return allow_fail;
+	 }
+    #endif
 	}
 
 

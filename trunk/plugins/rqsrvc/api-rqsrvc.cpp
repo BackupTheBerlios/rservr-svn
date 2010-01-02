@@ -55,7 +55,7 @@ PLUGIN_DEFAULT_RESPONSE(rqsrvc, struct rqsrvc_source_info)
 
 PLUGIN_BASIC_DEFINITIONS(rqsrvc)
 
-extern ATTR_PROT int rsvp_rqsrvc_load(struct local_commands *lLoader)
+extern int rsvp_rqsrvc_load(struct local_commands *lLoader)
 {
 	PLUGIN_LOAD_START(rqsrvc, lLoader)
 

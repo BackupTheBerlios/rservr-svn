@@ -55,7 +55,7 @@ PLUGIN_DEFAULT_RESPONSE(dataref, struct dataref_source_info)
 
 PLUGIN_BASIC_DEFINITIONS(dataref)
 
-extern ATTR_PROT int rsvp_dataref_load(struct local_commands *lLoader)
+extern int rsvp_dataref_load(struct local_commands *lLoader)
 {
 	PLUGIN_LOAD_START(dataref, lLoader)
 

@@ -1,9 +1,6 @@
-STANDARD_INCLUDES=-I/usr/include -I/usr/local/include
 ALL_INCLUDES=$(STANDARD_INCLUDES) -I$(srcdir)/../.. -I$(srcdir)/../../include/rservr -I$(srcdir)/.. -I$(srcdir)/../../libs/include/protocol
 AM_CPPFLAGS=-DENABLE_VIRT_ARRAY_ALL $(ALL_INCLUDES)
-AM_CXXFLAGS=-ansi -Wall -O2
-AM_CFLAGS=-Wall -O2
-AM_LDFLAGS=--version-info 1:1:0
 lib_LTLIBRARIES=librservr-i18n-us-english.la
-librservr_i18n_us_english_la_SOURCES=client.c command.c general.c proto.c protocol.c server.c command-info.c ../translation.h
+librservr_i18n_us_english_la_SOURCES=client.c command.c general.c proto.c protocol.c server.c command-info.c
 librservr_i18n_us_english_la_LIBADD=
+EXTRA_DIST=../translation.h
