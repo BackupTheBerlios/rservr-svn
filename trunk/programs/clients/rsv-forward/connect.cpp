@@ -1076,7 +1076,6 @@ const char *aAddress, const char *pPort, std::string &rRevised)
 
 	if (outcome < 0)
 	{
-fprintf(stderr, "?? %s\n", rRevised.c_str());
     log_message_connect_deny(aAddress);
 	close(new_socket);
 	return -1;
