@@ -41,6 +41,20 @@
 
 class regex_check
 {
+private:
+	inline bool assign_pattern_common(const char *eExpression)
+	{
+	if (!eExpression)         return false;
+	if (!strlen(eExpression)) return true;
+
+	if (regcomp(&compiled_expression, eExpression, REG_EXTENDED | REG_NOSUB)) return false;
+
+	compiled = true;
+	expression = eExpression;
+
+	return true;
+	}
+
 public:
 	inline regex_check(bool iInverses = true) :
 	inverses(iInverses),
@@ -57,9 +71,11 @@ public:
 	inline regex_check &operator = (const regex_check &eEqual)
 	{
 	if (&eEqual == this) return *this;
+	if (compiled) regfree(&compiled_expression);
+	compiled   = false;
 	inverses   = eEqual.inverses;
 	check_mode = eEqual.check_mode;
-	*this = eEqual.expression.c_str();
+	assign_pattern_common(eEqual.expression.c_str());
 	return *this;
 	}
 
@@ -68,20 +84,16 @@ public:
 	{
 	if (!eExpression) return false;
 	if (compiled) regfree(&compiled_expression);
-	compiled = false;
+	compiled   = false;
+	check_mode = false;
 
-	if (inverses && !check_mode && strlen(eExpression) && eExpression[0] == '!')
+	if (inverses && strlen(eExpression) && eExpression[0] == '!')
 	 {
 	eExpression++;
 	check_mode = true;
 	 }
-	expression = eExpression;
-	if (!expression.size()) return true;
 
-	if (regcomp(&compiled_expression, eExpression, REG_EXTENDED | REG_NOSUB)) return false;
-	compiled = true;
-
-	return true;
+	return assign_pattern_common(eExpression);
 	}
 
 
@@ -103,7 +115,6 @@ public:
 	inline ~regex_check()
 	{ if (compiled) regfree(&compiled_expression); }
 
-private:
 	std::string expression;
 	regex_t     compiled_expression;
 	bool        inverses, check_mode, compiled;

@@ -1051,9 +1051,10 @@ const char *aAddress, const char *pPort, std::string &rRevised)
 	current_state = fcntl(new_socket, F_GETFD);
 	fcntl(new_socket, F_SETFD, current_state | FD_CLOEXEC);
 
-	//NOTE: setting non-blocking mode prevents connection on FreeBSD
-//	current_state = fcntl(new_socket, F_GETFL);
-//	fcntl(new_socket, F_SETFL, current_state | O_NONBLOCK);
+#ifndef PARAM_BLOCKING_CONNECT
+	current_state = fcntl(new_socket, F_GETFL);
+	fcntl(new_socket, F_SETFL, current_state | O_NONBLOCK);
+#endif
 
 	//connect socket
 
@@ -1066,6 +1067,9 @@ const char *aAddress, const char *pPort, std::string &rRevised)
 	struct timespec connect_retry = local_default_cycle();
 	long_time current_retry = 0.0;
 
+#ifdef PARAM_BLOCKING_CONNECT
+	outcome = connect(new_socket, (struct sockaddr*) &new_address, sizeof new_address);
+#else
 	while ((outcome = connect(new_socket, (struct sockaddr*) &new_address, sizeof new_address)) < 0)
 	if (current_retry < local_default_timeout())
 	{
@@ -1073,6 +1077,7 @@ const char *aAddress, const char *pPort, std::string &rRevised)
 	current_retry += local_default_cycle_dec();
 	}
 	else break;
+#endif
 
 	if (outcome < 0)
 	{
