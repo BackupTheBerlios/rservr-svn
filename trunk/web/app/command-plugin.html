@@ -65,7 +65,7 @@
             <span class="important_box_title">Important:</span> In order to use a plug-in command, the plug-in must be loaded by <i>both</i> the initiating client and the executing client. When sending plug-in commands remotely, intermediate command forwarders needn't have the plug-in loaded. </p>
         </div>
       </div>
-      <p class="overview_content"> Use the function below to load command plug-ins that are hard-linked into the program. If a client uses <i>more than one</i> hard-linked plug-in, use this function anyway but keep reading. </p>
+      <p class="overview_content"> Use the function below to load command plug-ins that are hard-linked into the program (plug-in libraries are kept in the <span class="style_file_name">libexec/rservr</span> subdirectory of the installation path.) If a client uses <i>more than one</i> hard-linked plug-in, use this function anyway but keep reading. </p>
       <div align="center">
         <pre class="example_box code_box header_box">
 <b><u>#include &lt;rservr/api/load-plugin.h&gt;</u></b>
@@ -116,7 +116,7 @@
 <b>int load_plugin_lib(text_info);</b>
 </pre>
       </div>
-      <p class="overview_content"> The function above might require a fully-qualified path name if the library isn't in a conventional library directory. Standard Resourcerver plug-ins are stored in the same place as the other installed libraries, so this function shouldn't have a problem locating them. </p>
+      <p>The function above will first attempt to load the plug-in using the verbatim filename provided. If that fails, it will look in the <span class="style_file_name">libexec/rservr</span> subdirectory of the installation path, and will give up if that fails. This means all command plug-ins must be in a standard path, in <span class="style_file_name">libexec/rservr</span>, or explicitly specified. </p>
       <p>
         <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
       </p>

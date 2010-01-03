@@ -37,6 +37,8 @@ extern "C" {
 #include "plugin-dev/entry-point.h"
 }
 
+#include <string>
+
 #include <dlfcn.h> //'dlopen', etc.
 
 #include "client-command.hpp"
@@ -103,7 +105,17 @@ int load_plugin_lib(text_info fFile)
 {
 	if (!fFile) return -1;
 
-	void *handle = dlopen(fFile, RTLD_NOW | RTLD_LOCAL);
+	std::string plugin_file = fFile;
+
+	void *handle = NULL;
+
+	handle = dlopen(plugin_file.c_str(), RTLD_NOW | RTLD_LOCAL);
+	if (!handle && plugin_file[0] != '/')
+	{
+	plugin_file = std::string(PLUGIN_PATH "/") + plugin_file;
+	handle = dlopen(plugin_file.c_str(), RTLD_NOW | RTLD_LOCAL);
+	}
+
 	if (!handle)
 	{
     log_client_plugin_load_error(fFile, dlerror());

@@ -69,6 +69,9 @@ AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 AC_PROG_MKDIR_P
 
+export CPPFLAGS='-I/usr/include -I/usr/local/include'
+export LDFLAGS='-L/usr/lib -L/usr/local/lib'
+
 # Checks for libraries.
 AC_CHECK_LIB([dl], [dlopen], [LIBDL=true], [], [])
 AC_CHECK_LIB([pthread], [pthread_create], [LIBPTHREAD=true], [], [])

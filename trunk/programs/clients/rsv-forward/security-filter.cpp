@@ -39,6 +39,7 @@ extern "C" {
 #include "api/log-output.h"
 }
 
+#include <string>
 #include <list>
 #include <map>
 
@@ -149,9 +150,19 @@ socket_reference get_new_reference()
 
 int set_security_filter(const char *fFile, const char *aArguments)
 {
-	if (!fFile) return -1;
+	if (!fFile || !strlen(fFile)) return -1;
 
-	void *handle = dlopen(fFile, RTLD_NOW | RTLD_LOCAL);
+	std::string plugin_file = fFile;
+
+	void *handle = NULL;
+
+	handle = dlopen(plugin_file.c_str(), RTLD_NOW | RTLD_LOCAL);
+	if (!handle && plugin_file[0] != '/')
+	{
+	plugin_file = std::string(PLUGIN_PATH "/") + plugin_file;
+	handle = dlopen(plugin_file.c_str(), RTLD_NOW | RTLD_LOCAL);
+	}
+
 	if (!handle) return -1;
 
 	const struct remote_security_filter*(*load_function)(int, const char*, load_reference) =

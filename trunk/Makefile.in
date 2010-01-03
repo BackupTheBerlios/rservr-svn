@@ -619,8 +619,9 @@ uninstall-am:
 
 export AM_CXXFLAGS=-Wall
 export AM_CFLAGS=-Wall
+export PLUGIN_PATH=$(libexecdir)/rservr
 export STANDARD_INCLUDES=-I/usr/include -I/usr/local/include
-export STANDARD_LIBRARIES=-L/usr/lib -L/usr/local/lib
+export STANDARD_LIBRARIES=-L/usr/lib -L/usr/local/lib -L$(PLUGIN_PATH)
 export AM_LDFLAGS=-version-info 3:0:3
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
