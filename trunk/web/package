@@ -1,15 +1,19 @@
-#!/bin/bash
+#!/bin/sh
 
 if [ $# -ne 1 ]; then
   echo $0 [package name]
   exit 1
 fi
 
-file=$(readlink -f "$1")
-actual=$(readlink -f "$(dirname "$0")")
-cd "$actual"
+file="$1"
 
-rm -f $(find -name "*~")
+rm -f $(find . -name "*~")
 
-tar --owner=root --group=root -cvvjf "$file" $( find api/ app user -type f | grep -v '/\.' ) \
+TAR=tar
+
+if [ -x "$(which gtar)" ]; then
+  TAR=gtar
+fi
+
+$TAR --owner=root --group=`id -gn 0` -cvvjf "$file" $( find api/ app user -type f | grep -v '/\.' ) \
   fragment.png index.html rservr-rabbit2.png rservr.css
