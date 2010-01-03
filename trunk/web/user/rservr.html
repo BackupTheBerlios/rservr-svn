@@ -469,7 +469,7 @@ exec <b>rservr</b> "$1" "$1.log" \
           <td class="style_definition_short"> clear all environment variables </td>
         </tr>
       </table>
-      <p class="overview_content style_definition_long"> These options are used to alter the environment; mainly intended for communication with command substitution. The most useful purposes for these options are to set parameters in one location for use throughout the configuration, or to pass information on to clients. This information isn't directly available to the configuration file to use, but it can be accessed through command substitution. </p>
+      <p class="overview_content style_definition_long"> These options are used to alter the environment; mainly intended for communication with command substitution. The most useful purposes for these options are to set parameters in one location for use throughout the configuration, or to pass information on to clients. This information isn't directly available to the configuration file to use, but it can be accessed through command substitution. <i>(<span class="style_command_line">clearenv</span> might not succeed on some systems because its underlying functionality isn't in the POSIX standard.)</i></p>
       <div align="center">
         <pre class="example_box code_box script_box">
 <i>#this is an example of consolidating parameters</i>
