@@ -32,6 +32,8 @@
 
 #include "api-client-timing.hpp"
 
+#include <string.h> //'memcpy'
+
 extern "C" {
 #include "lang/translation.h"
 #include "protocol/api-timing.h"
@@ -82,12 +84,13 @@ result set_client_timing(const struct client_timing_table *tTable)
 {
 	if (!tTable) return false;
     log_client_timing_set();
-	internal_timing = *tTable;
+	memcpy(&internal_timing, tTable, sizeof(struct client_timing_table));
 	return true;
 }
 
 result update_client_timing(const struct client_timing_table *tTable)
 {
+	//TODO: add logging error for failed calculation
 	if (!tTable) return false;
     log_client_timing_update();
 	return calculate_client_table(tTable, &internal_timing);
@@ -95,6 +98,7 @@ result update_client_timing(const struct client_timing_table *tTable)
 
 result compile_client_timing()
 {
+	//TODO: add logging error for failed compilation
     log_client_timing_compiled();
 	return compile_client_table(&internal_timing, &internal_client_timing_specs) >= 0;
 }
@@ -106,10 +110,10 @@ short_time local_default_slow_cycle()
 { return internal_client_timing_specs.default_slow_cycle; }
 
 long_time local_default_timeout()
-{ internal_client_timing_specs.default_timeout; }
+{ return internal_client_timing_specs.default_timeout; }
 
 long_time local_default_short_timeout()
-{ internal_client_timing_specs.default_short_timeout; }
+{ return internal_client_timing_specs.default_short_timeout; }
 
 short_time local_default_connect_timeout()
 { return internal_client_timing_specs.default_connect_timeout; }
@@ -129,10 +133,10 @@ long_time local_default_slow_cycle_dec()
 }
 
 long_time local_default_timeout_dec()
-{ internal_client_timing_specs.default_timeout; }
+{ return internal_client_timing_specs.default_timeout; }
 
 long_time local_default_short_timeout_dec()
-{ internal_client_timing_specs.default_short_timeout; }
+{ return internal_client_timing_specs.default_short_timeout; }
 
 long_time local_default_connect_timeout_dec()
 {

@@ -33,7 +33,6 @@
 #include "common-output.hpp"
 
 #include <unistd.h> //'close', 'write'
-#include <sys/stat.h> //'fstat'
 #include <stdio.h> //'fileno', 'setvbuf'
 #include <errno.h> //'errno'
 
@@ -79,7 +78,7 @@ extern "C" {
 	bool common_output::is_closed() const
 	{
 	struct stat output_status;
-	return broken_pipe || output_pipe < 0 || fstat(output_pipe, &output_status) < 0;
+	return broken_pipe || output_pipe < 0;
 	}
 
 	bool common_output::synchronize()

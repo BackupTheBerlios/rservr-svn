@@ -49,7 +49,6 @@ const timing_mode timing_static    = 0x00;
 const timing_mode timing_scaled    = 0x01 << 0;
 const timing_mode timing_recursive = 0x01 << 1;
 
-
 static int calculate_spec(const timing_spec *cChange, timing_spec *oOld, timing_value sScale)
 {
 	if (!cChange || !oOld) return -1;
@@ -231,7 +230,7 @@ long_time *pPlace)
 {
 	if (!pPlace || !vValue) return -1;
 	timing_value temporary = vValue->value;
-	if ((vValue->mode & timing_scaled) && sScale) temporary *= sScale;
+	if (vValue->mode & timing_scaled) temporary *= sScale;
 	if (temporary < 0) return -1;
 	*pPlace = (long_time) temporary;
 	return 0;
@@ -301,6 +300,7 @@ struct internal_client_timing_table *tTable)
 	if (timing_spec_to_timing_value(&iInput->output.write_retry_max, current_scale,
 	                                &tTable->write_retry_max) < 0)
 	return -1;
+
 
 	if (timing_spec_to_short_time(&iInput->command_send_regulate, iInput->scale.value,
 	                              &tTable->command_send_regulate) < 0)

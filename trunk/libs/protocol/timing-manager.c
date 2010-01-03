@@ -150,7 +150,7 @@ timing_mode *mMode)
 int set_server_timing_value(struct server_timing_table *sServer, text_info lLabel,
 timing_value vValue)
 {
-	if (!lLabel || !sServer || !vValue) return -1;
+	if (!lLabel || !sServer) return -1;
 
 	/*server timing-------------------------------------------------------*/
 	if (strncmp(lLabel, "client.", 7) == 0)
@@ -193,7 +193,7 @@ timing_value vValue)
 int set_server_timing_mode(struct server_timing_table *sServer, text_info lLabel,
 timing_mode mMode)
 {
-	if (!lLabel || !sServer || !mMode) return -1;
+	if (!lLabel || !sServer) return -1;
 
 	/*server timing-------------------------------------------------------*/
 	if (strncmp(lLabel, "client.", 7) == 0)
@@ -319,7 +319,7 @@ timing_mode *mMode)
 int set_client_timing_value(struct client_timing_table *cClient, text_info lLabel,
 timing_value vValue)
 {
-	if (!lLabel || !cClient || !vValue) return -1;
+	if (!lLabel || !cClient) return -1;
 
 	/*client timing-------------------------------------------------------*/
 	     SET_VALUE_CHECK_CLIENT(cClient, lLabel, vValue, scale)
@@ -360,7 +360,7 @@ timing_value vValue)
 int set_client_timing_mode(struct client_timing_table *cClient, text_info lLabel,
 timing_mode mMode)
 {
-	if (!lLabel || !cClient || !mMode) return -1;
+	if (!lLabel || !cClient) return -1;
 
 	/*client timing-------------------------------------------------------*/
 	     SET_MODE_CHECK_CLIENT(cClient, lLabel, mMode, scale)

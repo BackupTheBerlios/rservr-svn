@@ -105,7 +105,7 @@ static pid_t common_execute(command_handle cCommand)
 	if (!sent_command) return -1;
 
 	command_event outcome = wait_command_event(sent_command, event_register,
-	  local_default_timeout_dec());
+	  local_default_timeout());
 	clear_command_status(sent_command);
 	if (!(outcome & event_register)) return -1;
 
@@ -125,6 +125,7 @@ static pid_t common_execute(command_handle cCommand)
 
 static int pre_execute_shell(const std::string &sShell)
 {
+	//TODO: make this use 'safexec'?
     log_message_pre_execute_shell(sShell.c_str());
 	int outcome = system(sShell.c_str());
 	if (outcome != 0)
@@ -514,7 +515,7 @@ static int add_execute_common(text_info sShell, bool cCritical)
 }
 
 int add_execute_respawn(text_info sShell)
-{ return add_execute_common(sShell, true); }
+{ return add_execute_common(sShell, false); }
 
 int add_execute_critical_respawn(text_info sShell)
 { return add_execute_common(sShell, true); }

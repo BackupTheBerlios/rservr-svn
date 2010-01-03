@@ -156,13 +156,6 @@ int &iInput, int &oOutput)
 	return -1;
 	}
 
-	int null_file = open(null_device, O_RDWR);
-	dup2(null_file, execute_input);
-	dup2(null_file, execute_output);
-
-	if (null_file != execute_input && null_file != execute_output)
-	close(null_file);
-
 	int input_pipes[2];
 	int output_pipes[2];
 

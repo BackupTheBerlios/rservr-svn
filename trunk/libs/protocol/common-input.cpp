@@ -37,7 +37,6 @@ extern "C" {
 }
 
 #include <unistd.h> //'close', 'nanosleep', 'read'
-#include <sys/stat.h> //'fstat'
 #include <fcntl.h> //open modes
 #include <errno.h> //'errno'
 
@@ -242,7 +241,7 @@ extern "C" {
 	bool buffered_common_input::is_terminated() const
 	{
 	struct stat current_state;
-	return eof_reached || input_pipe < 0 || fstat(input_pipe, &current_state) != 0;
+	return eof_reached || input_pipe < 0;
 	}
 	//----------------------------------------------------------------------
 

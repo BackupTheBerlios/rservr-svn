@@ -37,7 +37,7 @@ extern "C" {
 #include "api/tools.h"
 }
 
-#include <unistd.h> //'timespec', 'nanosleep', 'getuid', 'getgid', 'isatty'
+#include <unistd.h> //'timespec', 'nanosleep', 'getuid', 'getgid', 'isatty', 'open', 'dup2'
 #include <signal.h> //'signal'
 #include <sys/stat.h> //'umask'
 #include <fcntl.h> //'fcntl'
@@ -85,9 +85,28 @@ static void register_handlers()
 	register_other_handlers();
 }
 
+static bool initialize_conduit()
+{
+	int null_file = open(null_device, O_RDWR);
+	if (null_file < 0) return false;
+	if (null_file < dup2(null_file, execute_input) < 0) return false;
+	if (null_file < dup2(null_file, execute_output) < 0) return false;
+
+	if (null_file != execute_input && null_file != execute_output)
+	close(null_file);
+
+	int current_state = 0x00;
+
+	current_state = fcntl(execute_input, F_GETFD);
+	fcntl(execute_input, F_SETFL, current_state | FD_CLOEXEC);
+	current_state = fcntl(execute_output, F_GETFD);
+	fcntl(execute_output, F_SETFL, current_state | FD_CLOEXEC);
+
+	return true;
+}
+
 
 static bool initialize_timing_table();
-
 static void initialize_environment();
 
 
@@ -96,6 +115,7 @@ result initialize_server()
 	register_handlers();
 	if (!initialize_timing_table()) return false;
 	if (!initialize_label_check())  return false;
+	if (!initialize_conduit())      return false;
 	initialize_environment();
 	umask(default_mask);
 	return true;
@@ -106,6 +126,7 @@ void cleanup_server()
 {
 	cleanup_label_check();
 	cleanup_server_command();
+
 }
 
 

@@ -464,6 +464,7 @@ long_time wWait)
 { return cancelable_wait_command_event(rReference, sStatus, wWait, NULL); }
 
 
+#include <signal.h>
 command_event cancelable_wait_command_event(command_reference rReference, command_event sStatus,
 long_time wWait, int(*cCallback)(command_reference, command_event))
 {
