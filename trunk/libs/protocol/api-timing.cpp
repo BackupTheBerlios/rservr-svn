@@ -66,14 +66,14 @@ static int calculate_spec(const timing_spec *cChange, timing_spec *oOld, timing_
 
 	else if ((cChange->update & update_mask) == update_divide)
 	 {
-	if (cChange->value == 0) return -1;
+	if (cChange->value == 0.0) return -1;
 	temporary /= cChange->value;
 	 }
 
 	else if ((cChange->update & update_mask) == update_calculate)
 	 {
-	if (sScale == 0) temporary = cChange->value;
-	else             temporary = cChange->value / (timing_value) sScale;
+	if (sScale == 0.0) temporary = cChange->value;
+	else               temporary = cChange->value / (timing_value) sScale;
 	 }
 
 	else return -1;
@@ -231,7 +231,7 @@ long_time *pPlace)
 {
 	if (!pPlace || !vValue) return -1;
 	timing_value temporary = vValue->value;
-	if (vValue->mode & timing_scaled) temporary *= sScale;
+	if ((vValue->mode & timing_scaled) && sScale) temporary *= sScale;
 	if (temporary < 0) return -1;
 	*pPlace = (long_time) temporary;
 	return 0;
@@ -243,7 +243,7 @@ timing_value *pPlace)
 {
 	if (!pPlace || !vValue) return -1;
 	timing_value temporary = vValue->value;
-	if (vValue->mode & timing_scaled) temporary *= sScale;
+	if ((vValue->mode & timing_scaled) && sScale) temporary *= sScale;
 	if (temporary < 0) return -1;
 	*pPlace = (timing_value) temporary;
 	return 0;

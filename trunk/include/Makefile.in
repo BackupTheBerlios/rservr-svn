@@ -174,7 +174,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 projectdir = $(includedir)/rservr
 project_HEADERS = $(srcdir)/../param.h
-nobase_include_HEADERS = rservr/config-parser.h rservr/filter.h \
+nobase_include_HEADERS = rservr/config-parser.h \
+	rservr/config-parser.hpp rservr/filter.h \
 	rservr/api/admin-client.h rservr/api/client-timing.h \
 	rservr/api/client.h rservr/api/command-queue.h \
 	rservr/api/command-table.h rservr/api/command.h \

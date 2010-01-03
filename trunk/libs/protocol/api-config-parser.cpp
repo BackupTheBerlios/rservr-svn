@@ -30,9 +30,7 @@
  | POSSIBILITY OF SUCH DAMAGE.
  +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-extern "C" {
-#include "config-parser.h"
-}
+#include "config-parser.hpp"
 
 #include <string>
 #include <list>
@@ -54,7 +52,7 @@ extern "C" {
 }
 
 
-static std::list <std::string> buffered_data, meta_lines, substitute_lines;
+static config_arguments_data buffered_data, meta_lines, substitute_lines;
 
 
 static std::string holding_line, holding_execute;
@@ -573,6 +571,80 @@ unsigned int number_remaining()
 
 
 
+config_arguments *steal_config_arguments(config_arguments *aArguments)
+{
+	if (buffered_data.size()) buffered_data.pop_front();
+
+	if (aArguments)
+	{
+	aArguments->list = buffered_data;
+	buffered_data.clear();
+	return NULL;
+	}
+
+	config_arguments *copied = new config_arguments;
+	copied->list = buffered_data;
+	buffered_data.clear();
+	return copied;
+}
+
+
+int free_config_arguments(config_arguments *aArguments)
+{
+	delete(aArguments);
+	return 0;
+}
+
+
+char **convert_config_array(const config_arguments *aArguments)
+{
+	if (!aArguments) return NULL;
+
+	char **list = new char*[ aArguments->list.size() + 1 ];
+
+	config_arguments_data::const_iterator current = aArguments->list.begin();
+
+	unsigned int I = 0;
+	while (current != aArguments->list.end())
+	list[I++] = strdup(current++->c_str());
+
+	list[I] = NULL;
+
+	return list;
+}
+
+
+int free_config_array(char **lList)
+{
+	if (!lList) return 0;
+
+	char **copy = lList;
+	while (*copy) free((void*) *copy++);
+	delete[] lList;
+
+	return 0;
+}
+
+
+extern char *convert_config_concat(const config_arguments *aArguments)
+{
+	if (!aArguments) return NULL;
+
+	std::string concated;
+
+	config_arguments_data::const_iterator current = aArguments->list.begin();
+
+	while  (current != aArguments->list.end())
+	{
+	if (concated.size()) concated += " ";
+	concated += current++->c_str();
+	}
+
+	return strdup(concated.c_str());
+}
+
+
+
 int argument_delim_split(const char *aArgument, char ***lList)
 {
 	if (!aArgument || !strlen(aArgument) || !lList) return -1;
@@ -608,7 +680,7 @@ int argument_delim_split(const char *aArgument, char ***lList)
 }
 
 
-extern int free_delim_split(char **lList)
+int free_delim_split(char **lList)
 {
 	if (!lList) return 0;
 

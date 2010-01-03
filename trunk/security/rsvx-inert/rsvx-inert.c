@@ -48,5 +48,5 @@ static const struct remote_security_filter inert_filter =
              cleanup: NULL };
 
 
-const struct remote_security_filter *load_security_filter(int tType, const char *dData, load_reference lLoad)
+const struct remote_security_filter *load_security_filter(int tType, const char **dData, load_reference lLoad)
 { return &inert_filter; }

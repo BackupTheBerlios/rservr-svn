@@ -162,6 +162,56 @@ extern int remaining_line(const char **Variable);
 extern unsigned int number_remaining();
 
 
+struct config_arguments;
+
+/*! \brief Steal the configuration arguments.
+ *
+ * If NULL is provided, a duplicate will be dynamically-allocated. If a pointer
+ * is provided, the underlying object will be overwritten. Use
+ * free_config_arguments to free a dynamically-allocated duplicate.
+ *
+ * \param Arguments container to steal arguments to
+ * \return NULL or a dynamically-allocated container
+ */
+extern struct config_arguments *steal_config_arguments(struct config_arguments
+  *Arguments);
+
+/*! \brief Free a converted argument list.
+ *
+ * @see steal_config_arguments
+ *
+ * \param List list to free
+ * \return success (0) or error (-1)
+ */
+extern int free_config_arguments(struct config_arguments *Arguments);
+
+/*! \brief Convert the configuration arguments.
+ *
+ * Use free_config_array to free the array when done.
+ *
+ * \param Arguments a list of stolen arguments
+ * \return dynamically-allocated list
+ */
+extern char **convert_config_array(const struct config_arguments *Arguments);
+
+/*! \brief Free a converted argument list.
+ *
+ * @see convert_config_array
+ *
+ * \param List list to free
+ * \return success (0) or error (-1)
+ */
+extern int free_config_array(char **List);
+
+/*! \brief Convert the configuration arguments.
+ *
+ * Dyanmically allocates a space-separated string of arguments.
+ *
+ * \return dynamically-allocated string
+ */
+extern char *convert_config_concat(const struct config_arguments *Arguments);
+
+
 /*! \brief Split an argument into a list.
  *
  * This will split an argument into a list using its first character as the

@@ -1,3 +1,14 @@
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
+
+______]|]]]]|]__]|]]]]|]__]|]]]]]|]__]|]]]]|]__]|]__]|]__]|]]]]|]_______,_______
+_____]|]__]|]__]|]_______]|]___]|]__]|]__]|]___]|]_]|]__]|]__]|]_______, ,______
+____]|]__]|]__]|]]]]|]__]|]]]]]|]__]|]__]|]____]|]]|]__]|]__]|]_______,   ,_____
+___]|]____________]|]__]|]________]|]__________]|]|]__]|]____________, -R- ,____
+__]|]____________]|]__]|]________]|]___________]||]__]|]____________,   |   ,___
+_]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
+                                                                      ||  |
+\*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
 /* This software is released under the BSD License.
  |
  | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
@@ -30,28 +41,29 @@
  | POSSIBILITY OF SUCH DAMAGE.
  +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef security_filter_h
-#define security_filter_h
+/*! \file rservr/config-parser.hpp
+ *  \author Kevin P. Barry
+ *  \brief Configuration shortcuts for C++.
+ */
 
-#include "api/command-queue.h"
-#include "remote/security.h"
+#ifndef rservr_config_parser_hpp
+#define rservr_config_parser_hpp
 
-#include "attributes.h"
+#include <list>
+#include <string>
+
+extern "C" {
+#include "config-parser.h"
+}
 
 
-int set_security_filter(const char*, const char**) ATTR_INT;
-void cleanup_filters() ATTR_INT;
+/*! List of configuration arguments.*/
+typedef std::list <std::string> config_arguments_data;
 
-socket_reference get_new_reference() ATTR_INT;
+/*! Storage struct of arguments.*/
+struct config_arguments
+{
+	config_arguments_data list;
+};
 
-int filter_incoming_address(socket_reference, socket_reference, const struct sockaddr*, socklen_t) ATTR_INT;
-void report_connection_error(socket_reference, int) ATTR_INT;
-int connect_from_host(socket_reference, remote_connection, const struct sockaddr*,
-socklen_t) ATTR_INT;
-int connect_to_host(socket_reference, remote_connection, const struct sockaddr*, socklen_t,
-const char*) ATTR_INT;
-int disconnect_general(socket_reference, remote_connection) ATTR_INT;
-send_short_func send_command_filter() ATTR_INT;
-receive_short_func receive_command_filter() ATTR_INT;
-
-#endif /*security_filter_h*/
+#endif //rservr_config_parser_hpp

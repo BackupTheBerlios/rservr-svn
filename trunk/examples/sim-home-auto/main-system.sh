@@ -15,9 +15,9 @@ if [ -n "$2" ]; then
   output="$2"
 fi
 
-{ echo "execute_critical @rservrd@-dxr";
-  echo "execute @rsv-fsrelay@system-connect";
-  echo "execute @./system-status@status";
+{ echo "execute_critical rservrd -dxr";
+  echo "execute rsv-fsrelay system-connect";
+  echo "execute ./system-status status";
   echo "register_all_wait"; } | \
 rservr system "$output"
 

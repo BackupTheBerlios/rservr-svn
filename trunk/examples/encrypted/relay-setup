@@ -1,4 +1,4 @@
-security_filter librsvx-tls.so @passwords@tpasswd@tpasswd.conf
+security_filter librsvx-tls.so passwords tpasswd tpasswd.conf
 
 #this restricts incoming connections to the local machine
 security_filter librsvx-localhost.so

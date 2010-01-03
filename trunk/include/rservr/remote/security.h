@@ -90,7 +90,7 @@ typedef ssize_t (*receive_short_func) (socket_reference, remote_connection, char
 #define RSERVR_REMOTE_OTHER 3
 
 
-extern const struct remote_security_filter *load_security_filter(int, const char*, load_reference);
+extern const struct remote_security_filter *load_security_filter(int, const char**, load_reference);
 
 #ifdef __cplusplus
 }

@@ -34,8 +34,9 @@ extern "C" {
 #include "respawn-load.h"
 }
 
+#include "config-parser.hpp"
+
 extern "C" {
-#include "config-parser.h"
 #include "api/tools.h"
 #include "api/admin-client.h"
 #include "api/monitor-client.h"
@@ -146,65 +147,59 @@ static void unblock_respawn()
 class respawn_execute : public action_list_item
 {
 public:
-	respawn_execute(text_info cCommand, text_info sShell, bool cCritical) :
+	respawn_execute(const config_arguments &cCommand, text_info sShell, bool cCritical) :
 	//NOTE: simpler to just parse every time
 	critical(cCritical), already(false), limit(respawn_limit),
 	priority(respawn_priority), permissions(respawn_permissions),
-	command(cCommand? cCommand : ""), shell(sShell? sShell : "")
-	{ log_message_new_respawn_execute(command.c_str(), limit); }
+	command(cCommand), shell(sShell? sShell : "")
+	{
+	if (command.list.size())
+    log_message_new_respawn_execute(command.list.begin()->c_str(), limit);
+	}
 
 	pid_t execute_action()
 	{
+	if (!command.list.size()) return -1;
+
 	if (limit >= 0 && limit-- == 0)
 	 {
-    log_message_respawn_execute_limit(command.c_str());
+    log_message_respawn_execute_limit(command.list.begin()->c_str());
 	if (critical)
 	  {
-    log_message_critical_execute_failure(command.c_str());
+    log_message_critical_execute_failure(command.list.begin()->c_str());
 	stop_message_queue();
 	  }
 	return -1;
 	 }
 	else
-    log_message_try_respawn_execute(command.c_str());
+    log_message_try_respawn_execute(command.list.begin()->c_str());
 
 	if (already && shell.size() && pre_execute_shell(shell) != 0)
 	 {
 	if (critical)
 	  {
-    log_message_critical_execute_failure(command.c_str());
+    log_message_critical_execute_failure(command.list.begin()->c_str());
 	stop_message_queue();
 	  }
 	return -1;
 	 }
 
-	char **split_command = NULL;
+	char **argument_array = convert_config_array(&command);
 
-	if (argument_delim_split(command.c_str(), &split_command) < 0 || !split_command)
-	 {
-	if (critical)
-	  {
-    log_message_critical_execute_failure(command.c_str());
-	stop_message_queue();
-	  }
-	return -1;
-	 }
-	std::string program_name = (*split_command)? *split_command : "";
-
-	command_handle new_command = create_new_exec_client_pid((info_list) split_command,
+	command_handle new_command = create_new_exec_client_pid((info_list) argument_array,
 	  getuid(), getgid(), priority, permissions, 0x00);
-	free_delim_split(split_command);
+	free_config_array(argument_array);
 
 	pid_t new_process = common_execute(new_command);
 
 	if (new_process >= 0)
-    log_message_respawn_execute(program_name.c_str(), limit);
+    log_message_respawn_execute(command.list.begin()->c_str(), limit);
 	else
-    log_message_fail_respawn_execute(program_name.c_str());
+    log_message_fail_respawn_execute(command.list.begin()->c_str());
 
 	if (new_process < 0 && critical)
 	 {
-    log_message_critical_execute_failure(command.c_str());
+    log_message_critical_execute_failure(command.list.begin()->c_str());
 	stop_message_queue();
 	 }
 
@@ -217,17 +212,18 @@ private:
 	int              limit;
 	command_priority priority;
 	permission_mask  permissions;
-	std::string command, shell;
+	config_arguments command;
+	std::string      shell;
 };
 
 
 class respawn_system : public action_list_item
 {
 public:
-	respawn_system(text_info cCommand, text_info sShell, bool cCritical) :
+	respawn_system(std::string cCommand, text_info sShell, bool cCritical) :
 	critical(cCritical), already(false), limit(respawn_limit),
 	priority(respawn_priority), permissions(respawn_permissions),
-	command(cCommand? cCommand : ""), shell(sShell? sShell : "")
+	command(cCommand), shell(sShell? sShell : "")
 	{ log_message_new_respawn_system(command.c_str(), limit); }
 
 	pid_t execute_action()
@@ -498,10 +494,15 @@ int block_for_respawn()
 }
 
 
-static int add_execute_common(text_info cCommand, text_info sShell, bool cCritical)
+static int add_execute_common(text_info sShell, bool cCritical)
 {
+	config_arguments arguments;
+	steal_config_arguments(&arguments);
+
 	add_new_respawn new_execute(&client_actions);
-	action_list_item *new_item = new respawn_execute(cCommand, sShell, cCritical);
+
+	action_list_item *new_item = new respawn_execute(arguments, sShell, cCritical);
+
 	if (!new_item) return -1;
 
 	if (!new_execute(new_item))
@@ -512,20 +513,26 @@ static int add_execute_common(text_info cCommand, text_info sShell, bool cCritic
 	return 0;
 }
 
-int add_execute_respawn(text_info cCommand, text_info sShell)
-{ return add_execute_common(cCommand, sShell, false); }
+int add_execute_respawn(text_info sShell)
+{ return add_execute_common(sShell, true); }
 
-int add_execute_critical_respawn(text_info cCommand, text_info sShell)
-{ return add_execute_common(cCommand, sShell, true); }
+int add_execute_critical_respawn(text_info sShell)
+{ return add_execute_common(sShell, true); }
 
 
-static int add_system_common(text_info cCommand, text_info sShell, bool cCritical)
+static int add_system_common(text_info sShell, bool cCritical)
 {
-	add_new_respawn new_execute(&client_actions);
-	action_list_item *new_item = new respawn_system(cCommand, sShell, cCritical);
+	config_arguments arguments;
+	steal_config_arguments(&arguments);
+
+	add_new_respawn new_system(&client_actions);
+
+	action_list_item *new_item =
+	  new respawn_system(convert_config_concat(&arguments), sShell, cCritical);
+
 	if (!new_item) return -1;
 
-	if (!new_execute(new_item))
+	if (!new_system(new_item))
 	{
 	delete new_item;
 	return -1;
@@ -533,11 +540,11 @@ static int add_system_common(text_info cCommand, text_info sShell, bool cCritica
 	return 0;
 }
 
-int add_system_respawn(text_info cCommand, text_info sShell)
-{ return add_system_common(cCommand, sShell, false); }
+int add_system_respawn(text_info sShell)
+{ return add_system_common(sShell, false); }
 
-int add_system_critical_respawn(text_info cCommand, text_info sShell)
-{ return add_system_common(cCommand, sShell, true); }
+int add_system_critical_respawn(text_info sShell)
+{ return add_system_common(sShell, true); }
 
 
 void __monitor_update_hook(const struct monitor_update_data *dData)

@@ -123,9 +123,9 @@ static const struct remote_security_filter internal_filter =
              cleanup: NULL };
 
 
-const struct remote_security_filter *load_security_filter(int tType, const char *dData, load_reference lLoad)
+const struct remote_security_filter *load_security_filter(int tType, const char **dData, load_reference lLoad)
 {
-	loaded_filters[lLoad] = dData? dData : "";
+	loaded_filters[lLoad] = (dData && *dData)? *dData : "";
 
 
 	/*NOTE: this is not a good example of a hash operation*/

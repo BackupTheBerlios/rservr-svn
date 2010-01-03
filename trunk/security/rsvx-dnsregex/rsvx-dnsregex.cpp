@@ -86,12 +86,12 @@ static const struct remote_security_filter inert_filter =
              cleanup: NULL };
 
 
-const struct remote_security_filter *load_security_filter(int tType, const char *dData, load_reference lLoad)
+const struct remote_security_filter *load_security_filter(int tType, const char **dData, load_reference lLoad)
 {
 	if (tType != RSERVR_REMOTE_NET) return &inert_filter;
 
 	regex_check new_regex;
-	if (!(new_regex = dData)) return NULL;
+	if (!dData || !(new_regex = *dData)) return NULL;
 
 	loaded_checks[lLoad] = new_regex;
 	return &internal_filter;

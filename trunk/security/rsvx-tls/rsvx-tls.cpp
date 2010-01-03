@@ -403,7 +403,7 @@ static const struct remote_security_filter internal_filter =
              cleanup: &cleanup };
 
 
-const struct remote_security_filter *load_security_filter(int tType, const char *dData, load_reference lLoad)
+const struct remote_security_filter *load_security_filter(int tType, const char **dData, load_reference lLoad)
 {
 	if (initialized) return NULL;
 
@@ -426,11 +426,12 @@ const struct remote_security_filter *load_security_filter(int tType, const char 
 
 	forwarder_type = tType;
 
-	char **initializers = NULL, **current = NULL;
-	int argument_count;
+	const char **initializers = dData, **current = initializers;
+	int argument_count = 0;
 
-	if ((argument_count = argument_delim_split(dData, &initializers)) > 0 &&
-	  (current = initializers))
+	if (current) while (*current++) argument_count++;
+
+	if (argument_count > 0 && (current = initializers))
 	//srp initialization
 	{
 	use_srp_auth = true;
@@ -445,7 +446,6 @@ const struct remote_security_filter *load_security_filter(int tType, const char 
 
 	if (!parse_passwd())
 	  {
-	free_delim_split(initializers);
 	gnutls_global_deinit();
 	return NULL;
 	  }
@@ -460,8 +460,6 @@ const struct remote_security_filter *load_security_filter(int tType, const char 
 	gnutls_srp_set_server_credentials_file(srp_server, srp_passwd,
 	  srp_passwd_conf);
 	 }
-
-	free_delim_split(initializers);
 	}
 
 	else

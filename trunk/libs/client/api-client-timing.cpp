@@ -106,10 +106,10 @@ short_time local_default_slow_cycle()
 { return internal_client_timing_specs.default_slow_cycle; }
 
 long_time local_default_timeout()
-{ return internal_client_timing_specs.default_timeout; }
+{ internal_client_timing_specs.default_timeout; }
 
 long_time local_default_short_timeout()
-{ return internal_client_timing_specs.default_short_timeout; }
+{ internal_client_timing_specs.default_short_timeout; }
 
 short_time local_default_connect_timeout()
 { return internal_client_timing_specs.default_connect_timeout; }
@@ -129,10 +129,10 @@ long_time local_default_slow_cycle_dec()
 }
 
 long_time local_default_timeout_dec()
-{ return internal_client_timing_specs.default_timeout; }
+{ internal_client_timing_specs.default_timeout; }
 
 long_time local_default_short_timeout_dec()
-{ return internal_client_timing_specs.default_short_timeout; }
+{ internal_client_timing_specs.default_short_timeout; }
 
 long_time local_default_connect_timeout_dec()
 {

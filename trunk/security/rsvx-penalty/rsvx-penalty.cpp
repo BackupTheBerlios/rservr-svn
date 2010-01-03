@@ -165,12 +165,12 @@ static const struct remote_security_filter inert_filter =
              cleanup: NULL };
 
 
-const struct remote_security_filter *load_security_filter(int tType, const char *dData, load_reference lLoad)
+const struct remote_security_filter *load_security_filter(int tType, const char **dData, load_reference lLoad)
 {
 	if (tType != RSERVR_REMOTE_NET) return &inert_filter;
 
 	double timeout = 0.0;
-	if (!parse_double(dData, &timeout) || timeout < 0.0) return NULL;
+	if (!dData || !parse_double(*dData, &timeout) || timeout < 0.0) return NULL;
 
 	loaded_checks[lLoad].limit = (time_reference) timeout;
 	return &internal_filter;

@@ -92,7 +92,7 @@ if [ $# -ne 1 ]; then
   exit 1
 fi
 
-( echo "execute_critical @<b>rservrd</b>@-dxr"
+( echo "execute_critical <b>rservrd</b> -dxr"
   echo "register_all_wait" ) | \
 <b>rservr</b> "$1" "$1.log"
 </pre>
@@ -122,8 +122,8 @@ if [ $# -ne 1 ]; then
 fi
 
 exec <b>rservr</b> "$1" "$1.log" \
-  &lt;( echo "execute_critical @<b>rservrd</b>@-dxr"
-     echo "execute @<b>rsv-console</b>@console" ) <i>#(&lt;-- as an example)</i>
+  &lt;( echo "execute_critical <b>rservrd</b> -dxr"
+     echo "execute <b>rsv-console</b> console" ) <i>#(&lt;-- as an example)</i>
 </pre>
       </div>
       <p>
@@ -288,20 +288,20 @@ exec <b>rservr</b> "$1" "$1.log" \
       <p class="overview_content style_definition_long"> This value must be positive or 0 for non-super-user servers. Super-user servers can use a negative value. Offsets must be within the system's limits, but a failed "nicing" won't prevent a client from being added to the server. </p>
       <table summary="definition" class="overview_content">
         <tr>
-          <td width="350" align="left" class="style_term"> execute <i>&lt;command&gt;</i>
+          <td width="350" align="left" class="style_term"> execute <i>&lt;command&gt; (arguments...)</i>
           </td>
           <td class="style_definition_short"> execute a new client </td>
         </tr>
         <tr>
-          <td width="350" align="left" class="style_term"> execute_critical <i>&lt;command&gt;</i>
+          <td width="350" align="left" class="style_term"> execute_critical <i>&lt;command&gt; (arguments...)</i>
           </td>
           <td class="style_definition_short"> execute a critical new client </td>
         </tr>
       </table>
-      <p class="overview_content style_definition_long"> These options execute a new client using a command string. The first character of the string denotes that which separates the components of the command. The <span class="style_command_line">execute_critical</span> option will cause the server to exit if the client can't be started (<u>even</u> if "<b>!</b>" is used to allow the line to fail) or when the client process exits. Example: </p>
+      <p class="overview_content style_definition_long"> These options execute a new client using a command string. The first character of the string denotes that which separates the components of the command. The <span class="style_command_line">execute_critical</span> option will cause the server to exit if the client can't be started (<u>even</u> if "<b>!</b>" is used to allow the line to fail) or when the client process exits. For example: </p>
       <div align="center">
         <p class="style_definition_example">
-          <b>execute "@<i>&lt;program&gt;</i>@<i>&lt;argument1&gt;</i>@<i>&lt;argument2&gt;</i>"</b>
+          <b>execute ./program argument1 argument2</b>
         </p>
       </div>
       <table summary="definition" class="overview_content">
@@ -316,10 +316,10 @@ exec <b>rservr</b> "$1" "$1.log" \
           <td class="style_definition_short"> create a critical new shell command client </td>
         </tr>
       </table>
-      <p class="overview_content style_definition_long"> These options create a new client using a string interpreted by the default system shell. The <span class="style_command_line">system_critical</span> option will cause the server to exit if the client can't be started (<u>even</u> if "<b>!</b>" is used to allow the line to fail) or when the client process exits. Example: </p>
+      <p class="overview_content style_definition_long"> These options create a new client using a string interpreted by the default system shell. The <span class="style_command_line">system_critical</span> option will cause the server to exit if the client can't be started (<u>even</u> if "<b>!</b>" is used to allow the line to fail) or when the client process exits. This method can look very similar to the <span class="style_command_line">execute</span>; however, it allows the shell to interpret the command. For example: </p>
       <div align="center">
         <p class="style_definition_example">
-          <b>system "<i>&lt;program&gt;</i> <i>&lt;argument1&gt;</i> <i>&lt;argument2&gt;</i>"</b>
+          <b>system ./program 2&gt; errors.log</b>
         </p>
       </div>
       <table summary="definition" class="overview_content">

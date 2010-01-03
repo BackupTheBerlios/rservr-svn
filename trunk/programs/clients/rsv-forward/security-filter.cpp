@@ -148,7 +148,7 @@ socket_reference get_new_reference()
 }
 
 
-int set_security_filter(const char *fFile, const char *aArguments)
+int set_security_filter(const char *fFile, const char **aArguments)
 {
 	if (!fFile || !strlen(fFile)) return -1;
 
@@ -165,8 +165,8 @@ int set_security_filter(const char *fFile, const char *aArguments)
 
 	if (!handle) return -1;
 
-	const struct remote_security_filter*(*load_function)(int, const char*, load_reference) =
-	  (const struct remote_security_filter*(*)(int, const char*, load_reference))
+	const struct remote_security_filter*(*load_function)(int, const char**, load_reference) =
+	  (const struct remote_security_filter*(*)(int, const char**, load_reference))
 	  dlsym(handle, "load_security_filter");
 
 	if (!load_function) return -1;

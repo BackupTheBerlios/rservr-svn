@@ -371,15 +371,13 @@ static void parent_signal(int sSignal)
 
 static int execute_common(int cCritical)
 {
-	const char *config_segment = NULL;
+	struct config_arguments *arguments = steal_config_arguments(NULL);
 
-	if (remaining_line(&config_segment) < 0 || !config_segment) return -1;
+	char **exec_arguments = convert_config_array(arguments);
+	free_config_arguments(arguments);
 
-	char **exec_arguments = NULL;
-
-	if (argument_delim_split(config_segment, &exec_arguments) < 0) return -1;
 	int outcome = create_exec_client(exec_arguments, cCritical);
-	free_delim_split(exec_arguments);
+	free_config_array(exec_arguments);
 
 	return outcome? 0 : -1;
 }
@@ -387,13 +385,15 @@ static int execute_common(int cCritical)
 
 static int system_common(int cCritical)
 {
-	const char *config_segment = NULL;
+	struct config_arguments *arguments = steal_config_arguments(NULL);
 
-	if (remaining_line(&config_segment) < 0 || !config_segment) return -1;
-	char *command = strdup(config_segment);
-	int outcome = create_system_client(command, cCritical);
-	free(command);
-	return outcome? 0 :-1;
+	char *system_argument = convert_config_concat(arguments);
+	free_config_arguments(arguments);
+
+	int outcome = create_system_client(system_argument, cCritical);
+	free(system_argument);
+
+	return outcome? 0 : -1;
 }
 
 

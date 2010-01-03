@@ -199,46 +199,18 @@ static int parse_file(FILE *fFile, const char *nName, const char *pPath)
 }
 
 
-static int process_command_config(char **cCommand, char **sShell)
-{
-	if (!cCommand || !sShell || *cCommand || *sShell) return -1;
-	const char *current_argument = NULL;
-
-	if (number_remaining() == 2)
-	 {
-	if (next_argument(&current_argument) < 0 || !current_argument) return -1;
-	*cCommand = strdup(current_argument);
-	if (remaining_line(&current_argument) < 0 || !current_argument)
-	  {
-	free(*cCommand);
-	*cCommand = NULL;
-	return -1;
-	  }
-	*sShell = strdup(current_argument);
-	 }
-
-	else
-	 {
-	if (remaining_line(&current_argument) < 0 || !current_argument) return -1;
-	*cCommand = strdup(current_argument);
-	 }
-
-	return 0;
-}
-
-
 static int process_line()
 {
 	const char *config_segment = NULL;
-	char *command = NULL, *shell = NULL;
+	char *shell = NULL;
 
 	if (current_argument(&config_segment) < 0 || !config_segment) return 0;
 
 	     if (strcmp(config_segment, "execute") == 0)
 	{
-	if (process_command_config(&command, &shell) < 0) return -1;
-	int outcome = add_execute_respawn(command, shell);
-	free(command);
+	if (next_argument(&config_segment) < 0) return -1;
+	shell = strdup(config_segment);
+	int outcome = add_execute_respawn(shell);
 	free(shell);
 	if (outcome < 0) return -1;
 	}
@@ -246,9 +218,9 @@ static int process_line()
 
 	else if (strcmp(config_segment, "execute_critical") == 0)
 	{
-	if (process_command_config(&command, &shell) < 0) return -1;
-	int outcome = add_execute_critical_respawn(command, shell);
-	free(command);
+	if (next_argument(&config_segment) < 0) return -1;
+	shell = strdup(config_segment);
+	int outcome = add_execute_critical_respawn(shell);
 	free(shell);
 	if (outcome < 0) return -1;
 	}
@@ -256,9 +228,9 @@ static int process_line()
 
 	else if (strcmp(config_segment, "system") == 0)
 	{
-	if (process_command_config(&command, &shell) < 0) return -1;
-	int outcome = add_system_respawn(command, shell);
-	free(command);
+	if (next_argument(&config_segment) < 0) return -1;
+	shell = strdup(config_segment);
+	int outcome = add_system_respawn(shell);
 	free(shell);
 	if (outcome < 0) return -1;
 	}
@@ -266,9 +238,9 @@ static int process_line()
 
 	else if (strcmp(config_segment, "system_critical") == 0)
 	{
-	if (process_command_config(&command, &shell) < 0) return -1;
-	int outcome = add_system_critical_respawn(command, shell);
-	free(command);
+	if (next_argument(&config_segment) < 0) return -1;
+	shell = strdup(config_segment);
+	int outcome = add_system_critical_respawn(shell);
 	free(shell);
 	if (outcome < 0) return -1;
 	}

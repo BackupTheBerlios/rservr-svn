@@ -36,10 +36,10 @@
 #include "api/command.h"
 
 
-int add_execute_respawn(text_info, text_info);
-int add_execute_critical_respawn(text_info, text_info);
-int add_system_respawn(text_info, text_info);
-int add_system_critical_respawn(text_info, text_info);
+int add_execute_respawn(text_info);
+int add_execute_critical_respawn(text_info);
+int add_system_respawn(text_info);
+int add_system_critical_respawn(text_info);
 void set_limit(unsigned int);
 void set_priority(command_priority);
 void set_permissions(permission_mask);

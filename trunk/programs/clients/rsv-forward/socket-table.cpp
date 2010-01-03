@@ -34,9 +34,10 @@ extern "C" {
 #include "socket-table.h"
 }
 
+#include "config-parser.hpp"
+
 extern "C" {
 #include "param.h"
-#include "config-parser.h"
 #include "api/tools.h"
 #include "plugins/rsvp-netcntl-hook.h"
 #include "api/client.h"
@@ -44,6 +45,9 @@ extern "C" {
 #include "api/client-timing.h"
 #include "api/message-queue.h"
 }
+
+#include <string>
+#include <vector>
 
 #include <stdio.h> //'fprintf'
 #include <string.h> //'strerror', 'strcmp', 'strdup'
@@ -198,17 +202,26 @@ static int parse_config_line(const char *lLine, const char *pPath)
 	 }
 
 	if (next_argument(&config_segment) < 0 || !config_segment) return allow_fail;
-	char *filter_name = strdup(config_segment);
-	remaining_line(&(config_segment = NULL));
+	std::string filter_name = config_segment;
 
-	if (set_security_filter(filter_name, config_segment) < 0)
+	config_arguments arguments;
+	steal_config_arguments(&arguments);
+
+	char **argument_array = convert_config_array(&arguments);
+	if (!argument_array)
 	 {
-	fprintf(stderr, "%s: can't load security filter '%s'\n", client_name, filter_name);
-	free(filter_name);
-	return allow_fail;
+	fprintf(stderr, "%s: allocation error: %s\n", client_name, strerror(errno));
+	return 1;
 	 }
 
-	free(filter_name);
+	int outcome = set_security_filter(filter_name.c_str(), (const char**) argument_array);
+	free_config_array(argument_array);
+
+	if (outcome < 0)
+	 {
+	fprintf(stderr, "%s: can't load security filter '%s'\n", client_name, filter_name.c_str());
+	return allow_fail;
+	 }
 	}
 
 

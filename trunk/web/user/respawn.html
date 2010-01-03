@@ -64,12 +64,12 @@ rsv-respawn <b><i>&lt;name&gt; &lt;config file&gt; ...</i></b>
 <i>#this is a general example of a respawn configuration</i>
 
 limit 5                              <i>#limit to 5 respawns (including the first)</i>
-execute @<b>rsv-echo</b>@echoer1 'sleep 1;' <i>#sleep 1 second before respawning</i>
+execute "sleep 1;" <b>rsv-echo</b> echoer1 <i>#sleep 1 second before respawning</i>
 
 priority 255 <i>#give all subsequent clients a minimum priority of 255</i>
 
 limit 0                   <i>#allow unlimited respawns</i>
-system "<b>rsv-echo</b> echoer2" <i>#don't execute a shell command between respawns</i>
+system "" <b>rsv-echo</b> echoer2 <i>#don't execute a shell command between respawns</i>
 </pre>
       </div>
       <p>
@@ -88,27 +88,27 @@ system "<b>rsv-echo</b> echoer2" <i>#don't execute a shell command between respa
       </div>
       <table summary="definition" class="overview_content">
         <tr>
-          <td width="400" align="left" class="style_term"> execute <i>&lt;command&gt;</i> <i>(shell)</i>
+          <td width="400" align="left" class="style_term"> execute <i>&lt;shell&gt;</i> <i>&lt;command&gt;</i>
           </td>
           <td class="style_definition_short"> execute a new client </td>
         </tr>
         <tr>
-          <td width="400" align="left" class="style_term"> execute_critical <i>&lt;command&gt;</i> <i>(shell)</i>
+          <td width="400" align="left" class="style_term"> execute_critical <i>&lt;shell&gt;</i> <i>&lt;command&gt;</i>
           </td>
           <td class="style_definition_short"> execute a critical new client </td>
         </tr>
         <tr>
-          <td width="400" align="left" class="style_term"> system <i>&lt;command&gt;</i> <i>(shell)</i>
+          <td width="400" align="left" class="style_term"> system <i>&lt;shell&gt;</i> <i>&lt;command&gt;</i>
           </td>
           <td class="style_definition_short"> create a new shell command client </td>
         </tr>
         <tr>
-          <td width="400" align="left" class="style_term"> system_critical <i>&lt;command&gt;</i> <i>(shell)</i>
+          <td width="400" align="left" class="style_term"> system_critical <i>&lt;shell&gt;</i> <i>&lt;command&gt;</i>
           </td>
           <td class="style_definition_short"> create a critical new shell command client </td>
         </tr>
       </table>
-      <p class="overview_content style_definition_long"> These function almost identically to their <span class="style_command_line">rservr</span> counterparts, except they result in the sending of new-client requests for the server itself to start. The *<span class="style_command_line">_critical</span> variants will cause the <u>respawn client</u> to exit rather than the server itself.  If the respawn client itself was started as a critical client then this will incidentally cause <span class="style_command_line">rservr</span> to exit, as well. The optional argument indicates a shell command to execute <u>between</u> respawn attempts. The shell command will only be executed after the first exit of the corresponding client, and a failure of the shell command will result in the client not being restarted. This can be used to insert a short pause before restarting a client, or to check external information to determine if it should even be restarted.  If a client fails to be restarted for any reason then it will be removed from the list of clients to monitor. </p>
+      <p class="overview_content style_definition_long"> These function almost identically to their <span class="style_command_line">rservr</span> counterparts, except they result in the sending of new-client requests for the server itself to start. The *<span class="style_command_line">_critical</span> variants will cause the <u>respawn client</u> to exit rather than the server itself.  If the respawn client itself was started as a critical client then this will incidentally cause <span class="style_command_line">rservr</span> to exit, as well. The first argument indicates a shell command to execute <u>between</u> respawn attempts. The shell command will only be executed after the first exit of the corresponding client, and a failure of the shell command will result in the client not being restarted. This can be used to insert a short pause before restarting a client, or to check external information to determine if it should even be restarted.  If a client fails to be restarted for any reason then it will be removed from the list of clients to monitor. </p>
       <table summary="definition" class="overview_content">
         <tr>
           <td width="400" align="left" class="style_term"> limit <i>&lt;number&gt;</i>

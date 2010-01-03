@@ -22,23 +22,23 @@ trap clean_up SIGINT
 
 echo "starting 'node3'..."
 
-{ echo "execute_critical @rservrd@-dxr";
-  echo "execute @rsv-fsrelay@relay3in";
+{ echo "execute_critical rservrd -dxr";
+  echo "execute rsv-fsrelay relay3in";
   echo "register_all_wait"; } | \
 rservr node3 "$output"
 
 echo "starting 'node2'..."
 
-{ echo "execute_critical @rservrd@-dx";
-  echo "execute @rsv-fsrelay@relay2out";
-  echo "execute @rsv-fsrelay@relay2in";
+{ echo "execute_critical rservrd -dx";
+  echo "execute rsv-fsrelay relay2out";
+  echo "execute rsv-fsrelay relay2in";
   echo "register_all_wait"; } | \
 rservr node2 "$output"
 
 echo "starting 'node1'..."
 
-{ echo "execute_critical @rservrd@-dxr";
-  echo "execute @rsv-fsrelay@relay1out";
+{ echo "execute_critical rservrd -dxr";
+  echo "execute rsv-fsrelay relay1out";
   echo "register_all_wait"; } | \
 rservr node1 "$output"
 

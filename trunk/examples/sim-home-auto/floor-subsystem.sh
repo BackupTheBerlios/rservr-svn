@@ -7,8 +7,8 @@ output="$1"
 server="$2"
 shift 2
 
-{ echo "execute_critical @rservrd@-dxr";
-  echo "execute @rsv-fsrelay@$server-connect";
+{ echo "execute_critical rservrd -dxr";
+  echo "execute rsv-fsrelay $server-connect";
   echo "register_all_wait"; } | \
 rservr "$server" "$output"
 
