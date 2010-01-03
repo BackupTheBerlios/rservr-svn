@@ -1,6 +1,7 @@
-INCLUDE=-I/usr/include -I/usr/local/include
-PLUGINS=$(shell if test -z "$(PREFIX)"; then echo /usr/local; else echo "$(PREFIX)"; fi)/libexec/rservr
-LINK=-L/usr/lib -L/usr/local/lib -L$(PLUGINS) -Xlinker -rpath=$(PLUGINS)
+BASE=$(shell if test -z "$(PREFIX)"; then echo /usr/local; else echo "$(PREFIX)"; fi)
+PLUGINS=$(BASE)/libexec/rservr
+INCLUDE=-I$(BASE)/include
+LINK=-L$(BASE)/lib -L$(PLUGINS) -Xlinker -rpath=$(PLUGINS)
 
 .PHONY: all clean
 
