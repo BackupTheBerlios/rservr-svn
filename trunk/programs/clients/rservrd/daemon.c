@@ -212,7 +212,7 @@ int daemon_main(int argc, char *argv[])
 	/*NOTE: can't have queue running to load plugins*/
 	load_internal_plugins(); /*NOTE: ignore return value*/
 
-	allow_privileged_responses();
+	allow_responses();
 	if (!start_message_queue())
 	{
 	fprintf(stderr, "%s: could not start message queue\n", argv[0]);

@@ -73,10 +73,13 @@ DEFINE_MESSAGE_HEAD(name)
 
 #define TEMPORARY_VALUE value
 
+#define TEMPORARY_CONTEXT context
+
 #define PROCESS_START \
 command_reference ATTR_UNUSED message_number; \
 char ATTR_UNUSED *CURRENT_DATA = NULL; \
-int ATTR_UNUSED TEMPORARY_VALUE;
+int ATTR_UNUSED TEMPORARY_VALUE; \
+struct wait_context ATTR_UNUSED *TEMPORARY_CONTEXT = NULL;
 
 #define NEXT_INPUT (mMessage && (CURRENT_DATA = *mMessage++))
 
@@ -171,7 +174,7 @@ if (strlen(CURRENT_DATA)) \
   if (!new_command) ABORT_NO_SEND_ACTION(name, action) \
   if (!(message_number = send_command(new_command))) ABORT_NO_SEND_ACTION(name, action) \
   destroy_command(new_command); \
-  if (!wait_message_complete(fFile, TAGGED_NAME(name), message_number)) return 0; }
+  if (!wait_message_complete(fFile, TAGGED_NAME(name), message_number, NULL)) return 0; }
 
 #define RESPONSE_WAIT_ACTION(name, command, condition, action) \
 { command_handle new_command = command; \
@@ -199,11 +202,15 @@ if (strlen(CURRENT_DATA)) \
 
 #define REGISTER_SEND(name, command) REGISTER_SEND_ACTION(name, command,)
 #define REGISTER_SEND_ACTION(name, command, action) \
-RESPONSE_WAIT_ACTION(name, command, wait_message_register(fFile, TAGGED_NAME(name), message_number), action)
+{ RESPONSE_WAIT_ACTION(name, command, wait_message_register(fFile, TAGGED_NAME(name), message_number, \
+  &TEMPORARY_CONTEXT), action); \
+  finish_wait_message(fFile, TEMPORARY_CONTEXT, 0); }
 
 #define RESPONSE_SEND(name, command) RESPONSE_SEND_ACTION(name, command,)
 #define RESPONSE_SEND_ACTION(name, command, action) \
-RESPONSE_WAIT_ACTION(name, command, wait_message_complete(fFile, TAGGED_NAME(name), message_number), action)
+{ RESPONSE_WAIT_ACTION(name, command, wait_message_complete(fFile, TAGGED_NAME(name), message_number, \
+  &TEMPORARY_CONTEXT), action); \
+  finish_wait_message(fFile, TEMPORARY_CONTEXT, 1); }
 
 /*END complex function components~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 

@@ -87,26 +87,23 @@ int interface_main(int argc, char *argv[])
 
 	while (fgets(input_data, PARAM_MAX_INPUT_SECTION, new_stream))
 	 {
+	if (strlen(input_data)) input_data[ strlen(input_data) - 1 ] = 0x00;
+	if (!strlen(input_data)) continue;
 	current = input_data;
 
 	if (!(working = strsep(&current, " "))) continue;
 
 	if (strcmp(working, "\\") == 0)
-	  {
-	fprintf(stdout, "%s", current);
-	fflush(stdout);
-	  }
+	fprintf(stdout, "%s\n", current);
 
 	else if (parse_integer16(working, &single_value))
 	  {
 	return_value |= single_value;
 	if (!current) continue;
-	fprintf(stderr, "%s", current);
-	fflush(stderr);
-	if (!--I) break;
+	fprintf(stderr, "%s\n", current);
 	  }
 
-	else if (strcmp(working, "\n") != 0) fprintf(stderr, "(bad response data received)\n");
+	else fprintf(stderr, "(bad response data received)\n");
 	 }
 
 	shutdown(*current_socket, SHUT_RDWR);

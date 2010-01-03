@@ -30,29 +30,17 @@
  | POSSIBILITY OF SUCH DAMAGE.
  +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef daemon_commands_h
-#define daemon_commands_h
+extern "C" {
+#include "daemon-regex.h"
+}
 
-#include "api/command.h"
-
-#include <sys/types.h> /* 'getpid' */
-#include <stdio.h> /* 'FILE' */
+#include "global/regex-check.hpp"
 
 
-int process_message(char*, FILE*);
-int show_commands();
-int set_priority_permission(char*, int, int);
-const char *retrieve_info(const char*);
+static regex_check daemon_regex;
 
-void enable_register_wait();
+int set_daemon_regex(const char *eEntry)
+{ return daemon_regex = eEntry; }
 
-void return_message(FILE*, const char*, unsigned char);
-int return_data(FILE*, const char*);
-
-struct wait_context;
-
-int wait_message_complete(FILE*, const char*, command_reference, struct wait_context**);
-int wait_message_register(FILE*, const char*, command_reference, struct wait_context**);
-void finish_wait_message(FILE*, struct wait_context*, result); /*use 0 to free context only (no send)*/
-
-#endif /*daemon_commands_h*/
+int check_daemon_regex(const char *eEntry)
+{ return daemon_regex == eEntry; }

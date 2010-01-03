@@ -30,6 +30,10 @@
  | POSSIBILITY OF SUCH DAMAGE.
  +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+/* NOTE: this *must* stay a C file because FreeBSD doesn't use a POSIX-compliant
+   prototype for 'scandir'. C compilers generally just give a warning, which is
+   easier to deal with than an error. */
+
 #include "daemon-socket.h"
 
 #include "param.h"
@@ -51,7 +55,7 @@
 #include <signal.h> /* 'SIGUSR1' */
 
 #ifdef PARAM_RSERVRD_TARGET_REGEX
-#include <regex.h> /* regular expressions */
+#include "daemon-regex.h"
 #endif
 
 
@@ -478,14 +482,10 @@ static int connect_daemon(const char *nName)
 
 #ifdef PARAM_RSERVRD_TARGET_REGEX
 
-static regex_t compiled_expression;
-static int inverse_regex = 0;
-
 /*(a warning might occur because of the 'const' in the argument)*/
 static int regex_table_entry(const struct dirent *eEntry)
 {
-	if ( eEntry && eEntry->d_type == DT_SOCK &&
-	     (inverse_regex ^ !regexec(&compiled_expression, eEntry->d_name, 0, NULL, 0x00)) )
+	if (eEntry && eEntry->d_type == DT_SOCK && check_daemon_regex(eEntry->d_name))
 	{
 	return (resolve_existing_entry(eEntry->d_name) == -1)? 1 : 0;
 	}
@@ -503,16 +503,7 @@ static int *regex_find_daemon(const char *pPattern)
 	}
 
 
-	inverse_regex = 0;
-
-	if (strlen(pPattern) && pPattern[0] == '!')
-	{
-	pPattern++;
-	inverse_regex = 1;
-	}
-
-
-	if (regcomp(&compiled_expression, pPattern, REG_EXTENDED | REG_NOSUB) != 0)
+	if (!set_daemon_regex(pPattern))
 	{
 	fprintf(stderr, "%s: could not compile regular expression\n", command_name);
 	return NULL;
@@ -525,24 +516,17 @@ static int *regex_find_daemon(const char *pPattern)
 
 	if (total_matches < 1)
 	{
-	if (!inverse_regex)
 	fprintf(stderr, "%s: no match for daemon '%s'\n", command_name, pPattern);
-	else
-	fprintf(stderr, "%s: no match for daemon '!%s'\n", command_name, pPattern);
 
 	free(entries);
-	regfree(&compiled_expression);
-	inverse_regex = 0;
 	return NULL;
 	}
 
 
-	int *const daemons = calloc(sizeof(int), total_matches + 1), *current_daemon = daemons;
+	int *const daemons = (int*) calloc(sizeof(int), total_matches + 1), *current_daemon = daemons;
 	if (!daemons)
 	{
 	fprintf(stderr, "%s: couldn't create daemon list: %s\n", command_name, strerror(errno));
-	regfree(&compiled_expression);
-	inverse_regex = 0;
 	return NULL;
 	}
 
@@ -555,9 +539,6 @@ static int *regex_find_daemon(const char *pPattern)
 
 	free(entries);
 
-
-	regfree(&compiled_expression);
-	inverse_regex = 0;
 
 	if (current_daemon == daemons)
 	{
@@ -584,7 +565,7 @@ int *find_daemon(const char *pPattern)
 	int exact_daemon = special_path? -1 : connect_daemon(pPattern);
 	if (exact_daemon >= 0)
 	{
-	int *daemons = calloc(sizeof(int), 2);
+	int *daemons = (int*) calloc(sizeof(int), 2);
 	if (!daemons)
 	 {
 	fprintf(stderr, "%s: couldn't create daemon list: %s\n", command_name, strerror(errno));

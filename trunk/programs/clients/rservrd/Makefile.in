@@ -46,8 +46,8 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_rservrd_OBJECTS = daemon-commands.$(OBJEXT) daemon-socket.$(OBJEXT) \
 	daemon.$(OBJEXT) interface.$(OBJEXT) rservrd.$(OBJEXT) \
-	general.$(OBJEXT) clients.$(OBJEXT) control.$(OBJEXT) \
-	netcntl.$(OBJEXT)
+	daemon-regex.$(OBJEXT) general.$(OBJEXT) clients.$(OBJEXT) \
+	control.$(OBJEXT) netcntl.$(OBJEXT)
 rservrd_OBJECTS = $(am_rservrd_OBJECTS)
 am__DEPENDENCIES_1 =
 rservrd_DEPENDENCIES = $(am__DEPENDENCIES_1) \
@@ -65,6 +65,15 @@ LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+LTCXXCOMPILE = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+CXXLD = $(CXX)
+CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(rservrd_SOURCES)
 DIST_SOURCES = $(rservrd_SOURCES)
@@ -190,16 +199,16 @@ top_srcdir = @top_srcdir@
 @LINK_LIBPTHREAD_TRUE@USE_LIBPTHREAD = -lpthread
 ALL_INCLUDES = $(STANDARD_INCLUDES) -I$(srcdir)/../../.. -I$(srcdir)/../../../include/rservr -I$(srcdir)/../../../include
 AM_CPPFLAGS = -DENABLE_VIRT_ARRAY_ALL $(ALL_INCLUDES)
-rservrd_SOURCES = daemon-commands.c daemon-socket.c daemon.c interface.c rservrd.c commands/general.c commands/clients.c commands/control.c commands/netcntl.c
+rservrd_SOURCES = daemon-commands.c daemon-socket.c daemon.c interface.c rservrd.c daemon-regex.cpp commands/general.c commands/clients.c commands/control.c commands/netcntl.c
 rservrd_LDADD = $(STANDARD_LIBRARIES) $(USE_LIBPTHREAD) ../../../plugins/netcntl/librsvp-netcntl.la ../../../plugins/rqconfig/librsvp-rqconfig.la ../../../libs/client/librservr-client.la
-EXTRA_DIST = NOTICE daemon-commands.h daemon-socket.h daemon.h interface.h commands/include/commands-common.h commands/include/general.h commands/include/clients.h commands/include/control.h commands/include/netcntl.h
+EXTRA_DIST = NOTICE daemon-commands.h daemon-socket.h daemon.h interface.h daemon-regex.h commands/include/commands-common.h commands/include/general.h commands/include/clients.h commands/include/control.h commands/include/netcntl.h
 RSERVRD = rservrd
 RSERVRD_TABLE = /tmp/$(RSERVRD)
 RSERVRD_PERMISSION = 6755
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .c .cpp .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -259,7 +268,7 @@ clean-binPROGRAMS:
 	done
 rservrd$(EXEEXT): $(rservrd_OBJECTS) $(rservrd_DEPENDENCIES) 
 	@rm -f rservrd$(EXEEXT)
-	$(LINK) $(rservrd_OBJECTS) $(rservrd_LDADD) $(LIBS)
+	$(CXXLINK) $(rservrd_OBJECTS) $(rservrd_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -270,6 +279,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clients.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/control.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/daemon-commands.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/daemon-regex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/daemon-socket.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/daemon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/general.Po@am__quote@
@@ -353,6 +363,27 @@ netcntl.obj: commands/netcntl.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='commands/netcntl.c' object='netcntl.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o netcntl.obj `if test -f 'commands/netcntl.c'; then $(CYGPATH_W) 'commands/netcntl.c'; else $(CYGPATH_W) '$(srcdir)/commands/netcntl.c'; fi`
+
+.cpp.o:
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ $<
+
+.cpp.obj:
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.cpp.lo:
+@am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo

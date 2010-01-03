@@ -118,20 +118,30 @@ int show_commands()
 #undef SHOW_COMMAND
 
 
+struct wait_context
+{
+	command_event  event;
+	text_info      message;
+};
+
+
 static FILE *waiting_file = NULL;
 
 static int continue_wait(command_reference rReference, command_event eEvent)
-{ return (fprintf(waiting_file, "\n") > 0)? 0 : -1; }
+{ return (write(fileno(waiting_file), NULL, 0) == 0)? 0 : -1; }
 
 static int wait_message_common(FILE *fFile, const char *cCommand, command_reference rReference,
-command_event eEvent)
+command_event eEvent, struct wait_context **cContext)
 {
 	waiting_file = fFile;
+	eEvent &= event_no_success | event_complete | event_register;
 
 	command_event outcome = cancelable_wait_command_event(rReference, eEvent,
 	  local_default_timeout(), &continue_wait);
 
-	char message_buffer[PARAM_DEFAULT_FORMAT_BUFFER];
+	waiting_file = NULL;
+
+	char message_buffer[PARAM_DEFAULT_FORMAT_BUFFER] = { 0x00 };
 
 	if      (outcome & event_error)
 	snprintf(message_buffer, PARAM_DEFAULT_FORMAT_BUFFER, "%s request error", cCommand);
@@ -154,26 +164,42 @@ command_event eEvent)
 	else if (outcome & event_unavailable)
 	snprintf(message_buffer, PARAM_DEFAULT_FORMAT_BUFFER, "%s request status unavailable", cCommand);
 
-	else if (!(outcome & eEvent))
-	snprintf(message_buffer, PARAM_DEFAULT_FORMAT_BUFFER, "%s request unknown error", cCommand);
+	else if (outcome != event_none && !(outcome & eEvent))
+	snprintf(message_buffer, PARAM_DEFAULT_FORMAT_BUFFER, "%s unknown request error 0x%.8x", cCommand, outcome);
 
 	else outcome = event_none;
 
-	if (outcome != event_none)
-	return_message(fFile, message_buffer, outcome & event_exit_mask);
+	struct wait_context *context = malloc(sizeof(struct wait_context));
+	if (!context) return 0;
+
+	context->event   = outcome;
+	context->message = strdup(message_buffer);
 
 	clear_command_status(rReference);
 
-	waiting_file = NULL;
+	/*send the message right away if the context isn't being returned*/
+	if (cContext) *cContext = context;
+	else finish_wait_message(fFile, context, 1);
 
 	return (outcome == event_none)? 1 : 0;
 }
 
-int wait_message_complete(FILE *fFile, const char *cCommand, command_reference rReference)
-{ return wait_message_common(fFile, cCommand, rReference, event_complete); }
 
-int wait_message_register(FILE *fFile, const char *cCommand, command_reference rReference)
-{ return wait_message_common(fFile, cCommand, rReference, wait_register? event_register : event_complete); }
+void finish_wait_message(FILE *fFile, struct wait_context *cContext, result sSend)
+{
+	if (sSend && cContext && cContext->event != event_none)
+	return_message(fFile, cContext->message, cContext->event & event_exit_mask);
+	if (cContext) free((char*) cContext->message);
+	free(cContext);
+}
+
+int wait_message_complete(FILE *fFile, const char *cCommand, command_reference rReference,
+  struct wait_context **cContext)
+{ return wait_message_common(fFile, cCommand, rReference, event_complete, cContext); }
+
+int wait_message_register(FILE *fFile, const char *cCommand, command_reference rReference,
+  struct wait_context **cContext)
+{ return wait_message_common(fFile, cCommand, rReference, wait_register? event_register : event_complete, cContext); }
 
 
 void return_message(FILE *fFile, const char *mMessage, unsigned char sStatus)
@@ -183,4 +209,8 @@ void return_message(FILE *fFile, const char *mMessage, unsigned char sStatus)
 }
 
 int return_data(FILE *fFile, const char *mMessage)
-{ return (fprintf(fFile, "\\ %s\n", mMessage) > 0)? 1 : 0; }
+{
+	int outcome = fprintf(fFile, "\\ %s\n", mMessage);
+	fflush(fFile); /*NOTE: this is only safe because we ignore SIGPIPE*/
+	return (outcome > 0)? 1 : 0;
+}
