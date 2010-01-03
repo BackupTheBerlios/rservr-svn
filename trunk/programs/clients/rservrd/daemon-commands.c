@@ -211,6 +211,6 @@ void return_message(FILE *fFile, const char *mMessage, unsigned char sStatus)
 
 void return_data(FILE *fFile, const char *mMessage)
 {
-	int outcome = fprintf(fFile, "\\ %s\n", mMessage);
+	fprintf(fFile, "\\ %s\n", mMessage);
 	fflush(fFile); /*NOTE: this is only safe because we ignore SIGPIPE*/
 }
