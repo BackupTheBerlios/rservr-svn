@@ -203,14 +203,12 @@ if (strlen(CURRENT_DATA)) \
 #define REGISTER_SEND(name, command) REGISTER_SEND_ACTION(name, command,)
 #define REGISTER_SEND_ACTION(name, command, action) \
 { RESPONSE_WAIT_ACTION(name, command, wait_message_register(fFile, TAGGED_NAME(name), message_number, \
-  &TEMPORARY_CONTEXT), action); \
-  finish_wait_message(fFile, TEMPORARY_CONTEXT, 0); }
+  &TEMPORARY_CONTEXT), action; finish_wait_message(fFile, TEMPORARY_CONTEXT, 1)); }
 
 #define RESPONSE_SEND(name, command) RESPONSE_SEND_ACTION(name, command,)
 #define RESPONSE_SEND_ACTION(name, command, action) \
 { RESPONSE_WAIT_ACTION(name, command, wait_message_complete(fFile, TAGGED_NAME(name), message_number, \
-  &TEMPORARY_CONTEXT), action); \
-  finish_wait_message(fFile, TEMPORARY_CONTEXT, 1); }
+  &TEMPORARY_CONTEXT), action; finish_wait_message(fFile, TEMPORARY_CONTEXT, 1)); }
 
 /*END complex function components~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 

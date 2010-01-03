@@ -44,6 +44,7 @@
 #include <string.h> /* 'strcmp', 'strtok', 'strdup', etc. */
 #include <stdlib.h> /* 'free' */
 #include <sys/stat.h> /* 'fstat' */
+#include <unistd.h> /* 'write' */
 
 #include "commands/include/general.h"
 #include "commands/include/clients.h"
