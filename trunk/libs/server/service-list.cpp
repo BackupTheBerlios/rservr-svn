@@ -32,7 +32,7 @@
 
 #include "service-list.hpp"
 
-#include <regex.h> //regular expressions
+#include "global/regex-check.hpp"
 
 #include "local-client.hpp"
 #include "protocol/constants.hpp"
@@ -230,65 +230,24 @@ public:
 	typedef bool                            F1_RETURN;
 	typedef service_list::const_return_type F1_ARG1;
 
-	inline service_finder(text_info nName, text_info tType) :
-	name_inverse(false), type_inverse(false), name_expression(nName),
-	type_expression(tType)
+	inline service_finder(text_info nName, text_info tType)
 	{
-	if (name_expression && *name_expression == '!')
-	 {
-	name_expression++;
-	name_inverse = true;
-	 }
-	if (type_expression && *type_expression == '!')
-	 {
-	type_expression++;
-	type_inverse = true;
-	 }
-	if ( name_expression &&
-	     regcomp(&compiled_name_expression, name_expression, REG_EXTENDED | REG_NOSUB) )
-	name_expression = NULL;
-
-	if ( type_expression &&
-	     regcomp(&compiled_type_expression, type_expression, REG_EXTENDED | REG_NOSUB) )
-	type_expression = NULL;
-	//TODO: add log point here for failure
+	name_regex = nName;
+	type_regex = tType;
 	}
-
 
 	inline F1_RETURN operator () (F1_ARG1 eElement) const
 	{
-	bool outcome = name_expression || type_expression;
-
-	if (name_expression)
-	outcome &= !regexec(&compiled_name_expression, eElement.value().service_name.c_str(),
-	  0, NULL, 0x00) ^ name_inverse;
-
-	if (type_expression)
-	outcome &= !regexec(&compiled_type_expression, eElement.value().service_type.c_str(),
-	  0, NULL, 0x00) ^ type_inverse;
-
-	return outcome;
-	}
-
-
-	inline ~service_finder()
-	{
-	if (name_expression) regfree(&compiled_name_expression);
-	if (type_expression) regfree(&compiled_type_expression);
+	return name_regex == eElement.value().service_name.c_str() &&
+	       type_regex == eElement.value().service_type.c_str();
 	}
 
 private:
 	inline service_finder(const service_finder&) { }
 	inline service_finder &operator = (const service_finder&) { return *this; }
 
-	unsigned char name_inverse;
-	unsigned char type_inverse;
-
-	text_info name_expression;
-	text_info type_expression;
-
-	regex_t compiled_name_expression;
-	regex_t compiled_type_expression;
+	regex_check name_regex;
+	regex_check type_regex;
 };
 
 

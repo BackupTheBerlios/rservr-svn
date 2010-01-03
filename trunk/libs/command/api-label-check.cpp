@@ -44,6 +44,7 @@ extern "C" {
 #include "protocol/constants.hpp"
 
 
+//(don't use 'regex_check' for these at the moment)
 static regex_t entity_expression = regex_t(), address_expression = regex_t();
 static int entity_initialized = 0, address_initialized = 0;
 

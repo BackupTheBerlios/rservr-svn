@@ -47,7 +47,7 @@ const char *retrieve_info(const char*);
 void enable_register_wait();
 
 void return_message(FILE*, const char*, unsigned char);
-int return_data(FILE*, const char*);
+void return_data(FILE*, const char*);
 
 struct wait_context;
 

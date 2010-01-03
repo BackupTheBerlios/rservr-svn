@@ -51,10 +51,10 @@ extern "C" {
 #include <sys/stat.h> //'fstat'
 #include <signal.h> //'signal', etc.
 #include <time.h> //'strftime'
-#include <regex.h> //regular expressions
 #include <string.h> //'strlen', etc.
 
 #include "external/clist.hpp"
+#include "global/regex-check.hpp"
 
 #include "client-input.hpp"
 #include "client-output.hpp"
@@ -557,41 +557,21 @@ public:
 	typedef data::clist <const command_generator> ::const_return_type F1_ARG1;
 
 	inline command_find(text_info nName, command_type tType) :
-	inverse(false), name_expression(nName), type_mask(tType)
-	{
-	if (name_expression && strlen(name_expression) && name_expression[0] == '!')
-	 {
-	name_expression++;
-	inverse = true;
-	 }
-	if ( name_expression &&
-	     regcomp(&compiled_expression, name_expression, REG_EXTENDED | REG_NOSUB) )
-	name_expression = NULL;
-	//TODO: add log point here for failure
-	}
-
+	type_mask(tType)
+	{ command_regex = nName; }
 
 	inline F1_RETURN operator () (F1_ARG1 eElement) const
 	{
-	if (!name_expression) return false;
 	return check_command_any(eElement.execution_type(), type_mask) &&
-	       ( (inverse ^ !regexec(&compiled_expression, eElement.command_public_name().c_str(), 0, NULL, 0x00)) ||
-	         (inverse ^ !regexec(&compiled_expression, eElement.command_name().c_str(), 0, NULL, 0x00)) );
+	       command_regex == eElement.command_public_name().c_str();
 	}
-
-
-	inline ~command_find()
-	{ if (name_expression) regfree(&compiled_expression); }
 
 private:
 	inline command_find(const command_find&) { }
 	inline command_find &operator = (const command_find&) { return *this; }
 
-	unsigned char   inverse;
-	text_info       name_expression;
-	command_type    type_mask;
-
-	regex_t compiled_expression;
+	regex_check  command_regex;
+	command_type type_mask;
 };
 
 

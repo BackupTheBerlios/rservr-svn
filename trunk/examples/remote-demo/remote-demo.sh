@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 #set an optional log file by providing a single argument to the script
 
@@ -9,7 +9,7 @@ if [ -n "$1" ]; then
 fi
 
 
-function clean_up()
+clean_up()
 {
   rservrd 'node[1-3]' @server_term
   exit
@@ -70,8 +70,8 @@ if [ -n "$echo_pid" ] && [ -n "$term_pid" ]; then
   echo "terminal..."
 
   #start the terminal emulator (point of user interaction)
-  #don't press [Ctrl]+C to exit; use [Ctrl]+D
 
+  echo "*** use [Ctrl]+C or [Ctrl]+D to exit terminal ***"
   unsterm /tmp/terminal
 
 fi

@@ -488,9 +488,8 @@ long_time wWait, int(*cCallback)(command_reference, command_event))
 	command_event current_status = event_unavailable;
 
 	while ( total_cycle < wWait &&
-	  !check_event_any(current_status = find_command_status(rReference), sStatus) &&
-	  !check_event_any(current_status, event_no_success) && message_queue_status() &&
-	  (!cCallback || (*cCallback)(rReference, sStatus) == 0) )
+	  !check_event_any(current_status = find_command_status(rReference), sStatus | event_no_success) &&
+	  message_queue_status() && (!cCallback || (*cCallback)(rReference, sStatus) == 0) )
 	 {
 	nanosleep(&execute_cycle, NULL);
 	total_cycle += cycle_elapse;

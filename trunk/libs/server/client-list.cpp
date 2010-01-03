@@ -53,10 +53,11 @@ extern "C" {
 #include <string.h> //'strlen'
 #include <sys/socket.h> //sockets
 #include <sys/un.h> //socket macros
-#include <regex.h> //regular expressions
 #include <sys/resource.h> //'getpriority'
 #include <pwd.h> //'getpwuid'
 #include <grp.h> //groups
+
+#include "global/regex-check.hpp"
 
 #include "client-thread.hpp"
 #include "local-client.hpp"
@@ -1483,42 +1484,24 @@ public:
 	typedef client_list::const_return_type F1_ARG1;
 
 	inline client_finder(text_info nName, permission_mask iInclude, permission_mask eExclude) :
-	inverse(false), name_expression(nName), required(iInclude), denied(eExclude)
-	{
-	if (name_expression && strlen(name_expression) && name_expression[0] == '!')
-	 {
-	name_expression++;
-	inverse = true;
-	 }
-	if ( name_expression &&
-	     regcomp(&compiled_expression, name_expression, REG_EXTENDED | REG_NOSUB) )
-	name_expression = NULL;
-	//TODO: add log point here for failure
-	}
+	required(iInclude), denied(eExclude)
+	{ name_regex = nName; }
 
 
 	inline F1_RETURN operator () (F1_ARG1 eElement) const
 	{
-	if (!name_expression) return false;
 	return check_permission_all(eElement.client_type, required) &&
 	       check_permission_none(eElement.client_type, denied) &&
-	       (inverse ^ !regexec(&compiled_expression, eElement.client_name.c_str(), 0, NULL, 0x00));
+	       name_regex == eElement.client_name.c_str();
 	}
-
-
-	inline ~client_finder()
-	{ if (name_expression) regfree(&compiled_expression); }
 
 private:
 	inline client_finder(const client_finder&) { }
 	inline client_finder &operator = (const client_finder&) { return *this; }
 
-	unsigned char   inverse;
-	text_info       name_expression;
+	regex_check     name_regex;
 	permission_mask required;
 	permission_mask denied;
-
-	regex_t compiled_expression;
 };
 
 

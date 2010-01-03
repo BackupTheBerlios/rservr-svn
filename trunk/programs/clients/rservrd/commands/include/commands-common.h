@@ -190,7 +190,7 @@ if (strlen(CURRENT_DATA)) \
     while ((response = rotate_response(message_number))) \
     { if (RSERVR_IS_LIST_RESPONSE(response)) \
       { info_list current = RSERVR_TO_LIST_RESPONSE(response); \
-        if (current) while (*current && RETURN_DATA(*current++)); } \
+        if (current) while (*current) RETURN_DATA(*current++); } \
       else if (RSERVR_IS_SINGLE_RESPONSE(response)) \
       { RETURN_DATA(RSERVR_TO_SINGLE_RESPONSE(response)); } \
       else ABORT_RESPONSE_ERROR_ACTION(name, action) \

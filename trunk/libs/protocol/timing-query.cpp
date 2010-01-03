@@ -36,8 +36,9 @@ extern "C" {
 #include "api/tools.h"
 }
 
-#include <regex.h> //regular expressions
 #include <string.h> //'strsep', etc.
+
+#include "global/regex-check.hpp"
 
 extern "C" {
 #include "timing-manager.h"
@@ -115,32 +116,17 @@ public:
 	typedef bool                           F1_RETURN;
 	typedef timing_list::const_return_type F1_ARG1;
 
-	inline timing_finder(text_info nName) :
-	name_expression(nName)
-	{
-	if ( name_expression &&
-	     regcomp(&compiled_expression, name_expression, REG_EXTENDED | REG_NOSUB) )
-	name_expression = NULL;
-	}
-
+	inline timing_finder(text_info nName)
+	{ timing_regex = nName; }
 
 	inline F1_RETURN operator () (F1_ARG1 eElement) const
-	{
-	if (!name_expression) return false;
-	return !regexec(&compiled_expression, eElement.c_str(), 0, NULL, 0x00);
-	}
-
-
-	inline ~timing_finder()
-	{ if (name_expression) regfree(&compiled_expression); }
+	{ return timing_regex == eElement.c_str(); }
 
 private:
 	inline timing_finder(const timing_finder&) { }
 	inline timing_finder &operator = (const timing_finder&) { return *this; }
 
-	text_info       name_expression;
-
-	regex_t compiled_expression;
+	regex_check timing_regex;
 };
 
 

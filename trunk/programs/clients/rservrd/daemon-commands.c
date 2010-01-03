@@ -208,9 +208,8 @@ void return_message(FILE *fFile, const char *mMessage, unsigned char sStatus)
 	fflush(fFile); /*NOTE: this is only safe because we ignore SIGPIPE*/
 }
 
-int return_data(FILE *fFile, const char *mMessage)
+void return_data(FILE *fFile, const char *mMessage)
 {
 	int outcome = fprintf(fFile, "\\ %s\n", mMessage);
 	fflush(fFile); /*NOTE: this is only safe because we ignore SIGPIPE*/
-	return (outcome > 0)? 1 : 0;
 }

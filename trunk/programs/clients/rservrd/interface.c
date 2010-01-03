@@ -101,6 +101,7 @@ int interface_main(int argc, char *argv[])
 	return_value |= single_value;
 	if (!current) continue;
 	fprintf(stderr, "%s\n", current);
+	if (!--I) break;
 	  }
 
 	else fprintf(stderr, "(bad response data received)\n");

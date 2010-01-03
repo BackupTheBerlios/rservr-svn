@@ -51,9 +51,9 @@ extern "C" {
 #include <string>
 
 #include <string.h> //'strcmp', 'strncmp', 'strlen'
-#include <regex.h> //regular expressions
 
 #include "external/clist.hpp"
+#include "global/regex-check.hpp"
 
 extern "C" {
 #include "commands.h"
@@ -80,38 +80,17 @@ public:
 	typedef action_list::const_return_type F1_ARG1;
 
 	inline command_pattern(text_info nName) :
-	inverse(false), name_expression(nName)
-	{
-	if (name_expression && strlen(name_expression) && name_expression[0] == '!')
-	 {
-	name_expression++;
-	inverse = true;
-	 }
-	if ( name_expression &&
-	     regcomp(&compiled_expression, name_expression, REG_EXTENDED | REG_NOSUB) )
-	name_expression = NULL;
-	//TODO: add log point here for failure
-	}
-
+	command_regex(false)
+	{ command_regex = nName; }
 
 	inline F1_RETURN operator () (F1_ARG1 eElement) const
-	{
-	if (!name_expression) return false;
-	return inverse ^ !regexec(&compiled_expression, eElement.key().c_str(), 0, NULL, 0x00);
-	}
-
-
-	inline ~command_pattern()
-	{ if (name_expression) regfree(&compiled_expression); }
+	{ return command_regex == eElement.key().c_str(); }
 
 private:
 	inline command_pattern(const command_pattern&) { }
 	inline command_pattern &operator = (const command_pattern&) { return *this; }
 
-	unsigned char   inverse;
-	text_info       name_expression;
-
-	regex_t compiled_expression;
+	regex_check command_regex;
 };
 
 

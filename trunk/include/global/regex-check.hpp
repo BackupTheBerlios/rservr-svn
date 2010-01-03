@@ -42,7 +42,8 @@
 class regex_check
 {
 public:
-	inline regex_check() :
+	inline regex_check(bool iInverses = true) :
+	inverses(iInverses),
 	check_mode(false),
 	compiled(false) { }
 
@@ -56,6 +57,7 @@ public:
 	inline regex_check &operator = (const regex_check &eEqual)
 	{
 	if (&eEqual == this) return *this;
+	inverses   = eEqual.inverses;
 	check_mode = eEqual.check_mode;
 	*this = eEqual.expression.c_str();
 	return *this;
@@ -68,7 +70,7 @@ public:
 	if (compiled) regfree(&compiled_expression);
 	compiled = false;
 
-	if (!check_mode && strlen(eExpression) && eExpression[0] == '!')
+	if (inverses && !check_mode && strlen(eExpression) && eExpression[0] == '!')
 	 {
 	eExpression++;
 	check_mode = true;
@@ -90,6 +92,10 @@ public:
 	}
 
 
+	inline bool operator != (const char *sString) const
+	{ return !(*this == sString); }
+
+
 	inline bool get_mode() const
 	{ return check_mode; }
 
@@ -100,7 +106,7 @@ public:
 private:
 	std::string expression;
 	regex_t     compiled_expression;
-	bool        check_mode, compiled;
+	bool        inverses, check_mode, compiled;
 };
 
 #endif //regex_check_hpp

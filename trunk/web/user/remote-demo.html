@@ -30,7 +30,7 @@
       <div align="center">
         <pre class="example_box code_box script_box">
 <b><i><u>remote-demo.sh</u></i></b>
-<b>#!/bin/bash</b>
+<b>#!/bin/sh</b>
 
 <i>#set an optional log file by providing a single argument to the script</i>
 
@@ -41,7 +41,7 @@ if [ -n "$1" ]; then
 fi
 
 
-function clean_up()
+clean_up()
 {
   <b>rservrd</b> 'node[1-3]' @server_term
   exit
@@ -102,8 +102,8 @@ if [ -n "$echo_pid" ] && [ -n "$term_pid" ]; then
   echo "terminal..."
 
   <i>#start the terminal emulator <u>(point of user interaction)</u></i>
-  <i>#don't press <b>[Ctrl]+C</b> to exit; use <b>[Ctrl]+D</b></i>
 
+  echo "*** use [Ctrl]+C or [Ctrl]+D to exit terminal ***"
   <b>unsterm</b> /tmp/terminal
 
 fi
