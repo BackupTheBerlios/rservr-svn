@@ -7,8 +7,10 @@ the floor it controls and the main 'rservr' system would reside on a "normal"
 computer for user control.
 
 To run this interactive example, make sure Resourcerver is installed and is of
-the same version as this example's package.  Run 'make' to build the binaries
-and if all goes well, enter the following:
+the same version as this example's package.  Run 'gmake' to build the binaries.
+If you configured 'rservr' with the --prefix option, set PREFIX to that path,
+e.g. 'gmake PREFIX=/usr'. If everything builds successfully, start the example
+system with the following:
 
 	./main-system.sh subsystems
 
