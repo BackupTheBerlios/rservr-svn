@@ -976,7 +976,10 @@ bool revise_address_split(std::string &aAddress, std::string &pPort)
 
 	struct in_addr binary_address;
 
-	if (inet_aton(aAddress.c_str(), &binary_address) == 0)
+	//(saves the trouble of looking it up, which might not work)
+	if (aAddress == "localhost") aAddress = "127.0.0.1";
+
+	else if (inet_aton(aAddress.c_str(), &binary_address) == 0)
 	{
 	struct addrinfo *host_info = NULL;
 
@@ -1009,7 +1012,13 @@ const char *aAddress, const char *pPort, std::string &rRevised)
 
 	struct in_addr binary_address;
 
-	if (inet_aton(aAddress, &binary_address) != 0)
+	if (strcmp(aAddress, "localhost") == 0)
+	{
+	inet_aton("127.0.0.1", &binary_address);
+	rRevised = inet_ntoa(binary_address);
+	}
+
+	else if (inet_aton(aAddress, &binary_address) != 0)
 	rRevised = inet_ntoa(binary_address);
 
 	else
@@ -1042,8 +1051,9 @@ const char *aAddress, const char *pPort, std::string &rRevised)
 	current_state = fcntl(new_socket, F_GETFD);
 	fcntl(new_socket, F_SETFD, current_state | FD_CLOEXEC);
 
-	current_state = fcntl(new_socket, F_GETFL);
-	fcntl(new_socket, F_SETFL, current_state | O_NONBLOCK);
+	//NOTE: setting non-blocking mode prevents connection on FreeBSD
+//	current_state = fcntl(new_socket, F_GETFL);
+//	fcntl(new_socket, F_SETFL, current_state | O_NONBLOCK);
 
 	//connect socket
 
@@ -1066,6 +1076,7 @@ const char *aAddress, const char *pPort, std::string &rRevised)
 
 	if (outcome < 0)
 	{
+fprintf(stderr, "?? %s\n", rRevised.c_str());
     log_message_connect_deny(aAddress);
 	close(new_socket);
 	return -1;

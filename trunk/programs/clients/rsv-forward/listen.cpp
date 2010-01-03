@@ -819,7 +819,7 @@ static int create_socket(const char *pPort, std::string &rRevised)
 	//bind socket
 
         new_address.sin_family = AF_INET;
-        new_address.sin_port = binary_port; //NOTE: don't call 'htons' here
+        new_address.sin_port        = binary_port; //NOTE: don't call 'htons' here
         new_address.sin_addr.s_addr = htonl(INADDR_ANY);
 
     #if defined(SOL_SOCKET) && defined(SO_REUSEADDR)
