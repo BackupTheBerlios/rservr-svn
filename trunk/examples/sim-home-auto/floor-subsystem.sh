@@ -3,13 +3,14 @@
 # This script creates a server system for each virtual floor with one client for
 # each room on the floor.
 
-server="$1"
-shift
+output="$1"
+server="$2"
+shift 2
 
 { echo "execute_critical @rservrd@-dxr";
   echo "execute @rsv-fsrelay@$server-connect";
   echo "register_all_wait"; } | \
-rservr "$server" /dev/null
+rservr "$server" "$output"
 
 for room in $*; do
   name=$( echo "$room" | cut -d: -f1 )
@@ -21,4 +22,4 @@ for room in $*; do
 done
 
 #connect the virtual floor's server system to the main system
-rservrd "$server" @local_connect@"$1"-connect@/tmp/system-connect > /dev/null
+rservrd "$server" @local_connect@"$server"-connect@/tmp/system-connect > /dev/null
