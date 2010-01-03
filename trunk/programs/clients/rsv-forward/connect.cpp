@@ -1394,6 +1394,7 @@ command_event __rsvp_netcntl_hook_local_connect(const struct netcntl_source_info
 	     !add_initiated_connection(new_socket, new_reference,
 	        revised_address.c_str(), rResponse) )
 	{
+	if (new_socket >= 0)
     log_message_connect_deny(aAddress);
 	if (new_socket >= 0) shutdown(new_socket, SHUT_RDWR);
 	return event_error;
@@ -1459,6 +1460,7 @@ command_event __rsvp_netcntl_hook_local_filtered_connect(const struct netcntl_so
 	     !add_initiated_connection(extra_socket, new_reference,
 	       revised_address.c_str(), rResponse) )
 	{
+	if (new_socket >= 0)
     log_message_connect_deny(aAddress);
 	if (new_socket >= 0)   shutdown(new_socket, SHUT_RDWR);
 	if (extra_socket >= 0) shutdown(extra_socket, SHUT_RDWR);
