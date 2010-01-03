@@ -186,9 +186,6 @@ extern "C" {
 #define PARAM_LOCALRELAY_TYPE "fs"  PARAM_RELAY_TYPE
 #define PARAM_NETRELAY_TYPE   "net" PARAM_RELAY_TYPE
 
-/* force command-forwarders to block when connecting */
-#define PARAM_BLOCKING_CONNECT
-
 /* addressing separators for command forwarders */
 #define PARAM_LOCAL_SERIAL_SEP ";"
 #define PARAM_NET_SERIAL_SEP   "/"
