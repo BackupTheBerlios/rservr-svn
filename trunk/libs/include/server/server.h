@@ -51,6 +51,7 @@ extern result set_log_file(text_info);
 extern result set_logging_mode(logging_mode);
 extern void log_from_configuration(text_info);
 extern result set_terminal();
+extern void set_env_pid();
 
 /*(from 'server-command.hpp')*/
 extern result change_server_name(text_info);

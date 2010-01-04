@@ -190,6 +190,8 @@ int main(int argc, char *argv[])
 #endif
 
 
+	set_env_pid();
+
 	if (set_terminal())
     log_server_terminal();
 

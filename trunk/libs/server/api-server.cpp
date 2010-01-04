@@ -76,6 +76,16 @@ extern "C" {
 }
 
 
+inline static void auto_env10(text_info nName, int vValue)
+{ setenv(nName, convert_integer10(vValue, NULL), true); }
+
+inline static void auto_env16(text_info nName, unsigned int vValue)
+{ setenv(nName, convert_integer16(vValue, NULL), true); }
+
+inline static void auto_envf(text_info nName, double vValue)
+{ setenv(nName, convert_double(vValue, NULL), true); }
+
+
 //initialization----------------------------------------------------------------
 
 static void register_handlers()
@@ -170,6 +180,10 @@ void set_fork_handlers()
 	set_logging_mode(PARAM_FORK_LOG_MODE);
 	restore_handlers();
 }
+
+
+void set_env_pid()
+{ auto_env10("RSERVR_PID", getpid()); }
 
 //END initialization------------------------------------------------------------
 
@@ -445,16 +459,6 @@ static exposed_server internal_server = {    protected_data: &local_server_data,
 
 
 const struct server_parameters *const server_settings = &internal_server.server_parameters;
-
-
-inline static void auto_env10(text_info nName, int vValue)
-{ setenv(nName, convert_integer10(vValue, NULL), true); }
-
-inline static void auto_env16(text_info nName, unsigned int vValue)
-{ setenv(nName, convert_integer16(vValue, NULL), true); }
-
-inline static void auto_envf(text_info nName, double vValue)
-{ setenv(nName, convert_double(vValue, NULL), true); }
 
 
 static void initialize_environment()
