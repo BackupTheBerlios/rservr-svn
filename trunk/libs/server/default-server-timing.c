@@ -82,7 +82,6 @@ int ATTR_INT create_default_timing_table(struct server_timing_table *tTable)
 	tTable->command_purge_retry.value          = 0.1;
 	tTable->execution_exit_latency.value       = 0.1;
 	tTable->forced_client_exit_latency.value   = 0.25;
-	tTable->internal_client_exit_cycle.mode    = timing_scaled;
 	tTable->internal_client_exit_latency.mode  = timing_scaled;
 	tTable->command_purge_retry.mode           = timing_scaled;
 	tTable->execution_exit_latency.mode        = timing_static;
