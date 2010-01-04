@@ -151,8 +151,6 @@ static const input_section default_input_section;
 	attached_client = NULL;
 	delete attached;
 
-	struct timespec destruct_cycle = server_timing_specs->internal_client_exit_cycle;
-
 	while (waitpid(WAIT_ANY, NULL, WNOHANG) > 0);
 	}
 
@@ -399,7 +397,8 @@ static const input_section default_input_section;
 
 	void local_detached_client::terminate_client()
 	{
-	shutdown(socket_file, SHUT_RDWR);
+	if (socket_file >= 0) shutdown(socket_file, SHUT_RDWR);
+	socket_file = -1;
 
 	if (getpid() == get_controlling_pid()) this->condemn();
 

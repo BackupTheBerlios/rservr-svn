@@ -197,11 +197,11 @@ struct server_timing_table *oOld)
 
 	if (calculate_standby_group(&cChange->execute, &oOld->execute, oOld->scale.value) < 0) return -1;
 
-	if (calculate_spec(&cChange->internal_client_exit_cycle, &oOld->internal_client_exit_cycle,
-	      oOld->scale.value) < 0) return -1;
 	if (calculate_spec(&cChange->command_purge_retry, &oOld->command_purge_retry,
 	      oOld->scale.value) < 0) return -1;
 	if (calculate_spec(&cChange->execution_exit_latency, &oOld->execution_exit_latency,
+	      oOld->scale.value) < 0) return -1;
+	if (calculate_spec(&cChange->forced_client_exit_latency, &oOld->forced_client_exit_latency,
 	      oOld->scale.value) < 0) return -1;
 
 	if (calculate_client_table(&cChange->client, &oOld->client) < 0) return -1;
@@ -428,10 +428,6 @@ struct internal_server_timing_table *tTable)
 	                                &tTable->execute_standby_wait) < 0)
 	return -1;
 
-	if (timing_spec_to_short_time(&iInput->internal_client_exit_cycle, iInput->scale.value,
-	                              &tTable->internal_client_exit_cycle) < 0)
-	return -1;
-
 	if (timing_spec_to_short_time(&iInput->internal_client_exit_latency, iInput->scale.value,
 	                              &tTable->internal_client_exit_latency) < 0)
 	return -1;
@@ -442,6 +438,10 @@ struct internal_server_timing_table *tTable)
 
 	if (timing_spec_to_short_time(&iInput->execution_exit_latency, iInput->scale.value,
 	                              &tTable->execution_exit_latency) < 0)
+	return -1;
+
+	if (timing_spec_to_short_time(&iInput->forced_client_exit_latency, iInput->scale.value,
+	                              &tTable->forced_client_exit_latency) < 0)
 	return -1;
 
 	return 0;

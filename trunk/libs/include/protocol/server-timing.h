@@ -50,10 +50,10 @@ struct server_timing_table
 
 	standby_group execute;
 
-	timing_spec internal_client_exit_cycle;
 	timing_spec internal_client_exit_latency;
 	timing_spec command_purge_retry;
 	timing_spec execution_exit_latency;
+	timing_spec forced_client_exit_latency;
 
 	struct client_timing_table client;
 } ATTR_PACK;

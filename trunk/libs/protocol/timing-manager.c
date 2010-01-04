@@ -92,10 +92,10 @@ timing_value *vValue)
 	else GET_VALUE_CHECK(sServer, lLabel, vValue, execute.standby_retry)
 	else GET_VALUE_CHECK(sServer, lLabel, vValue, execute.standby_wait)
 
-	else GET_VALUE_CHECK(sServer, lLabel, vValue, internal_client_exit_cycle)
 	else GET_VALUE_CHECK(sServer, lLabel, vValue, internal_client_exit_latency)
 	else GET_VALUE_CHECK(sServer, lLabel, vValue, command_purge_retry)
 	else GET_VALUE_CHECK(sServer, lLabel, vValue, execution_exit_latency)
+	else GET_VALUE_CHECK(sServer, lLabel, vValue, forced_client_exit_latency)
 
 	else return -1;
 
@@ -135,10 +135,10 @@ timing_mode *mMode)
 	else GET_MODE_CHECK(sServer, lLabel, mMode, execute.standby_retry)
 	else GET_MODE_CHECK(sServer, lLabel, mMode, execute.standby_wait)
 
-	else GET_MODE_CHECK(sServer, lLabel, mMode, internal_client_exit_cycle)
 	else GET_MODE_CHECK(sServer, lLabel, mMode, internal_client_exit_latency)
 	else GET_MODE_CHECK(sServer, lLabel, mMode, command_purge_retry)
 	else GET_MODE_CHECK(sServer, lLabel, mMode, execution_exit_latency)
+	else GET_MODE_CHECK(sServer, lLabel, mMode, forced_client_exit_latency)
 
 	else return -1;
 
@@ -178,10 +178,10 @@ timing_value vValue)
 	else SET_VALUE_CHECK(sServer, lLabel, vValue, execute.standby_retry)
 	else SET_VALUE_CHECK(sServer, lLabel, vValue, execute.standby_wait)
 
-	else SET_VALUE_CHECK(sServer, lLabel, vValue, internal_client_exit_cycle)
 	else SET_VALUE_CHECK(sServer, lLabel, vValue, internal_client_exit_latency)
 	else SET_VALUE_CHECK(sServer, lLabel, vValue, command_purge_retry)
 	else SET_VALUE_CHECK(sServer, lLabel, vValue, execution_exit_latency)
+	else SET_VALUE_CHECK(sServer, lLabel, vValue, forced_client_exit_latency)
 
 	else return -1;
 
@@ -221,10 +221,10 @@ timing_mode mMode)
 	else SET_MODE_CHECK(sServer, lLabel, mMode, execute.standby_retry)
 	else SET_MODE_CHECK(sServer, lLabel, mMode, execute.standby_wait)
 
-	else SET_MODE_CHECK(sServer, lLabel, mMode, internal_client_exit_cycle)
 	else SET_MODE_CHECK(sServer, lLabel, mMode, internal_client_exit_latency)
 	else SET_MODE_CHECK(sServer, lLabel, mMode, command_purge_retry)
 	else SET_MODE_CHECK(sServer, lLabel, mMode, execution_exit_latency)
+	else SET_MODE_CHECK(sServer, lLabel, mMode, forced_client_exit_latency)
 
 	else return -1;
 

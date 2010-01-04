@@ -703,10 +703,10 @@ const client_id *rRequestor)
 }
 
 
-bool add_detached_client(client_list *tTable, text_info sSocket, command_priority pPri,
+bool add_detached_client(client_list *lList, text_info sSocket, command_priority pPri,
 permission_mask pPerm, command_reference rReference, entity_handle nNotify)
 {
-	if (!tTable || !sSocket) return false;
+	if (!lList || !sSocket) return false;
 
 	const client_id *requester = NULL;
 
@@ -714,7 +714,7 @@ permission_mask pPerm, command_reference rReference, entity_handle nNotify)
 
 	if (nNotify)
 	{
-	int position = tTable->f_find(nNotify, &find_by_handle);
+	int position = lList->f_find(nNotify, &find_by_handle);
 	//NOTE: this is a failure because we need to verify group membership
 	if (position == data::not_found)
 	 {
@@ -722,7 +722,7 @@ permission_mask pPerm, command_reference rReference, entity_handle nNotify)
 	return false;
 	 }
 
-	else requester = &tTable->get_element(position);
+	else requester = &lList->get_element(position);
 	pPerm &= (requester->max_permissions | requester->max_new_client);
 	if (requester->min_priority > pPri) pPri = requester->min_priority;
 	}
@@ -732,27 +732,27 @@ permission_mask pPerm, command_reference rReference, entity_handle nNotify)
 	int detached_socket = connect_detached(sSocket, detached_user, detached_group, requester);
 	if (detached_socket < 0) return false;
 
-	if (!tTable->add_element(client_id())) return false;
+	if (!lList->add_element(client_id())) return false;
 
-	tTable->last_element().process_id      = 0;
-	tTable->last_element().user_id         = detached_user;
-	tTable->last_element().group_id        = detached_group;
-	tTable->last_element().min_priority    = pPri;
-	tTable->last_element().max_permissions = (pPerm & security_mask_detached) | type_detached_client;
-	tTable->last_element().max_new_client  = type_none;
-	tTable->last_element().input_pipe      = -1;
-	tTable->last_element().output_pipe     = -1;
-	tTable->last_element().detached_socket = detached_socket;
-	tTable->last_element().reference       = rReference;
-	tTable->last_element().notify          = nNotify;
+	lList->last_element().process_id      = 0;
+	lList->last_element().user_id         = detached_user;
+	lList->last_element().group_id        = detached_group;
+	lList->last_element().min_priority    = pPri;
+	lList->last_element().max_permissions = (pPerm & security_mask_detached) | type_detached_client;
+	lList->last_element().max_new_client  = type_none;
+	lList->last_element().input_pipe      = -1;
+	lList->last_element().output_pipe     = -1;
+	lList->last_element().detached_socket = detached_socket;
+	lList->last_element().reference       = rReference;
+	lList->last_element().notify          = nNotify;
 
 	pthread_attr_t attributes;
 
 	if ( !initialize_attributes(attributes) ||
-	     pthread_create(&tTable->last_element().response_thread,
-	       NULL, &client_thread, &tTable->last_element()) != 0 )
+	     pthread_create(&lList->last_element().response_thread,
+	       NULL, &client_thread, &lList->last_element()) != 0 )
 	{
-	tTable->p_last_element();
+	lList->p_last_element();
 	shutdown(detached_socket, SHUT_RDWR);
     log_server_new_client_error(error_internal);
 	return false;
@@ -1399,16 +1399,23 @@ monitor_list *mMonitorTable, const client_id *cClient, bool mMode)
 	if (!cClientTable || !sServiceList || !mMonitorTable) return false;
 
 	int position = 0;
+	bool killed = false;
 
 	while ((position = cClientTable->f_find(cClient, &find_client_pointer)) != data::not_found)
+	{
+	killed = true;
 	if ( !remove_client_common( cClientTable, sServiceList, mMonitorTable,
 	       cClientTable->get_element(position).notify,
 	       cClientTable->get_element(position).reference, position,  mMode) ) break;
+	}
 
 	if (register_notify_state() && cClientTable->fe_find(&find_fresh_client) == data::not_found)
 	continue_register_notify(true);
 
 	if (!cClientTable->size()) exit_server();
+
+	short_time term_latency = server_timing_specs->forced_client_exit_latency;
+	if (killed) nanosleep(&term_latency, NULL);
 
 	return true;
 }
@@ -1545,19 +1552,26 @@ monitor_list *mMonitorTable, pid_t cClient, bool mMode)
 	if (!cClientTable || !sServiceList || !mMonitorTable) return false;
 
 	int position = 0;
+	bool killed = false;
 
 	if ((cClientTable->f_find(cClient, &find_client_pid)) == data::not_found)
 	return false;
 
 	while ((position = cClientTable->f_find(cClient, &find_client_pid)) != data::not_found)
+	{
+	killed = true;
 	if ( !remove_client_common( cClientTable, sServiceList, mMonitorTable,
 	       cClientTable->get_element(position).notify,
 	       cClientTable->get_element(position).reference, position,  mMode) ) break;
+	}
 
 	if (register_notify_state() && cClientTable->fe_find(&find_fresh_client) == data::not_found)
 	continue_register_notify(true);
 
 	if (!cClientTable->size()) exit_server();
+
+	short_time term_latency = server_timing_specs->forced_client_exit_latency;
+	if (killed) nanosleep(&term_latency, NULL);
 
 	return true;
 }
@@ -1569,6 +1583,7 @@ monitor_list *mMonitorTable, pid_t cClient, text_info nName, bool mMode)
 	if (!cClientTable || !sServiceList || !mMonitorTable) return false;
 
 	int position = 0;
+	bool killed = false;
 
 	client_finder finder_functor(nName, 0x00, 0x00);
 
@@ -1578,14 +1593,20 @@ monitor_list *mMonitorTable, pid_t cClient, text_info nName, bool mMode)
 	return false;
 
 	while ((position = cClientTable->fe_find(&finder_functor)) != data::not_found)
+	{
+	killed = true;
 	if ( !remove_client_common( cClientTable, sServiceList, mMonitorTable,
 	       cClientTable->get_element(position).notify,
 	       cClientTable->get_element(position).reference, position,  mMode) ) break;
+	}
 
 	if (register_notify_state() && cClientTable->fe_find(&find_fresh_client) == data::not_found)
 	continue_register_notify(true);
 
 	if (!cClientTable->size()) exit_server();
+
+	short_time term_latency = server_timing_specs->forced_client_exit_latency;
+	if (killed) nanosleep(&term_latency, NULL);
 
 	return true;
 }

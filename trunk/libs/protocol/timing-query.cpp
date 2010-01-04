@@ -69,10 +69,10 @@ static const char *server_timing_labels[] = {
 	"execute.standby_retry",
 	"execute.standby_wait",
 
-	"internal_client_exit_cycle",
 	"internal_client_exit_latency",
 	"command_purge_retry",
 	"execution_exit_latency",
+	"forced_client_exit_latency",
 	/*END server timing---------------------------------------------------*/
 
 	/*client timing-------------------------------------------------------*/

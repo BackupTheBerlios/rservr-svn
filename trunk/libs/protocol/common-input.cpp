@@ -239,10 +239,7 @@ extern "C" {
 
 
 	bool buffered_common_input::is_terminated() const
-	{
-	struct stat current_state;
-	return eof_reached || input_pipe < 0;
-	}
+	{ return eof_reached || input_pipe < 0; }
 	//----------------------------------------------------------------------
 
 
@@ -265,7 +262,7 @@ extern "C" {
 	return false;
 	  }
 
-	//NOTE: all reads need to use 'read' because mixing modes causes lost data (also needed for encrypted input)
+	//NOTE: all reads need to use 'read' because mixing modes causes lost data
 	//NOTE: when using 'read', don't set beginning of read to null character
 
 	read_cancel = current;

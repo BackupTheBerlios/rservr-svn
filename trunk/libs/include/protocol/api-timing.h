@@ -99,10 +99,10 @@ struct internal_server_timing_table
 	timing_value execute_standby_retry;
 	timing_value execute_standby_wait;
 
-	short_time internal_client_exit_cycle;
 	short_time internal_client_exit_latency;
 	short_time command_purge_retry;
 	short_time execution_exit_latency;
+	short_time forced_client_exit_latency;
 } ATTR_PACK;
 
 #endif /*api_timing_h*/
