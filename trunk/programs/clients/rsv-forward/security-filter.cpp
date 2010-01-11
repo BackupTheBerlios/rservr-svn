@@ -43,7 +43,8 @@ extern "C" {
 #include <list>
 #include <map>
 
-#include <dlfcn.h> //'dlopen', etc
+#include <dlfcn.h> //'dlopen', etc.
+#include <string.h> //'strlen', etc.
 
 #include "global/condition-block.hpp"
 
