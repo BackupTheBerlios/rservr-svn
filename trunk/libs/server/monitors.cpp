@@ -41,9 +41,8 @@ extern "C" {
 #include "api/monitor-client.h"
 }
 
+#include <stdio.h> //'snprintf'
 #include <map>
-
-#include <stdio.h>
 
 #include "external/clist.hpp"
 #include "external/global-sentry-pthread.hpp"

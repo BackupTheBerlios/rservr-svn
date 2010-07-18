@@ -42,6 +42,7 @@ extern "C" {
 }
 
 #include <string.h> //'strlen', 'strcmp'
+#include <stdio.h> //'snprintf'
 #include <string>
 
 #include "plugin-macro.hpp"
