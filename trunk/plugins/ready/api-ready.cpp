@@ -41,6 +41,7 @@ extern "C" {
 #include "plugins/rsvp-ready-hook.h"
 }
 
+#include <stdio.h> //'snprintf'
 #include <string.h> //'strlen', etc.
 
 #include "plugin-macro.hpp"
