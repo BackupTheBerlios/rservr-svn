@@ -439,9 +439,10 @@ static bool initialize_attributes(pthread_attr_t &aAttributes)
 
 	struct sched_param parameters =
 	  { sched_priority: sched_get_priority_min(SCHED_RR) };
-	if (pthread_attr_setschedparam(&aAttributes, &parameters) != 0) return false;
 
-	if (pthread_attr_setschedpolicy(&aAttributes, SCHED_RR) != 0) return false;
+	//if these fail, it's because the OS is blocking it!
+	if (pthread_attr_setschedparam(&aAttributes, &parameters) != 0); //return false;
+	if (pthread_attr_setschedpolicy(&aAttributes, SCHED_RR) != 0); //return false;
 
 	return true;
 }
