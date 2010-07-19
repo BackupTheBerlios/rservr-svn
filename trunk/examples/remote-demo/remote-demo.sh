@@ -15,7 +15,7 @@ clean_up()
   exit
 }
 
-trap clean_up SIGINT
+trap 'clean_up' 2 15
 
 
 #start 3 very basic server systems

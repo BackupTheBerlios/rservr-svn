@@ -47,30 +47,30 @@ clean_up()
   exit
 }
 
-trap clean_up SIGINT
+trap 'clean_up' 2 15
 
 
 <i>#start 3 very basic server systems</i>
 
 echo "starting 'node3'..."
 
-{ echo "execute_critical @<b>rservrd</b>@-dxr";
-  echo "execute @<b>rsv-fsrelay</b>@relay3in";
+{ echo "execute_critical <b>rservrd</b> -dxr";
+  echo "execute <b>rsv-fsrelay</b> relay3in";
   echo "register_all_wait"; } | \
 <b>rservr</b> node3 "$output"
 
 echo "starting 'node2'..."
 
-{ echo "execute_critical @<b>rservrd</b>@-dx";
-  echo "execute @<b>rsv-fsrelay</b>@relay2out";
-  echo "execute @<b>rsv-fsrelay</b>@relay2in";
+{ echo "execute_critical <b>rservrd</b> -dx";
+  echo "execute <b>rsv-fsrelay</b> relay2out";
+  echo "execute <b>rsv-fsrelay</b> relay2in";
   echo "register_all_wait"; } | \
 <b>rservr</b> node2 "$output"
 
 echo "starting 'node1'..."
 
-{ echo "execute_critical @<b>rservrd</b>@-dxr";
-  echo "execute @<b>rsv-fsrelay</b>@relay1out";
+{ echo "execute_critical <b>rservrd</b> -dxr";
+  echo "execute <b>rsv-fsrelay</b> relay1out";
   echo "register_all_wait"; } | \
 <b>rservr</b> node1 "$output"
 
