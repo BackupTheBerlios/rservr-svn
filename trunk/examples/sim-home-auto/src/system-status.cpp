@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#include <stdio.h> //'fprintf', etc.
 #include <string.h> //'strlen', 'strcmp', 'strsep'
 #include <pthread.h> //pthreads
 

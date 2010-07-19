@@ -12,6 +12,7 @@
 #include <vector>
 #include <sstream>
 
+#include <stdio.h> //'fprintf', etc.
 #include <string.h> //'strlen', 'strcmp', 'strsep'
 
 #include <rservr/api/client.h>
