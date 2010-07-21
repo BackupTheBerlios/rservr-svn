@@ -479,7 +479,7 @@ setenv CLIENT_NAME="echo"
 
 <i>#... much later in the file ...</i>
 
-execute `echo @$CLIENT_TYPE@$CLIENT_NAME`
+execute `echo $CLIENT_TYPE $CLIENT_NAME`
 </pre>
       </div>
       <p class="overview_content style_definition_long"> This method can specifically be used to pass parameters to the <a href="socket-forward.html" class="general_link">socket-forwarder programs</a> for use at configuration time: </p>
@@ -488,7 +488,7 @@ execute `echo @$CLIENT_TYPE@$CLIENT_NAME`
 <i>#<b>rservr</b> configuration file</i>
 
 setenv LISTEN_ALLOW="^204[0-9]$"
-execute @<b>rsv-netrelay</b>@relay@<u>security.conf</u>
+execute <b>rsv-netrelay</b> relay <u>security.conf</u>
 unsetenv LISTEN_ALLOW
 </pre>
       </div>
@@ -642,7 +642,7 @@ listen_allow `echo "$LISTEN_ALLOW"`
       <div align="center">
         <pre class="example_box code_box script_box">
 <b><i><u>substitution.conf</u></i></b>
-execute_critical @rservrd@-dxr
+execute_critical rservrd -dxr
 
 <i>#sequence parameters</i>
 setenv STEP=32 SEQUENCE="a b"
@@ -652,12 +652,12 @@ setenv STEP=32 SEQUENCE="a b"
  seq $( expr $STEP - 1 ) $STEP 255 | while read priority; do
    echo <u>priority $priority</u>
    for spec in $SEQUENCE; do
-     echo <u>execute @<b>rsv-echo</b>@echo-$priority$spec</u>
+     echo <u>execute <b>rsv-echo</b> echo-$priority$spec</u>
    done
  done`
 
 <i>#terminal emulator (element substitution)</i>
-execute `echo @<b>rsv-terminal</b>@$HOME/terminal;`
+execute `echo <b>rsv-terminal</b> $HOME/terminal;`
 
 <i>#timing change (element substitution)</i>
 timing `echo register_all_wait; echo '~2.0';`
