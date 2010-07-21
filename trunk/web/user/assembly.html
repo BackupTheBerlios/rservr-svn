@@ -258,7 +258,7 @@ rservrd -d<b><i>(</i></b>x<b><i>)(</i></b>g<b><i>)(</i></b>r<b><i>)</i></b> <b><
       <p class="overview_content"> This should be done using the configuration file. The following configuration line demonstrates the standard way of starting <span class="style_command_line">rservrd</span> from the <span class="style_command_line">rservr</span> configuration file: </p>
       <div align="center">
         <pre class="example_box shell_box">
-execute_critical @rservrd@-dxr
+execute_critical rservrd -dxr
 </pre>
       </div>
       <p class="overview_content"> In brief, the <span class="style_command_line">x</span> option will cause the daemon to terminate the <span class="style_command_line">rservr</span> it's connected to when it exits itself (this only works when starting the daemon from a configuration file,) and the <span class="style_command_line">g</span> option allows the daemon's interface to be accessed by users who are a part of the same group as that of the daemon. The <span class="style_command_line">r</span> option causes a "new client" call to pause until that client registers with the server. See the <a href="rservrd.html" class="general_link"><span class="style_command_line">rservrd</span> Program Guide</a> for information about the priority and permission options. </p>
