@@ -8,9 +8,10 @@ computer for user control.
 
 To run this interactive example, make sure Resourcerver is installed and is of
 the same version as this example's package.  Run 'gmake' to build the binaries.
-If you configured 'rservr' with the --prefix option, set PREFIX to that path,
-e.g. 'gmake PREFIX=/usr'. If everything builds successfully, start the example
-system with the following:
+The Makefile will guess what --prefix you installed Resourcerver in, but if that
+fails (e.g. it's unable to find a library,) set PREFIX to that path, e.g.
+'gmake PREFIX=/usr'. If everything builds successfully, start the example system
+with the following:
 
 	./main-system.sh subsystems
 
