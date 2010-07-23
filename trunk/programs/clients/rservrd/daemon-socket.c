@@ -401,6 +401,16 @@ static int connect_daemon(const char *nName)
 
 	struct stat current_stats;
 
+	if (access(nName, O_RDWR) != 0)
+	/*this is required because 'connect' doesn't always fail on bad access*/
+	/*NOTE: this is before 'stat' to prevent detection of multiple checks when access isn't allowed*/
+	{
+    #ifndef PARAM_RSERVRD_TARGET_REGEX
+	fprintf(stderr, "%s: no match for daemon '%s'\n", command_name, nName);
+    #endif
+	return -1;
+	}
+
 	if (stat(nName, &current_stats) >= 0)
 	{
 	if (!S_ISSOCK(current_stats.st_mode))
@@ -411,15 +421,6 @@ static int connect_daemon(const char *nName)
 	}
 
 	else
-	{
-    #ifndef PARAM_RSERVRD_TARGET_REGEX
-	fprintf(stderr, "%s: no match for daemon '%s'\n", command_name, nName);
-    #endif
-	return -1;
-	}
-
-	if (access(nName, O_RDWR) != 0)
-	/*this is required because 'connect' doesn't always fail on bad access*/
 	{
     #ifndef PARAM_RSERVRD_TARGET_REGEX
 	fprintf(stderr, "%s: no match for daemon '%s'\n", command_name, nName);
@@ -456,7 +457,7 @@ static int connect_daemon(const char *nName)
 	close(new_socket);
 
     #ifdef PARAM_RSERVRD_TARGET_REGEX
-	/*NOTE: this allows regular expressions that match "hidden" daemons*/
+	/*NOTE: this allows regular expressions that match "hidden" daemons, but 'access' should preempt this error*/
 	if (errno == EACCES) return -1;
     #endif
 
