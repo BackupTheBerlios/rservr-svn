@@ -78,11 +78,16 @@ AC_CHECK_LIB([pthread], [pthread_create], [LIBPTHREAD=true], [], [])
 
 
 #infer 'rservrd' parameters from 'param.h'
-export RSERVRD_USER=`grep PARAM_RSERVRD_UNAME param.h | grep -o '".*"'`
-export RSERVRD_GROUP=`grep PARAM_RSERVRD_GNAME param.h | grep -o '".*"'`
-export RSERVRD_TABLE=`grep PARAM_RSERVRD_TABLE param.h | grep -o '".*"'`
-export RSERVRD_DELETE_USER=`grep PARAM_RSERVRD_DELETE_UNAME param.h | grep -o 'true'`
-export RSERVRD_DELETE_GROUP=`grep PARAM_RSERVRD_DELETE_GNAME param.h | grep -o 'true'`
+RSERVRD_USER=`grep PARAM_RSERVRD_UNAME param.h | grep -o '".*"'`
+RSERVRD_GROUP=`grep PARAM_RSERVRD_GNAME param.h | grep -o '".*"'`
+RSERVRD_DELETE_USER=`grep PARAM_RSERVRD_DELETE_UNAME param.h | grep -o 'true'`
+RSERVRD_DELETE_GROUP=`grep PARAM_RSERVRD_DELETE_GNAME param.h | grep -o 'true'`
+RSERVRD_TABLE=`grep PARAM_RSERVRD_TABLE param.h | grep -o '".*"'`
+AC_SUBST(RSERVRD_USER)
+AC_SUBST(RSERVRD_GROUP)
+AC_SUBST(RSERVRD_DELETE_USER)
+AC_SUBST(RSERVRD_DELETE_GROUP)
+AC_SUBST(RSERVRD_TABLE)
 
 
 # Checks for header files.
