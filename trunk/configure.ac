@@ -76,6 +76,14 @@ export LDFLAGS='-L/usr/lib -L/usr/local/lib'
 AC_CHECK_LIB([dl], [dlopen], [LIBDL=true], [], [])
 AC_CHECK_LIB([pthread], [pthread_create], [LIBPTHREAD=true], [], [])
 
+RSERVRD_USER=`grep PARAM_RSERVRD_UNAME param.h | grep -o '".*"'`
+RSERVRD_GROUP=`grep PARAM_RSERVRD_GNAME param.h | grep -o '".*"'`
+RSERVRD_TABLE=`grep PARAM_RSERVRD_TABLE param.h | grep -o '".*"'`
+AC_SUBST(RSERVRD_USER)
+AC_SUBST(RSERVRD_GROUP)
+AC_SUBST(RSERVRD_TABLE)
+
+
 # Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_STDC

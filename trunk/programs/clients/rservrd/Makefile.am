@@ -10,30 +10,29 @@ rservrd_LDADD=$(STANDARD_LIBRARIES) $(USE_LIBPTHREAD) ../../../plugins/netcntl/l
 EXTRA_DIST=NOTICE daemon-commands.h daemon-socket.h daemon.h interface.h daemon-regex.h commands/include/commands-common.h commands/include/general.h commands/include/clients.h commands/include/control.h commands/include/netcntl.h
 
 RSERVRD=rservrd
-RSERVRD_TABLE=/tmp/$(RSERVRD)
 RSERVRD_PERMISSION=6755
 
 install-exec-hook:
 	if [ "$$(id -u 2> /dev/null)" -eq 0 ]; then \
 	  case "$$(uname)" in \
 	    "Linux"|"linux") \
-	      if ! id $(RSERVRD); then \
-	        groupadd $(RSERVRD) || true; \
-	        if ! useradd -g $(RSERVRD) -d $(RSERVRD_TABLE) $(RSERVRD); then \
+	      if ! id $(RSERVRD_USER); then \
+	        groupadd $(RSERVRD_GROUP) || true; \
+	        if ! useradd -g $(RSERVRD_GROUP) -d $(RSERVRD_TABLE) $(RSERVRD_USER); then \
 	          ( echo "{fail point 1[Linux]}" && cat $(srcdir)/NOTICE && sleep 2 ) 1>&2 || true; \
 	        fi; \
 	      fi; \
 	    ;; \
 	    "FreeBSD"|"freebsd") \
-	      if ! id $(RSERVRD); then \
-	        pw groupadd $(RSERVRD) || true; \
-	        if ! pw useradd $(RSERVRD) -g $(RSERVRD) -d $(RSERVRD_TABLE); then \
+	      if ! id $(RSERVRD_USER); then \
+	        pw groupadd $(RSERVRD_GROUP) || true; \
+	        if ! pw useradd $(RSERVRD_GROUP) -g $(RSERVRD_USER) -d $(RSERVRD_TABLE); then \
 	          ( echo "{fail point 1[FreeBSD]}" && cat $(srcdir)/NOTICE && sleep 2 ) 1>&2 || true; \
 	        fi; \
 	      fi; \
 	    ;; \
 	  esac; \
-	  if ! ( chown $(RSERVRD):$(RSERVRD) $(DESTDIR)$(bindir)/$(RSERVRD) &> /dev/null ) || \
+	  if ! ( chown $(RSERVRD_USER):$(RSERVRD_GROUP) $(DESTDIR)$(bindir)/$(RSERVRD) &> /dev/null ) || \
 	     ! ( chmod $(RSERVRD_PERMISSION) $(DESTDIR)$(bindir)/$(RSERVRD) &> /dev/null ); then \
 	    ( echo "{fail point 2}" && cat $(srcdir)/NOTICE && sleep 2 ) 1>&2 || true; \
 	  fi; \
@@ -47,12 +46,12 @@ uninstall-hook:
 	  ( rm -rfv $(RSERVRD_TABLE) &> /dev/null ) || true; \
 	  case "$$(uname)" in \
 	    "Linux"|"linux") \
-	      ( userdel $(RSERVRD) &> /dev/null ) || true; \
-	      ( groupdel $(RSERVRD) &> /dev/null ) || true; \
+	      ( [ $(RSERVRD_USER) == $(RSERVRD) ] && userdel $(RSERVRD_USER) &> /dev/null ) || true; \
+	      ( [ $(RSERVRD_USER) == $(RSERVRD) ] && groupdel $(RSERVRD_GROUP) &> /dev/null ) || true; \
 	    ;; \
 	    "FreeBSD"|"freebsd") \
-	      ( pw userdel $(RSERVRD) &> /dev/null ) || true; \
-	      ( pw groupdel $(RSERVRD) &> /dev/null ) || true; \
+	      ( [ $(RSERVRD_USER) == $(RSERVRD) ] && pw userdel $(RSERVRD_USER) &> /dev/null ) || true; \
+	      ( [ $(RSERVRD_USER) == $(RSERVRD) ] && pw groupdel $(RSERVRD_GROUP) &> /dev/null ) || true; \
 	    ;; \
 	  esac; \
 	fi;
