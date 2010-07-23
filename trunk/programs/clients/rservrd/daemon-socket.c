@@ -616,7 +616,7 @@ int list_daemons(const char *nName)
 
 	if ((current = entries)) while (total_matches-- && *current)
 	{
-	fprintf(stderr, "%s: bad daemon table entry '%s'\n", nName, (*current)->d_name);
+	fprintf(stderr, "%s: bad daemon table entry '%s' (run as root to remove)\n", nName, (*current)->d_name);
 	remove((*current)->d_name);
 	free(*current++);
 	}
