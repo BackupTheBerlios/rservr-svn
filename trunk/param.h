@@ -237,6 +237,11 @@ extern "C" {
 #define PARAM_RSERVRD_UNAME "rservrd"
 #define PARAM_RSERVRD_GNAME "rservrd"
 
+/* delete the user and group upon uninstall */
+/* SET TO 'false' OR BLANK IF YOU DON'T WANT THEM DELETED UPON UNINSTALL! */
+#define PARAM_RSERVRD_DELETE_UNAME true
+#define PARAM_RSERVRD_DELETE_GNAME true
+
 /* table directory name */
 #define PARAM_RSERVRD_TABLE    "/tmp/rservrd"
 #define PARAM_RSERVRD_SUBTABLE "table"

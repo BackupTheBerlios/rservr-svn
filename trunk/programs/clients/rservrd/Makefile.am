@@ -46,12 +46,12 @@ uninstall-hook:
 	  ( rm -rfv $(RSERVRD_TABLE) &> /dev/null ) || true; \
 	  case "$$(uname)" in \
 	    "Linux"|"linux") \
-	      ( [ $(RSERVRD_USER) == $(RSERVRD) ] && userdel $(RSERVRD_USER) &> /dev/null ) || true; \
-	      ( [ $(RSERVRD_USER) == $(RSERVRD) ] && groupdel $(RSERVRD_GROUP) &> /dev/null ) || true; \
+	      ( [ -n "$(RSERVRD_DELETE_USER)" ] && [ "$(RSERVRD_DELETE_USER)" == 'true' ] && userdel $(RSERVRD_USER) &> /dev/null ) || true; \
+	      ( [ -n "$(RSERVRD_DELETE_GROUP)" ] && [ "$(RSERVRD_DELETE_GROUP)" == 'true' ] && groupdel $(RSERVRD_GROUP) &> /dev/null ) || true; \
 	    ;; \
 	    "FreeBSD"|"freebsd") \
-	      ( [ $(RSERVRD_USER) == $(RSERVRD) ] && pw userdel $(RSERVRD_USER) &> /dev/null ) || true; \
-	      ( [ $(RSERVRD_USER) == $(RSERVRD) ] && pw groupdel $(RSERVRD_GROUP) &> /dev/null ) || true; \
+	      ( [ -n "$(RSERVRD_DELETE_USER)" ] && [ "$(RSERVRD_DELETE_USER)" == 'true' ] && pw userdel $(RSERVRD_USER) &> /dev/null ) || true; \
+	      ( [ -n "$(RSERVRD_DELETE_GROUP)" ] && [ "$(RSERVRD_DELETE_GROUP)" == 'true' ] && pw groupdel $(RSERVRD_GROUP) &> /dev/null ) || true; \
 	    ;; \
 	  esac; \
 	fi;
