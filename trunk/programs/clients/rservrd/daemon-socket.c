@@ -67,7 +67,7 @@ void set_command_name(const char *nName)
 
 static const char global_dir_name[] = PARAM_RSERVRD_TABLE;
 static const char table_dir_name[]  = PARAM_RSERVRD_SUBTABLE;
-static const mode_t global_mode     = S_IRWXU;
+static const mode_t global_mode     = S_IRWXU | S_IRGRP | S_IXGRP;
 static const mode_t table_mode      = S_IRWXU | S_IRWXG | S_IRWXO | S_ISVTX;
 
 static uid_t user_id  = -1;
