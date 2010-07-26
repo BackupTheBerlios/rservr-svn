@@ -78,11 +78,11 @@ AC_CHECK_LIB([pthread], [pthread_create], [LIBPTHREAD=true], [], [])
 
 
 #infer 'rservrd' parameters from 'param.h'
-RSERVRD_USER=`grep -E '^\[ \t\]*#define[ \t]+PARAM_RSERVRD_UNAME[ \t]+' param.h | tr ' \t' '\n' | grep . | sed '3!d'`
-RSERVRD_GROUP=`grep -E '^\[ \t\]*#define[ \t]+PARAM_RSERVRD_GNAME[ \t]+' param.h | tr ' \t' '\n' | grep . | sed '3!d'`
-RSERVRD_DELETE_USER=`grep -E '^\[ \t\]*#define[ \t]+PARAM_RSERVRD_DELETE_GNAME[ \t]+' param.h | tr ' \t' '\n' | grep . | sed '3!d'`
-RSERVRD_DELETE_GROUP=`grep -E '^\[ \t\]*#define[ \t]+PARAM_RSERVRD_DELETE_GNAME[ \t]+' param.h | tr ' \t' '\n' | grep . | sed '3!d'`
-RSERVRD_TABLE=`grep -E '^\[ \t\]*#define[ \t]+PARAM_RSERVRD_TABLE[ \t]+' param.h | tr ' \t' '\n' | grep . | sed '3!d'`
+RSERVRD_USER=`grep -E '^( |\t)*#define[ \t]+PARAM_RSERVRD_UNAME[ \t]+' "$srcdir/param.h" | tr ' \t' '\n' | grep . | sed '3!d'`
+RSERVRD_GROUP=`grep -E '^( |\t)*#define[ \t]+PARAM_RSERVRD_GNAME[ \t]+' "$srcdir/param.h" | tr ' \t' '\n' | grep . | sed '3!d'`
+RSERVRD_DELETE_USER=`grep -E '^( |\t)*#define[ \t]+PARAM_RSERVRD_DELETE_GNAME[ \t]+' "$srcdir/param.h" | tr ' \t' '\n' | grep . | sed '3!d'`
+RSERVRD_DELETE_GROUP=`grep -E '^( |\t)*#define[ \t]+PARAM_RSERVRD_DELETE_GNAME[ \t]+' "$srcdir/param.h" | tr ' \t' '\n' | grep . | sed '3!d'`
+RSERVRD_TABLE=`grep -E '^( |\t)*#define[ \t]+PARAM_RSERVRD_TABLE[ \t]+' "$srcdir/param.h" | tr ' \t' '\n' | grep . | sed '3!d'`
 AC_SUBST(RSERVRD_USER)
 AC_SUBST(RSERVRD_GROUP)
 AC_SUBST(RSERVRD_DELETE_USER)
