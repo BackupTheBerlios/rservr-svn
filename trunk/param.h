@@ -59,8 +59,8 @@ extern "C" {
 /*#define PARAM_FORK_LOG_MODE (logging_default & ~logging_extended)*/
 
 /* allow certain loopholes for the purposes of debugging */
-/* COMMENT OUT FOR RELEASE VERSIONS! */
-#define PARAM_ALLOW_DEBUG_LOOPHOLES
+/* NOT A SECURITY RISK, BUT COMMENT OUT FOR RELEASE VERSIONS! */
+/*#define PARAM_ALLOW_DEBUG_LOOPHOLES*/
 
 /* set logging level for GNU TLS in 'librsvx-tls.so' */
 /* SET TO 0 OR 1 FOR RELEASE VERSIONS! */
@@ -110,6 +110,7 @@ extern "C" {
 #define PARAM_IPC_DESCRIPTOR_OFFSET 32
 
 /* allow a remote service to alias a local service with a different name */
+/* NOT MANY GOOD REASONS TO COMMENT THIS OUT */
 #define PARAM_ASYM_REMOTE_SERVICES
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~ END GENERAL PARAMETERS ~~~~~~~~~~~~~~~~~~~~~~~~~ */
@@ -126,8 +127,8 @@ extern "C" {
 
 /* recursive mutex locking for the server */
 /* SET TO 'false' FOR TESTING AND 'true' FOR RELEASE VERSIONS! */
-#define PARAM_SERVER_MULTI_LOCK false
-/*#define PARAM_SERVER_MULTI_LOCK true*/
+/*#define PARAM_SERVER_MULTI_LOCK false*/
+#define PARAM_SERVER_MULTI_LOCK true
 
 /* limits for bad client commands (disconnect client when reached) */
 #define PARAM_MAX_CLIENT_ERROR   64
@@ -198,7 +199,7 @@ extern "C" {
 #define PARAM_MAX_FORWARD_ERROR 16
 
 /* force explicit listen and connect network forwarder permissions */
-/* DEFINE FOR RELEASE VERSIONS! */
+/* DEFINE FOR RELEASE VERSIONS FOR SECURITY! */
 #define PARAM_FORCE_SOCKET_AUTHORIZE
 
 /* allow remote socket commands which arrive via the executing forwarder */
@@ -233,7 +234,7 @@ extern "C" {
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~ DAEMON PARAMETERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 /* user and group names for suid/sgid */
-/* SET TO 'rservrd' FOR RELEASE VERSIONS! */
+/* SET TO 'rservrd' (OR CUSTOMIZE) FOR RELEASE VERSIONS! */
 #define PARAM_RSERVRD_UNAME "rservrd"
 #define PARAM_RSERVRD_GNAME "rservrd"
 
@@ -243,6 +244,7 @@ extern "C" {
 #define PARAM_RSERVRD_DELETE_GNAME true
 
 /* table directory name */
+/* 'table' WILL BE DELETED UPON UNINSTALL AND CANNOT CONTAIN OTHER THINGS! */
 #define PARAM_RSERVRD_TABLE    "/tmp/rservrd"
 #define PARAM_RSERVRD_SUBTABLE "table"
 

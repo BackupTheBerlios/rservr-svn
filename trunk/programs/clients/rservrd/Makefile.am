@@ -44,6 +44,7 @@ install-exec-hook:
 uninstall-hook:
 	if [ "$$(id -u 2> /dev/null)" -eq 0 ]; then \
 	  ( rm -rfv $(RSERVRD_TABLE) &> /dev/null ) || true; \
+	  ( rmdir $(RSERVRD_HOME) &> /dev/null ) || true; \
 	  case "$$(uname)" in \
 	    "Linux"|"linux") \
 	      ( [ -n "$(RSERVRD_DELETE_USER)" ] && [ "$(RSERVRD_DELETE_USER)" == 'true' ] && userdel $(RSERVRD_USER) &> /dev/null ) || true; \
