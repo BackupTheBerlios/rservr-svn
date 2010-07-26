@@ -99,8 +99,8 @@ static bool initialize_conduit()
 {
 	int null_file = open(null_device, O_RDWR);
 	if (null_file < 0) return false;
-	if (null_file < dup2(null_file, execute_input) < 0) return false;
-	if (null_file < dup2(null_file, execute_output) < 0) return false;
+	if (dup2(null_file, execute_input)  < 0) return false;
+	if (dup2(null_file, execute_output) < 0) return false;
 
 	if (null_file != execute_input && null_file != execute_output)
 	close(null_file);
