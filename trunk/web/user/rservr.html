@@ -83,7 +83,7 @@
       <div align="center">
         <pre class="example_box code_box script_box">
 <b><i><u>example-server.sh</u></i></b>
-<b>#!/bin/bash</b>
+<b>#!/bin/sh</b>
 
 <i>#this script starts a server using its first argument as the server's name</i>
 
@@ -108,7 +108,7 @@ fi
 <b><u>{example} server exiting</u></b>
 </pre>
       </div>
-      <p class="overview_content"> Unless the server is started as a session leader (normally by starting it with <span class="style_command_line">exec</span> from a shell or using it in a new <span class="style_command_line">xterm</span>,) the server will fork and will normally return to the shell right away. If your server requires terminal access, it must own the terminal it's started in by taking the place of the shell that starts it. Only servers that will be using clients that require the terminal will need to own a terminal. Use a script like this to ensure the server owns the terminal: </p>
+      <p class="overview_content"> Unless the server is started as a session leader (normally by starting it with <span class="style_command_line">exec</span> from a shell or using it in a new <span class="style_command_line">xterm</span>,) the server will fork and will normally return to the shell right away. If your server requires terminal access, it must own the terminal it's started in by taking the place of the shell that starts it. Only servers that will be using clients that require the terminal will need to own a terminal. Use a script like this to ensure the server owns the terminal (note the use of <span class="style_command_line">bash</span> because of <span class="style_command_line">&lt;(...)</span>): </p>
       <div align="center">
         <pre class="example_box code_box script_box">
 <b><i><u>example-terminal-server.sh</u></i></b>
