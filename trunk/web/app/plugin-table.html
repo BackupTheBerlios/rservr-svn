@@ -214,6 +214,7 @@
       </h3>
       <p class="overview_content"> <span class="style_file_name">librsvp-rqsrvc.so</span> provides commands for one client to request another client register or deregister a service on the sending client's server. These requests are generally sent outside of the local system to remote clients, allowing access to the remote clients' services as if they were local. </p>
       <p class="overview_content"> <span class="style_file_name">librsvp-rqsrvc-auto.so</span> is a transparent automation of <span class="style_file_name">librsvp-rqsrvc.so</span>. It's a generic implementation of <span class="style_file_name">librsvp-rqsrvc.so</span> which allows the client to screen the type of service requested, then registers the service automatically if approved. </p>
+      <p class="overview_content"> If you override <span class="style_inline_code">load_all_commands</span> in your client and you also link to <span class="style_file_name">librsvp-rqsrvc-auto.so</span>, you'll also need to make a call to <span class="style_inline_code">rsvp_rqsrvc_load</span> in <span class="style_inline_code">load_all_commands</span> to make sure it gets loaded (see <a class="general_link" href="command-plugin.html#PiLR">plug-in loading requirements</a> for more information.) </p>
       <div align="center">
         <table width="900" class="command_table">
 		    <tr style="font-size: larger;">
