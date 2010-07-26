@@ -17,8 +17,8 @@ install-exec-hook:
 	  case "$$(uname)" in \
 	    "Linux"|"linux") \
 	      if ! id $(RSERVRD_USER); then \
-	        groupadd $(RSERVRD_GROUP) || true; \
-	        if ! useradd -g $(RSERVRD_GROUP) -d $(RSERVRD_TABLE) $(RSERVRD_USER); then \
+	        groupadd -g $(RSERVRD_GROUP) || true; \
+	        if ! useradd -g $(RSERVRD_GROUP) -d $(RSERVRD_TABLE) -s /bin/false $(RSERVRD_USER); then \
 	          ( echo "{fail point 1[Linux]}" && cat $(srcdir)/NOTICE && sleep 2 ) 1>&2 || true; \
 	        fi; \
 	      fi; \
@@ -26,7 +26,7 @@ install-exec-hook:
 	    "FreeBSD"|"freebsd") \
 	      if ! id $(RSERVRD_USER); then \
 	        pw groupadd $(RSERVRD_GROUP) || true; \
-	        if ! pw useradd $(RSERVRD_GROUP) -g $(RSERVRD_USER) -d $(RSERVRD_TABLE); then \
+	        if ! pw useradd $(RSERVRD_GROUP) -g $(RSERVRD_USER) -d $(RSERVRD_TABLE) -s /bin/false; then \
 	          ( echo "{fail point 1[FreeBSD]}" && cat $(srcdir)/NOTICE && sleep 2 ) 1>&2 || true; \
 	        fi; \
 	      fi; \
