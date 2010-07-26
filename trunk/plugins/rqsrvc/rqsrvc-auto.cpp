@@ -39,11 +39,20 @@ extern "C" {
 #include "api/service-client.h"
 #include "api/command-queue.h"
 #include "api/remote-service.h"
+#include "plugin-dev/entry-point.h"
+#include "plugins/rsvp-rqsrvc.h"
 #include "plugins/rsvp-rqsrvc-hook.h"
 #include "plugins/rsvp-rqsrvc-auto.h"
 }
 
 #include "external/clist.hpp"
+
+
+int load_all_commands(struct local_commands *lLoader)
+{
+	if (rsvp_rqsrvc_load(lLoader) < 0) return -1;
+	return 0;
+}
 
 
 struct remote_service
