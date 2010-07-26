@@ -141,22 +141,24 @@ static bool merge_and_add_common(std::list <std::string> &lList)
 	++index;
 
 	if (escaped)
-	if (index != end)
 	 {
+	if (index != end)
+	  {
 	previous += *index;
 	lList.erase(index);
 
 	//not at all efficient for many escapes, but no simple way around it
 	index = lList.begin();
 	end   = lList.end();
-	 }
+	  }
 
 	else
-	 {
+	  {
 	meta_continue = !holding_line.size();
 	holding_line = previous + holding_line;
 	lList.pop_back();
 	break;
+	  }
 	 }
 	}
 
@@ -312,8 +314,10 @@ static int load_line_common(const char *dData, const char *pPath, bool fFail)
 	if (separated && (holding_line.size() || blank))
 	 {
 	if (merge_and_add())
+	  {
 	if ((next_line = !buffered_data.size())) return RSERVR_LINE_CONTINUE;
 	else continue;
+	  }
 	buffered_data.push_back(holding_line);
 	holding_line.erase();
 	 }
@@ -355,8 +359,10 @@ static int load_line_common(const char *dData, const char *pPath, bool fFail)
 	if (holding_line.size() || blank)
 	    {
 	if (merge_and_add())
+	     {
 	if ((next_line = !buffered_data.size())) return RSERVR_LINE_CONTINUE;
 	else continue;
+	     }
 	buffered_data.push_back(holding_line);
 	    }
 	holding_line.erase();
@@ -414,8 +420,10 @@ static int load_line_common(const char *dData, const char *pPath, bool fFail)
 			   if (!meta_quote)
 			    {
 			   if (merge_and_add())
+			     {
 			   if ((next_line = !buffered_data.size())) return RSERVR_LINE_CONTINUE;
 			   else break;
+			     }
 			   buffered_data.push_back(holding_line);
 			    }
 			   else holding_execute += "\n";

@@ -1150,12 +1150,12 @@ static bool common_start()
 	bool input_fail = false, output_fail = false;
 	struct stat file_status;
 
-	if ( input_fail = (fstat(execute_input, &file_status) < 0 ||
-	                   (!S_ISFIFO(file_status.st_mode) && !S_ISSOCK(file_status.st_mode))) )
+	if ( (input_fail = (fstat(execute_input, &file_status) < 0 ||
+	                   (!S_ISFIFO(file_status.st_mode) && !S_ISSOCK(file_status.st_mode)))) )
     log_client_file_error(standardized_input);
 
-	if ( output_fail = (fstat(execute_output, &file_status) < 0 ||
-	                    (!S_ISFIFO(file_status.st_mode) && !S_ISSOCK(file_status.st_mode))) )
+	if ( (output_fail = (fstat(execute_output, &file_status) < 0 ||
+	                    (!S_ISFIFO(file_status.st_mode) && !S_ISSOCK(file_status.st_mode)))) )
     log_client_file_error(standardized_output);
 
 	if (input_fail || output_fail) return false;

@@ -209,6 +209,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+AM_LDFLAGS = -version-info 3:0:3
 plugindir = $(PLUGIN_PATH)
 ALL_INCLUDES = $(STANDARD_INCLUDES) -I$(srcdir)/../.. -I$(srcdir)/../../include/rservr -I$(srcdir)/../../include
 AM_CPPFLAGS = -DENABLE_VIRT_ARRAY_ALL $(ALL_INCLUDES)

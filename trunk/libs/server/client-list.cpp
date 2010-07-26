@@ -283,7 +283,9 @@ int &iInput, int &oOutput)
 	int old_nice = getpriority(PRIO_PROCESS, 0), new_nice = 0;
 	if (errno == 0)
 	  {
-	nice(get_new_client_niceness());
+	//this isn't a reliable indication of failure since the new niceness
+	//could be -1 (also the error return). storing prevents a warning.
+	int ignore = nice(get_new_client_niceness());
 
 	errno = 0;
 	new_nice = getpriority(PRIO_PROCESS, 0);
@@ -1286,16 +1288,17 @@ entity_handle hHandle, transmit_block *cCommand)
 
 
 	if (!new_output(cCommand))
-	if (new_output.is_terminated)
 	{
+	if (new_output.is_terminated)
+	 {
 	send_server_response(*cCommand, event_error);
 	return false;
-	}
+	 }
 
 	else
-	{
-	if ((int) cCommand->penalty + PARAM_REQUEUE_PENALTY > PARAM_PENALTY_MAX)
 	 {
+	if ((int) cCommand->penalty + PARAM_REQUEUE_PENALTY > PARAM_PENALTY_MAX)
+	  {
     log_server_discard_limit(cCommand->target_entity.c_str(), cCommand->command_name());
 	send_server_response(*cCommand, event_discarded);
 	return false;
@@ -1314,16 +1317,17 @@ entity_handle hHandle, transmit_block *cCommand)
 	copied_command->value().penalty += PARAM_REQUEUE_PENALTY;
 
 	if (!requeue_server_command(copied_command))
-	 {
+	  {
     log_server_discard_full(copied_command->value().command_name());
 	send_server_response(*cCommand, event_discarded);
 	return false;
-	 }
+	  }
 	else
-	 {
+	  {
 	//NOTE: requeue here doesn't remove errors because it can happen more than once
 	++cClientTable->get_element(position1).total_waiting;
 	return true;
+	  }
 	 }
 	}
 

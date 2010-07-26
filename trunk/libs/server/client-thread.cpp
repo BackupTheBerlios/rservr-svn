@@ -66,7 +66,7 @@ void *client_thread(void *cClient)
 	pid_t         thread_pid    = this_client->process_id;
 	local_client *thread_client = this_client->set_local_client();
 
-    log_server_client_thread_start(*(unsigned int*) &thread_id, thread_pid);
+    log_server_client_thread_start(*(unsigned int*) (void*) &thread_id, thread_pid);
 
 	pthread_testcancel();
 
@@ -87,9 +87,9 @@ void *client_thread(void *cClient)
 	pthread_detach(thread_id);
 
 	if (remove_local_client(this_client))
-    log_server_client_thread_end(*(unsigned int*) &thread_id, thread_pid);
+    log_server_client_thread_end(*(unsigned int*) (void*) &thread_id, thread_pid);
 	else
-    log_server_client_thread_error(*(unsigned int*) &thread_id, thread_pid);
+    log_server_client_thread_error(*(unsigned int*) (void*) &thread_id, thread_pid);
 	}
 
 	while (waitpid(WAIT_ANY, NULL, WNOHANG) > 0);

@@ -283,7 +283,7 @@ extern "C" {
 
 	else
 	  {
-	if (read_size == 0 || error_copy != EAGAIN && error_copy != EINTR) eof_reached = true;
+	if (read_size == 0 || (error_copy != EAGAIN && error_copy != EINTR)) eof_reached = true;
 	buffer->loaded_data.resize(current);
 	  }
 

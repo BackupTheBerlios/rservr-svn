@@ -76,10 +76,7 @@ extern "C" {
 	}
 
 	bool common_output::is_closed() const
-	{
-	struct stat output_status;
-	return broken_pipe || output_pipe < 0;
-	}
+	{ return broken_pipe || output_pipe < 0; }
 
 	bool common_output::synchronize()
 	{

@@ -5,4 +5,4 @@ export AM_CFLAGS=-Wall
 export PLUGIN_PATH=$(libexecdir)/rservr
 export STANDARD_INCLUDES=-I/usr/include -I/usr/local/include
 export STANDARD_LIBRARIES=-L/usr/lib -L/usr/local/lib -L$(PLUGIN_PATH)
-export AM_LDFLAGS=-version-info 3:0:3
+export ACLOCAL_AMFLAGS=-I m4

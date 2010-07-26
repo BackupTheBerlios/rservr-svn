@@ -451,13 +451,15 @@ inline static bool ATTR_INL local_check_su()
 	discard = current_input.size();
 
 	if (iInput->end_of_data())
-	if (read_last)
 	  {
+	if (read_last)
+	   {
 	read_last = first_try;
 	first_try = false;
 	if (!read_last) continue;
-	  }
+	   }
 	else break;
+	  }
 
 	position_close = current_input.find(close_tag);
 	position_open  = current_input.find(open_tag);
@@ -521,8 +523,10 @@ inline static bool ATTR_INL local_check_su()
 	this->set_child( section_releaser(NULL) );
 
 	if (eEvent != event_none && !silent_auto_response)
+	 {
 	if (is_server()) send_server_response(*this, eEvent);
 	else             send_client_response(*this, eEvent);
+	 }
 
 	return return_value;
 	}

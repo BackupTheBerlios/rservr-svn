@@ -812,7 +812,7 @@ result set_default_uid(uid_t iId)
 {
 	if (iId != 0 && getuid() != 0) return false;
 
-	if (!(iId != 0 ^ getuid() != 0))
+	if (!((iId != 0) ^ (getuid() != 0)))
 	{
 	if (!internal_server.initial_user) return false;
     log_server_default_uid(internal_server.default_user, internal_server.initial_user);
@@ -844,7 +844,7 @@ result set_default_gid(gid_t iId)
 {
 	if (iId != 0 && getuid() != 0) return false;
 
-	if (!(iId != 0 ^ getuid() != 0))
+	if (!((iId != 0) ^ (getuid() != 0)))
 	{
 	if (!internal_server.initial_group) return false;
     log_server_default_uid(internal_server.default_group, internal_server.initial_group);
