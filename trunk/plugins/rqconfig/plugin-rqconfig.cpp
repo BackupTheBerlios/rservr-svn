@@ -47,9 +47,9 @@ extern "C" {
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_rqconfig_configure) { }
 
 
-	rsvp_rqconfig_configure::rsvp_rqconfig_configure(text_info aAddress) :
+	rsvp_rqconfig_configure::rsvp_rqconfig_configure(text_info tType) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_rqconfig_configure_tag),
-	request_origin(get_client_name()), configure_type(aAddress? aAddress : "")
+	request_origin(get_client_name()), configure_type(tType? tType : "")
 	{
 	PLUGIN_CREATE_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(configure))
 
@@ -98,9 +98,9 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqconfig_configure, rsvp_rqconfig_configure_
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_rqconfig_deconfigure) { }
 
 
-	rsvp_rqconfig_deconfigure::rsvp_rqconfig_deconfigure(text_info aAddress) :
+	rsvp_rqconfig_deconfigure::rsvp_rqconfig_deconfigure(text_info tType) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_rqconfig_deconfigure_tag),
-	request_origin(get_client_name()), deconfigure_type(aAddress? aAddress : "")
+	request_origin(get_client_name()), deconfigure_type(tType? tType : "")
 	{
 	PLUGIN_CREATE_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(deconfigure))
 
