@@ -9,9 +9,9 @@ echo '		string = some_label'
 echo '		address = mydata?/tmp/socket'
 echo '	}'
 echo ''
-/bin/echo -En '	single_data = \BA\'; dd if=/dev/urandom bs=10 count=1 2> /dev/null; echo
+/bin/echo -En '	single_data = \BA\'; echo #dd if=/dev/urandom bs=10 count=1 2> /dev/null; echo
 echo '	a_group = {'
-/bin/echo -En '		some_data = \BA\'; dd if=/dev/urandom bs=10 count=1 2> /dev/null; echo
-/bin/echo -En '		more_data = \BA\'; dd if=/dev/urandom bs=10 count=1 2> /dev/null; echo
+/bin/echo -En '		some_data = \BA\'; echo #dd if=/dev/urandom bs=10 count=1 2> /dev/null; echo
+/bin/echo -En '		more_data = \BA\'; echo #dd if=/dev/urandom bs=10 count=1 2> /dev/null; echo
 echo '	}'
 echo '}'

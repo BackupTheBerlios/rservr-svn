@@ -1,0 +1,22 @@
+!rservr[my_command] {
+  !route {
+    priority = !x80
+    orig_reference = !x1
+    target_reference = !x2
+    remote_reference = !x3
+    creator_pid = !x123
+    send_time = !xabcde
+    orig_entity = from_client
+    orig_address = from_address
+    target_entity = to_client
+    target_address = to_address
+  }
+  single_data = \TA\abcdefghij
+  some_group = {
+    some_data = \B5\12345
+    more_data = \T5\ABCDE
+    {
+      \T5\hello
+    }
+  }
+}

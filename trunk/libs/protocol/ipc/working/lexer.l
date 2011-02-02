@@ -67,7 +67,7 @@ int parse_u_integer16(const char *dData, unsigned int *vValue)
 		copied_text[strlen(copied_text) - 2] = 0x00;
 		parse_u_integer16(yytext + 2, &yylval->data.target);
 		yylval->data.string = NULL;
-		yylval->data.string = malloc(yylval->data.target);
+		yylval->data.string = (char*) malloc(yylval->data.target);
 		if (yylval->data.target) BEGIN TEXT_DATA; }
 
 <TEXT_DATA>[ -~] {
@@ -86,7 +86,7 @@ int parse_u_integer16(const char *dData, unsigned int *vValue)
 		copied_text[strlen(copied_text) - 2] = 0x00;
 		parse_u_integer16(yytext + 2, &yylval->data.target);
 		yylval->data.string = NULL;
-		yylval->data.string = malloc(yylval->data.target);
+		yylval->data.string = (char*) malloc(yylval->data.target);
 		if (yylval->data.target) BEGIN BINARY_DATA; }
 
 <BINARY_DATA>. {
