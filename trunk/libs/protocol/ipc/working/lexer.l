@@ -30,6 +30,8 @@ int parse_u_integer16(const char *dData, unsigned int *vValue)
 
 %x TEXT_DATA BINARY_DATA
 
+%option prefix="protocol_"
+
 %option reentrant bison-bridge
 %option noyywrap
 
@@ -63,12 +65,17 @@ int parse_u_integer16(const char *dData, unsigned int *vValue)
 
 \\[tT][A-Fa-f0-9]+\\ {
 		yylval->data.length = 0;
+		yylval->data.target = 0;
 		char *copied_text = strdup(yytext);
 		copied_text[strlen(copied_text) - 2] = 0x00;
-		parse_u_integer16(yytext + 2, &yylval->data.target);
+		parse_u_integer16(copied_text + 2, &yylval->data.target);
+		free(copied_text);
 		yylval->data.string = NULL;
+		if (yylval->data.target)
+		 {
 		yylval->data.string = (char*) malloc(yylval->data.target);
-		if (yylval->data.target) BEGIN TEXT_DATA; }
+		BEGIN TEXT_DATA;
+		 } }
 
 <TEXT_DATA>[ -~] {
 		if (yylval->data.length < yylval->data.target)
@@ -82,12 +89,17 @@ int parse_u_integer16(const char *dData, unsigned int *vValue)
 
 \\[bB][A-Fa-f0-9]+\\ {
 		yylval->data.length = 0;
+		yylval->data.target = 0;
 		char *copied_text = strdup(yytext);
 		copied_text[strlen(copied_text) - 2] = 0x00;
-		parse_u_integer16(yytext + 2, &yylval->data.target);
+		parse_u_integer16(copied_text + 2, &yylval->data.target);
+		free(copied_text);
 		yylval->data.string = NULL;
+		if (yylval->data.target)
+		 {
 		yylval->data.string = (char*) malloc(yylval->data.target);
-		if (yylval->data.target) BEGIN BINARY_DATA; }
+		BEGIN BINARY_DATA;
+		 } }
 
 <BINARY_DATA>. {
 		if (yylval->data.length < yylval->data.target)

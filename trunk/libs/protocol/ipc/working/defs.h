@@ -17,9 +17,9 @@ typedef struct
 	int              input, eof;
 
 	struct command_base *command;
-} scanner_context;
+} protocol_scanner_context;
 
-#define YY_EXTRA_TYPE scanner_context*
+#define YY_EXTRA_TYPE protocol_scanner_context*
 
 #ifdef __cplusplus
 }

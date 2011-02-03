@@ -26,9 +26,6 @@ public:
 	const text_data &get_name() const
 	{ return name; }
 
-	storage_section *child() const
-	{ return this->linked_section::child(); }
-
 private:
 	text_data name;
 };

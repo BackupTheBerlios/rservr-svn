@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 extern "C" {
-void yyerror(scanner_context*, void*, char*);
+void protocol_error(protocol_scanner_context*, void*, char*);
 }
 %}
 
@@ -29,7 +29,9 @@ void yyerror(scanner_context*, void*, char*);
 	struct storage_section *holding;
 }
 
-%destructor { if ($$.length) free($$.string); } LABEL TEXT BINARY EXTENDED
+%name-prefix="protocol_"
+
+%destructor { free($$.string); } LABEL TEXT BINARY EXTENDED
 
 %destructor { delete $$; } text binary group block data content
 
@@ -44,9 +46,9 @@ void yyerror(scanner_context*, void*, char*);
 %define api.pure
 %define api.push_pull "push"
 
-%parse-param { scanner_context *cContext }
+%parse-param { protocol_scanner_context *cContext }
 %parse-param { void *sScanner }
-%lex-param   { yyscan_t *sScanner }
+%lex-param   { protocol_scan_t *sScanner }
 
 
 %%
@@ -59,6 +61,7 @@ input:
 command:
 	COMMAND_START '[' LABEL ']' '{' route content '}' {
 		cContext->command->set_command_data($7);
+		free($7);
 		$7 = NULL;
 		cContext->command->set_command_name($3.string); }
 	|;
@@ -71,36 +74,62 @@ routing:
 
 property:
 	LABEL '=' LABEL {
-		cContext->command->string_property($1.string, $3.string); } |
+		cContext->command->string_property($1.string, $3.string);
+		free($1.string);
+		$1.string = NULL;
+		free($3.string);
+		$3.string = NULL; } |
 	LABEL '=' EXTENDED {
-		cContext->command->string_property($1.string, $3.string); } |
+		cContext->command->string_property($1.string, $3.string);
+		free($1.string);
+		$1.string = NULL;
+		free($3.string);
+		$3.string = NULL; } |
 	LABEL '=' SINTEGER {
-		cContext->command->sinteger_property($1.string, $3); } |
+		cContext->command->sinteger_property($1.string, $3);
+		free($1.string);
+		$1.string = NULL; } |
 	LABEL '=' UINTEGER {
-		cContext->command->uinteger_property($1.string, $3); }
+		cContext->command->uinteger_property($1.string, $3);
+		free($1.string);
+		$1.string = NULL; }
 	;
 
 text:
 	LABEL '=' TEXT {
 		storage_section *new_section = new actual_data_section($1.string, $3.string);
+		free($1.string);
+		$1.string = NULL;
+		free($3.string);
+		$3.string = NULL;
 		$$ = new_section; } |
 	TEXT {
 		storage_section *new_section = new actual_data_section("", $1.string);
+		free($1.string);
+		$1.string = NULL;
 		$$ = new_section; }
 	;
 
 binary:
 	LABEL '=' BINARY {
 		storage_section *new_section = new actual_data_section($1.string, $3.string, $3.length);
+		free($1.string);
+		$1.string = NULL;
+		free($3.string);
+		$3.string = NULL;
 		$$ = new_section; } |
 	BINARY {
 		storage_section *new_section = new actual_data_section("", $1.string, $1.length);
+		free($1.string);
+		$1.string = NULL;
 		$$ = new_section; }
 	;
 
 group:
 	LABEL '=' '{' content '}' {
 		storage_section *new_section = new group_data_section($1.string);
+		free($1.string);
+		$1.string = NULL;
 		new_section->set_child($4);
 		$4 = NULL;
 		$$ = new_section; } |
@@ -144,39 +173,39 @@ content:
 
 extern "C" {
 
-int yylex_init(void*);
-int yylex_destroy(void*);
-void yyset_extra(YY_EXTRA_TYPE, void*);
-int yylex(void*, YYSTYPE*);
-void yyset_out(FILE*, void*);
+int protocol_lex_init(void*);
+int protocol_lex_destroy(void*);
+void protocol_set_extra(YY_EXTRA_TYPE, void*);
+int protocol_lex(void*, YYSTYPE*);
+void protocol_set_out(FILE*, void*);
 
 
-void set_up_context(scanner_context *cContext)
+void set_up_context(protocol_scanner_context *cContext)
 {
 	cContext->scanner = NULL;
-        yylex_init(&cContext->scanner);
-	cContext->state = yypstate_new();
-	yyset_extra(cContext, cContext->scanner);
+        protocol_lex_init(&cContext->scanner);
+	cContext->state = protocol_pstate_new();
+	protocol_set_extra(cContext, cContext->scanner);
 	cContext->eof = false;
-	yyset_out(stderr, cContext->scanner);
+	protocol_set_out(stderr, cContext->scanner);
 }
 
 
-void finish_context(scanner_context *cContext)
+void finish_context(protocol_scanner_context *cContext)
 {
-	yypstate_delete(cContext->state);
-        yylex_destroy(cContext->scanner);
+	protocol_pstate_delete(cContext->state);
+        protocol_lex_destroy(cContext->scanner);
 }
 
 
-int parse_loop(scanner_context *cContext)
+int parse_loop(protocol_scanner_context *cContext)
 {
 	int status;
 
 	YYSTYPE transfer;
 
 	do
-	status = yypush_parse(cContext->state, yylex(&transfer, (YYSTYPE*) cContext->scanner),
+	status = protocol_push_parse(cContext->state, protocol_lex(&transfer, (YYSTYPE*) cContext->scanner),
 	  &transfer, cContext, cContext->scanner);
 	while (status == YYPUSH_MORE);
 
@@ -186,7 +215,7 @@ int parse_loop(scanner_context *cContext)
 }
 
 //*****TEMP*****
-void yyerror(scanner_context *cContext, void *sScanner, char *eError)
+void protocol_error(protocol_scanner_context *cContext, void *sScanner, char *eError)
 { fprintf(stderr, "ERROR: %s\n", eError); }
 
 
@@ -239,12 +268,12 @@ void display(const command_base &cCommand)
 	fprintf(stdout, "!rservr[%s] {\n", cCommand.name.c_str());
 
 	fprintf(stdout, "  !route {\n");
-	fprintf(stdout, "    priority = !x%x\n", (unsigned int) cCommand.priority);
-	fprintf(stdout, "    orig_reference = !x%x\n", (unsigned int) cCommand.orig_reference);
-	fprintf(stdout, "    target_reference = !x%x\n", (unsigned int) cCommand.target_reference);
-	fprintf(stdout, "    remote_reference = !x%x\n", (unsigned int) cCommand.remote_reference);
-	fprintf(stdout, "    creator_pid = !x%x\n", (unsigned int) cCommand.creator_pid);
-	fprintf(stdout, "    send_time = !x%x\n", (unsigned int) cCommand.send_time);
+	fprintf(stdout, "    priority = !x%X\n", (unsigned int) cCommand.priority);
+	fprintf(stdout, "    orig_reference = !x%X\n", (unsigned int) cCommand.orig_reference);
+	fprintf(stdout, "    target_reference = !x%X\n", (unsigned int) cCommand.target_reference);
+	fprintf(stdout, "    remote_reference = !x%X\n", (unsigned int) cCommand.remote_reference);
+	fprintf(stdout, "    creator_pid = !x%X\n", (unsigned int) cCommand.creator_pid);
+	fprintf(stdout, "    send_time = !x%X\n", (unsigned int) cCommand.send_time);
 	fprintf(stdout, "    orig_entity = %s\n", cCommand.orig_entity.c_str());
 	fprintf(stdout, "    orig_address = %s\n", cCommand.orig_address.c_str());
 	fprintf(stdout, "    target_entity = %s\n", cCommand.target_entity.c_str());
@@ -258,7 +287,7 @@ void display(const command_base &cCommand)
 //*****TEMP*****
 int main(int argc, char *argv[])
 {
-	scanner_context context;
+	protocol_scanner_context context;
 	set_up_context(&context);
 	context.input = (argc > 1)? open(argv[1], O_RDONLY) : STDIN_FILENO;
 

@@ -11,31 +11,9 @@
 
 
 class command_base :
-	public structure_base,
-	public element_interface
+	public structure_base
 {
 public:
-	element_interface *extract_interface()
-	{ return this; }
-
-	const element_interface *extract_interface() const
-	{ return this; }
-
-	const text_data &get_name() const
-	{ return name; }
-
-	section_type data_type() const
-	{ return empty_section; }
-
-	data_array get_data() const
-	{return NULL;  }
-
-	unsigned int data_size() const
-	{ return 0; }
-
-	storage_section *child() const
-	{ return this->first_branch(); }
-
 	void set_command_name(const text_data &nName)
 	{ name = nName; }
 
@@ -44,6 +22,7 @@ public:
 
 	storage_section *get_tree() const
 	{ return this->first_branch(); }
+
 
 	bool string_property(const char *lLabel, const char *vValue)
 	{
@@ -55,8 +34,10 @@ public:
 	return true;
 	}
 
+
 	bool sinteger_property(const char *lLabel, int vValue)
 	{ return false; }
+
 
 	bool uinteger_property(const char *lLabel, unsigned int vValue)
 	{
@@ -69,6 +50,7 @@ public:
 	else return false;
 	return true;
 	}
+
 
 	text_data name;
 
