@@ -41,7 +41,7 @@ void protocol_error(protocol_scanner_context*, void*, char*);
 
 %type <holding> text binary group block data content
 
-%token COMMAND_START ROUTE_START
+%token COMMAND_START ROUTE_START GARBAGE
 
 %define api.pure
 %define api.push_pull "push"
@@ -61,9 +61,10 @@ input:
 command:
 	COMMAND_START '[' LABEL ']' '{' route content '}' {
 		cContext->command->set_command_data($7);
-		free($7);
 		$7 = NULL;
-		cContext->command->set_command_name($3.string); }
+		cContext->command->set_command_name($3.string);
+		free($3.string);
+		$3.string = NULL; }
 	|;
 
 route:
@@ -183,7 +184,7 @@ void protocol_set_out(FILE*, void*);
 void set_up_context(protocol_scanner_context *cContext)
 {
 	cContext->scanner = NULL;
-        protocol_lex_init(&cContext->scanner);
+	protocol_lex_init(&cContext->scanner);
 	cContext->state = protocol_pstate_new();
 	protocol_set_extra(cContext, cContext->scanner);
 	cContext->eof = false;
@@ -194,7 +195,7 @@ void set_up_context(protocol_scanner_context *cContext)
 void finish_context(protocol_scanner_context *cContext)
 {
 	protocol_pstate_delete(cContext->state);
-        protocol_lex_destroy(cContext->scanner);
+	protocol_lex_destroy(cContext->scanner);
 }
 
 
@@ -284,6 +285,8 @@ void display(const command_base &cCommand)
 	fprintf(stdout, "}\n");
 }
 
+#include "test-command.hpp"
+
 //*****TEMP*****
 int main(int argc, char *argv[])
 {
@@ -296,12 +299,24 @@ int main(int argc, char *argv[])
 	while (!context.eof)
 	{
 	fprintf(stderr, "START PARSE\n");
-	command_base new_command;
-	context.command = &new_command;
-	parse_loop(&context);
+	command_base new_base;
+	context.command = &new_base;
+	bool outcome = parse_loop(&context) == 0;
 	fprintf(stderr, "END PARSE\n");
 
-	display(new_command);
+	if (outcome && new_base.name.size())
+	 {
+	display(new_base);
+
+	test_command *new_command = new test_command;
+	if (!new_base.set_command(new_command))
+	  {
+	delete new_command;
+	fprintf(stderr, "COMPILE ERROR\n");
+	  }
+
+	else new_base.execute_client();
+	 }
 	}
 
 	finish_context(&context);

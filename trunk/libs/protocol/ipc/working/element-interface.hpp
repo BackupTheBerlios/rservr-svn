@@ -8,9 +8,9 @@
 
 
 enum section_type {  empty_section = 0x00,
-                      text_section,
-                    binary_section,
-                     group_section  };
+                      text_section = 0x01 << 0,
+                    binary_section = 0x01 << 1,
+                     group_section = 0x01 << 2  };
 
 
 typedef std::string  text_data;

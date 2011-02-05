@@ -1,4 +1,4 @@
-!rservr[my_command] {
+rservr[test_command] {
 	!route {
 		priority = !x80
 		orig_reference = !x1
@@ -12,12 +12,11 @@
 		target_address = to_address
 	}
 
-	single_data = \TA\abcdefghij
-	some_group = {
-		some_data = \B5\12345
-		more_data = \T5\ABCDE
-		{
+	type = \T6\ABCDEF
+	data = \TA\abcdefghij
+	list = {
+		\B5\12345
+		\T5\ABCDE
 		\T5\hello
-		}
 	}
 }

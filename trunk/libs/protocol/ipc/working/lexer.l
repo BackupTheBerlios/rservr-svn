@@ -39,6 +39,29 @@ int parse_u_integer16(const char *dData, unsigned int *vValue)
 %%
 
 
+	/*NOTE: '<TEXT_DATA>' and '<BINARY_DATA>' must be first!*/
+
+<TEXT_DATA>[ -~] {
+		if (yylval->data.length < yylval->data.target - 1)
+		yylval->data.string[yylval->data.length++] = *yytext;
+		else
+		{
+		yylval->data.string[yylval->data.length++] = 0x00;
+		BEGIN 0;
+		unput(*yytext);
+		return TEXT;
+		} }
+
+<BINARY_DATA>. {
+		if (yylval->data.length < yylval->data.target)
+		yylval->data.string[yylval->data.length++] = *yytext;
+		else
+		{
+		BEGIN 0;
+		unput(*yytext);
+		return BINARY;
+		} }
+
 "!rservr" {
 		return COMMAND_START; }
 
@@ -67,8 +90,9 @@ int parse_u_integer16(const char *dData, unsigned int *vValue)
 		yylval->data.length = 0;
 		yylval->data.target = 0;
 		char *copied_text = strdup(yytext);
-		copied_text[strlen(copied_text) - 2] = 0x00;
+		copied_text[strlen(copied_text) - 1] = 0x00;
 		parse_u_integer16(copied_text + 2, &yylval->data.target);
+		++yylval->data.target;
 		free(copied_text);
 		yylval->data.string = NULL;
 		if (yylval->data.target)
@@ -77,21 +101,11 @@ int parse_u_integer16(const char *dData, unsigned int *vValue)
 		BEGIN TEXT_DATA;
 		 } }
 
-<TEXT_DATA>[ -~] {
-		if (yylval->data.length < yylval->data.target)
-		yylval->data.string[yylval->data.length++] = *yytext;
-		else
-		{
-		BEGIN 0;
-		unput(*yytext);
-		return TEXT;
-		} }
-
 \\[bB][A-Fa-f0-9]+\\ {
 		yylval->data.length = 0;
 		yylval->data.target = 0;
 		char *copied_text = strdup(yytext);
-		copied_text[strlen(copied_text) - 2] = 0x00;
+		copied_text[strlen(copied_text) - 1] = 0x00;
 		parse_u_integer16(copied_text + 2, &yylval->data.target);
 		free(copied_text);
 		yylval->data.string = NULL;
@@ -101,20 +115,13 @@ int parse_u_integer16(const char *dData, unsigned int *vValue)
 		BEGIN BINARY_DATA;
 		 } }
 
-<BINARY_DATA>. {
-		if (yylval->data.length < yylval->data.target)
-		yylval->data.string[yylval->data.length++] = *yytext;
-		else
-		{
-		BEGIN 0;
-		unput(*yytext);
-		return BINARY;
-		} }
-
 [\[\]{}=] {
 		return *yytext; }
 
 [ \t\r\n]+ {}
+
+. {
+	return GARBAGE; }
 
 
 %%

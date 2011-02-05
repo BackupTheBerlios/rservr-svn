@@ -69,6 +69,9 @@ public:
 	 }
 	}
 
+	actual_data_section(const text_data &nName, const text_data &dData) :
+	data_section(nName), binary(true), data(dData) {}
+
 	section_releaser copy() const
 	{ return section_releaser(new actual_data_section(*this)); }
 
