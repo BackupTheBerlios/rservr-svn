@@ -1,7 +1,7 @@
 .PHONY: clean
 
 parser: parser.tab.o lexer.o
-	g++ parser.tab.o lexer.o -o parser -lhparser
+	g++ parser.tab.o lexer.o -o parser -lhpaux
 
 parser.tab.h parser.tab.c: parser.y
 	bison -Wall -b parser -y -d parser.y

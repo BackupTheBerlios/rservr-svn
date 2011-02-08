@@ -1,18 +1,126 @@
 #ifndef command_base_hpp
 #define command_base_hpp
 
+#include "parser.tab.h"
 #include "element-interface.hpp"
 #include "external-command.hpp"
 
+extern "C" {
 #include "../../../../include/rservr/api/command.h"
+}
 
+#include <stdio.h>
 #include <string.h>
 
 #include <hparser/structure-base.hpp>
+#include <hparser/data-input.hpp>
+#include <hparser/data-output.hpp>
+#include <hparser/classes/string-input.hpp>
+#include <hparser/classes/string-output.hpp>
+
+
+
+
+extern "C" {
+int protocol_lex_init(void*);
+int protocol_lex_destroy(void*);
+void protocol_set_extra(YY_EXTRA_TYPE, void*);
+int protocol_lex(void*, YYSTYPE*);
+void protocol_set_out(FILE*, void*);
+
+ssize_t get_input(struct data_input*, char*, ssize_t);
+}
+
+
+
+ssize_t get_input(data_input *iInput, char *bBuffer, ssize_t mMax)
+{
+	if (!iInput) return 0;
+
+	const input_section &input = iInput->receive_input();
+	ssize_t used = ((signed) input.size() < mMax)? input.size() : mMax;
+
+	memcpy(bBuffer, &input[0], used);
+	iInput->next_input(used);
+
+	return used;
+}
+
+
+static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
+  struct yypstate *sState)
+{
+	int status;
+
+	YYSTYPE transfer;
+
+	do
+	status = protocol_push_parse(sState, protocol_lex(&transfer, (YYSTYPE*) sScanner),
+	  &transfer, cContext, sScanner);
+	while (status == YYPUSH_MORE);
+
+	return status;
+}
+
+
+class command_base;
+
+
+
+class lexer_input :
+	public data_input
+{
+public:
+	lexer_input() : scanner(NULL), state(NULL)
+	{
+	protocol_lex_init(&scanner);
+	protocol_set_out(NULL, scanner);
+	state = protocol_pstate_new();
+	}
+
+
+	lexer_input(const lexer_input &eEqual) : scanner(NULL), state(NULL)
+	{
+	protocol_lex_init(&scanner);
+	protocol_set_out(NULL, scanner);
+	state = protocol_pstate_new();
+	}
+
+
+	lexer_input &operator = (const lexer_input &eEqual)
+	{ return *this; }
+
+
+
+	bool parse_command(command_base *cCommand)
+	{
+	if (!cCommand) return false;
+
+	struct protocol_scanner_context context = { command: cCommand, input: this };
+	bool outcome = parse_loop(&context, scanner, state) == 0;
+
+	return outcome;
+	}
+
+
+
+	~lexer_input()
+	{
+	protocol_pstate_delete(state);
+	protocol_lex_destroy(scanner);
+	}
+
+private:
+	int              input_pipe;
+	void            *scanner;
+	struct yypstate *state;
+};
+
 
 
 class command_base :
-	public structure_base
+	public structure_base,
+	public data_exporter
 {
 public:
 	command_base() : command(NULL) {}
@@ -42,6 +150,115 @@ public:
 	return *this;
 	}
 
+
+	const output_sender *export_data(data_output *oOutput) const
+	{
+	if (!name.size() || !oOutput) return NULL;
+
+	char buffer[256];
+
+	snprintf(buffer, sizeof buffer, "!rservr[%s] {\n", name.c_str());
+	oOutput->send_output(buffer);
+
+	oOutput->send_output("  !route {\n");
+
+	snprintf(buffer, sizeof buffer, "    priority = !x%X\n", (unsigned int) priority);
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    orig_reference = !x%X\n", (unsigned int) orig_reference);
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    target_reference = !x%X\n", (unsigned int) target_reference);
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    remote_reference = !x%X\n", (unsigned int) remote_reference);
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    creator_pid = !x%X\n", (unsigned int) creator_pid);
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    send_time = !x%X\n", (unsigned int) send_time);
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    orig_entity = %s\n", orig_entity.c_str());
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    orig_address = %s\n", orig_address.c_str());
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    target_entity = %s\n", target_entity.c_str());
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    target_address = %s\n", target_address.c_str());
+	oOutput->send_output(buffer);
+
+	oOutput->send_output("  }\n");
+
+	this->output_section(this->get_tree(), oOutput, "  ");
+
+	oOutput->send_output("}\n");
+
+	return this;
+	}
+
+
+private:
+	void output_section(const storage_section *sSection, data_output *oOutput, text_data pPrefix) const
+	{
+	const storage_section *current = sSection;
+
+	char buffer[256];
+
+	while (current)
+	 {
+	if (current->extract_interface()->get_name().size())
+	  {
+	snprintf(buffer, sizeof buffer, "%s%s = ", pPrefix.c_str(), current->extract_interface()->get_name().c_str());
+	oOutput->send_output(buffer);
+	  }
+	else
+	oOutput->send_output(pPrefix);
+
+	     if (current->extract_interface()->data_type() == text_section)
+	  {
+	unsigned int length = current->extract_interface()->data_size();
+	snprintf(buffer, sizeof buffer, "\\T%X\\", length);
+	oOutput->send_output(buffer);
+	for (int I = 0; I < (signed) length; I++)
+	   {
+	snprintf(buffer, sizeof buffer, "%c", current->extract_interface()->get_data()[I]);
+	oOutput->send_output(buffer);
+	   }
+	oOutput->send_output("\n");
+	  }
+
+	else if (current->extract_interface()->data_type() == binary_section)
+	  {
+	unsigned int length = current->extract_interface()->data_size();
+	snprintf(buffer, sizeof buffer, "\\B%X\\", length);
+	oOutput->send_output(buffer);
+	for (int I = 0; I < (signed) length; I++)
+	   {
+	snprintf(buffer, sizeof buffer, "%c", current->extract_interface()->get_data()[I]);
+	oOutput->send_output(buffer);
+	   }
+	oOutput->send_output("\n");
+	  }
+
+	else if (current->extract_interface()->data_type() == group_section)
+	  {
+	oOutput->send_output("{\n");
+	this->output_section(current->child(), oOutput, pPrefix + "  ");
+	snprintf(buffer, sizeof buffer, "%s}\n", pPrefix.c_str());
+	oOutput->send_output(buffer);
+	  }
+
+	current = current->next();
+	 }
+	}
+
+
+public:
 	void set_command_name(const text_data &nName)
 	{ name = nName; }
 

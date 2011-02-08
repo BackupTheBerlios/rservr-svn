@@ -5,21 +5,16 @@
 extern "C" {
 #endif
 
-struct yypstate;
 struct command_base;
-struct element_interface;
-struct storage_section;
+struct data_input;
 
-typedef struct
+struct protocol_scanner_context
 {
-	void            *scanner;
-	struct yypstate *state;
-	int              input, eof;
-
 	struct command_base *command;
-} protocol_scanner_context;
+	struct data_input   *input;
+};
 
-#define YY_EXTRA_TYPE protocol_scanner_context*
+#define YY_EXTRA_TYPE struct protocol_scanner_context*
 
 #ifdef __cplusplus
 }
