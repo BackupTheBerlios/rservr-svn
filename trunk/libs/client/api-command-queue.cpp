@@ -55,9 +55,9 @@ extern "C" {
 #include "client-command.hpp"
 #include "command-queue.hpp"
 #include "protocol/conversion.hpp"
-#include "protocol/cstring-input.hpp"
-#include "protocol/common-input.hpp"
 #include "protocol/constants.hpp"
+#include "protocol/ipc/common-input.hpp"
+#include "protocol/ipc/cstring-input.hpp"
 
 extern "C" {
 #include "command/api-label-check.h"

@@ -30,19 +30,58 @@
  | POSSIBILITY OF SUCH DAMAGE.
  +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef client_output_hpp
-#define client_output_hpp
-
-#include "external/global-sentry.hpp"
-
-#include "protocol/ipc/common-output.hpp"
+#include "ipc/cstring-input.hpp"
 
 extern "C" {
-#include "attributes.h"
-#include "api/command.h"
+#include "param.h"
+}
+
+#include <string.h> //'strlen'
+
+#include <hparser/formats/tag-properties.hpp>
+
+#include "constants.hpp"
+
+extern "C" {
+#include "lang/translation.h"
 }
 
 
-extern protected_output *const pipe_output ATTR_INT;
+	cstring_input::cstring_input(const char *iInput) : input_base(this)
+	{
+	if (!iInput) return;
+	if (strlen(iInput) > PARAM_MAX_COMMAND_DATA)
+    log_command_input_holding_exceeded("cstring_input");
+	else loaded_data = iInput;
+	}
 
-#endif //client_output_hpp
+
+	cstring_input::cstring_input(const cstring_input &eEqual) : input_base(this)
+	{ this->input_base::operator = (eEqual); }
+
+
+	//from 'data_input'-----------------------------------------------------
+	bool cstring_input::end_of_data() const
+	{ return true; }
+
+	bool cstring_input::is_terminated() const
+	{ return this->end_of_data(); }
+	//----------------------------------------------------------------------
+
+	bool cstring_input::read_line_input()
+	{ return false; }
+
+	bool cstring_input::read_binary_input()
+	{ return false; }
+
+	unsigned int cstring_input::decoded_size() const
+	{ return this->loaded_data.size(); }
+
+	bool cstring_input::decode_next()
+	{ return true; }
+
+	void cstring_input::reset_underrun() { }
+
+	void cstring_input::reset_decode() { }
+
+	void cstring_input::clear_cancel() { }

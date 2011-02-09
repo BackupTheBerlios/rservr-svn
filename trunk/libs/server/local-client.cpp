@@ -52,7 +52,7 @@ extern "C" {
 #include "api-server-interface.hpp" //(auto service/monitor deregistration on exit)
 #include "protocol/monitor-standby.hpp"
 #include "protocol/constants.hpp"
-#include "command/command-transmit.hpp"
+#include "protocol/ipc/command-transmit.hpp"
 #include "proto/server-response.hpp"
 
 extern "C" {

@@ -35,8 +35,8 @@
 #include "external/global-sentry-pthread.hpp"
 
 #include "protocol/constants.hpp"
-#include "protocol/common-input.hpp"
+#include "protocol/ipc/common-input.hpp"
 
 
-static protect::derivative_capsule <data_input, common_input, global_sentry_pthread <> > local_pipe_input(execute_input);
-protect::capsule <data_input> *const pipe_input = &local_pipe_input;
+static protect::derivative_capsule <input_interface, common_input, global_sentry_pthread <> > local_pipe_input(execute_input);
+protected_input *const pipe_input = &local_pipe_input;

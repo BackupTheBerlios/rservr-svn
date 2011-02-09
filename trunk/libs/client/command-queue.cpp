@@ -39,7 +39,7 @@ extern "C" {
 #include <string.h> //'strncpy'
 
 #include "protocol/conversion.hpp"
-#include "protocol/common-input.hpp"
+#include "protocol/ipc/common-input.hpp"
 
 extern "C" {
 #include "protocol/local-types.h"

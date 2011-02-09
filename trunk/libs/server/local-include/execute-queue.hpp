@@ -45,7 +45,7 @@ extern "C" {
 #include "attributes.h"
 }
 
-#include "command/command-transmit.hpp"
+#include "protocol/ipc/command-transmit.hpp"
 
 
 template <unsigned int>

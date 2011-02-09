@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -30,58 +30,27 @@
  | POSSIBILITY OF SUCH DAMAGE.
  +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include "cstring-input.hpp"
+#ifndef ipc_context_h
+#define ipc_context_h
 
+#ifdef __cplusplus
 extern "C" {
-#include "param.h"
+#endif
+
+
+struct transmit_block;
+struct data_input;
+
+struct protocol_scanner_context
+{
+	struct transmit_block *command;
+	struct data_input     *input;
+};
+
+#define YY_EXTRA_TYPE struct protocol_scanner_context*
+
+#ifdef __cplusplus
 }
+#endif
 
-#include <string.h> //'strlen'
-
-#include <hparser/formats/tag-properties.hpp>
-
-#include "constants.hpp"
-
-extern "C" {
-#include "lang/translation.h"
-}
-
-
-	cstring_input::cstring_input(const char *iInput) : input_base(this)
-	{
-	if (!iInput) return;
-	if (strlen(iInput) > PARAM_MAX_COMMAND_DATA)
-    log_command_input_holding_exceeded("cstring_input");
-	else loaded_data = iInput;
-	}
-
-
-	cstring_input::cstring_input(const cstring_input &eEqual) : input_base(this)
-	{ this->input_base::operator = (eEqual); }
-
-
-	//from 'data_input'-----------------------------------------------------
-	bool cstring_input::end_of_data() const
-	{ return true; }
-
-	bool cstring_input::is_terminated() const
-	{ return this->end_of_data(); }
-	//----------------------------------------------------------------------
-	
-	bool cstring_input::read_line_input()
-	{ return false; }
-
-	bool cstring_input::read_binary_input()
-	{ return false; }
-
-	unsigned int cstring_input::decoded_size() const
-	{ return this->loaded_data.size(); }
-
-	bool cstring_input::decode_next()
-	{ return true; }
-
-	void cstring_input::reset_underrun() { }
-
-	void cstring_input::reset_decode() { }
-
-	void cstring_input::clear_cancel() { }
+#endif /*ipc_context_h*/

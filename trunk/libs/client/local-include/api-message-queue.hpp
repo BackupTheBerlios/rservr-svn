@@ -38,7 +38,7 @@ extern "C" {
 #include "api/message-queue.h"
 }
 
-#include "command/command-transmit.hpp"
+#include "protocol/ipc/command-transmit.hpp"
 
 
 void reset_input_standby() ATTR_INT;

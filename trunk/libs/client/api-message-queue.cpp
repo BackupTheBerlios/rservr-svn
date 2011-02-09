@@ -62,10 +62,10 @@ extern "C" {
 #include "api-command-queue.hpp"
 #include "api-client-timing.hpp"
 #include "protocol/conversion.hpp"
-#include "protocol/common-input.hpp"
 #include "protocol/constants.hpp"
 #include "protocol/monitor-standby.hpp"
 #include "protocol/timing-query.hpp"
+#include "protocol/ipc/common-input.hpp"
 #include "proto/client-response.hpp"
 
 extern "C" {

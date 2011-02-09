@@ -30,7 +30,7 @@
  | POSSIBILITY OF SUCH DAMAGE.
  +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include "common-input.hpp"
+#include "ipc/common-input.hpp"
 
 extern "C" {
 #include "param.h"
@@ -47,9 +47,75 @@ extern "C" {
 
 extern "C" {
 #include "local-timing.h"
+#include "ipc/ipc-context.h"
 #include "lang/translation.h"
 #include "command/api-command.h"
 }
+
+
+//lexer/parser logic------------------------------------------------------------
+
+extern "C" {
+int protocol_lex_init(void*);
+int protocol_lex_destroy(void*);
+void protocol_set_extra(YY_EXTRA_TYPE, void*);
+int protocol_lex(void*, YYSTYPE*);
+void protocol_set_out(FILE*, void*);
+}
+
+
+static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
+  struct protocol_pstate *sState)
+{
+	int status;
+
+	YYSTYPE transfer;
+
+	do
+	status = protocol_push_parse(sState, protocol_lex(&transfer, (YYSTYPE*) sScanner),
+	  &transfer, cContext, sScanner);
+	while (status == YYPUSH_MORE);
+
+	return status;
+}
+
+
+	lexer_input::lexer_input() : scanner(NULL), state(NULL)
+	{
+	protocol_lex_init(&scanner);
+	protocol_set_out(NULL, scanner);
+	state = protocol_pstate_new();
+	}
+
+	lexer_input::lexer_input(const lexer_input &eEqual) : scanner(NULL), state(NULL)
+	{
+	protocol_lex_init(&scanner);
+	protocol_set_out(NULL, scanner);
+	state = protocol_pstate_new();
+	}
+
+	lexer_input &lexer_input::operator = (const lexer_input &eEqual)
+	{ return *this; }
+
+
+	bool lexer_input::parse_command(transmit_block *cCommand)
+	{
+	if (!cCommand) return false;
+
+	struct protocol_scanner_context context = { command: cCommand, input: this };
+	bool outcome = parse_loop(&context, scanner, state) == 0;
+
+	return outcome;
+	}
+
+
+	lexer_input::~lexer_input()
+	{
+	protocol_pstate_delete(state);
+	protocol_lex_destroy(scanner);
+	}
+
+//END lexer/parser logic--------------------------------------------------------
 
 
 	input_base::input_base(external_buffer *bBuffer) :
@@ -373,7 +439,7 @@ extern "C" {
 	receive_protected_input::receive_protected_input(protected_input *iInput) :
 	current_input(NULL), current_source(iInput) { }
 
-	bool receive_protected_input::operator () (data_importer *iInput)
+	bool receive_protected_input::operator () (transmit_block *iInput)
 	{
 	current_input = iInput;
 	bool outcome = current_source->access_contents(this);
@@ -394,7 +460,7 @@ extern "C" {
 	//NOTE: this allows input loops to distinguish between end of data and bad data
 	if (object->receive_input().size()) return protect::entry_retry;
 	else if (object->is_terminated())   return protect::exit_forced;
-	else                               return protect::entry_fail;
+	else                                return protect::entry_fail;
 
 	else return protect::entry_success;
 	}

@@ -45,8 +45,33 @@ extern "C" {
 
 #include "external/global-sentry.hpp"
 
+#include "command-transmit.hpp"
+#include "ipc-parser.tab.h" //NOTE: don't include with 'extern "C"'!
 
-class input_base : virtual public data_input
+
+//lexer/parser logic------------------------------------------------------------
+
+class lexer_input : virtual public data_input
+{
+public:
+	lexer_input();
+	lexer_input(const lexer_input&);
+	lexer_input &operator = (const lexer_input&);
+
+	bool parse_command(transmit_block*);
+
+	~lexer_input();
+
+private:
+	int                     input_pipe;
+	void                   *scanner;
+	struct protocol_pstate *state;
+};
+
+//END lexer/parser logic--------------------------------------------------------
+
+
+class input_base : public lexer_input
 {
 public:
 	input_base(external_buffer*);
@@ -115,7 +140,8 @@ struct common_input : public buffered_common_input, private external_buffer
 };
 
 
-typedef protect::capsule <data_input> protected_input;
+typedef input_base input_interface;
+typedef protect::capsule <input_interface> protected_input;
 
 
 class receive_protected_input : public protected_input::modifier
@@ -123,12 +149,12 @@ class receive_protected_input : public protected_input::modifier
 public:
 	receive_protected_input(protected_input*);
 
-	bool operator () (data_importer*);
+	bool operator () (transmit_block*);
 
 private:
 	protect::entry_result access_entry(write_object) const;
 
-	data_importer    *      current_input;
+	transmit_block  *      current_input;
 	protected_input *const current_source;
 };
 

@@ -33,9 +33,9 @@
 #ifndef client_input_hpp
 #define client_input_hpp
 
-#include <hparser/data-input.hpp>
-
 #include "external/global-sentry.hpp"
+
+#include "protocol/ipc/common-input.hpp"
 
 extern "C" {
 #include "attributes.h"
@@ -43,6 +43,6 @@ extern "C" {
 }
 
 
-extern protect::capsule <data_input> *const pipe_input ATTR_INT;
+extern protected_input *const pipe_input ATTR_INT;
 
 #endif //client_input_hpp

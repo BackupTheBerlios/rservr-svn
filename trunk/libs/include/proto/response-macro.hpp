@@ -33,7 +33,7 @@
 #ifndef response_macro_cpp
 #define response_macro_cpp
 
-#include "command/command-transmit.hpp"
+#include "protocol/ipc/command-transmit.hpp"
 
 extern "C" {
 #include "protocol/local-types.h"

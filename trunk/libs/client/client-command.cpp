@@ -61,7 +61,7 @@ extern "C" {
 #include "api-client-timing.hpp"
 #include "api-message-queue.hpp"
 #include "protocol/constants.hpp"
-#include "command/api-external-command.hpp"
+#include "protocol/ipc/api-external-command.hpp"
 #include "command/command-generator.hpp"
 #include "proto/load-macro.hpp"
 #include "proto/proto-server.hpp"

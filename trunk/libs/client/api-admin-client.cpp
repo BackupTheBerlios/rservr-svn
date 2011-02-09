@@ -42,7 +42,7 @@
 #include "api-client-timing.hpp"
 #include "api-command-queue.hpp"
 #include "proto/proto-admin-client.hpp"
-#include "command/command-transmit.hpp"
+#include "protocol/ipc/command-transmit.hpp"
 
 extern "C" {
 #include "lang/translation.h"

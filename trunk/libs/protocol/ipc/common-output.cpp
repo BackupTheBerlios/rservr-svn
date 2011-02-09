@@ -30,15 +30,15 @@
  | POSSIBILITY OF SUCH DAMAGE.
  +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include "common-output.hpp"
+#include "ipc/common-output.hpp"
 
 #include <unistd.h> //'close', 'write'
 #include <stdio.h> //'fileno', 'setvbuf'
 #include <errno.h> //'errno'
 
 #include "constants.hpp"
-#include "common-input.hpp"
 #include "retry-limit.hpp"
+#include "ipc/common-input.hpp"
 
 extern "C" {
 #include "local-timing.h"

@@ -77,7 +77,8 @@ private:
 };
 
 
-typedef protect::capsule <data_output> protected_output;
+typedef data_output output_interface;
+typedef protect::capsule <output_interface> protected_output;
 
 
 class send_protected_output : public protected_output::modifier

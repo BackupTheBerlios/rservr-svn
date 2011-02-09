@@ -30,13 +30,12 @@
  | POSSIBILITY OF SUCH DAMAGE.
  +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include "api-external-command.hpp"
+#include "ipc/api-external-command.hpp"
 
 #include "plugin-dev/client-interface.hpp"
 
 extern "C" {
 #include "api/tools.h"
-#include "api-command.h"
 }
 
 #include <string.h> //'strlen', etc.
@@ -45,13 +44,14 @@ extern "C" {
 #include <hparser/classes/string-input.hpp>
 #include <hparser/classes/string-output.hpp>
 
-#include "auto-response.hpp"
-#include "command-transmit.hpp"
-#include "protocol/constants.hpp"
-#include "protocol/conversion.hpp"
+#include "constants.hpp"
+#include "conversion.hpp"
+#include "ipc/command-transmit.hpp"
+#include "command/auto-response.hpp"
 
 extern "C" {
 #include "lang/translation.h"
+#include "command/api-command.h"
 }
 
 	null_command::null_command(const text_data &cCommand) :
@@ -607,3 +607,92 @@ struct sized_descriptor
 
 	return copied_size >= actual_size;
 	}
+
+
+
+//NOTE: WORKING!!!
+
+
+	data_section::data_section(const text_data &nName) :
+	name(nName) {}
+
+	element_interface *data_section::extract_interface()
+//TEMP!!!
+//	{ return this; }
+{ return NULL; }
+
+	const element_interface *data_section::extract_interface() const
+//TEMP!!!
+//	{ return this; }
+{ return NULL; }
+
+	bool data_section::allow_child(const storage_section*)
+	{ return false; }
+
+	const text_data &data_section::get_name() const
+	{ return name; }
+
+
+	empty_data_section::empty_data_section(const text_data &nName) :
+	data_section(nName) {}
+
+	section_releaser empty_data_section::copy() const
+	{ return section_releaser(new empty_data_section(*this)); }
+
+	bool empty_data_section::allow_child(const storage_section*)
+	{ return false; }
+
+	section_type empty_data_section::data_type() const
+	{ return empty_section; }
+
+	text_info empty_data_section::get_data() const
+	{return NULL;  }
+
+	unsigned int empty_data_section::data_size() const
+	{ return 0; }
+
+
+	actual_data_section::actual_data_section(const text_data &nName, text_info dData,
+	unsigned int sSize) :
+	data_section(nName), binary(dData && sSize), data((!binary && dData)? dData : "")
+	{
+	if (binary)
+	 {
+	data.resize(sSize);
+	memcpy(&data[0], dData, sSize);
+	 }
+	}
+
+	actual_data_section::actual_data_section(const text_data &nName, const text_data &dData) :
+	data_section(nName), binary(true), data(dData) {}
+
+	section_releaser actual_data_section::copy() const
+	{ return section_releaser(new actual_data_section(*this)); }
+
+	bool actual_data_section::allow_child(const storage_section*)
+	{ return false; }
+
+	section_type actual_data_section::data_type() const
+	{ return binary? binary_section : text_section; }
+
+	text_info actual_data_section::get_data() const
+	{return &data[0];  }
+
+	unsigned int actual_data_section::data_size() const
+	{ return data.size(); }
+
+
+	group_data_section::group_data_section(const text_data &nName) :
+	data_section(nName) {}
+
+	section_releaser group_data_section::copy() const
+	{ return section_releaser(new group_data_section(*this)); }
+
+	section_type group_data_section::data_type() const
+	{ return group_section; }
+
+	text_info group_data_section::get_data() const
+	{return NULL;  }
+
+	unsigned int group_data_section::data_size() const
+	{ return 0; }

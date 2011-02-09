@@ -48,9 +48,9 @@ extern "C" {
 
 #include "external/global-sentry-pthread.hpp"
 
-#include "protocol/common-input.hpp"
-#include "protocol/common-output.hpp"
-#include "command/command-transmit.hpp"
+#include "protocol/ipc/common-input.hpp"
+#include "protocol/ipc/common-output.hpp"
+#include "protocol/ipc/command-transmit.hpp"
 
 extern "C" {
 #include "attributes.h"

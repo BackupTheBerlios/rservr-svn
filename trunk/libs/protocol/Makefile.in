@@ -68,8 +68,10 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 librservr_protocol_la_DEPENDENCIES =
 am_librservr_protocol_la_OBJECTS = api-config-parser.lo api-timing.lo \
-	cstring-input.lo api-tools.lo common-input.lo common-output.lo \
-	timing-manager.lo timing-query.lo constants.lo conversion.lo
+	api-tools.lo timing-manager.lo timing-query.lo constants.lo \
+	conversion.lo command-transmit.lo common-input.lo \
+	cstring-input.lo common-output.lo api-external-command.lo \
+	ipc-parser.tab.lo ipc-lexer.lo
 librservr_protocol_la_OBJECTS = $(am_librservr_protocol_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -225,9 +227,9 @@ AM_LDFLAGS = -version-info 3:0:3
 ALL_INCLUDES = $(STANDARD_INCLUDES) -I$(srcdir)/local-include -I$(srcdir)/../.. -I$(srcdir)/../../include/rservr -I$(srcdir)/../../include -I$(srcdir)/../include/protocol -I$(srcdir)/../include
 AM_CPPFLAGS = -DENABLE_VIRT_ARRAY_ALL $(ALL_INCLUDES)
 lib_LTLIBRARIES = librservr-protocol.la
-librservr_protocol_la_SOURCES = api-config-parser.cpp api-timing.cpp cstring-input.cpp api-tools.cpp common-input.cpp common-output.cpp timing-manager.c timing-query.cpp constants.cpp conversion.cpp
+librservr_protocol_la_SOURCES = api-config-parser.cpp api-timing.cpp api-tools.cpp timing-manager.c timing-query.cpp constants.cpp conversion.cpp ipc/command-transmit.cpp ipc/common-input.cpp ipc/cstring-input.cpp ipc/common-output.cpp ipc/api-external-command.cpp ipc/ipc-parser.tab.cpp ipc/ipc-lexer.c
 librservr_protocol_la_LIBADD = $(STANDARD_LIBRARIES) -lhparser -lhpaux
-EXTRA_DIST = ../include/protocol/common-output.hpp ../include/protocol/local-check.h ../include/protocol/logging.h ../include/protocol/server-timing.h ../include/protocol/api-timing.h ../include/protocol/cstring-input.hpp ../include/protocol/local-timing.h ../include/protocol/monitor-standby.hpp ../include/protocol/retry-limit.hpp ../include/protocol/api-tools.hpp ../include/protocol/common-input.hpp ../include/protocol/local-types.h ../include/protocol/server-interface.hpp ../include/protocol/timing-manager.h ../include/protocol/timing-query.hpp ../include/protocol/constants.hpp ../include/protocol/conversion.hpp ../include/protocol/client-descriptors.h
+EXTRA_DIST = ../include/protocol/local-check.h ../include/protocol/logging.h ../include/protocol/server-timing.h ../include/protocol/api-timing.h ../include/command/api-external-command.hpp ../include/protocol/local-timing.h ../include/protocol/monitor-standby.hpp ../include/protocol/retry-limit.hpp ../include/protocol/api-tools.hpp../include/protocol/local-types.h ../include/protocol/server-interface.hpp ../include/protocol/timing-manager.h ../include/protocol/timing-query.hpp ../include/protocol/constants.hpp ../include/protocol/conversion.hpp ../include/protocol/client-descriptors.h ../include/protocol/ipc/command-transmit.hpp ../include/protocol/ipc/common-input.hpp ../include/protocol/ipc/cstring-input.hpp ../include/protocol/ipc/common-output.hpp ipc/ipc-context.h ipc/ipc-parser.tab.h ipc/ipc-lexer.l ipc/ipc-parser.y ipc/build-parser.sh
 all: all-am
 
 .SUFFIXES:
@@ -303,13 +305,17 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api-config-parser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api-external-command.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api-timing.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api-tools.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/command-transmit.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/common-input.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/common-output.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/constants.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/conversion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cstring-input.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ipc-lexer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ipc-parser.tab.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timing-manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timing-query.Plo@am__quote@
 
@@ -334,6 +340,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
+ipc-lexer.lo: ipc/ipc-lexer.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ipc-lexer.lo -MD -MP -MF $(DEPDIR)/ipc-lexer.Tpo -c -o ipc-lexer.lo `test -f 'ipc/ipc-lexer.c' || echo '$(srcdir)/'`ipc/ipc-lexer.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ipc-lexer.Tpo $(DEPDIR)/ipc-lexer.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ipc/ipc-lexer.c' object='ipc-lexer.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ipc-lexer.lo `test -f 'ipc/ipc-lexer.c' || echo '$(srcdir)/'`ipc/ipc-lexer.c
+
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
@@ -354,6 +367,48 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+command-transmit.lo: ipc/command-transmit.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT command-transmit.lo -MD -MP -MF $(DEPDIR)/command-transmit.Tpo -c -o command-transmit.lo `test -f 'ipc/command-transmit.cpp' || echo '$(srcdir)/'`ipc/command-transmit.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/command-transmit.Tpo $(DEPDIR)/command-transmit.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ipc/command-transmit.cpp' object='command-transmit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o command-transmit.lo `test -f 'ipc/command-transmit.cpp' || echo '$(srcdir)/'`ipc/command-transmit.cpp
+
+common-input.lo: ipc/common-input.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT common-input.lo -MD -MP -MF $(DEPDIR)/common-input.Tpo -c -o common-input.lo `test -f 'ipc/common-input.cpp' || echo '$(srcdir)/'`ipc/common-input.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/common-input.Tpo $(DEPDIR)/common-input.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ipc/common-input.cpp' object='common-input.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o common-input.lo `test -f 'ipc/common-input.cpp' || echo '$(srcdir)/'`ipc/common-input.cpp
+
+cstring-input.lo: ipc/cstring-input.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cstring-input.lo -MD -MP -MF $(DEPDIR)/cstring-input.Tpo -c -o cstring-input.lo `test -f 'ipc/cstring-input.cpp' || echo '$(srcdir)/'`ipc/cstring-input.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/cstring-input.Tpo $(DEPDIR)/cstring-input.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ipc/cstring-input.cpp' object='cstring-input.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cstring-input.lo `test -f 'ipc/cstring-input.cpp' || echo '$(srcdir)/'`ipc/cstring-input.cpp
+
+common-output.lo: ipc/common-output.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT common-output.lo -MD -MP -MF $(DEPDIR)/common-output.Tpo -c -o common-output.lo `test -f 'ipc/common-output.cpp' || echo '$(srcdir)/'`ipc/common-output.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/common-output.Tpo $(DEPDIR)/common-output.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ipc/common-output.cpp' object='common-output.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o common-output.lo `test -f 'ipc/common-output.cpp' || echo '$(srcdir)/'`ipc/common-output.cpp
+
+api-external-command.lo: ipc/api-external-command.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT api-external-command.lo -MD -MP -MF $(DEPDIR)/api-external-command.Tpo -c -o api-external-command.lo `test -f 'ipc/api-external-command.cpp' || echo '$(srcdir)/'`ipc/api-external-command.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/api-external-command.Tpo $(DEPDIR)/api-external-command.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ipc/api-external-command.cpp' object='api-external-command.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o api-external-command.lo `test -f 'ipc/api-external-command.cpp' || echo '$(srcdir)/'`ipc/api-external-command.cpp
+
+ipc-parser.tab.lo: ipc/ipc-parser.tab.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ipc-parser.tab.lo -MD -MP -MF $(DEPDIR)/ipc-parser.tab.Tpo -c -o ipc-parser.tab.lo `test -f 'ipc/ipc-parser.tab.cpp' || echo '$(srcdir)/'`ipc/ipc-parser.tab.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/ipc-parser.tab.Tpo $(DEPDIR)/ipc-parser.tab.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ipc/ipc-parser.tab.cpp' object='ipc-parser.tab.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ipc-parser.tab.lo `test -f 'ipc/ipc-parser.tab.cpp' || echo '$(srcdir)/'`ipc/ipc-parser.tab.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

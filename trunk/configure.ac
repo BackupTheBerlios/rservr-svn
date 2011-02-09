@@ -26,11 +26,12 @@ AC_CONFIG_FILES([ Makefile
                   libs/client/Makefile
                   libs/filter/Makefile
                   plugins/Makefile
-                  plugins/netcntl/Makefile
-                  plugins/rqsrvc/Makefile
-                  plugins/rqconfig/Makefile
-                  plugins/ready/Makefile
-                  plugins/dataref/Makefile
+                  plugins/rsvp-netcntl/Makefile
+                  plugins/rsvp-rqsrvc/Makefile
+                  plugins/rsvp-rqconfig/Makefile
+                  plugins/rsvp-ready/Makefile
+                  plugins/rsvp-dataref/Makefile
+                  plugins/rsvp-trigger/Makefile
                   security/Makefile
                   security/rsvx-localhost/Makefile
                   security/rsvx-ipregex/Makefile

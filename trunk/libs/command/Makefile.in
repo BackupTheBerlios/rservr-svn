@@ -67,9 +67,8 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 librservr_command_la_DEPENDENCIES = ../protocol/librservr-protocol.la
-am_librservr_command_la_OBJECTS = api-command.lo \
-	api-external-command.lo command-generator.lo \
-	command-transmit.lo api-label-check.lo
+am_librservr_command_la_OBJECTS = api-command.lo command-generator.lo \
+	api-label-check.lo
 librservr_command_la_OBJECTS = $(am_librservr_command_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -216,9 +215,9 @@ AM_LDFLAGS = -version-info 3:0:3
 ALL_INCLUDES = $(STANDARD_INCLUDES) -I$(srcdir)/../.. -I$(srcdir)/../../include/rservr -I$(srcdir)/../../include -I$(srcdir)/../include/command -I$(srcdir)/../include
 AM_CPPFLAGS = -DENABLE_VIRT_ARRAY_ALL $(ALL_INCLUDES)
 lib_LTLIBRARIES = librservr-command.la
-librservr_command_la_SOURCES = api-command.cpp api-external-command.cpp command-generator.cpp command-transmit.cpp api-label-check.cpp
+librservr_command_la_SOURCES = api-command.cpp command-generator.cpp api-label-check.cpp
 librservr_command_la_LIBADD = -lhparser -lhpaux ../protocol/librservr-protocol.la
-EXTRA_DIST = ../include/command/api-command.h ../include/command/api-external-command.hpp ../include/command/auto-response.hpp ../include/command/command-generator.hpp ../include/command/command-transmit.hpp ../include/command/api-label-check.h
+EXTRA_DIST = ../include/command/api-command.h ../include/command/auto-response.hpp ../include/command/command-generator.hpp ../include/command/api-label-check.h
 all: all-am
 
 .SUFFIXES:
@@ -294,10 +293,8 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api-command.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api-external-command.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api-label-check.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/command-generator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/command-transmit.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

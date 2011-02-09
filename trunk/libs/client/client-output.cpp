@@ -35,8 +35,8 @@
 #include "external/global-sentry-pthread.hpp"
 
 #include "protocol/constants.hpp"
-#include "protocol/common-output.hpp"
+#include "protocol/ipc/common-output.hpp"
 
 
-static protect::derivative_capsule <data_output, common_output, global_sentry_pthread <> > local_pipe_output(execute_output);
-protect::capsule <data_output> *const pipe_output = &local_pipe_output;
+static protect::derivative_capsule <output_interface, common_output, global_sentry_pthread <> > local_pipe_output(execute_output);
+protected_output *const pipe_output = &local_pipe_output;

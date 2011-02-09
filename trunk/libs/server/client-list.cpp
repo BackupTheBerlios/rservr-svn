@@ -65,9 +65,9 @@ extern "C" {
 #include "execute-thread.hpp"
 #include "api-server.hpp"
 #include "protocol/conversion.hpp"
-#include "protocol/common-output.hpp"
-#include "protocol/cstring-input.hpp"
 #include "protocol/constants.hpp"
+#include "protocol/ipc/cstring-input.hpp"
+#include "protocol/ipc/common-output.hpp"
 #include "proto/server-response.hpp"
 
 extern "C" {

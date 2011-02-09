@@ -34,7 +34,7 @@
 #define command_macro_hpp
 
 #include "api-command-queue.hpp"
-#include "command/command-transmit.hpp"
+#include "protocol/ipc/command-transmit.hpp"
 #include "client-command.hpp"
 
 extern "C" {

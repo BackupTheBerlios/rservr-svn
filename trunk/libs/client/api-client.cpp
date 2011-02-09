@@ -50,9 +50,9 @@
 #include "api-client-timing.hpp"
 #include "client-output.hpp"
 #include "protocol/constants.hpp"
-#include "protocol/common-output.hpp"
+#include "protocol/ipc/common-output.hpp"
+#include "protocol/ipc/command-transmit.hpp"
 #include "command/auto-response.hpp"
-#include "command/command-transmit.hpp"
 #include "proto/proto-common.hpp"
 
 extern "C" {

@@ -40,7 +40,8 @@
 #include <hparser/output-manager.hpp>
 #include <hparser/formats/tagged-output.hpp>
 
-#include "protocol/common-output.hpp"
+#include "common-output.hpp"
+
 
 class transmit_block;
 
@@ -104,6 +105,17 @@ public:
 	bool command_ready() const;
 	text_info extract();
 
+
+	//NOTE: WORKING!!!
+	void set_command_name(const text_data&);
+	void set_command_data(storage_section*);
+	bool set_command(external_command*);
+	storage_section *get_tree() const;
+	bool string_property(text_info, text_info);
+	bool sinteger_property(text_info, int);
+	bool uinteger_property(text_info, unsigned int);
+
+
 	//command parameters----------------------------------------------------
 	//transmitted___________________________________________________________
 	//(inherited from 'command_info')
@@ -157,7 +169,7 @@ private:
 
 	const command_finder *finder;
 	unsigned char output_mode;
-	text_data extracted_command;
+	text_data command_label, extracted_command;
 };
 
 #endif //command_transmit_hpp

@@ -41,7 +41,7 @@ extern "C" {
 #include "client-output.hpp"
 #include "client-command.hpp"
 #include "protocol/conversion.hpp"
-#include "command/command-transmit.hpp"
+#include "protocol/ipc/command-transmit.hpp"
 #include "proto/proto-resource-client.hpp"
 
 extern "C" {

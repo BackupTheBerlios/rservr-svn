@@ -33,7 +33,7 @@
 #ifndef client_command_hpp
 #define client_command_hpp
 
-#include "command/command-transmit.hpp"
+#include "protocol/ipc/command-transmit.hpp"
 #include "plugin-dev/external-command.hpp"
 
 extern "C" {

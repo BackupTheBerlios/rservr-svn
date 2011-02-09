@@ -233,4 +233,84 @@ struct empty_element :
 	const output_sender *send_data(data_output*) const;
 };
 
+
+
+
+//NOTE: WORKING!!!
+
+
+enum section_type {  empty_section = 0x00,
+                      text_section = 0x01 << 0,
+                    binary_section = 0x01 << 1,
+                     group_section = 0x01 << 2  };
+
+
+// struct element_interface
+// {
+// 	virtual const text_data &get_name() const  = 0;
+// 	virtual section_type     data_type() const = 0;
+// 	virtual data_array       get_data() const  = 0;
+// 	virtual unsigned int     data_size() const = 0;
+// };
+
+
+
+class data_section :
+//	private element_interface,
+	public linked_section
+{
+public:
+	data_section(const text_data&);
+	element_interface *extract_interface();
+	const element_interface *extract_interface() const;
+	bool allow_child(const storage_section*);
+	const text_data &get_name() const;
+
+private:
+	text_data name;
+};
+
+
+class empty_data_section :
+	public data_section
+{
+public:
+	empty_data_section(const text_data&);
+	section_releaser copy() const;
+	bool allow_child(const storage_section*);
+	section_type data_type() const;
+	text_info get_data() const;
+	unsigned int data_size() const;
+};
+
+
+class actual_data_section :
+	public data_section
+{
+public:
+	actual_data_section(const text_data&, text_info, unsigned int = 0);
+	actual_data_section(const text_data&, const text_data&);
+	section_releaser copy() const;
+	bool allow_child(const storage_section*);
+	section_type data_type() const;
+	text_info get_data() const;
+	unsigned int data_size() const;
+
+private:
+	bool      binary;
+	text_data data;
+};
+
+
+class group_data_section :
+	public data_section
+{
+public:
+	group_data_section(const text_data&);
+	section_releaser copy() const;
+	section_type data_type() const;
+	text_info get_data() const;
+	unsigned int data_size() const;
+};
+
 #endif //rservr_external_command_hpp

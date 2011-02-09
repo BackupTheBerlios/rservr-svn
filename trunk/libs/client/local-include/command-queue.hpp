@@ -42,7 +42,7 @@ extern "C" {
 #undef RSERVR_CLIST_HACKS
 
 #include "module-macro.hpp"
-#include "command/command-transmit.hpp"
+#include "protocol/ipc/command-transmit.hpp"
 
 extern "C" {
 #include "command/api-command.h"

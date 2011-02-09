@@ -32,7 +32,7 @@
 
 #include "monitor-list.hpp"
 
-#include "command/command-transmit.hpp"
+#include "protocol/ipc/command-transmit.hpp"
 #include "proto/proto-server.hpp"
 #include "proto/proto-resource-client.hpp"
 
