@@ -43,7 +43,7 @@ extern "C" {
 
 extern "C" {
 #include "protocol/local-types.h"
-#include "command/api-label-check.h"
+#include "protocol/api-label-check.h"
 }
 
 #include "api-client-timing.hpp"

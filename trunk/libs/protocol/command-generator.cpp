@@ -35,7 +35,7 @@
 extern "C" {
 #include "attributes.h"
 #include "lang/translation.h"
-#include "protocol/local-check.h"
+#include "local-check.h"
 }
 
 
@@ -66,10 +66,10 @@ extern "C" {
 
 	const text_data &command_generator::command_name() const
 	{ return name; }
-	
+
 	const text_data &command_generator::command_public_name() const
 	{ return alias.size()? alias : name; }
-	
+
 	const text_data &command_generator::command_info() const
 	{ return info; }
 
@@ -95,6 +95,6 @@ extern "C" {
 
 	bool command_generator::can_auto_gen() const
 	{ return create_callback; }
-	
+
 	external_command *command_generator::auto_gen_command(const text_data &dData) const
 	{ return create_callback? (*create_callback)(dData) : NULL; }

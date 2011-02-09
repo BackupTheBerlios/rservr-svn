@@ -71,7 +71,7 @@ librsvp_rqsrvc_auto_la_DEPENDENCIES = librsvp-rqsrvc.la \
 am_librsvp_rqsrvc_auto_la_OBJECTS = rqsrvc-auto.lo
 librsvp_rqsrvc_auto_la_OBJECTS = $(am_librsvp_rqsrvc_auto_la_OBJECTS)
 librsvp_rqsrvc_la_DEPENDENCIES =  \
-	../../libs/command/librservr-command.la
+	../../libs/protocol/librservr-protocol.la
 am_librsvp_rqsrvc_la_OBJECTS = api-rqsrvc.lo plugin-rqsrvc.lo
 librsvp_rqsrvc_la_OBJECTS = $(am_librsvp_rqsrvc_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -232,7 +232,7 @@ ALL_INCLUDES = $(STANDARD_INCLUDES) -I$(srcdir)/../.. -I$(srcdir)/../../include/
 AM_CPPFLAGS = -DENABLE_VIRT_ARRAY_ALL -DRSERVR_RESTRICT_COMMAND_INTERFACE $(ALL_INCLUDES)
 plugin_LTLIBRARIES = librsvp-rqsrvc.la librsvp-rqsrvc-auto.la
 librsvp_rqsrvc_la_SOURCES = api-rqsrvc.cpp plugin-rqsrvc.cpp api-rqsrvc.h plugin-rqsrvc.hpp
-librsvp_rqsrvc_la_LIBADD = ../../libs/command/librservr-command.la
+librsvp_rqsrvc_la_LIBADD = ../../libs/protocol/librservr-protocol.la
 librsvp_rqsrvc_auto_la_SOURCES = rqsrvc-auto.cpp
 librsvp_rqsrvc_auto_la_LIBADD = librsvp-rqsrvc.la ../../libs/client/librservr-client.la
 all: all-am

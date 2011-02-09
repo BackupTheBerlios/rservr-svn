@@ -1,4 +1,4 @@
-SUBDIRS=protocol command proto server client filter
+SUBDIRS=protocol proto server client filter
 EXTRA_DIST=include/module-macro.hpp
 
 install-exec-hook:

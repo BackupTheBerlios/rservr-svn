@@ -39,7 +39,7 @@
 extern "C" {
 #include "param.h"
 #include "lang/translation.h"
-#include "command/api-command.h"
+#include "protocol/api-command.h"
 }
 
 

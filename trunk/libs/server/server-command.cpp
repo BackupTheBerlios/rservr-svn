@@ -55,7 +55,7 @@ extern "C" {
 #include "protocol/constants.hpp"
 #include "protocol/ipc/command-transmit.hpp"
 #include "protocol/ipc/api-external-command.hpp"
-#include "command/command-generator.hpp"
+#include "protocol/command-generator.hpp"
 #include "proto/load-macro.hpp"
 #include "proto/proto-server.hpp"
 #include "proto/proto-common.hpp"

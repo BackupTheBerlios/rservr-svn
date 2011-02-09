@@ -70,7 +70,7 @@ extern "C" {
 
 extern "C" {
 #include "protocol/local-types.h"
-#include "command/api-command.h"
+#include "protocol/api-command.h"
 }
 
 

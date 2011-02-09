@@ -67,7 +67,7 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(plugindir)"
 LTLIBRARIES = $(plugin_LTLIBRARIES)
 librsvp_dataref_la_DEPENDENCIES =  \
-	../../libs/command/librservr-command.la
+	../../libs/protocol/librservr-protocol.la
 am_librsvp_dataref_la_OBJECTS = api-dataref.lo plugin-dataref.lo \
 	api-dataref-thread.lo
 librsvp_dataref_la_OBJECTS = $(am_librsvp_dataref_la_OBJECTS)
@@ -227,7 +227,7 @@ ALL_INCLUDES = $(STANDARD_INCLUDES) -I$(srcdir)/../.. -I$(srcdir)/../../include/
 AM_CPPFLAGS = -DENABLE_VIRT_ARRAY_ALL -DRSERVR_RESTRICT_COMMAND_INTERFACE $(ALL_INCLUDES)
 plugin_LTLIBRARIES = librsvp-dataref.la
 librsvp_dataref_la_SOURCES = api-dataref.cpp plugin-dataref.cpp api-dataref-thread.cpp api-dataref.h plugin-dataref.hpp
-librsvp_dataref_la_LIBADD = ../../libs/command/librservr-command.la
+librsvp_dataref_la_LIBADD = ../../libs/protocol/librservr-protocol.la
 all: all-am
 
 .SUFFIXES:

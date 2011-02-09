@@ -3,5 +3,5 @@ ALL_INCLUDES=$(STANDARD_INCLUDES) -I$(srcdir)/../../.. -I$(srcdir)/../../../incl
 AM_CPPFLAGS=-DENABLE_VIRT_ARRAY_ALL -DRSERVR_RESTRICT_COMMAND_INTERFACE $(ALL_INCLUDES)
 lib_LTLIBRARIES=librservr-proto-service.la
 librservr_proto_service_la_SOURCES=proto-service-client.cpp
-librservr_proto_service_la_LIBADD=../../command/librservr-command.la
+librservr_proto_service_la_LIBADD=../../protocol/librservr-protocol.la
 EXTRA_DIST=../../include/proto/proto-service-client.hpp

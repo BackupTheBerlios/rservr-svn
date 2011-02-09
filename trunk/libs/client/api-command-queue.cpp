@@ -60,7 +60,7 @@ extern "C" {
 #include "protocol/ipc/cstring-input.hpp"
 
 extern "C" {
-#include "command/api-label-check.h"
+#include "protocol/api-label-check.h"
 #include "protocol/local-types.h"
 #include "protocol/api-timing.h"
 #include "lang/translation.h"

@@ -46,12 +46,12 @@ extern "C" {
 
 #include "constants.hpp"
 #include "conversion.hpp"
+#include "auto-response.hpp"
 #include "ipc/command-transmit.hpp"
-#include "command/auto-response.hpp"
 
 extern "C" {
 #include "lang/translation.h"
-#include "command/api-command.h"
+#include "protocol/api-command.h"
 }
 
 	null_command::null_command(const text_data &cCommand) :

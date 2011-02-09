@@ -35,7 +35,7 @@
 
 #include "attributes.h"
 #include "local-types.h"
-#include "command/api-command.h"
+#include "api-command.h"
 
 
 inline result ATTR_INL

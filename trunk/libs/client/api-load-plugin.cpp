@@ -42,12 +42,12 @@ extern "C" {
 #include <dlfcn.h> //'dlopen', etc.
 
 #include "client-command.hpp"
-#include "command/command-generator.hpp"
+#include "protocol/command-generator.hpp"
 
 extern "C" {
 #include "lang/translation.h"
 #include "protocol/local-check.h"
-#include "command/api-command.h"
+#include "protocol/api-command.h"
 }
 
 

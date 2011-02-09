@@ -60,7 +60,7 @@ extern "C" {
 #include "server-command.hpp"
 #include "api-server-interface.hpp"
 #include "protocol/constants.hpp"
-#include "command/auto-response.hpp"
+#include "protocol/auto-response.hpp"
 #include "proto/proto-server.hpp"
 #include "proto/response-macro.hpp"
 
@@ -68,7 +68,7 @@ extern "C" {
 #include "monitors.h"
 #include "server-signal.h"
 #include "lang/translation.h"
-#include "command/api-label-check.h"
+#include "protocol/api-label-check.h"
 #include "protocol/local-types.h"
 #include "protocol/local-timing.h"
 #include "protocol/timing-manager.h"

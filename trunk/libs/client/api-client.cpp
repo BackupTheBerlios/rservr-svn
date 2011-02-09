@@ -52,14 +52,14 @@
 #include "protocol/constants.hpp"
 #include "protocol/ipc/common-output.hpp"
 #include "protocol/ipc/command-transmit.hpp"
-#include "command/auto-response.hpp"
+#include "protocol/auto-response.hpp"
 #include "proto/proto-common.hpp"
 
 extern "C" {
 #include "protocol/local-check.h"
 #include "protocol/local-types.h"
-#include "command/api-command.h"
-#include "command/api-label-check.h"
+#include "protocol/api-command.h"
+#include "protocol/api-label-check.h"
 #include "lang/translation.h"
 }
 

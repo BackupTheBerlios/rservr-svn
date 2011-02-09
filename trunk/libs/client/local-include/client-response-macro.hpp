@@ -39,7 +39,7 @@
 #include "proto/response-macro.hpp"
 
 extern "C" {
-#include "command/api-command.h"
+#include "protocol/api-command.h"
 }
 
 

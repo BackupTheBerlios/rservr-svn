@@ -67,7 +67,7 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(plugindir)"
 LTLIBRARIES = $(plugin_LTLIBRARIES)
 librsvp_ready_la_DEPENDENCIES =  \
-	../../libs/command/librservr-command.la
+	../../libs/protocol/librservr-protocol.la
 am_librsvp_ready_la_OBJECTS = api-ready.lo plugin-ready.lo
 librsvp_ready_la_OBJECTS = $(am_librsvp_ready_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -226,7 +226,7 @@ ALL_INCLUDES = $(STANDARD_INCLUDES) -I$(srcdir)/../.. -I$(srcdir)/../../include/
 AM_CPPFLAGS = -DENABLE_VIRT_ARRAY_ALL -DRSERVR_RESTRICT_COMMAND_INTERFACE $(ALL_INCLUDES)
 plugin_LTLIBRARIES = librsvp-ready.la
 librsvp_ready_la_SOURCES = api-ready.cpp plugin-ready.cpp api-ready.h plugin-ready.hpp
-librsvp_ready_la_LIBADD = ../../libs/command/librservr-command.la
+librsvp_ready_la_LIBADD = ../../libs/protocol/librservr-protocol.la
 all: all-am
 
 .SUFFIXES:

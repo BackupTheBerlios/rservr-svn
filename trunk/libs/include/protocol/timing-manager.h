@@ -35,7 +35,7 @@
 
 #include "api/command.h"
 
-#include "protocol/server-timing.h"
+#include "server-timing.h"
 
 
 /*NOTE: combine timing_mode with update_type to set update table values

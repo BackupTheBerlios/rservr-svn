@@ -47,9 +47,9 @@ extern "C" {
 
 extern "C" {
 #include "local-timing.h"
+#include "api-command.h"
 #include "ipc/ipc-context.h"
 #include "lang/translation.h"
-#include "command/api-command.h"
 }
 
 

@@ -38,7 +38,7 @@
 #include "plugin-dev/source-macro.hpp"
 
 #include "protocol/server-interface.hpp"
-#include "command/command-generator.hpp"
+#include "protocol/command-generator.hpp"
 
 extern "C" {
 #include "lang/translation.h"

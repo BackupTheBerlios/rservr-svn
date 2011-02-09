@@ -62,7 +62,7 @@ extern "C" {
 #include "api-message-queue.hpp"
 #include "protocol/constants.hpp"
 #include "protocol/ipc/api-external-command.hpp"
-#include "command/command-generator.hpp"
+#include "protocol/command-generator.hpp"
 #include "proto/load-macro.hpp"
 #include "proto/proto-server.hpp"
 #include "proto/proto-common.hpp"
@@ -77,8 +77,8 @@ extern "C" {
 #include "protocol/logging.h"
 #include "protocol/local-check.h"
 #include "protocol/local-types.h"
-#include "command/api-label-check.h"
-#include "command/api-command.h"
+#include "protocol/api-label-check.h"
+#include "protocol/api-command.h"
 }
 
 

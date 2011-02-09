@@ -33,7 +33,7 @@
 #include "bit-data.hpp"
 
 extern "C" {
-#include "command/api-command.h" //NOTE: "borrowed" for more comprehensive information
+#include "protocol/api-command.h" //NOTE: "borrowed" for more comprehensive information
 }
 
 

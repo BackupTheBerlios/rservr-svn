@@ -38,7 +38,7 @@
 #include "external/clist.hpp"
 
 extern "C" {
-#include "protocol/server-timing.h"
+#include "server-timing.h"
 }
 
 

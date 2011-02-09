@@ -38,7 +38,7 @@
 
 extern "C" {
 #include "attributes.h"
-#include "command/api-command.h"
+#include "protocol/api-command.h"
 }
 
 

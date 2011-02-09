@@ -49,7 +49,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_rsv_echo_OBJECTS = rsv-echo.$(OBJEXT)
 rsv_echo_OBJECTS = $(am_rsv_echo_OBJECTS)
 rsv_echo_DEPENDENCIES =  \
-	../../../plugins/rqsrvc/librsvp-rqsrvc-auto.la \
+	../../../plugins/rsvp-rqsrvc/librsvp-rqsrvc-auto.la \
 	../../../libs/client/librservr-client.la
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -195,7 +195,7 @@ top_srcdir = @top_srcdir@
 ALL_INCLUDES = $(STANDARD_INCLUDES) -I$(srcdir)/../../.. -I$(srcdir)/../../../include/rservr
 AM_CPPFLAGS = -DENABLE_VIRT_ARRAY_ALL $(ALL_INCLUDES)
 rsv_echo_SOURCES = rsv-echo.c
-rsv_echo_LDADD = ../../../plugins/rqsrvc/librsvp-rqsrvc-auto.la ../../../libs/client/librservr-client.la
+rsv_echo_LDADD = ../../../plugins/rsvp-rqsrvc/librsvp-rqsrvc-auto.la ../../../libs/client/librservr-client.la
 all: all-am
 
 .SUFFIXES:

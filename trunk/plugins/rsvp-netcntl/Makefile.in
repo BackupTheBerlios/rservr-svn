@@ -67,7 +67,7 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(plugindir)"
 LTLIBRARIES = $(plugin_LTLIBRARIES)
 librsvp_netcntl_la_DEPENDENCIES =  \
-	../../libs/command/librservr-command.la
+	../../libs/protocol/librservr-protocol.la
 am_librsvp_netcntl_la_OBJECTS = api-netcntl.lo plugin-netcntl.lo
 librsvp_netcntl_la_OBJECTS = $(am_librsvp_netcntl_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -226,7 +226,7 @@ ALL_INCLUDES = $(STANDARD_INCLUDES) -I$(srcdir)/../.. -I$(srcdir)/../../include/
 AM_CPPFLAGS = -DENABLE_VIRT_ARRAY_ALL -DRSERVR_RESTRICT_COMMAND_INTERFACE $(ALL_INCLUDES)
 plugin_LTLIBRARIES = librsvp-netcntl.la
 librsvp_netcntl_la_SOURCES = api-netcntl.cpp plugin-netcntl.cpp api-netcntl.h plugin-netcntl.hpp
-librsvp_netcntl_la_LIBADD = ../../libs/command/librservr-command.la
+librsvp_netcntl_la_LIBADD = ../../libs/protocol/librservr-protocol.la
 all: all-am
 
 .SUFFIXES:

@@ -41,7 +41,7 @@ extern "C" {
 #include "protocol/constants.hpp"
 
 extern "C" {
-#include "command/api-command.h"
+#include "protocol/api-command.h"
 }
 
 

@@ -41,7 +41,7 @@ extern "C" {
 #include <regex.h> //regular expressions
 #include <string.h> //'strlen', etc.
 
-#include "protocol/constants.hpp"
+#include "constants.hpp"
 
 
 //(don't use 'regex_check' for these at the moment)

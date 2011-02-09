@@ -69,7 +69,8 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 librservr_protocol_la_DEPENDENCIES =
 am_librservr_protocol_la_OBJECTS = api-config-parser.lo api-timing.lo \
 	api-tools.lo timing-manager.lo timing-query.lo constants.lo \
-	conversion.lo command-transmit.lo common-input.lo \
+	conversion.lo api-command.lo command-generator.lo \
+	api-label-check.lo command-transmit.lo common-input.lo \
 	cstring-input.lo common-output.lo api-external-command.lo \
 	ipc-parser.tab.lo ipc-lexer.lo
 librservr_protocol_la_OBJECTS = $(am_librservr_protocol_la_OBJECTS)
@@ -227,9 +228,9 @@ AM_LDFLAGS = -version-info 3:0:3
 ALL_INCLUDES = $(STANDARD_INCLUDES) -I$(srcdir)/local-include -I$(srcdir)/../.. -I$(srcdir)/../../include/rservr -I$(srcdir)/../../include -I$(srcdir)/../include/protocol -I$(srcdir)/../include
 AM_CPPFLAGS = -DENABLE_VIRT_ARRAY_ALL $(ALL_INCLUDES)
 lib_LTLIBRARIES = librservr-protocol.la
-librservr_protocol_la_SOURCES = api-config-parser.cpp api-timing.cpp api-tools.cpp timing-manager.c timing-query.cpp constants.cpp conversion.cpp ipc/command-transmit.cpp ipc/common-input.cpp ipc/cstring-input.cpp ipc/common-output.cpp ipc/api-external-command.cpp ipc/ipc-parser.tab.cpp ipc/ipc-lexer.c
+librservr_protocol_la_SOURCES = api-config-parser.cpp api-timing.cpp api-tools.cpp timing-manager.c timing-query.cpp constants.cpp conversion.cpp api-command.cpp command-generator.cpp api-label-check.cpp ipc/command-transmit.cpp ipc/common-input.cpp ipc/cstring-input.cpp ipc/common-output.cpp ipc/api-external-command.cpp ipc/ipc-parser.tab.cpp ipc/ipc-lexer.c
 librservr_protocol_la_LIBADD = $(STANDARD_LIBRARIES) -lhparser -lhpaux
-EXTRA_DIST = ../include/protocol/local-check.h ../include/protocol/logging.h ../include/protocol/server-timing.h ../include/protocol/api-timing.h ../include/command/api-external-command.hpp ../include/protocol/local-timing.h ../include/protocol/monitor-standby.hpp ../include/protocol/retry-limit.hpp ../include/protocol/api-tools.hpp../include/protocol/local-types.h ../include/protocol/server-interface.hpp ../include/protocol/timing-manager.h ../include/protocol/timing-query.hpp ../include/protocol/constants.hpp ../include/protocol/conversion.hpp ../include/protocol/client-descriptors.h ../include/protocol/ipc/command-transmit.hpp ../include/protocol/ipc/common-input.hpp ../include/protocol/ipc/cstring-input.hpp ../include/protocol/ipc/common-output.hpp ipc/ipc-context.h ipc/ipc-parser.tab.h ipc/ipc-lexer.l ipc/ipc-parser.y ipc/build-parser.sh
+EXTRA_DIST = ../include/protocol/local-check.h ../include/protocol/logging.h ../include/protocol/server-timing.h ../include/protocol/api-timing.h ../include/command/api-external-command.hpp ../include/protocol/local-timing.h ../include/protocol/monitor-standby.hpp ../include/protocol/retry-limit.hpp ../include/protocol/api-tools.hpp../include/protocol/local-types.h ../include/protocol/server-interface.hpp ../include/protocol/timing-manager.h ../include/protocol/timing-query.hpp ../include/protocol/constants.hpp ../include/protocol/conversion.hpp ../include/protocol/client-descriptors.h ../include/protocol/ipc/command-transmit.hpp ../include/protocol/ipc/common-input.hpp ../include/protocol/ipc/cstring-input.hpp ../include/protocol/api-command.h ../include/protocol/auto-response.hpp ../include/protocol/command-generator.hpp ../include/protocol/api-label-check.h ../include/protocol/ipc/common-output.hpp ipc/ipc-context.h ipc/ipc-parser.tab.h ipc/ipc-lexer.l ipc/ipc-parser.y ipc/build-parser.sh
 all: all-am
 
 .SUFFIXES:
@@ -304,10 +305,13 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api-command.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api-config-parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api-external-command.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api-label-check.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api-timing.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/api-tools.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/command-generator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/command-transmit.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/common-input.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/common-output.Plo@am__quote@

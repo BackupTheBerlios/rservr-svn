@@ -37,7 +37,7 @@
 #include <stdio.h> //'snprintf'
 
 extern "C" {
-#include "command/api-command.h"
+#include "api-command.h"
 }
 
 

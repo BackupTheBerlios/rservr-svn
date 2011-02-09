@@ -42,7 +42,7 @@ extern "C" {
 #include "api-source-macro.hpp"
 #include "load-macro.hpp"
 #include "protocol/conversion.hpp"
-#include "command/auto-response.hpp"
+#include "protocol/auto-response.hpp"
 
 extern "C" {
 #include "attributes.h"

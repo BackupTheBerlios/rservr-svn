@@ -13,7 +13,6 @@ AC_CONFIG_FILES([ Makefile
                   lang/us-english/Makefile
                   libs/Makefile
                   libs/protocol/Makefile
-                  libs/command/Makefile
                   libs/proto/Makefile
                   libs/proto/proto-server/Makefile
                   libs/proto/proto-common/Makefile
