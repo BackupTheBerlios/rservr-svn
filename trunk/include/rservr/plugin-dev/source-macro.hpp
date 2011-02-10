@@ -52,10 +52,49 @@ extern "C" {
 }
 
 
+//NOTE: WORKING!!!
+
+#ifndef RSERVR_COMMAND_TEMP
+#define RSERVR_COMMAND_TEMP temp_node
+#endif
+
+#ifndef RSERVR_COMMAND_CURRENT
+#define RSERVR_COMMAND_CURRENT current_node
+#endif
+
+#define RSERVR_COMMAND_NAME RSERVR_COMMAND_CURRENT->extract_interface()->get_name()
+
+#define RSERVR_COMMAND_TYPE RSERVR_COMMAND_CURRENT->extract_interface()->data_type()
+
+#define RSERVR_COMMAND_DATA RSERVR_COMMAND_CURRENT->extract_interface()->get_data()
+
+#define RSERVR_COMMAND_SIZE RSERVR_COMMAND_CURRENT->extract_interface()->data_size()
+
+#define RSERVR_COMMAND_GROUP RSERVR_COMMAND_CURRENT->child()
+
+#define RSERVR_COMMAND_PARSE_START(node) \
+{ const storage_section *RSERVR_COMMAND_TEMP = (node); /*necessary for nested loops*/ \
+  while (RSERVR_COMMAND_TEMP) { \
+    const storage_section *RSERVR_COMMAND_CURRENT = RSERVR_COMMAND_TEMP; \
+    if (false);
+
+#define RSERVR_COMMAND_CASE(condition) \
+    else if ((condition))
+
+#define RSERVR_COMMAND_DEFAULT \
+    else
+
+#define RSERVR_COMMAND_PARSE_END \
+    RSERVR_COMMAND_TEMP = RSERVR_COMMAND_TEMP->next(); } }
+
+
+
+
 #define RSERVR_COMMAND_DEFAULT_CONSTRUCT(name) name::name(const text_data &cCommand) : external_command(cCommand)
 
 #define RSERVR_COMMAND_INIT_BASE(tag) external_command(tag)
 
+//TODO: REMOVE -->
 #define RSERVR_COMMAND_ADD_TEXT(data)    this->add_child(new unsized_element(data));
 #define RSERVR_COMMAND_ADD_BINARY(data)  this->add_child(new sized_element(data));
 #define RSERVR_COMMAND_ADD_SECTION(next) this->add_child(next = new section_element);
@@ -72,6 +111,7 @@ RSERVR_CONVERT_TEMP.resize(RSERVR_MAX_CONVERT_SIZE);
 
 #define RSERVR_CONVERT16_ADD(data) RSERVR_COMMAND_ADD_TEXT(convert_integer16(data, &RSERVR_CONVERT_TEMP[0]))
 #define RSERVR_CONVERT10_ADD(data) RSERVR_COMMAND_ADD_TEXT(convert_integer10(data, &RSERVR_CONVERT_TEMP[0]))
+//TODO: <-- REMOVE
 
 #define RSERVR_CLIENT_COMMAND_DEFAULTS(name, tag, execute) \
 external_command *name::generate(const text_data &cCommand) \
@@ -99,6 +139,7 @@ command_event name::evaluate_client(const command_info &RSERVR_INFO_ARG, client_
 #define RSERVR_EVAL_NONE     event_none
 #define RSERVR_EVAL_COMPLETE event_complete
 
+//TODO: REMOVE -->
 #define RSERVR_COMMAND_PARSE_HEAD(name) input_receiver *name::receive_data(data_input *iInput)
 
 #define RSERVR_COMMAND_INPUT_CHECK if (!iInput) return NULL;
@@ -167,6 +208,7 @@ RSERVR_COMMAND_INPUT_SET \
 if (!tag_compare_close(iInput->receive_input(), command_tag)) return NULL; \
 iInput->next_input(); \
 return this->parent(); }
+//TODO: <-- REMOVE
 
 #define RSERVR_CHECK_FROM_REMOTE external_command::is_command_from_remote(RSERVR_INFO_ARG)
 #define RSERVR_CHECK_TO_REMOTE   external_command::is_command_to_remote(RSERVR_INFO_ARG)

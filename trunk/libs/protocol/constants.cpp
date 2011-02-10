@@ -101,13 +101,6 @@ const text_data content_newline = "\n";
 const text_data message_null = "";
 
 const text_data standard_delimiter = "*";
-
-const input_mode input_none                   = 0x00;
-const input_mode input_null                   = 0x01 << 0;
-const input_mode input_tagged                 = 0x01 << 1;
-const input_mode input_binary                 = 0x01 << 2;
-const input_mode input_allow_underrun         = 0x01 << 3;
-const input_mode universal_transmission_reset = 0x01 << 4;
 //END command data--------------------------------------------------------------
 //END transmission formatting===================================================
 

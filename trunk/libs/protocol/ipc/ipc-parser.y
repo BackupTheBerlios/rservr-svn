@@ -39,6 +39,7 @@
 #include <unistd.h>
 
 #include <hparser/storage-section.hpp>
+#include <hparser/classes/string-input.hpp>
 
 #include "ipc/command-transmit.hpp"
 

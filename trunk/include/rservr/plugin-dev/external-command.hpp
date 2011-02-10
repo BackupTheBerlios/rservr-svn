@@ -11,7 +11,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -47,65 +47,42 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 #include <string>
 #include <vector>
 
-#include <hparser/impl-defined.hpp>
 #include <hparser/linked-section.hpp>
-#include <hparser/formats/tagged-output.hpp>
-#include <hparser/formats/descriptor-output.hpp>
-#include <hparser/formats/tag-properties.hpp>
-#include <hparser/classes/string-input.hpp>
 
 extern "C" {
 #include "../api/command.h"
 }
 
 
+//NOTE: WORKING!!!
+
+
 //TODO: move 'text_data' typedef somewhere else?
 typedef std::string text_data;
-typedef std::vector <text_data> data_list;
-typedef uint32_t input_mode;
+typedef std::vector <text_data> data_list; //TODO: is this needed anywhere?
 
 
 struct server_interface;
 struct client_interface;
 struct command_info;
 
-struct element_interface
-{
-	virtual command_event evaluate_server(const command_info&, server_interface*) const = 0;
-	virtual command_event evaluate_client(const command_info&, client_interface*) const = 0;
-	virtual command_priority override_priority(command_priority) const = 0;
-	virtual permission_mask execute_permissions() const = 0;
-	virtual text_info command_name() const = 0;
-	virtual bool allow_sender(text_info, text_info, text_info) const = 0;
-
-	inline virtual ~element_interface() { }
-};
-
-
-class external_command :
-	public linked_section,
-	public element_interface,
-	public tagged_output
+class external_command
 {
 public:
-	external_command(const text_data&);
+	virtual bool compile_command(const storage_section*) = 0;
+	virtual storage_section *assemble_command() const = 0;
+	virtual external_command *copy() const = 0;
 
-	bool parse_open_tag(const text_data&);
+	virtual command_event evaluate_server(const command_info&, server_interface*) const = 0;
+	virtual command_event evaluate_client(const command_info&, client_interface*) const = 0;
+	virtual command_priority override_priority(command_priority) const;
+	virtual permission_mask execute_permissions() const = 0;
 
-	command_priority override_priority(command_priority) const;
-	text_info command_name() const;
-	bool allow_sender(text_info, text_info, text_info) const;
+	virtual bool allow_sender(text_info, text_info, text_info) const;
 
-	bool allow_next(const storage_section*) const;
-
-	element_interface *extract_interface();
-	const element_interface *extract_interface() const;
-
-	//virtual input_receiver *receive_data(data_input*) = 0;
+	inline virtual ~external_command() {}
 
 protected:
-	static bool set_for_text(data_input*);
-	static bool set_for_binary(data_input*);
 	static bool is_command_from_remote(const command_info&);
 	static bool is_command_to_remote(const command_info&);
 	static command_priority get_command_priority(const command_info&);
@@ -117,18 +94,6 @@ protected:
 	static result manual_response(const command_info&, section_releaser);
 	static result auto_response(const command_info&, command_event, text_info);
 	static result auto_response_list(const command_info&, command_event, info_list);
-
-	text_data    command_tag;
-	property_list command_properties;
-
-private:
-	bool send_open_tag(data_output*) const;
-	bool send_close_tag(data_output*) const;
-
-	bool send_content(data_output*) const;
-	const output_sender *get_subsection() const;
-	const output_sender *get_next() const;
-	const output_sender *get_out_parent() const;
 };
 
 
@@ -146,117 +111,23 @@ const text_data&, permission_mask, permission_mask, command_type,
 create_command_function, create_command_function = NULL, text_info = NULL);
 
 
-class section_element :
-	public linked_section,
-	public tagged_output
-{
-public:
-	static section_element *check_type(data_input*);
-	static section_releaser extract_list(data_input*, data_list&);
-	bool add_element(storage_section*);
-	static bool check_close(data_input*);
-
-	section_releaser copy() const;
-
-private:
-	bool send_open_tag(data_output*) const;
-	bool send_close_tag(data_output*) const;
-
-	bool send_content(data_output*) const;
-	const output_sender *get_subsection() const;
-	const output_sender *get_next() const;
-	const output_sender *get_out_parent() const;
-};
-
-
-struct unsized_element :
-	public linked_section,
-	public tagged_output
-{
-public:
-	unsized_element(const text_data&);
-
-	static unsized_element *extract_data(data_input*, text_data&);
-
-	section_releaser copy() const;
-
-	bool allow_child(const storage_section*) const;
-
-private:
-	bool send_open_tag(data_output*) const;
-	bool send_close_tag(data_output*) const;
-
-	bool send_content(data_output*) const;
-	const output_sender *get_subsection() const;
-	const output_sender *get_next() const;
-	const output_sender *get_out_parent() const;
-
-	const text_data element_data;
-};
-
-
-struct sized_element :
-	public linked_section,
-	public descriptor_output
-{
-public:
-	sized_element(const text_data&);
-
-	static sized_element *extract_data(data_input*, text_data&);
-
-	section_releaser copy() const;
-
-	bool allow_child(const storage_section*) const;
-
-	static bool is_sized_element(const text_data&);
-	static bool parse_sized_element(data_input*, text_data&);
-
-private:
-	bool send_descriptor(data_output*) const;
-
-	bool send_content(data_output*) const;
-	const output_sender *get_subsection() const;
-	const output_sender *get_next() const;
-	const output_sender *get_out_parent() const;
-
-	text_data element_data;
-};
-
-
-struct empty_element :
-	public linked_section
-{
-	section_releaser copy() const;
-
-	input_receiver *receive_data(data_input*);
-
-	const output_sender *send_data(data_output*) const;
-};
-
-
-
-
-//NOTE: WORKING!!!
-
-
 enum section_type {  empty_section = 0x00,
                       text_section = 0x01 << 0,
                     binary_section = 0x01 << 1,
                      group_section = 0x01 << 2  };
 
 
-// struct element_interface
-// {
-// 	virtual const text_data &get_name() const  = 0;
-// 	virtual section_type     data_type() const = 0;
-// 	virtual data_array       get_data() const  = 0;
-// 	virtual unsigned int     data_size() const = 0;
-// };
-
+struct element_interface
+{
+	virtual const text_data &get_name() const  = 0;
+	virtual section_type     data_type() const = 0;
+	virtual text_info        get_data() const  = 0;
+	virtual unsigned int     data_size() const = 0;
+};
 
 
 class data_section :
-//	private element_interface,
+	private element_interface,
 	public linked_section
 {
 public:

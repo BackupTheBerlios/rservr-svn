@@ -38,6 +38,7 @@ extern "C" {
 }
 
 #include <unistd.h> //'nanosleep', 'getpid'
+#include <stdio.h> //'snprintf'
 #include <string.h> //'strlen'
 #include <time.h> //'time'
 
@@ -86,14 +87,58 @@ inline static bool ATTR_INL local_check_su()
 
 
 	transmit_block::transmit_block(const command_finder *fFinder) :
-	wait_start(0), execute_type(0), no_send(false), send_to(NULL), finder(fFinder),
-	output_mode(0x00)
+	wait_start(0), execute_type(0), no_send(false), send_to(NULL), command(NULL),
+	finder(fFinder), output_mode(0x00)
 	{ }
 
+	transmit_block::transmit_block(const transmit_block &eEqual) :
+	wait_start(eEqual.wait_start), no_send(eEqual.no_send),
+	send_to(eEqual.send_to), command(eEqual.command? eEqual.command->copy() : NULL),
+	finder(eEqual.finder), output_mode(eEqual.output_mode)
+	{ }
 
-	bool transmit_block::set_command(section_releaser eElement)
-	{ return this->set_child(eElement).result(); }
+	transmit_block &transmit_block::operator = (const transmit_block &eEqual)
+	{
+	if (&eEqual == this) return *this;
 
+	execute_type = eEqual.execute_type;
+	no_send      = eEqual.no_send;
+	send_to      = eEqual.send_to;
+
+	delete command;
+	command = NULL;
+	command = eEqual.command? eEqual.command->copy() : NULL;
+
+	finder            = eEqual.finder;
+	output_mode       = eEqual.output_mode;
+	command_label     = eEqual.command_label;
+	extracted_command = eEqual.extracted_command;
+
+	return *this;
+	}
+
+
+	transmit_block::~transmit_block()
+	{
+	delete command;
+	command = NULL;
+	}
+
+
+	bool transmit_block::find_command()
+	{
+	external_command *actual_command = finder->new_command(*this, command_label);
+
+        if (!actual_command || (this->orig_address.size() && check_command_all(execute_type, command_no_remote)))
+         {
+     log_command_parse_rejected(command_label.c_str());
+         return false;
+         }
+
+	bool outcome = this->set_command(actual_command);
+	if (!outcome) delete actual_command;
+	return outcome;
+	}
 
 	bool transmit_block::command_ready() const
 	{ return this->first_branch(); }
@@ -115,15 +160,17 @@ inline static bool ATTR_INL local_check_su()
 	void transmit_block::set_command_name(const text_data &nName)
 	{ command_label = nName; }
 
+	text_info transmit_block::command_name() const
+	{ return command_label.c_str(); }
+
 	void transmit_block::set_command_data(storage_section *sSection)
 	{ this->set_child(sSection); }
 
 	bool transmit_block::set_command(external_command *cCommand)
 	{
-//TEMP
-// 	if (cCommand && !cCommand->compile_command(this->get_tree())) return false;
-// 	delete command;
-// 	command = cCommand;
+	if (cCommand && !cCommand->compile_command(this->get_tree())) return false;
+	delete command;
+	command = cCommand;
 	return true;
 	}
 
@@ -142,7 +189,10 @@ inline static bool ATTR_INL local_check_su()
 	}
 
 	bool transmit_block::sinteger_property(const char *lLabel, int vValue)
-	{ return false; }
+	{
+	if (vValue < 0) return false;
+	return this->uinteger_property(lLabel, vValue);
+	}
 
 	bool transmit_block::uinteger_property(const char *lLabel, unsigned int vValue)
 	{
@@ -158,181 +208,54 @@ inline static bool ATTR_INL local_check_su()
 	}
 
 
-	//from 'data_importer'--------------------------------------------------
-	input_receiver *transmit_block::import_data(data_input *iInput)
-	{
-	if (!iInput || !iInput->set_input_mode(universal_transmission_reset)) return NULL;
-
-	this->set_command(section_releaser(NULL));
-
-	if (!iInput->set_input_mode(input_tagged)) return NULL; //disable underrun for first read
-
-	input_section working = iInput->receive_input();
-
-	if (!iInput->set_input_mode(input_tagged | input_allow_underrun)) return NULL;
-
-	//check for open tag____________________________________________________
-	if (!working.size()) return NULL;
-
-	if (!is_whole_tag(working) || !tag_compare_open(working, main_tag))
-	 {
-	//(non-standard 'hparser' useage to increment input here)
-	iInput->next_input();
-	return this->abort_parsing(iInput, event_error, main_tag.c_str());
-	 }
-
-	property_list attributes;
-	extract_properties(working, attributes);
-	iInput->next_input();
-
-
-	//parse attributes______________________________________________________
-	//this is important for "reused" commands
-	this->clear_info();
-
-	if (!get_property_value(attributes, time_label, working)) creator_pid = 0x00;
-	else if (!parse_reference(working, send_time))
-	return this->abort_parsing(iInput, event_error, time_label.c_str());
-	remove_property(attributes, time_label);
-
-	if (!get_property_value(attributes, priority_label, working)) priority = priority_default;
-	else if (!parse_command_priority(working, priority))
-	return this->abort_parsing(iInput, event_error, priority_label.c_str());
-	remove_property(attributes, priority_label);
-
-	if (!get_property_value(attributes, orig_reference_label, working)) orig_reference = 0x00;
-	else if (!parse_reference(working, orig_reference))
-	return this->abort_parsing(iInput, event_error, orig_reference_label.c_str());
-	remove_property(attributes, orig_reference_label);
-
-	if (!get_property_value(attributes, target_reference_label, working)) target_reference = 0x00;
-	else if (!parse_reference(working, target_reference))
-	return this->abort_parsing(iInput, event_error, target_reference_label.c_str());
-	remove_property(attributes, target_reference_label);
-
-	if (!get_property_value(attributes, remote_reference_label, working)) remote_reference = 0x00;
-	else if (!parse_reference(working, remote_reference))
-	return this->abort_parsing(iInput, event_error, remote_reference_label.c_str());
-	remove_property(attributes, remote_reference_label);
-
-	if (!get_property_value(attributes, creator_pid_label, working)) creator_pid = 0x00;
-	else if (!parse_reference(working, creator_pid))
-	return this->abort_parsing(iInput, event_error, creator_pid_label.c_str());
-	remove_property(attributes, creator_pid_label);
-
-	get_property_value(attributes, orig_entity_label, orig_entity);
-	remove_property(attributes, orig_entity_label);
-
-	get_property_value(attributes, orig_address_label, orig_address);
-	remove_property(attributes, orig_address_label);
-
-	get_property_value(attributes, target_entity_label, target_entity);
-	remove_property(attributes, target_entity_label);
-
-	get_property_value(attributes, target_address_label, target_address);
-	remove_property(attributes, target_address_label);
-
-	text_data silence_state;
-	get_property_value(attributes, silent_response_label, silence_state);
-	remove_property(attributes, target_address_label);
-	silent_auto_response = silence_state == silent_response_value;
-
-	//NOTE: don't check labels for incoming; waste of time
-
-	if (finder)
-	 {
-	//parse subsection______________________________________________________
-	input_section command = iInput->receive_input();
-
-	if (!is_open_tag(command)) return this->abort_parsing(iInput, event_error, "[command open 1]");
-
-	if (tag_compare_open(command, main_tag))
-	return this->abort_parsing(iInput, event_error, "[command open 2]");
-
-	data_tag tag_type;
-	extract_tag_type(command, tag_type);
-	external_command *actual_command = finder->new_command(*this, tag_type);
-
-	if (!actual_command || (this->orig_address.size() && check_command_all(execute_type, command_no_remote)))
-	  {
-    log_command_parse_rejected(tag_type.c_str());
-	return this->abort_parsing(iInput, event_error, "[remote check]");
-	  }
-
-	if (!actual_command->parse_open_tag(command))
-	return this->abort_parsing(iInput, event_error, "[command tag parse]");
-
-	iInput->next_input();
-
-	//pass input to subsection______________________________________________
-	input_receiver *current = this->first_branch();
-	while (current && current != this) current = current->receive_data(iInput);
-	if (!current) return this->abort_parsing(iInput, event_error, command.c_str());
-	 }
-
-	if (!iInput->set_input_mode(input_tagged | input_allow_underrun))
-	return this->abort_parsing(iInput, event_error, "[reset mode]");
-
-	//check for close tag___________________________________________________
-	if (!tag_compare_close(iInput->receive_input(), main_tag))
-	return this->abort_parsing(iInput, event_error, "[command close]");
-	iInput->next_input();
-
-    log_command_command_received(this->command_name(), this->orig_reference,
-      this->orig_entity.c_str());
-
-	return this;
-	}
-	//----------------------------------------------------------------------
-
-
 	//from 'data_exporter'--------------------------------------------------
 	const output_sender *transmit_block::export_data(data_output *oOutput) const
 	{
-	if (!oOutput || !oOutput->set_output_mode(universal_transmission_reset)) return NULL;
+	if (!command_label.size() || !oOutput) return NULL;
 
-	//NOTE: we count on the command API to check labels (allows for more efficiency)
+	char buffer[256];
 
-	if ( (!this->first_branch() || !this->first_branch()->extract_interface()) &&
-	     output_mode == 0x00 )
-	 {
-    log_command_empty_send();
-	return NULL;
-	 }
+	snprintf(buffer, sizeof buffer, "!rservr[%s] {\n", command_label.c_str());
+	oOutput->send_output(buffer);
 
-	if (!is_server() && local_check_su() && output_mode == 0x00)
-	 {
-    log_command_command_send_error(error_su_violation, this->command_name(),
-      this->orig_reference, this->target_entity.c_str());
-	return NULL;
-	 }
+	oOutput->send_output("  !route {\n");
 
-	if ( this->first_branch() && this->first_branch()->extract_interface() &&
-	     !this->first_branch()->extract_interface()->allow_sender(this->orig_entity.c_str(),
-	       this->target_entity.c_str(), this->target_address.c_str()) )
-	 {
-    log_command_command_send_error(error_not_authorized, this->command_name(),
-      this->orig_reference, this->target_entity.c_str());
-	return NULL;
-	 }
+	snprintf(buffer, sizeof buffer, "    priority = !x%X\n", (unsigned int) priority);
+	oOutput->send_output(buffer);
 
-	if (this->output_manager::export_data(oOutput))
-	//NOTE: don't use '::export_data' here (causes infinite recursion)
-	 {
-	if (output_mode == 0x00)
-    log_command_command_sent(this->command_name(), this->orig_reference,
-      this->target_entity.c_str());
-	 }
+	snprintf(buffer, sizeof buffer, "    orig_reference = !x%X\n", (unsigned int) orig_reference);
+	oOutput->send_output(buffer);
 
-	else
-	 {
-	if (output_mode == 0x00)
-    log_command_command_send_error(error_communication, this->command_name(),
-      this->orig_reference, this->target_entity.c_str());
-	 }
+	snprintf(buffer, sizeof buffer, "    target_reference = !x%X\n", (unsigned int) target_reference);
+	oOutput->send_output(buffer);
 
-	if (this->first_branch()) this->send_close_tag(oOutput);
-	this->set_sending_subs(false);
+	snprintf(buffer, sizeof buffer, "    remote_reference = !x%X\n", (unsigned int) remote_reference);
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    creator_pid = !x%X\n", (unsigned int) creator_pid);
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    send_time = !x%X\n", (unsigned int) send_time);
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    orig_entity = %s\n", orig_entity.c_str());
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    orig_address = %s\n", orig_address.c_str());
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    target_entity = %s\n", target_entity.c_str());
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    target_address = %s\n", target_address.c_str());
+	oOutput->send_output(buffer);
+
+	oOutput->send_output("  }\n");
+
+	this->export_tree(this->get_tree(), oOutput, "  ");
+
+	oOutput->send_output("}\n");
+
 	return this;
 	}
 	//----------------------------------------------------------------------
@@ -363,10 +286,9 @@ inline static bool ATTR_INL local_check_su()
 	                    send_client_response(*this, event_rejected);
 	 }
 
-	if (this->first_branch() && this->first_branch()->extract_interface())
+	if (command)
 	 {
-	command_event current_event =
-	  this->first_branch()->extract_interface()->evaluate_server(*this, sServer);
+	command_event current_event = command->evaluate_server(*this, sServer);
 
     log_command_server_eval(this->command_name(), this->orig_reference,
       this->orig_entity.c_str());
@@ -413,12 +335,11 @@ inline static bool ATTR_INL local_check_su()
 	                    send_client_response(*this, event_rejected);
 	 }
 
-	if (this->first_branch() && this->first_branch()->extract_interface())
+	if (command)
 	 {
 	//NOTE: built-in null commands get an interface, but plug-ins don't
 	//NOTE: use the 'command_builtin' flag and not 'command_plugin' flag
-	command_event current_event =
-	  this->first_branch()->extract_interface()->evaluate_client( *this,
+	command_event current_event = command->evaluate_client( *this,
 	    ( check_command_all(execute_type, command_null) &&
 	      !check_command_all(execute_type, command_builtin) )? NULL : cClient );
 
@@ -440,24 +361,12 @@ inline static bool ATTR_INL local_check_su()
 	  override_priority(command_priority pPriority) const
 	{
 	command_priority new_priority = (pPriority < priority)? priority : pPriority;
-
 	if (!allow_override_priority(execute_type)) return new_priority;
-
-	return (this->first_branch() && this->first_branch()->extract_interface())?
-	  this->first_branch()->extract_interface()->override_priority(new_priority) : new_priority;
+	return command? command->override_priority(new_priority) : new_priority;
 	}
 
 	permission_mask transmit_block::execute_permissions() const
-	{
-	return (this->first_branch() && this->first_branch()->extract_interface())?
-	  this->first_branch()->extract_interface()->execute_permissions() : type_none;
-	}
-
-	text_info transmit_block::command_name() const
-	{
-	return (this->first_branch() && this->first_branch()->extract_interface())?
-	  this->first_branch()->extract_interface()->command_name() : "";
-	}
+	{ return command? command->execute_permissions() : type_none; }
 
 	const transmit_block *transmit_block::show_command() const
 	{ return target_address.size()? this : NULL; }
@@ -466,167 +375,69 @@ inline static bool ATTR_INL local_check_su()
 	{
 	if (&eEqual == this) return true;
 	eEqual = *this;
+	eEqual.set_command_data(NULL);
+	eEqual.set_command(NULL);
 	eEqual.set_child(section_releaser(NULL));
 	return true;
 	}
 	//----------------------------------------------------------------------
 
 
-	input_receiver *transmit_block::discard_input(data_input *iInput)
+	void transmit_block::export_tree(const storage_section *sSection,
+	data_output *oOutput, text_data pPrefix) const
 	{
-	if (!iInput || !iInput->set_input_mode(input_binary | input_null)) return NULL;
-	iInput->set_input_mode(universal_transmission_reset);
+	const storage_section *current = sSection;
 
-	struct timespec discard_latency = *local_discard_latency();
+	char buffer[256];
 
-	int position_open = 0, position_close = 0;
-	unsigned int discard = 0;
-
-	text_data open_tag;
-	construct_partial_open(main_tag, open_tag);
-
-	text_data close_tag;
-	construct_close(main_tag, close_tag);
-
-	text_data discarded;
-	bool read_last = true, first_try = true;
-
-	while (read_last || !iInput->end_of_data())
+	while (current)
 	 {
-	if (!read_last) nanosleep(&discard_latency, NULL);
-
-	const input_section &current_input = iInput->receive_input();
-	discard = current_input.size();
-
-	if (iInput->end_of_data())
+	if (current->extract_interface()->get_name().size())
 	  {
-	if (read_last)
+	snprintf(buffer, sizeof buffer, "%s%s = ", pPrefix.c_str(), current->extract_interface()->get_name().c_str());
+	oOutput->send_output(buffer);
+	  }
+	else
+	oOutput->send_output(pPrefix);
+
+	     if (current->extract_interface()->data_type() == text_section)
+	  {
+	unsigned int length = current->extract_interface()->data_size();
+	snprintf(buffer, sizeof buffer, "\\T%X\\", length);
+	oOutput->send_output(buffer);
+	for (int I = 0; I < (signed) length; I++)
 	   {
-	read_last = first_try;
-	first_try = false;
-	if (!read_last) continue;
+	snprintf(buffer, sizeof buffer, "%c", current->extract_interface()->get_data()[I]);
+	oOutput->send_output(buffer);
 	   }
-	else break;
+	oOutput->send_output("\n");
 	  }
 
-	position_close = current_input.find(close_tag);
-	position_open  = current_input.find(open_tag);
-
-	if (position_close >= 0 && (position_close < position_open || position_open < 1))
-	//the next open tag seen is after the next close tag...
-	//NOTE: if the open tag is at the front then that's where the error was
+	else if (current->extract_interface()->data_type() == binary_section)
 	  {
-	if (local_log_mode() & logging_extended)
-	discarded.assign(current_input, 0, position_close + close_tag.size());
-
-	//remove up to the end of the close tag
-	if (position_close) iInput->next_input(position_close + close_tag.size());
-
-	if (local_log_mode() & logging_extended)
-    log_command_discard_dump(discarded.c_str());
-
-	return this;
+	unsigned int length = current->extract_interface()->data_size();
+	snprintf(buffer, sizeof buffer, "\\B%X\\", length);
+	oOutput->send_output(buffer);
+	for (int I = 0; I < (signed) length; I++)
+	   {
+	snprintf(buffer, sizeof buffer, "%c", current->extract_interface()->get_data()[I]);
+	oOutput->send_output(buffer);
+	   }
+	oOutput->send_output("\n");
 	  }
 
-	else if ((position_open < position_close || position_close < 0) && position_open > 0)
-	//...the next close tag seen is after the next open tag (or not at all)
-	//NOTE: if the open tag is at the front then that's where the error was
+	else if (current->extract_interface()->data_type() == group_section)
 	  {
-	if (local_log_mode() & logging_extended)
-	discarded.assign(current_input, 0, position_open);
-
-	//remove up to the beginning of the open tag
-	if (position_open) iInput->next_input(position_open);
-
-	if (local_log_mode() & logging_extended)
-    log_command_discard_dump(discarded.c_str());
-
-	return this;
+	oOutput->send_output("{\n");
+	this->export_tree(current->child(), oOutput, pPrefix + "  ");
+	snprintf(buffer, sizeof buffer, "%s}\n", pPrefix.c_str());
+	oOutput->send_output(buffer);
 	  }
 
-	if (local_log_mode() & logging_extended)
-	discarded = current_input;
+	current = current->next();
 	 }
-
-	//if an underrun happens before finding a close/open then discard all
-	if (discard) iInput->next_input();
-
-	if (local_log_mode() & logging_extended)
-    log_command_discard_dump(discarded.c_str());
-
-	return NULL;
 	}
 
-	input_receiver *transmit_block::abort_parsing(data_input *iInput,
-	command_event eEvent, text_info lLocation)
-	{
-    log_command_command_parse_error(lLocation, this->command_name(),
-      this->orig_reference, this->orig_entity.c_str());
-
-	if (local_log_mode() & logging_extended)
-    log_command_command_dump(this->extract());
-
-	input_receiver *return_value = this->discard_input(iInput);
-
-	this->set_child( section_releaser(NULL) );
-
-	if (eEvent != event_none && !silent_auto_response)
-	 {
-	if (is_server()) send_server_response(*this, eEvent);
-	else             send_client_response(*this, eEvent);
-	 }
-
-	return return_value;
-	}
-
-	//from 'tagged_output'--------------------------------------------------
-	bool transmit_block::send_open_tag(data_output *oOutput) const
-	{
-	property_list properties;
-
-	set_property_value( properties, time_label,             convert_reference(time(NULL)) );
-	set_property_value( properties, version_label,          protocol_version );
-	set_property_value( properties, priority_label,         convert_command_priority(priority) );
-	set_property_value( properties, orig_reference_label,   convert_reference(orig_reference) );
-	set_property_value( properties, target_reference_label, convert_reference(target_reference) );
-	set_property_value( properties, remote_reference_label, convert_reference(remote_reference) );
-	set_property_value( properties, creator_pid_label,      convert_reference(creator_pid) );
-	set_property_value( properties, orig_entity_label,      orig_entity );
-	set_property_value( properties, orig_address_label,     orig_address );
-	set_property_value( properties, target_entity_label,    target_entity );
-	set_property_value( properties, target_address_label,   target_address );
-
-	if (silent_auto_response)
-	set_property_value( properties, silent_response_label,   silent_response_value );
-
-	data_tag open_data;
-	construct_open(main_tag, open_data);
-	insert_set_properties(open_data, properties);
-
-	return oOutput->send_output(open_data += content_newline);
-	}
-
-	bool transmit_block::send_close_tag(data_output *oOutput) const
-	{
-	data_tag close_data;
-	construct_close(main_tag, close_data);
-	return oOutput->send_output(close_data += content_newline);
-	}
-	//----------------------------------------------------------------------
-
-	//from 'managed_ouput'--------------------------------------------------
-	bool transmit_block::send_content(data_output*) const
-	{ return true; }
-
-	const output_sender *transmit_block::get_subsection() const
-	{ return this->first_branch(); }
-
-	const output_sender *transmit_block::get_next() const
-	{ return NULL; }
-
-	const output_sender *transmit_block::get_out_parent() const
-	{ return this; }
-	//----------------------------------------------------------------------
 
 	//from 'data_output'----------------------------------------------------
 	bool transmit_block::send_output(const output_section &dData)

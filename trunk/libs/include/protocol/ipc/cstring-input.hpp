@@ -51,7 +51,6 @@ public:
 	//----------------------------------------------------------------------
 
 private:
-	bool read_line_input();
 	bool read_binary_input();
 	unsigned int decoded_size() const;
 	bool decode_next();

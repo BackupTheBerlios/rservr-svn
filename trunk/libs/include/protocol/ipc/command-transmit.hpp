@@ -36,9 +36,8 @@
 #include "plugin-dev/external-command.hpp"
 
 #include <hparser/structure-base.hpp>
-#include <hparser/data-input.hpp>
-#include <hparser/output-manager.hpp>
-#include <hparser/formats/tagged-output.hpp>
+#include <hparser/data-output.hpp>
+#include <hparser/classes/string-output.hpp>
 
 #include "common-output.hpp"
 
@@ -93,21 +92,24 @@ struct command_info
 class transmit_block :
 	public command_info,
 	public structure_base,
-	public data_importer,
-	public tagged_output,
-	public output_manager,
+	public data_exporter,
 	private data_output
 {
 public:
 	transmit_block(const command_finder* = NULL);
+	transmit_block(const transmit_block&);
+	transmit_block &operator = (const transmit_block&);
+	~transmit_block();
 
-	bool set_command(section_releaser);
+
+	bool find_command();
 	bool command_ready() const;
 	text_info extract();
 
 
 	//NOTE: WORKING!!!
 	void set_command_name(const text_data&);
+	text_info command_name() const;
 	void set_command_data(storage_section*);
 	bool set_command(external_command*);
 	storage_section *get_tree() const;
@@ -127,45 +129,30 @@ public:
 	response_receiver *send_to;
 	//----------------------------------------------------------------------
 
-	//from 'data_importer'--------------------------------------------------
-	input_receiver *import_data(data_input*);
-	//----------------------------------------------------------------------
-
 	//from 'data_exporter'--------------------------------------------------
 	const output_sender *export_data(data_output*) const;
 	//----------------------------------------------------------------------
 
-	//mirrored to 'element_interface'---------------------------------------
+	//mirrored to 'external_command'----------------------------------------
 	bool evaluate_server(server_interface*) const;
 	bool evaluate_client(client_interface*) const;
 	command_priority override_priority(command_priority) const;
 	permission_mask execute_permissions() const;
-	text_info command_name() const;
 	const transmit_block *show_command() const;
 	bool copy_base(transmit_block&) const;
 	//----------------------------------------------------------------------
 
 private:
-	input_receiver *discard_input(data_input*);
-	input_receiver *abort_parsing(data_input*, command_event, text_info);
-
-	//from 'tagged_output'--------------------------------------------------
-	bool send_open_tag(data_output*) const;
-	bool send_close_tag(data_output*) const;
-	//----------------------------------------------------------------------
-
-	//from 'managed_ouput'--------------------------------------------------
-	bool send_content(data_output*) const;
-	const output_sender *get_subsection() const;
-	const output_sender *get_next() const;
-	const output_sender *get_out_parent() const;
-	//----------------------------------------------------------------------
+	void export_tree(const storage_section *sSection, data_output *oOutput,
+	  text_data pPrefix) const;
 
 	//from 'data_output'----------------------------------------------------
 	bool send_output(const output_section&);
 	bool is_closed() const;
 	bool set_output_mode(unsigned int);
 	//----------------------------------------------------------------------
+
+	external_command *command;
 
 	const command_finder *finder;
 	unsigned char output_mode;

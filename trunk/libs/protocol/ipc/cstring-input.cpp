@@ -68,9 +68,6 @@ extern "C" {
 	{ return this->end_of_data(); }
 	//----------------------------------------------------------------------
 
-	bool cstring_input::read_line_input()
-	{ return false; }
-
 	bool cstring_input::read_binary_input()
 	{ return false; }
 

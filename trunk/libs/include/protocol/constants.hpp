@@ -103,16 +103,6 @@ extern const text_data content_newline;
 extern const text_data message_null;
 
 extern const text_data standard_delimiter;
-
-//(these are also in "plugin-dev/external-command.hpp")
-extern const input_mode input_reset;
-
-extern const input_mode input_none;
-extern const input_mode input_null;
-extern const input_mode input_tagged;
-extern const input_mode input_binary;
-extern const input_mode input_allow_underrun;
-extern const input_mode universal_transmission_reset;
 //END command data--------------------------------------------------------------
 //END transmission formatting===================================================
 

@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -88,7 +88,6 @@ public:
 	void reset_transmission_limit();
 
 private:
-	virtual bool read_line_input() = 0;
 	virtual bool read_binary_input() = 0;
 	virtual void reset_underrun() = 0;
 	virtual void clear_cancel() = 0;
@@ -97,7 +96,6 @@ protected:
 	void clear_buffer() const;
 
 	unsigned int total_transmission;
-	unsigned int current_mode;
 	external_buffer *const buffer;
 };
 
@@ -116,7 +114,6 @@ public:
 	receive_short_func input_receiver;
 
 private:
-	bool read_line_input();
 	bool read_binary_input();
 	void reset_underrun();
 	void clear_cancel();
@@ -140,7 +137,7 @@ struct common_input : public buffered_common_input, private external_buffer
 };
 
 
-typedef input_base input_interface;
+typedef lexer_input input_interface;
 typedef protect::capsule <input_interface> protected_input;
 
 

@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -35,48 +35,5 @@
 
 #include "plugin-dev/external-command.hpp"
 
-#include <hparser/formats/tagged-input.hpp>
-
-
-class null_command :
-	public external_command,
-	public tagged_input
-{
-public:
-	null_command(const text_data&);
-
-	//from 'storage_section'------------------------------------------------
-	section_releaser copy() const;
-	//----------------------------------------------------------------------
-
-	//from 'element_interface'----------------------------------------------
-	command_event evaluate_server(const command_info&, server_interface*) const;
-	command_event evaluate_client(const command_info&, client_interface*) const;
-	permission_mask execute_permissions() const;
-	//----------------------------------------------------------------------
-
-	//from 'connection_control'---------------------------------------------
-	bool allow_next(const storage_section*) const;
-	//----------------------------------------------------------------------
-
-private:
-	//from 'tagged_input'---------------------------------------------------
-	bool is_close_tag(data_input*) const;
-	//----------------------------------------------------------------------
-
-	//from 'managed_input'--------------------------------------------------
-	bool makes_sense(data_input*) const;
-	bool is_subsection(data_input*) const;
-	input_receiver *new_subsection(data_input*);
-	input_receiver *apply_input(data_input*);
-	input_receiver *get_in_parent() const;
-	//----------------------------------------------------------------------
-
-	//from 'managed_ouput'--------------------------------------------------
-	bool send_content(data_output*) const;
-	//----------------------------------------------------------------------
-
-	text_data inert_content;
-};
 
 #endif //proto_external_command_hpp
