@@ -62,6 +62,12 @@ extern "C" {
 #define RSERVR_COMMAND_CURRENT current_node
 #endif
 
+#ifndef RSERVR_COMMAND_INDEX
+#define RSERVR_COMMAND_INDEX current_index
+#endif
+
+#define RSERVR_COMMAND_TREE tTree
+
 #define RSERVR_COMMAND_NAME RSERVR_COMMAND_CURRENT->extract_interface()->get_name()
 
 #define RSERVR_COMMAND_TYPE RSERVR_COMMAND_CURRENT->extract_interface()->data_type()
@@ -74,6 +80,7 @@ extern "C" {
 
 #define RSERVR_COMMAND_PARSE_START(node) \
 { const storage_section *RSERVR_COMMAND_TEMP = (node); /*necessary for nested loops*/ \
+  unsigned int RSERVR_COMMAND_INDEX = 0; \
   while (RSERVR_COMMAND_TEMP) { \
     const storage_section *RSERVR_COMMAND_CURRENT = RSERVR_COMMAND_TEMP; \
     if (false);
@@ -85,6 +92,7 @@ extern "C" {
     else
 
 #define RSERVR_COMMAND_PARSE_END \
+    ++RSERVR_COMMAND_INDEX; \
     RSERVR_COMMAND_TEMP = RSERVR_COMMAND_TEMP->next(); } }
 
 
@@ -119,8 +127,8 @@ command_event name::evaluate_client(const command_info &RSERVR_INFO_ARG, client_
 #define RSERVR_EVAL_NONE     event_none
 #define RSERVR_EVAL_COMPLETE event_complete
 
-#define RSERVR_COMMAND_PARSE_HEAD(name) bool compile_command(const storage_section *tTree)
-#define RSERVR_COMMAND_BUILD_HEAD(name) storage_section *assemble_command() const
+#define RSERVR_COMMAND_PARSE_HEAD(name) bool name::compile_command(const storage_section *RSERVR_COMMAND_TREE)
+#define RSERVR_COMMAND_BUILD_HEAD(name) storage_section *name::assemble_command() const
 
 #define RSERVR_TEMP_STRING  temp_input
 #define RSERVR_TEMP_UVALUE  temp_uvalue
@@ -131,15 +139,74 @@ input_section  ATTR_UNUSED  RSERVR_TEMP_STRING; \
 unsigned int   ATTR_UNUSED  RSERVR_TEMP_UVALUE = 0; \
 int            ATTR_UNUSED  RSERVR_TEMP_SVALUE = 0;
 
-#define RSERVR_PARSE16(variable) { \
-if (!parse_integer16(RSERVR_COMMAND_DATA.c_str(), &RSERVR_TEMP_UVALUE)) return false; \
+#define RSERVR_COMMAND_COPY_DATA(variable) \
+{ variable = RSERVR_COMMAND_DATA; }
+
+#define RSERVR_COMMAND_PARSE16(variable) { \
+unsigned int RSERVR_TEMP_UVALUE = 0; \
+if (!parse_integer16(RSERVR_COMMAND_DATA, &RSERVR_TEMP_UVALUE)) return false; \
 variable = RSERVR_TEMP_UVALUE; }
 
-#define RSERVR_PARSE10(variable) { \
+#define RSERVR_COMMAND_PARSE10(variable) { \
+unsigned int RSERVR_TEMP_SVALUE = 0; \
 if (!parse_integer10(RSERVR_COMMAND_DATA.c_str(), &RSERVR_TEMP_SVALUE)) return false; \
+variable = RSERVR_TEMP_SVALUE; }
+
+#define RSERVR_COMMAND_PARSE16_MAYBE(result, variable) { \
+unsigned int RSERVR_TEMP_UVALUE = 0; \
+if ((result = parse_integer16(RSERVR_COMMAND_DATA, &RSERVR_TEMP_UVALUE))) \
+variable = RSERVR_TEMP_UVALUE; }
+
+#define RSERVR_COMMAND_PARSE10_MAYBE(result, variable) { \
+unsigned int RSERVR_TEMP_SVALUE = 0; \
+if ((result = parse_integer10(RSERVR_COMMAND_DATA, &RSERVR_TEMP_SVALUE))) \
 variable = RSERVR_TEMP_SVALUE; }
 
 #define RSERVR_CHECK_FROM_REMOTE external_command::is_command_from_remote(RSERVR_INFO_ARG)
 #define RSERVR_CHECK_TO_REMOTE   external_command::is_command_to_remote(RSERVR_INFO_ARG)
+
+#define RSERVR_COMMAND_BUILD_START \
+{ storage_section *command_tree_base = NULL; \
+  storage_section *&command_tree = command_tree_base;
+
+#define RSERVR_COMMAND_ADD_EMPTY \
+  { if (command_tree) command_tree->add_next(new empty_data_section("")); \
+    else command_tree = new empty_data_section(""); }
+
+#define RSERVR_COMMAND_ADD_TEXT(name, variable) \
+  { if (command_tree) command_tree->add_next(new actual_data_section(name, variable.c_str())); \
+    else command_tree = new actual_data_section(name, variable.c_str()); }
+
+#define RSERVR_COMMAND_ADD_CSTR(name, variable) \
+  { if (command_tree) command_tree->add_next(new actual_data_section(name, variable)); \
+    else command_tree = new actual_data_section(name, variable); }
+
+#define RSERVR_COMMAND_ADD_BINARY(name, variable) \
+  { if (command_tree) command_tree->add_next(new actual_data_section(name, variable.c_str(), variable.size())); \
+    else command_tree = new actual_data_section(name, variable.c_str(), variable.size()); }
+
+#define RSERVR_COMMAND_CONVERT16(name, variable) \
+{ char buffer[RSERVR_MAX_CONVERT_SIZE] = ""; \
+  RSERVR_COMMAND_ADD_CSTR(name, convert_integer16(variable, buffer)) }
+
+#define RSERVR_COMMAND_CONVERT10(name, variable) \
+{ char buffer[RSERVR_MAX_CONVERT_SIZE] = ""; \
+  RSERVR_COMMAND_ADD_CSTR(name, convert_integer10(variable, buffer)) }
+
+#define RSERVR_COMMAND_GROUP_START(name) \
+  { storage_section *command_group = NULL; \
+    if (command_tree) command_tree->add_next(command_group = new group_data_section(name)); \
+    else command_tree = (command_group = new group_data_section(name)); \
+    { command_tree = command_group;
+
+#define RSERVR_COMMAND_GROUP_END \
+  } }
+
+#define RSERVR_COMMAND_BUILD_ABORT \
+  { delete command_tree_base; \
+    return NULL; }
+
+#define RSERVR_COMMAND_BUILD_END \
+  return command_tree_base; }
 
 #endif //source_macro_hpp

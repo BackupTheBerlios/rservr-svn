@@ -52,12 +52,12 @@ extern "C" {
 #define RSERVR_COMMAND_CREATE_CHECK(name, require, exclude) \
 if (!allow_create_builtin(require, exclude)) { \
 log_command_create_rejected(RSERVR_BUILTIN_TAG(name).c_str()); \
-return; }
+return NULL; }
 
 #define RSERVR_COMMAND_PARSE_CHECK(name, require, exclude) \
 if (!allow_parse_builtin(require, exclude)) { \
 log_command_parse_rejected(RSERVR_BUILTIN_TAG(name).c_str()); \
-return NULL; }
+return false; }
 
 #define RSERVR_COMMAND_DEFAULT_GEN(name, tag) \
 external_command *name::generate(const text_data &cCommand) \
@@ -93,8 +93,8 @@ permission_mask name::execute_permissions() const \
 { return execute; }
 
 #define RSERVR_COMMAND_DEFAULT_COPY(name) \
-section_releaser name::copy() const \
-{ return section_releaser(new name(*this)); }
+external_command *name::copy() const \
+{ return new name(*this); }
 
 #define RSERVR_SERVER_COMMAND_DEFAULTS(name, tag, execute) \
 RSERVR_COMMAND_DEFAULT_GEN(name, tag) \
