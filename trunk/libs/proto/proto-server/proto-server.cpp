@@ -54,8 +54,8 @@ RSERVR_AUTO_BUILTIN_TAG(server_response)
 
 
 	proto_server_response::proto_server_response(command_event eEvent, text_info mMessage) :
-	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(server_response)),
-	event_origin(entity_name()), event_type(eEvent), event_message(mMessage? mMessage : "")
+	RSERVR_COMMAND_INIT_BASE, event_origin(entity_name()), event_type(eEvent),
+	event_message(mMessage? mMessage : "")
 	{
 	RSERVR_COMMAND_CREATE_CHECK(server_response, type_server, type_any_client)
 
@@ -103,10 +103,7 @@ RSERVR_AUTO_BUILTIN_TAG(server_response)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_server_response)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
+//TODO: start conversion here!
 	RSERVR_TEMP_STORAGE
 
 	event_origin.clear();
@@ -120,6 +117,12 @@ RSERVR_AUTO_BUILTIN_TAG(server_response)
 	RSERVR_AUTO_COPY_ANY(event_message)
 
 	RSERVR_PARSE_END
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_server_response)
+	{
+return NULL;
 	}
 
 

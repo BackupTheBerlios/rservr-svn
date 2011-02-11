@@ -59,8 +59,7 @@ const text_info null_device = "/dev/null";
 
 //transmission formatting=======================================================
 //main command------------------------------------------------------------------
-const text_data main_tag = "rservr";
-const text_data protocol_version = "t6";
+const text_data protocol_version = "fb1"; //flex/bison protocol 1
 
 const text_data time_label = "_t";
 const text_data version_label = "_v";
@@ -73,34 +72,25 @@ const text_data orig_entity_label = "_oe";
 const text_data orig_address_label = "_oa";
 const text_data target_entity_label = "_te";
 const text_data target_address_label = "_ta";
-const text_data respond_to_label = "_rs";
-const text_data binary_label = "_b";
 const text_data disable_auto_label = "_da";
 const text_data return_pid_label = "_rp";
 const text_data silent_response_label = "_sr";
-const text_data silent_response_value = "+";
 
 const text_data client_scope_separator  = "?";
 const text_data address_scope_separator = "|";
 const char client_scope_char  = '?';
 const char address_scope_char = '|';
-
-const text_data size_label_open  = "{\\%";
-const text_data size_label_close = "%\\}";
 //END main command--------------------------------------------------------------
 
 //command data------------------------------------------------------------------
-const text_data section_label = "sec";
-const text_data unsized_data_label = "dat";
-const text_data sized_data_label = "dat";
-const text_data descriptor_open = "[";
-const text_data descriptor_close = "]";
-const text_data descriptor_separator = " ";
-const text_data content_newline = "\n";
-
 const text_data message_null = "";
 
 const text_data standard_delimiter = "*";
+
+const input_mode input_none                   = 0x00;
+const input_mode input_binary                 = 0x01 << 0;
+const input_mode input_allow_underrun         = 0x01 << 1;
+const input_mode universal_transmission_reset = 0x01 << 2;
 //END command data--------------------------------------------------------------
 //END transmission formatting===================================================
 

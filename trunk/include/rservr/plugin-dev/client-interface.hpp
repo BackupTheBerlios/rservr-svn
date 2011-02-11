@@ -61,7 +61,7 @@ struct client_interface
 	virtual bool register_request(const command_info&, const struct incoming_request_data*) = 0;
 	virtual bool register_response(const command_info&, const struct incoming_response_data*) = 0;
 	virtual bool register_remote(const command_info&) = 0;
-	virtual bool register_alt_remote(const command_info&, section_releaser) = 0;
+	virtual bool register_alt_remote(const command_info&, external_command*) = 0;
 	virtual bool register_message(const command_info&, const struct incoming_info_data*) = 0;
 
 	virtual bool set_timing_table(const command_info&, const data_list&) = 0;

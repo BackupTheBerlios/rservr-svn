@@ -65,12 +65,13 @@ extern "C" {
 name(const text_data&) RSERVR_RESTRICT_COMMAND_INTERNAL;\
 public: \
 constructors \
+bool compile_command(const storage_section*) RSERVR_RESTRICT_COMMAND_HIDDEN; \
+storage_section *assemble_command() const RSERVR_RESTRICT_COMMAND_HIDDEN; \
+external_command *copy() const RSERVR_RESTRICT_COMMAND_HIDDEN; \
 command_event evaluate_server(const command_info&, server_interface*) const RSERVR_RESTRICT_COMMAND_HIDDEN; \
 command_event evaluate_client(const command_info&, client_interface*) const RSERVR_RESTRICT_COMMAND_HIDDEN; \
 command_priority override_priority(command_priority) const RSERVR_RESTRICT_COMMAND_HIDDEN; \
-permission_mask execute_permissions() const RSERVR_RESTRICT_COMMAND_HIDDEN; \
-section_releaser copy() const RSERVR_RESTRICT_COMMAND_HIDDEN; \
-input_receiver *receive_data(data_input*) RSERVR_RESTRICT_COMMAND_HIDDEN;
+permission_mask execute_permissions() const RSERVR_RESTRICT_COMMAND_HIDDEN;
 
 #define RSERVR_COMMAND_CLASS(name, constructors, members) RSERVR_COMMAND_HEAD(name) \
 { RSERVR_COMMAND_TOP(name, constructors) \

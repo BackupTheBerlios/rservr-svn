@@ -612,7 +612,7 @@ void free_command_table_info(const command_table_element *iInfo)
 }
 
 
-external_command *empty_client_command(transmit_block &bBase, const text_data &nName)
+bool empty_client_command(transmit_block &bBase, const text_data &nName)
 {
 	bBase.execute_type = command_null;
 	external_command *new_command = NULL;
@@ -623,7 +623,7 @@ external_command *empty_client_command(transmit_block &bBase, const text_data &n
 
 	else if (position == data::not_found)
 	{
-	if (!bBase.target_address.size()) return NULL;
+	if (!bBase.target_address.size()) return false;
 	new_command = new null_command(nName);
 	//NOTE: built-in flag is necessary in order to get a client interface
 	bBase.execute_type = command_remote | command_null | command_builtin;
@@ -632,7 +632,7 @@ external_command *empty_client_command(transmit_block &bBase, const text_data &n
 	else
 	{
 	if (!client_commands.get_element(position).parse_permissions())
-	return NULL;
+	return false;
 
 	bBase.execute_type = client_commands.get_element(position).execution_type();
 
@@ -656,6 +656,11 @@ external_command *empty_client_command(transmit_block &bBase, const text_data &n
 	 }
 	}
 
-	if (bBase.set_command( section_releaser(new_command) )) return new_command;
-	else return NULL;
+	if (!bBase.set_command(new_command))
+	{
+	delete new_command;
+	return false;
+	}
+
+	else return true;
 }

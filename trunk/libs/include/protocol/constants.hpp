@@ -61,8 +61,7 @@ extern const text_info null_device;
 
 //transmission formatting=======================================================
 //main command------------------------------------------------------------------
-extern const text_data main_tag;
-extern const text_data protocol_version;
+extern const text_data protocol_version; //TODO: make this visible in API?
 
 extern const text_data time_label;
 extern const text_data version_label;
@@ -75,34 +74,27 @@ extern const text_data orig_entity_label;
 extern const text_data orig_address_label;
 extern const text_data target_entity_label;
 extern const text_data target_address_label;
-extern const text_data respond_to_label;
-extern const text_data binary_label;
 extern const text_data disable_auto_label;
 extern const text_data return_pid_label;
 extern const text_data silent_response_label;
-extern const text_data silent_response_value;
 
 extern const text_data client_scope_separator;
 extern const text_data address_scope_separator;
 extern const char client_scope_char;
 extern const char address_scope_char;
-
-extern const text_data size_label_open;
-extern const text_data size_label_close;
 //END main command--------------------------------------------------------------
 
 //command data------------------------------------------------------------------
-extern const text_data section_label;
-extern const text_data unsized_data_label;
-extern const text_data sized_data_label;
-extern const text_data descriptor_open;
-extern const text_data descriptor_close;
-extern const text_data descriptor_separator;
-extern const text_data content_newline;
+typedef uint8_t input_mode;
 
 extern const text_data message_null;
 
-extern const text_data standard_delimiter;
+extern const text_data standard_delimiter; //TODO: make this visible in API?
+
+extern const input_mode input_none;
+extern const input_mode input_binary;
+extern const input_mode input_allow_underrun;
+extern const input_mode universal_transmission_reset;
 //END command data--------------------------------------------------------------
 //END transmission formatting===================================================
 

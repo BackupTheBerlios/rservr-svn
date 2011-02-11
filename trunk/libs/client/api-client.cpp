@@ -131,8 +131,14 @@ bool master_register_client(text_info nName, permission_mask tType)
 
 	if (tType != type_none && local_type() != type_none) return false;
 	transmit_block new_block;
-	section_releaser new_command(new proto_register_client(nName, tType, disable_ready));
-	if (!new_block.set_command(new_command)) return false;
+	external_command *new_command = new proto_register_client(nName, tType, disable_ready);
+	if (!new_block.set_command(new_command))
+	 {
+	delete new_command;
+	return false;
+	 }
+	new_command = NULL;
+	//NOTE: 'new_block' now owns 'new_command'
 	if (!lookup_command(new_block.command_name(), new_block.execute_type)) return false;
 
 	new_block.orig_reference = manual_message_number();
@@ -148,7 +154,7 @@ bool master_register_client(text_info nName, permission_mask tType)
 
 	reset_input_standby();
 
-	if (manual_command_status(new_block.orig_reference) && new_output(&new_block))
+	if (manual_command_status(new_block.orig_reference) && new_block.command_sendable() && new_output(&new_block))
 	{
 	command_event outcome = wait_command_event(new_block.orig_reference, event_complete,
 	  client_timing_specs->register_wait);

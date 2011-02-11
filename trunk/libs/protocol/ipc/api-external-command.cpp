@@ -55,7 +55,42 @@ extern "C" {
 }
 
 
-//NOTE: WORKING!!!
+	bool null_command::compile_command(const storage_section *tTree)
+	{ return false; }
+
+	storage_section *null_command::assemble_command() const
+	{ return new empty_data_section(""); }
+
+	external_command *null_command::copy() const
+	{ return new null_command(*this); }
+
+	command_event null_command::evaluate_server(const command_info&, server_interface*) const
+	{
+    log_command_null_execution();
+	return event_none;
+	}
+
+	command_event null_command::evaluate_client(const command_info &iInfo, client_interface *cClient) const
+	{
+	//NOTE: only commands with target addresses are evaluated...
+	if (iInfo.target_address.size() || !cClient)
+	return cClient->register_remote(iInfo)? event_none : event_rejected;
+
+	//all others prompt an error...
+	else
+     log_command_null_execution();
+	return event_none;
+        }
+
+	permission_mask null_command::execute_permissions() const
+	{ return type_active_client; }
+
+
+
+	external_command::external_command(const text_data &nName) : command_label(nName) {}
+
+	text_info external_command::command_name() const
+	{ return command_label.c_str(); }
 
 
 	command_priority external_command::override_priority(command_priority pPriority) const

@@ -36,4 +36,15 @@
 #include "plugin-dev/external-command.hpp"
 
 
+struct null_command : public external_command
+{
+	bool compile_command(const storage_section*);
+	storage_section *assemble_command() const;
+	external_command *copy() const;
+
+	command_event evaluate_server(const command_info&, server_interface*) const;
+	command_event evaluate_client(const command_info&, client_interface*) const;
+	permission_mask execute_permissions() const;
+};
+
 #endif //proto_external_command_hpp

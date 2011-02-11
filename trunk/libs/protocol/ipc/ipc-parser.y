@@ -31,6 +31,10 @@
  +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 %{
+extern "C" {
+#include "ipc/ipc-parser.tab.h"
+}
+
 #include "plugin-dev/external-command.hpp"
 
 #include <stdio.h>
@@ -41,6 +45,7 @@
 #include <hparser/storage-section.hpp>
 #include <hparser/classes/string-input.hpp>
 
+#include "constants.hpp"
 #include "ipc/command-transmit.hpp"
 
 extern "C" {
@@ -112,23 +117,23 @@ routing:
 
 property:
 	LABEL '=' LABEL {
-		cContext->command->string_property($1.string, $3.string);
+		if (!cContext->command->string_property($1.string, $3.string)) YYERROR;
 		free($1.string);
 		$1.string = NULL;
 		free($3.string);
 		$3.string = NULL; } |
 	LABEL '=' EXTENDED {
-		cContext->command->string_property($1.string, $3.string);
+		if (!cContext->command->string_property($1.string, $3.string)) YYERROR;
 		free($1.string);
 		$1.string = NULL;
 		free($3.string);
 		$3.string = NULL; } |
 	LABEL '=' SINTEGER {
-		cContext->command->sinteger_property($1.string, $3);
+		if (!cContext->command->sinteger_property($1.string, $3)) YYERROR;
 		free($1.string);
 		$1.string = NULL; } |
 	LABEL '=' UINTEGER {
-		cContext->command->uinteger_property($1.string, $3);
+		if (!cContext->command->uinteger_property($1.string, $3)) YYERROR;
 		free($1.string);
 		$1.string = NULL; }
 	;
@@ -222,6 +227,8 @@ ssize_t get_input(struct data_input*, char*, ssize_t);
 ssize_t get_input(data_input *iInput, char *bBuffer, ssize_t mMax)
 {
 	if (!iInput) return 0;
+
+	iInput->set_input_mode(input_binary | input_allow_underrun);
 
 	const input_section &input = iInput->receive_input();
 	ssize_t used = ((signed) input.size() < mMax)? input.size() : mMax;

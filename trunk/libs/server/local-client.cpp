@@ -64,7 +64,7 @@ extern "C" {
 
 struct server_command_finder : public command_finder
 {
-	external_command *new_command(transmit_block &bBase, const text_data &cCommand) const
+	bool new_command(transmit_block &bBase, const text_data &cCommand) const
 	{ return empty_server_command(bBase, cCommand); }
 };
 
@@ -198,7 +198,7 @@ static const input_section default_input_section;
 	                              server_timing_specs->read_standby_retry,
 	                              server_timing_specs->read_standby_wait);
 
-	this->set_input_mode(input_tagged); //unsets 'input_allow_underrun'
+	this->set_input_mode(input_binary); //unsets 'input_allow_underrun'
 
 
 	struct stat current_status;
@@ -304,7 +304,7 @@ static const input_section default_input_section;
 	   }
 	  }
 
-	this->set_input_mode(input_tagged); //unsets 'input_allow_underrun'
+	this->set_input_mode(input_binary); //unsets 'input_allow_underrun'
 	 }
 
 	if (identity->total_errors >= server_settings->max_client_error)

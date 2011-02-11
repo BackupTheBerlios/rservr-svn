@@ -49,7 +49,8 @@ extern "C" {
   new_block = new transmit_block; \
   if (!new_block) return NULL; \
   if (!new_block->set_command(command)) \
-  { delete new_block; \
+  { delete command; \
+    delete new_block; \
     return NULL; } \
   if (!lookup_command(new_block->command_name(), new_block->execute_type)) \
   { delete new_block; \
@@ -68,7 +69,8 @@ extern "C" {
   new_block = new transmit_block; \
   if (!new_block) return NULL; \
   if (!new_block->set_command(command)) \
-  { delete new_block; \
+  { delete command; \
+    delete new_block; \
     return NULL; } \
   if (!lookup_command(new_block->command_name(), new_block->execute_type)) \
   { delete new_block; \
@@ -84,13 +86,15 @@ extern "C" {
 #define DEFAULT_SEND_SERVER_COMMAND(command, wait) \
 command_event SEND_SERVER_COMMAND_OUTCOME; \
 { transmit_block new_block; \
-  if (!new_block.set_command(command)) return event_unsent; \
+  if (!new_block.set_command(command)) \
+  { delete command; \
+    return event_unsent; } \
   if (!lookup_command(new_block.command_name(), new_block.execute_type)) return event_unsent; \
   new_block.orig_reference = manual_message_number(); \
   new_block.orig_entity = entity_name(); \
   send_protected_output new_output(pipe_output); \
   reset_input_standby(); \
-  if (!manual_command_status(new_block.orig_reference) || !new_output(&new_block)) \
+  if (!manual_command_status(new_block.orig_reference) || (new_block.command_sendable() && !new_output(&new_block))) \
   { clear_command_status(new_block.orig_reference); \
     return event_error; } \
   SEND_SERVER_COMMAND_OUTCOME = wait_command_event(new_block.orig_reference, event_complete, wait); \
@@ -100,13 +104,15 @@ command_event SEND_SERVER_COMMAND_OUTCOME; \
 #define SEND_SERVER_COMMAND_NO_EVENT(command, wait) \
 command_event SEND_SERVER_COMMAND_OUTCOME; \
 { transmit_block new_block; \
-  if (!new_block.set_command(command)) return false; \
+  if (!new_block.set_command(command)) \
+  { delete command; \
+    return false; } \
   if (!lookup_command(new_block.command_name(), new_block.execute_type)) return false; \
   new_block.orig_reference = manual_message_number(); \
   new_block.orig_entity = entity_name(); \
   send_protected_output new_output(pipe_output); \
   reset_input_standby(); \
-  if (!manual_command_status(new_block.orig_reference) || !new_output(&new_block)) \
+  if (!manual_command_status(new_block.orig_reference) || !(new_block.command_sendable() && new_output(&new_block))) \
   { clear_command_status(new_block.orig_reference); \
     return false; } \
   SEND_SERVER_COMMAND_OUTCOME = wait_command_event(new_block.orig_reference, event_complete, wait); \
@@ -115,11 +121,13 @@ command_event SEND_SERVER_COMMAND_OUTCOME; \
 
 #define SILENT_SEND_SERVER_COMMAND(command) \
 { transmit_block new_block; \
-  if (!new_block.set_command(command)) return false; \
+  if (!new_block.set_command(command)) \
+  { delete command; \
+    return false; } \
   if (!lookup_command(new_block.command_name(), new_block.execute_type)) return false; \
   new_block.orig_reference = manual_message_number(); \
   new_block.orig_entity = entity_name(); \
   send_protected_output new_output(pipe_output); \
-  return new_output(&new_block); }
+  return new_block.command_sendable() && new_output(&new_block); }
 
 #endif //command_macro_hpp

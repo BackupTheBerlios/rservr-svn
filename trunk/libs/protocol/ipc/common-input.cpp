@@ -102,6 +102,9 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	{
 	if (!cCommand) return false;
 
+	this->set_input_mode(universal_transmission_reset);
+	this->set_input_mode(input_binary); //disable underrun for first read
+
 	struct protocol_scanner_context context = { command: cCommand, input: this };
 	bool outcome = parse_loop(&context, scanner, state) == 0;
 
@@ -112,7 +115,11 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	return outcome;
 	 }
 
-	else return cCommand->find_command();
+	else
+	 {
+	if (!cCommand->get_tree()) cCommand->set_command_data(new empty_data_section(""));
+	return cCommand->find_command();
+	 }
 	}
 
 
@@ -126,12 +133,13 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 
 
 	input_base::input_base(external_buffer *bBuffer) :
-	total_transmission(0), buffer(bBuffer) { }
+	current_mode(input_none), total_transmission(0), buffer(bBuffer) { }
 
 
 	input_base &input_base::operator = (const input_base &eEqual)
 	{
 	if (&eEqual == this) return *this;
+	current_mode = eEqual.current_mode;
 	if (buffer && eEqual.buffer) *buffer = *eEqual.buffer;
 	else if (buffer) *buffer = external_buffer();
 	return *this;
@@ -144,15 +152,17 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	//TODO: add a lot of comments to this!
 	this->clear_cancel();
 
+	if (current_mode & input_binary)
+	 {
 	if (buffer->current_data.size()) return buffer->current_data;
 
 	if ( buffer->current_data.size() + buffer->current_line.size() +
 	       buffer->loaded_data.size() > PARAM_MAX_HOLDING_INPUT )
-	 {
+	  {
     log_command_input_holding_exceeded("input_base [binary]");
 	this->clear_buffer();
 	return buffer->current_data;
-	 }
+	  }
 
 	if (!this->buffer->loaded_data.size() && !this->read_binary_input())
 	return buffer->current_data;
@@ -161,6 +171,10 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	buffer->current_data.assign(buffer->loaded_data, 0, use_limit);
 
 	buffer->loaded_data.erase(0, use_limit);
+	return buffer->current_data;
+	 }
+
+	buffer->current_data.clear();
 	return buffer->current_data;
 	}
 
@@ -186,13 +200,23 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 
 	bool input_base::set_input_mode(unsigned int mMode)
 	{
-	if (mMode)
+	if (mMode == universal_transmission_reset)
 	 {
 	this->reset_transmission_limit();
 	return true;
 	 }
 
-	return false;
+	this->reset_underrun();
+
+	if (current_mode != mMode && (mMode & input_binary))
+	 {
+	//NOTE: leave 'loaded_data' and 'current_data' alone here
+     if (buffer->current_line.size()) log_command_line_discard(buffer->current_line.c_str());
+	buffer->current_line.clear(); //NOTE: leftover line segments are malformed
+	 }
+
+	current_mode = mMode;
+	return true;
 	}
 	//----------------------------------------------------------------------
 
@@ -288,7 +312,7 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
     log_protocol_input_underrun("buffered_common_input");
 	underrun_logged = true;
 	   }
-	if (retry_cycle.wait()) input_underrun = false;
+	if ((current_mode & input_allow_underrun) && retry_cycle.wait()) input_underrun = false;
 	  }
 	 }
 
@@ -329,6 +353,7 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	loaded_data.clear();
 	read_cancel = -1;
 	eof_reached = false;
+	this->set_input_mode(input_binary);
 	 }
 	input_pipe = fFile;
 	}
@@ -387,6 +412,7 @@ class is_input_waiting : public protected_input::modifier
 	if (!(object = oObject)) return protect::exit_forced;
 
 	//NOTE: blocking should be turned off for the input source
+	if (!object->set_input_mode(input_binary)) return protect::entry_fail; //removes "input_allow_underrun"
 	bool outcome = object->receive_input().size();
 	if (!outcome && (!(object = oObject) || object->is_terminated())) return protect::exit_forced;
 

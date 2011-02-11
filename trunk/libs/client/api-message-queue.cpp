@@ -844,15 +844,16 @@ struct external_client_interface : public client_interface
 	}
 
 
-	bool ATTR_INT register_alt_remote(const command_info &iInfo, section_releaser cCommand)
+	bool ATTR_INT register_alt_remote(const command_info &iInfo, external_command *cCommand)
 	{
 	//TODO: combine with 'register_remote'
 	if (!iInfo.show_command()) return false;
 	if (requirement_fail(command_remote) || block_remote_status()) return false;
 
 	transmit_block *command_copy = NULL;
-	command_copy = new transmit_block(*iInfo.show_command());
+	command_copy = new transmit_block;
 	if (!command_copy) return false;
+	iInfo.show_command()->copy_base(*command_copy);
 	command_copy->set_command(cCommand);
 
 	if (!lookup_command(command_copy->command_name(), command_copy->execute_type))
@@ -963,7 +964,7 @@ static external_client_interface local_client_interface;
 
 struct client_command_finder : public command_finder
 {
-	external_command ATTR_INT *new_command(transmit_block &bBase, const text_data &cCommand) const
+	bool ATTR_INT new_command(transmit_block &bBase, const text_data &cCommand) const
 	{ return empty_client_command(bBase, cCommand); }
 };
 

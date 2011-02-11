@@ -94,7 +94,7 @@ private:
 	protect::entry_result access_entry(write_object);
 
 	const data_exporter *      current_output;
-	protected_output   *const current_destination;
+	protected_output    *const current_destination;
 };
 
 #endif //common_output_hpp

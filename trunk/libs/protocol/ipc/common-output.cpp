@@ -98,7 +98,7 @@ extern "C" {
 
 	bool common_output::set_output_mode(unsigned int mMode)
 	{
-	if (mMode)
+	if (mMode == universal_transmission_reset)
 	 {
 	this->reset_transmission_limit();
 	return true;

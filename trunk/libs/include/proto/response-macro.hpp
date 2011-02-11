@@ -44,7 +44,9 @@ extern "C" {
 #define COPY_TO_RESPONSE(command, left, right) \
 { if (!left.send_to) return false; \
   left.send_to = NULL; \
-  if (!left.set_command(command)) return false; \
+  if (!left.set_command(command)) \
+  { delete command; \
+    return false; } \
   left.orig_entity      = is_server()? entity_name() : right.target_entity; \
   left.orig_address     = ""; \
   left.orig_reference   = 0; \
@@ -59,7 +61,7 @@ extern "C" {
 
 #define AUTO_SEND_COMMAND(left, right) \
 { send_protected_output new_output(right.send_to->response_output()); \
-  return new_output(&left); }
+  return left.command_sendable() && new_output(&left); }
 
 
 #define RESPONSE_ORIGINAL_ARG cCommand

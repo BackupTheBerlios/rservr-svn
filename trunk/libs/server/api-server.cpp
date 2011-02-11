@@ -1251,7 +1251,7 @@ bool send_server_directive(client_id *cClient, server_directive dDirective)
 	directive_command.orig_entity   = entity_name();
 
 	send_protected_output new_output(cClient->attached_client);
-	return new_output(&directive_command);
+	return directive_command.command_sendable() && new_output(&directive_command);
 }
 
 
@@ -1267,7 +1267,7 @@ bool send_timing_table(const struct server_timing_table *tTiming, const client_i
 	timing_command.orig_entity   = entity_name();
 
 	send_protected_output new_output(cClient->attached_client);
-	return new_output(&timing_command);
+	return directive_command.command_sendable() && new_output(&timing_command);
 }
 
 
@@ -1285,7 +1285,7 @@ bool notify_register_attempt(const client_id *cClient, command_reference rRefere
 
 	notify_command.silent_auto_response = true;
 	send_protected_output new_output(cClient->attached_client);
-	return new_output(&notify_command);
+	return directive_command.command_sendable() && new_output(&notify_command);
 }
 
 //END directives and broadcasts-------------------------------------------------

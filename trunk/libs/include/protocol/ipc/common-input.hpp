@@ -45,8 +45,12 @@ extern "C" {
 
 #include "external/global-sentry.hpp"
 
+#include "constants.hpp"
 #include "command-transmit.hpp"
-#include "ipc-parser.tab.h" //NOTE: don't include with 'extern "C"'!
+
+extern "C" {
+#include "ipc-parser.tab.h"
+}
 
 
 //lexer/parser logic------------------------------------------------------------
@@ -95,6 +99,7 @@ private:
 protected:
 	void clear_buffer() const;
 
+	input_mode current_mode;
 	unsigned int total_transmission;
 	external_buffer *const buffer;
 };

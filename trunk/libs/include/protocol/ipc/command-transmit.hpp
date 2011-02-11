@@ -46,7 +46,7 @@ class transmit_block;
 
 struct command_finder
 {
-	virtual external_command *new_command(transmit_block&, const text_data&) const = 0;
+	virtual bool new_command(transmit_block&, const text_data&) const = 0;
 
 	inline virtual ~command_finder() { }
 };
@@ -92,8 +92,7 @@ struct command_info
 class transmit_block :
 	public command_info,
 	public structure_base,
-	public data_exporter,
-	private data_output
+	public data_exporter
 {
 public:
 	transmit_block(const command_finder* = NULL);
@@ -101,13 +100,11 @@ public:
 	transmit_block &operator = (const transmit_block&);
 	~transmit_block();
 
-
 	bool find_command();
 	bool command_ready() const;
-	text_info extract();
+	bool command_sendable();
 
-
-	//NOTE: WORKING!!!
+	//TODO: rename these functions
 	void set_command_name(const text_data&);
 	text_info command_name() const;
 	void set_command_data(storage_section*);
@@ -117,6 +114,8 @@ public:
 	bool sinteger_property(text_info, int);
 	bool uinteger_property(text_info, unsigned int);
 
+	const transmit_block *show_command() const;
+	bool copy_base(transmit_block&) const;
 
 	//command parameters----------------------------------------------------
 	//transmitted___________________________________________________________
@@ -138,25 +137,19 @@ public:
 	bool evaluate_client(client_interface*) const;
 	command_priority override_priority(command_priority) const;
 	permission_mask execute_permissions() const;
-	const transmit_block *show_command() const;
-	bool copy_base(transmit_block&) const;
 	//----------------------------------------------------------------------
 
 private:
+	void property_equal(const transmit_block&);
+	bool assemble_command();
 	void export_tree(const storage_section *sSection, data_output *oOutput,
 	  text_data pPrefix) const;
-
-	//from 'data_output'----------------------------------------------------
-	bool send_output(const output_section&);
-	bool is_closed() const;
-	bool set_output_mode(unsigned int);
-	//----------------------------------------------------------------------
 
 	external_command *command;
 
 	const command_finder *finder;
 	unsigned char output_mode;
-	text_data command_label, extracted_command;
+	text_data command_label;
 };
 
 #endif //command_transmit_hpp

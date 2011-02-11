@@ -551,9 +551,10 @@ socket_reference sSocket, send_short_func sSend)
 	new_output.output_sender = sSend;
 
     #ifdef PARAM_CACHE_COMMAND_OUTPUT
-	bool outcome = export_data(copied_command, &new_output) && new_output.synchronize();
+	bool outcome = copied_command->command_sendable() &&
+	  export_data(copied_command, &new_output) && new_output.synchronize();
     #else
-	bool outcome = export_data(copied_command, &new_output);
+	bool outcome = copied_command->command_sendable() && export_data(copied_command, &new_output);
     #endif
 	delete copied_command;
 
@@ -565,7 +566,7 @@ socket_reference sSocket, send_short_func sSend)
 
 struct local_command_finder : public command_finder
 {
-	external_command ATTR_INT *new_command(transmit_block &bBase, const text_data &cCommand) const
+	bool ATTR_INT new_command(transmit_block &bBase, const text_data &cCommand) const
 	{ return empty_client_command(bBase, cCommand); }
 };
 
@@ -582,7 +583,7 @@ command_handle insert_remote_command(text_info cCommand, text_info nName, text_i
 	new_command = new transmit_block(&local_finder);
 	if (!new_command) return NULL;
 
-	if (!import_data(new_command, &local_input))
+	if (!local_input.parse_command(new_command))
 	{
 	delete new_command;
 	return NULL;
@@ -623,7 +624,7 @@ text_info nName, text_info aAddress)
 	new_command = new transmit_block(&local_finder);
 	if (!new_command) return result_fail;
 
-	if (!internal_stream_input.set_input_mode(input_tagged | input_allow_underrun))
+	if (!internal_stream_input.set_input_mode(input_binary | input_allow_underrun))
 	{
 	delete new_command;
 	return result_fail;
@@ -645,7 +646,7 @@ text_info nName, text_info aAddress)
 	return result_success;
 	}
 
-	if (!internal_stream_input.set_input_mode(input_tagged)); //NOTE: to turn off underrun
+	if (!internal_stream_input.set_input_mode(input_binary)); //NOTE: to turn off underrun
 
 	insert_remote_address(new_command->orig_address, aAddress);
 	insert_remote_client(new_command->orig_address, new_command->orig_entity);
@@ -693,7 +694,7 @@ receive_short_func rReceive)
 	new_command = new transmit_block(&local_finder);
 	if (!new_command) return result_fail;
 
-	if (!buffered_stream_input.set_input_mode(input_tagged | input_allow_underrun))
+	if (!buffered_stream_input.set_input_mode(input_binary | input_allow_underrun))
 	{
 	delete new_command;
 	return result_fail;
@@ -713,7 +714,7 @@ receive_short_func rReceive)
 	return result_success;
 	}
 
-	if (!buffered_stream_input.set_input_mode(input_tagged)); //NOTE: to turn off underrun
+	if (!buffered_stream_input.set_input_mode(input_binary)); //NOTE: to turn off underrun
 
 	insert_remote_address(new_command->orig_address, aAddress);
 	insert_remote_client(new_command->orig_address, new_command->orig_entity);
@@ -808,22 +809,30 @@ text_info get_next_address(command_handle hHandle, char *cCopy, unsigned int sSi
 //(from 'plugin-dev/manual-command.hpp')
 command_handle manual_command(text_info nName, external_command *cCommand)
 {
-	//NOTE: this goes first in case we return early
-	section_releaser new_command(cCommand);
-
 	//NOTE: must have target name because plugins can't execute on servers!
-	if (!nName) return NULL;
+	if (!nName)
+	{
+	delete cCommand;
+	return NULL;
+	}
 
 	transmit_block *new_block            = NULL;
 	const transmit_block *queued_command = NULL;
 	new_block = new transmit_block(NULL);
-	if (!new_block) return NULL;
+	if (!new_block)
+	{
+	delete cCommand;
+	return NULL;
+	}
 
 	if (!new_block->set_command(new_command))
 	{
+	delete cCommand;
 	delete new_block;
 	return NULL;
 	}
+
+	//NOTE: 'new_block' now owns 'new_command'
 
 	if (!lookup_command(new_block->command_name(), new_block->execute_type))
 	{

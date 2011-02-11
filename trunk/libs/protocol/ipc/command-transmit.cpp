@@ -101,18 +101,13 @@ inline static bool ATTR_INL local_check_su()
 	{
 	if (&eEqual == this) return *this;
 
-	execute_type = eEqual.execute_type;
-	no_send      = eEqual.no_send;
-	send_to      = eEqual.send_to;
+	this->property_equal(eEqual);
+
+	this->structure_base::operator = (eEqual);
 
 	delete command;
 	command = NULL;
 	command = eEqual.command? eEqual.command->copy() : NULL;
-
-	finder            = eEqual.finder;
-	output_mode       = eEqual.output_mode;
-	command_label     = eEqual.command_label;
-	extracted_command = eEqual.extracted_command;
 
 	return *this;
 	}
@@ -127,31 +122,23 @@ inline static bool ATTR_INL local_check_su()
 
 	bool transmit_block::find_command()
 	{
-	external_command *actual_command = finder->new_command(*this, command_label);
-
-        if (!actual_command || (this->orig_address.size() && check_command_all(execute_type, command_no_remote)))
+        if (!finder->new_command(*this, command_label) ||
+	    (this->orig_address.size() && check_command_all(execute_type, command_no_remote)))
          {
      log_command_parse_rejected(command_label.c_str());
          return false;
          }
 
-	bool outcome = this->set_command(actual_command);
-	if (!outcome) delete actual_command;
-	return outcome;
+	return true;
 	}
 
 	bool transmit_block::command_ready() const
-	{ return this->first_branch(); }
+	{ return this->get_tree(); }
 
-
-	text_info transmit_block::extract()
+	bool transmit_block::command_sendable()
 	{
-	unsigned int current_mode = this->output_mode;
-	this->set_output_mode(0x01);
-	extracted_command.clear();
-	::export_data(this, this);
-	this->set_output_mode(current_mode);
-	return extracted_command.c_str();
+	if (this->command_ready()) return true;
+	return this->assemble_command();
 	}
 
 
@@ -161,14 +148,14 @@ inline static bool ATTR_INL local_check_su()
 	{ command_label = nName; }
 
 	text_info transmit_block::command_name() const
-	{ return command_label.c_str(); }
+	{ return command? command->command_name() : command_label.c_str(); }
 
 	void transmit_block::set_command_data(storage_section *sSection)
 	{ this->set_child(sSection); }
 
 	bool transmit_block::set_command(external_command *cCommand)
 	{
-	if (cCommand && !cCommand->compile_command(this->get_tree())) return false;
+	if (cCommand && this->get_tree() && !cCommand->compile_command(this->get_tree())) return false;
 	delete command;
 	command = cCommand;
 	return true;
@@ -177,13 +164,15 @@ inline static bool ATTR_INL local_check_su()
 	storage_section *transmit_block::get_tree() const
 	{ return this->first_branch(); }
 
+
 	bool transmit_block::string_property(const char *lLabel, const char *vValue)
 	{
 	if (!lLabel || !vValue) return false;
-	     if (strcmp(lLabel, "orig_entity") == 0)    orig_entity    = vValue;
-	else if (strcmp(lLabel, "orig_address") == 0)   orig_address   = vValue;
-	else if (strcmp(lLabel, "target_entity") == 0)  target_entity  = vValue;
-	else if (strcmp(lLabel, "target_address") == 0) target_address = vValue;
+	     if (orig_entity_label == lLabel)    orig_entity    = vValue;
+	else if (orig_address_label == lLabel)   orig_address   = vValue;
+	else if (target_entity_label == lLabel)  target_entity  = vValue;
+	else if (target_address_label == lLabel) target_address = vValue;
+	else if (version_label == lLabel)        return protocol_version == vValue; //TODO: add logging for bad version
 	else return false;
 	return true;
 	}
@@ -197,13 +186,23 @@ inline static bool ATTR_INL local_check_su()
 	bool transmit_block::uinteger_property(const char *lLabel, unsigned int vValue)
 	{
 	if (!lLabel) return false;
-	     if (strcmp(lLabel, "priority") == 0)         priority         = vValue;
-	else if (strcmp(lLabel, "orig_reference") == 0)   orig_reference   = vValue;
-	else if (strcmp(lLabel, "target_reference") == 0) target_reference = vValue;
-	else if (strcmp(lLabel, "remote_reference") == 0) remote_reference = vValue;
-	else if (strcmp(lLabel, "creator_pid") == 0)      creator_pid      = vValue;
-	else if (strcmp(lLabel, "send_time") == 0)        send_time        = vValue;
+	     if (priority_label == lLabel)         priority             = vValue;
+	else if (orig_reference_label == lLabel)   orig_reference       = vValue;
+	else if (target_reference_label == lLabel) target_reference     = vValue;
+	else if (remote_reference_label == lLabel) remote_reference     = vValue;
+	else if (creator_pid_label == lLabel)      creator_pid          = vValue;
+	else if (time_label == lLabel)             send_time            = vValue;
+	else if (silent_response_label == lLabel)  silent_auto_response = vValue;
 	else return false;
+	return true;
+	}
+
+	const transmit_block *transmit_block::show_command() const
+	{ return target_address.size()? this : NULL; }
+
+	bool transmit_block::copy_base(transmit_block &eEqual) const
+	{
+	eEqual.property_equal(*this);
 	return true;
 	}
 
@@ -220,34 +219,40 @@ inline static bool ATTR_INL local_check_su()
 
 	oOutput->send_output("  !route {\n");
 
-	snprintf(buffer, sizeof buffer, "    priority = !x%X\n", (unsigned int) priority);
+	snprintf(buffer, sizeof buffer, "    %s = %s\n", version_label.c_str(), protocol_version.c_str());
 	oOutput->send_output(buffer);
 
-	snprintf(buffer, sizeof buffer, "    orig_reference = !x%X\n", (unsigned int) orig_reference);
+	snprintf(buffer, sizeof buffer, "    %s = !x%X\n", priority_label.c_str(), (unsigned int) priority);
 	oOutput->send_output(buffer);
 
-	snprintf(buffer, sizeof buffer, "    target_reference = !x%X\n", (unsigned int) target_reference);
+	snprintf(buffer, sizeof buffer, "    %s = !x%X\n", orig_reference_label.c_str(), (unsigned int) orig_reference);
 	oOutput->send_output(buffer);
 
-	snprintf(buffer, sizeof buffer, "    remote_reference = !x%X\n", (unsigned int) remote_reference);
+	snprintf(buffer, sizeof buffer, "    %s = !x%X\n", target_reference_label.c_str(), (unsigned int) target_reference);
 	oOutput->send_output(buffer);
 
-	snprintf(buffer, sizeof buffer, "    creator_pid = !x%X\n", (unsigned int) creator_pid);
+	snprintf(buffer, sizeof buffer, "    %s = !x%X\n", remote_reference_label.c_str(), (unsigned int) remote_reference);
 	oOutput->send_output(buffer);
 
-	snprintf(buffer, sizeof buffer, "    send_time = !x%X\n", (unsigned int) send_time);
+	snprintf(buffer, sizeof buffer, "    %s = !x%X\n", creator_pid_label.c_str(), (unsigned int) creator_pid);
 	oOutput->send_output(buffer);
 
-	snprintf(buffer, sizeof buffer, "    orig_entity = %s\n", orig_entity.c_str());
+	snprintf(buffer, sizeof buffer, "    %s = !x%X\n", silent_response_label.c_str(), (unsigned int) send_time);
 	oOutput->send_output(buffer);
 
-	snprintf(buffer, sizeof buffer, "    orig_address = %s\n", orig_address.c_str());
+	snprintf(buffer, sizeof buffer, "    %s = !x%X\n", time_label.c_str(), (unsigned int) silent_auto_response);
 	oOutput->send_output(buffer);
 
-	snprintf(buffer, sizeof buffer, "    target_entity = %s\n", target_entity.c_str());
+	snprintf(buffer, sizeof buffer, "    %s = %s\n", orig_entity_label.c_str(), orig_entity.c_str());
 	oOutput->send_output(buffer);
 
-	snprintf(buffer, sizeof buffer, "    target_address = %s\n", target_address.c_str());
+	snprintf(buffer, sizeof buffer, "    %s = %s\n", orig_address_label.c_str(), orig_address.c_str());
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    %s = %s\n", target_entity_label.c_str(), target_entity.c_str());
+	oOutput->send_output(buffer);
+
+	snprintf(buffer, sizeof buffer, "    %s = %s\n", target_address_label.c_str(), target_address.c_str());
 	oOutput->send_output(buffer);
 
 	oOutput->send_output("  }\n");
@@ -367,20 +372,33 @@ inline static bool ATTR_INL local_check_su()
 
 	permission_mask transmit_block::execute_permissions() const
 	{ return command? command->execute_permissions() : type_none; }
+	//----------------------------------------------------------------------
 
-	const transmit_block *transmit_block::show_command() const
-	{ return target_address.size()? this : NULL; }
 
-	bool transmit_block::copy_base(transmit_block &eEqual) const
+	void transmit_block::property_equal(const transmit_block &eEqual)
 	{
-	if (&eEqual == this) return true;
-	eEqual = *this;
-	eEqual.set_command_data(NULL);
-	eEqual.set_command(NULL);
-	eEqual.set_child(section_releaser(NULL));
+	if (&eEqual == this) return;
+
+	this->command_info::operator = (eEqual);
+
+	execute_type = eEqual.execute_type;
+	no_send      = eEqual.no_send;
+	send_to      = eEqual.send_to;
+
+	finder        = eEqual.finder;
+	output_mode   = eEqual.output_mode;
+	command_label = eEqual.command_label;
+	}
+
+
+	bool transmit_block::assemble_command()
+	{
+	if (!command) return false;
+	storage_section *new_tree = command->assemble_command();
+	if (!new_tree) return false;
+	this->set_command_data(new_tree);
 	return true;
 	}
-	//----------------------------------------------------------------------
 
 
 	void transmit_block::export_tree(const storage_section *sSection,
@@ -437,27 +455,3 @@ inline static bool ATTR_INL local_check_su()
 	current = current->next();
 	 }
 	}
-
-
-	//from 'data_output'----------------------------------------------------
-	bool transmit_block::send_output(const output_section &dData)
-	{
-	if (extracted_command.size() + dData.size() > PARAM_MAX_COMMAND_DATA)
-	 {
-    log_command_extract_holding_exceeded();
-	return false;
-	 }
-
-	extracted_command += dData;
-	return true;
-	}
-
-	bool transmit_block::is_closed() const
-	{ return false; }
-
-	bool transmit_block::set_output_mode(unsigned int mMode)
-	{
-	output_mode = mMode;
-	return true;
-	}
-	//----------------------------------------------------------------------

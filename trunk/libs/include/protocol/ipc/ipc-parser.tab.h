@@ -69,7 +69,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 57 "ipc-parser.y"
+#line 62 "ipc-parser.y"
 
 	struct {
 	char         *string;

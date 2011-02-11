@@ -50,7 +50,7 @@ result load_server_commands() ATTR_INT;
 void cleanup_server_command() ATTR_INT;
 
 struct transmit_block;
-external_command *empty_server_command(transmit_block&, const text_data&) ATTR_INT;
+bool empty_server_command(transmit_block&, const text_data&) ATTR_INT;
 
 
 bool take_terminal_control(pid_t, pid_t, entity_type, command_priority) ATTR_INT;

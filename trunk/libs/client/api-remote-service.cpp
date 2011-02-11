@@ -62,8 +62,13 @@ result remote_service_broken_connection(const struct remote_service_data *dData)
 
 	if (dData->direction == RSERVR_REMOTE_TOWARD_CLIENT && dData->notify_entity && dData->notify_address)
 	{
-	if (!new_block.set_command( section_releaser(new proto_deregister_own_service(dData->service_name)) ))
+	external_command *new_command = new proto_deregister_own_service(dData->service_name);
+	if (!new_block.set_command(new_command))
+	 {
+	delete new_command;
 	return false;
+	 }
+	//NOTE: 'new_block' now owns 'new_command'
 	if (!lookup_command(new_block.command_name(), new_block.execute_type)) return false;
 	new_block.orig_entity = dData->current_target;
 
@@ -71,15 +76,20 @@ result remote_service_broken_connection(const struct remote_service_data *dData)
 	new_block.target_address = dData->notify_address;
 
 	if (set_to_server_scope(new_block.target_entity, new_block.target_address))
-	if (!new_output(&new_block)) return false;
+	if (!new_block.command_sendable() || !new_output(&new_block)) return false;
 	}
 
 
 	if (strlen(dData->notify_address) && dData->notify_entity)
 	{
-	if (!new_block.set_command( section_releaser(
-	  new proto_remote_service_disconnect(dData->direction, dData->service_name, dData->complete_address) ) ))
+	external_command *new_command = new proto_remote_service_disconnect(dData->direction,
+	    dData->service_name, dData->complete_address);
+	if (!new_block.set_command(new_command))
+	 {
+	delete new_command;
 	return false;
+	 }
+	//NOTE: 'new_block' now owns 'new_command'
 	if (!lookup_command(new_block.command_name(), new_block.execute_type)) return false;
 	new_block.orig_entity    = dData->current_target;
 	new_block.target_entity  = dData->notify_entity;

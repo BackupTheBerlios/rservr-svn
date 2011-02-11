@@ -456,7 +456,7 @@ result set_program_name(text_info nName)
 }
 
 
-external_command *empty_server_command(transmit_block &bBase, const text_data &nName)
+bool empty_server_command(transmit_block &bBase, const text_data &nName)
 {
 	bBase.execute_type = command_null;
 	external_command *new_command = NULL;
@@ -473,7 +473,7 @@ external_command *empty_server_command(transmit_block &bBase, const text_data &n
 	else
 	{
 	if (!server_commands.get_element(position).parse_permissions())
-	return NULL;
+	return false;
 
 	new_type = server_commands.get_element(position).execution_type();
 
@@ -494,11 +494,15 @@ external_command *empty_server_command(transmit_block &bBase, const text_data &n
 	new_command = server_commands.get_element(position).new_command(nName);
 	}
 
-	if (bBase.set_command( section_releaser(new_command) ))
+	if (!bBase.set_command(new_command))
 	{
-	bBase.execute_type = new_type;
-	return new_command;
+	delete new_command;
+	return false;
 	}
 
-	else return NULL;
+	else
+	{
+	bBase.execute_type = new_type;
+	return true;
+	}
 }

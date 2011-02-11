@@ -1102,10 +1102,6 @@ entity_handle hHandle, transmit_block *cCommand)
 	  {
     log_server_reparse_command(cCommand->command_name(), cCommand->target_entity.c_str());
 
-	//NOTE: must reparse to requeue since the command will be a 'null_command'
-	cstring_input copied_data(cCommand->extract());
-	cCommand->set_command(section_releaser(NULL));
-
 	execute_queue::insert_type copied_command = NULL;
 	copied_command = new execute_queue::create_type(
 	    (entity_handle) &cClientTable->get_element(position1), *cCommand );
@@ -1115,7 +1111,7 @@ entity_handle hHandle, transmit_block *cCommand)
 	return false;
 	   }
 
-	if (!import_data(&copied_command->value(), &copied_data))
+	if (!copied_command->find_command())
 	   {
 	delete copied_command;
 	send_server_response(*cCommand, event_error);
@@ -1287,7 +1283,7 @@ entity_handle hHandle, transmit_block *cCommand)
 	send_protected_output new_output(cClientTable->get_element(position2).response_output());
 
 
-	if (!new_output(cCommand))
+	if (!cCommand->command_sendable() || !new_output(cCommand))
 	{
 	if (new_output.is_terminated)
 	 {

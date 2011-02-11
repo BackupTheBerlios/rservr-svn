@@ -69,10 +69,13 @@ struct command_info;
 class external_command
 {
 public:
+	external_command(const text_data&);
+
 	virtual bool compile_command(const storage_section*) = 0;
 	virtual storage_section *assemble_command() const = 0;
 	virtual external_command *copy() const = 0;
 
+	virtual text_info command_name() const;
 	virtual command_event evaluate_server(const command_info&, server_interface*) const = 0;
 	virtual command_event evaluate_client(const command_info&, client_interface*) const = 0;
 	virtual command_priority override_priority(command_priority) const;
@@ -94,6 +97,8 @@ protected:
 	static result manual_response(const command_info&, section_releaser);
 	static result auto_response(const command_info&, command_event, text_info);
 	static result auto_response_list(const command_info&, command_event, info_list);
+
+	text_data command_label;
 };
 
 
@@ -119,6 +124,7 @@ enum section_type {  empty_section = 0x00,
 
 struct element_interface
 {
+	//TODO: rename these functions
 	virtual const text_data &get_name() const  = 0;
 	virtual section_type     data_type() const = 0;
 	virtual text_info        get_data() const  = 0;
