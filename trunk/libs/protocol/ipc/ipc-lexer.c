@@ -535,7 +535,9 @@ ssize_t get_input(struct data_input*, char*, ssize_t);
 #define YY_INPUT(buffer,result,max_size) \
 { result = get_input(yyextra->input, buffer, max_size); }
 
-#line 539 "ipc-lexer.c"
+#define ECHO /*prevent printing of discarded data*/
+
+#line 541 "ipc-lexer.c"
 
 #define INITIAL 0
 #define TEXT_DATA 1
@@ -775,13 +777,13 @@ YY_DECL
 	register int yy_act;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
-#line 74 "ipc-lexer.l"
+#line 76 "ipc-lexer.l"
 
 
 
 	/*NOTE: '<TEXT_DATA>' and '<BINARY_DATA>' must be first!*/
 
-#line 785 "ipc-lexer.c"
+#line 787 "ipc-lexer.c"
 
     yylval = yylval_param;
 
@@ -868,7 +870,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 79 "ipc-lexer.l"
+#line 81 "ipc-lexer.l"
 {
 		if (yylval->data.length < yylval->data.target - 1)
 		yylval->data.string[yylval->data.length++] = *yytext;
@@ -882,7 +884,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 90 "ipc-lexer.l"
+#line 92 "ipc-lexer.l"
 {
 		if (yylval->data.length < yylval->data.target)
 		yylval->data.string[yylval->data.length++] = *yytext;
@@ -895,33 +897,33 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 100 "ipc-lexer.l"
+#line 102 "ipc-lexer.l"
 {
 		return COMMAND_START; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 103 "ipc-lexer.l"
+#line 105 "ipc-lexer.l"
 {
 		return ROUTE_START; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 106 "ipc-lexer.l"
+#line 108 "ipc-lexer.l"
 {
 		parse_s_integer10(yytext + 1, &yylval->s_integer);
 		return SINTEGER; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 110 "ipc-lexer.l"
+#line 112 "ipc-lexer.l"
 {
 		parse_u_integer16(yytext + 2, &yylval->u_integer);
 		return UINTEGER; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 114 "ipc-lexer.l"
+#line 116 "ipc-lexer.l"
 {
 		yylval->data.string = strdup(yytext);
 		yylval->data.length = strlen(yytext);
@@ -929,7 +931,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 119 "ipc-lexer.l"
+#line 121 "ipc-lexer.l"
 {
 		yylval->data.string = strdup(yytext);
 		yylval->data.length = strlen(yytext);
@@ -937,7 +939,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 124 "ipc-lexer.l"
+#line 126 "ipc-lexer.l"
 {
 		yylval->data.length = 0;
 		yylval->data.target = 0;
@@ -955,7 +957,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 139 "ipc-lexer.l"
+#line 141 "ipc-lexer.l"
 {
 		yylval->data.length = 0;
 		yylval->data.target = 0;
@@ -972,28 +974,28 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 153 "ipc-lexer.l"
+#line 155 "ipc-lexer.l"
 {
 		return *yytext; }
 	YY_BREAK
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 156 "ipc-lexer.l"
+#line 158 "ipc-lexer.l"
 {}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 158 "ipc-lexer.l"
+#line 160 "ipc-lexer.l"
 {
 	return GARBAGE; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 162 "ipc-lexer.l"
+#line 164 "ipc-lexer.l"
 ECHO;
 	YY_BREAK
-#line 997 "ipc-lexer.c"
+#line 999 "ipc-lexer.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(TEXT_DATA):
 case YY_STATE_EOF(BINARY_DATA):
@@ -2162,7 +2164,7 @@ void protocol_free (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 162 "ipc-lexer.l"
+#line 164 "ipc-lexer.l"
 
 
 

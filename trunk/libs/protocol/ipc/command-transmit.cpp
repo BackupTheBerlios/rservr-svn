@@ -221,20 +221,23 @@ inline static bool ATTR_INL local_check_su()
 	}
 
 
-	//from 'data_exporter'--------------------------------------------------
-	const output_sender *transmit_block::export_data(data_output *oOutput) const
+	//from 'output_sender'--------------------------------------------------
+	const output_sender *transmit_block::send_data(data_output *oOutput) const
 	{
-	if (!command_label.size() || !oOutput) return NULL;
+	if (!strlen(this->command_name()) || !oOutput) return NULL;
 
 	char buffer[256];
 
-	snprintf(buffer, sizeof buffer, "!rservr[%s] {\n", command_label.c_str());
+	snprintf(buffer, sizeof buffer, "!rservr[%s] {\n", this->command_name());
 	oOutput->send_output(buffer);
 
 	oOutput->send_output("  !route {\n");
 
+	if (protocol_version.size())
+	 {
 	snprintf(buffer, sizeof buffer, "    %s = %s\n", version_label.c_str(), protocol_version.c_str());
 	oOutput->send_output(buffer);
+	 }
 
 	snprintf(buffer, sizeof buffer, "    %s = !x%X\n", priority_label.c_str(), (unsigned int) priority);
 	oOutput->send_output(buffer);
@@ -257,17 +260,29 @@ inline static bool ATTR_INL local_check_su()
 	snprintf(buffer, sizeof buffer, "    %s = !x%X\n", time_label.c_str(), (unsigned int) silent_auto_response);
 	oOutput->send_output(buffer);
 
+	if (orig_entity.size())
+	 {
 	snprintf(buffer, sizeof buffer, "    %s = %s\n", orig_entity_label.c_str(), orig_entity.c_str());
 	oOutput->send_output(buffer);
+	 }
 
+	if (orig_address.size())
+	 {
 	snprintf(buffer, sizeof buffer, "    %s = %s\n", orig_address_label.c_str(), orig_address.c_str());
 	oOutput->send_output(buffer);
+	 }
 
+	if (target_entity.size())
+	 {
 	snprintf(buffer, sizeof buffer, "    %s = %s\n", target_entity_label.c_str(), target_entity.c_str());
 	oOutput->send_output(buffer);
+	 }
 
+	if (target_address.size())
+	 {
 	snprintf(buffer, sizeof buffer, "    %s = %s\n", target_address_label.c_str(), target_address.c_str());
 	oOutput->send_output(buffer);
+	 }
 
 	oOutput->send_output("  }\n");
 

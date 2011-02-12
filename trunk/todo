@@ -1,3 +1,20 @@
+12feb11
+- review all commands to make sure that:
+  - all members are initialized when constructed
+  - all members are set when parsing
+  - all members are added when building
+  - parsing and building match (either order or labels)
+- update docs
+  - new library structure
+  - remove old filter-parser script
+- update structure
+  - merge proto- into a single library
+  - rename transmit_block or command-transmit.hpp
+  - rename command.h
+  - make a library for rsv-forward and link all forwarders to it
+    - make an api so it can be extended to e.g. character devices?
+
+
 clean up and update this todo! actually, this is just for testing a commit
 
 20dec08

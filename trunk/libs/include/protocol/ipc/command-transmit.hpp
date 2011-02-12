@@ -37,6 +37,7 @@
 
 #include <hparser/structure-base.hpp>
 #include <hparser/data-output.hpp>
+#include <hparser/output-manager.hpp>
 #include <hparser/classes/string-output.hpp>
 
 #include "common-output.hpp"
@@ -92,7 +93,7 @@ struct command_info
 class transmit_block :
 	public command_info,
 	public structure_base,
-	public data_exporter,
+	public output_manager,
 	private data_output
 {
 public:
@@ -131,8 +132,8 @@ public:
 	response_receiver *send_to;
 	//----------------------------------------------------------------------
 
-	//from 'data_exporter'--------------------------------------------------
-	const output_sender *export_data(data_output*) const;
+	//from 'output_sender'--------------------------------------------------
+	const output_sender *send_data(data_output*) const;
 	//----------------------------------------------------------------------
 
 	//mirrored to 'external_command'----------------------------------------

@@ -44,7 +44,6 @@ extern "C" {
 #include <unistd.h>
 
 #include <hparser/storage-section.hpp>
-#include <hparser/classes/string-input.hpp>
 
 #include "constants.hpp"
 #include "ipc/command-transmit.hpp"
@@ -97,9 +96,7 @@ void protocol_error(protocol_scanner_context*, void*, char*);
 %%
 
 input:
-	error command | command {
-		YYACCEPT; }
-	;
+	error command | command;
 
 command:
 	COMMAND_START '[' LABEL ']' '{' route content '}' {
@@ -218,29 +215,8 @@ content:
 void protocol_error(protocol_scanner_context *cContext, void *sScanner, char *eError)
 {
 	if (cContext && cContext->command)
-    log_command_command_parse_error(eError, cContext->command->command_name(),
+    log_protocol_command_parse_error(eError, cContext->command->command_name(),
       cContext->command->orig_reference, cContext->command->orig_entity.c_str());
 	else
-    log_command_command_parse_error(eError, "", 0, "");
-}
-
-
-extern "C" {
-ssize_t get_input(struct data_input*, char*, ssize_t);
-}
-
-
-ssize_t get_input(data_input *iInput, char *bBuffer, ssize_t mMax)
-{
-	if (!iInput) return 0;
-
-	iInput->set_input_mode(input_binary | input_allow_underrun);
-
-	const input_section &input = iInput->receive_input();
-	ssize_t used = ((signed) input.size() < mMax)? input.size() : mMax;
-
-	memcpy(bBuffer, &input[0], used);
-	iInput->next_input(used);
-
-	return used;
+    log_protocol_command_parse_error(eError, "", 0, "");
 }

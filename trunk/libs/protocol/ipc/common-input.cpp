@@ -39,8 +39,9 @@ extern "C" {
 #include <unistd.h> //'close', 'nanosleep', 'read'
 #include <fcntl.h> //open modes
 #include <errno.h> //'errno'
+#include <string.h> //'memcpy'
 
-#include <hparser/formats/tag-properties.hpp>
+#include <hparser/classes/string-input.hpp>
 
 #include "constants.hpp"
 #include "retry-limit.hpp"
@@ -61,6 +62,23 @@ int protocol_lex_destroy(void*);
 void protocol_set_extra(YY_EXTRA_TYPE, void*);
 int protocol_lex(void*, YYSTYPE*);
 void protocol_set_out(FILE*, void*);
+ssize_t get_input(struct data_input*, char*, ssize_t);
+}
+
+
+ssize_t get_input(data_input *iInput, char *bBuffer, ssize_t mMax)
+{
+	if (!iInput) return 0;
+
+	iInput->set_input_mode(input_binary | input_allow_underrun);
+
+	const input_section &input = iInput->receive_input();
+	ssize_t used = ((signed) input.size() < mMax)? input.size() : mMax;
+
+	memcpy(bBuffer, &input[0], used);
+	iInput->next_input(used);
+
+	return used;
 }
 
 
@@ -102,10 +120,16 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	{
 	if (!cCommand) return false;
 
+	cCommand->clear_command();
+
 	this->set_input_mode(universal_transmission_reset);
 	this->set_input_mode(input_binary); //disable underrun for first read
 
-	struct protocol_scanner_context context = { command: cCommand, input: this };
+	struct protocol_scanner_context context =
+	  { command: cCommand,
+	    input:   static_cast <lexer_input_type> (this) };
+
+	protocol_set_extra(static_cast <YY_EXTRA_TYPE> (&context), scanner);
 	bool outcome = parse_loop(&context, scanner, state) == 0;
 
 	if (!outcome)

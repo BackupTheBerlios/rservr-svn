@@ -145,7 +145,6 @@ bool master_register_client(text_info nName, permission_mask tType)
 	send_protected_output new_output(pipe_output);
 
 	reset_input_standby();
-
 	if (manual_command_status(new_block.orig_reference) && new_block.command_sendable() && new_output(&new_block))
 	{
 	command_event outcome = wait_command_event(new_block.orig_reference, event_complete,

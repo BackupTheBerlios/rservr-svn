@@ -41,10 +41,12 @@ extern "C" {
 struct transmit_block;
 struct data_input;
 
+typedef struct data_input *lexer_input_type;
+
 struct protocol_scanner_context
 {
 	struct transmit_block *command;
-	struct data_input     *input;
+	lexer_input_type       input;
 };
 
 #define YY_EXTRA_TYPE struct protocol_scanner_context*

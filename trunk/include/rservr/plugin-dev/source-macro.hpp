@@ -168,8 +168,8 @@ int            ATTR_UNUSED  RSERVR_TEMP_SVALUE = 0;
 #define RSERVR_CHECK_TO_REMOTE   external_command::is_command_to_remote(RSERVR_INFO_ARG)
 
 #define RSERVR_COMMAND_BUILD_START \
-{ storage_section *command_tree_base = NULL; \
-  storage_section *&command_tree = command_tree_base;
+{ storage_section *command_tree = NULL; \
+  storage_section *&command_tree_base = command_tree;
 
 #define RSERVR_COMMAND_ADD_EMPTY \
   { if (command_tree) command_tree->add_next(new empty_data_section("")); \
@@ -199,10 +199,10 @@ int            ATTR_UNUSED  RSERVR_TEMP_SVALUE = 0;
   { storage_section *command_group = NULL; \
     if (command_tree) command_tree->add_next(command_group = new group_data_section(name)); \
     else command_tree = (command_group = new group_data_section(name)); \
-    { command_tree = command_group;
+    { storage_section *command_tree = NULL;
 
 #define RSERVR_COMMAND_GROUP_END \
-  } }
+      command_group->set_child(command_tree); } }
 
 #define RSERVR_COMMAND_BUILD_ABORT \
   { delete command_tree_base; \

@@ -60,6 +60,8 @@ ssize_t get_input(struct data_input*, char*, ssize_t);
 
 #define YY_INPUT(buffer,result,max_size) \
 { result = get_input(yyextra->input, buffer, max_size); }
+
+#define ECHO /*prevent printing of discarded data*/
 %}
 
 
