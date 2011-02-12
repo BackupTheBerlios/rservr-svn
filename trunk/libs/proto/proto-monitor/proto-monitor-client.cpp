@@ -44,14 +44,7 @@ RSERVR_AUTO_BUILTIN_TAG(set_monitor_types)
 
 	proto_set_monitor_types::proto_set_monitor_types(monitor_event eEvent) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(set_monitor_types)),
-	monitor_types(eEvent)
-	{
-	RSERVR_COMMAND_BUILD_CHECK(set_monitor_types, type_monitor_client, type_server)
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_CONVERT16_ADD(monitor_types)
-	}
+	monitor_types(eEvent) {}
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_set_monitor_types)
@@ -63,17 +56,30 @@ RSERVR_AUTO_BUILTIN_TAG(set_monitor_types)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_set_monitor_types)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(set_monitor_types, type_server, type_any_client)
-	RSERVR_COMMAND_INPUT_SET
 
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(monitor_types)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_PARSE16(monitor_types)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_set_monitor_types)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(set_monitor_types, type_monitor_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_CONVERT16("", monitor_types)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
