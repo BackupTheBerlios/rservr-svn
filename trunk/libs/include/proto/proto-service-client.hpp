@@ -45,6 +45,7 @@ RSERVR_COMMAND_CLASS( proto_service_request, \
 	proto_service_request(text_info); \
 	proto_service_request(binary_info, binary_size);, \
 	/*members*/ \
+	bool binary; \
 	text_data event_origin; \
 	text_data request_message; )
 
@@ -54,6 +55,7 @@ RSERVR_COMMAND_CLASS( proto_service_response, \
 	proto_service_response(text_info); \
 	proto_service_response(binary_info, binary_size);, \
 	/*members*/ \
+	bool binary; \
 	text_data event_origin; \
 	text_data response_message; )
 
@@ -81,7 +83,7 @@ RSERVR_COMMAND_CLASS( proto_partial_response_list, \
 	/*members*/ \
 	text_data     event_origin; \
 	response_type event_type; \
-	data_list response_data; )
+	data_list     response_data; )
 
 
 RSERVR_COMMAND_CLASS( proto_find_services, \

@@ -32,6 +32,8 @@
 
 #include "proto-service-client.hpp"
 
+#include <string.h> //'memcpy'
+
 #include "api-source-macro.hpp"
 #include "load-macro.hpp"
 #include "protocol/constants.hpp"
@@ -45,30 +47,15 @@ RSERVR_AUTO_BUILTIN_TAG(service_request)
 
 	proto_service_request::proto_service_request(text_info mMessage) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(service_request)),
-	event_origin(entity_name()), request_message(mMessage? mMessage : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(service_request, type_service_client, type_server)
-
-	RSERVR_COMMAND_ADD_TEXT(event_origin)
-	RSERVR_COMMAND_ADD_BINARY(request_message)
-	}
+	binary(false), event_origin(entity_name()), request_message(mMessage? mMessage : "") {}
 
 
 	proto_service_request::proto_service_request(binary_info mMessage, binary_size sSize) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(service_request)),
-	event_origin(entity_name())
+	binary(true), event_origin(entity_name())
 	{
-	RSERVR_COMMAND_BUILD_CHECK(service_request, type_service_client, type_server)
-
-	set_property(this->command_properties, binary_label);
-
 	request_message.resize(sSize);
-
-	if (mMessage) for (unsigned int I = 0; I < sSize; I++)
-	request_message[I] = (char) mMessage[I];
-
-	RSERVR_COMMAND_ADD_TEXT(event_origin)
-	RSERVR_COMMAND_ADD_BINARY(request_message)
+	if (mMessage) memcpy(&request_message[0], mMessage, sSize);
 	}
 
 
@@ -78,8 +65,7 @@ RSERVR_AUTO_BUILTIN_TAG(service_request)
 
 	struct incoming_request_data request = { __n1: {
 	  __message: request_message.c_str() },
-	     __size: is_property_set(this->command_properties, binary_label)?
-	               request_message.size() : 0 };
+	     __size: binary? request_message.size() : 0 };
 	return RSERVR_CLIENT_ARG->register_request(RSERVR_INFO_ARG, &request)?
 	  RSERVR_EVAL_NONE : RSERVR_EVAL_REJECTED;
 	}
@@ -87,21 +73,42 @@ RSERVR_AUTO_BUILTIN_TAG(service_request)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_service_request)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(service_request, type_active_client, type_admin_client)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	event_origin.clear();
 	request_message.clear();
 
-	RSERVR_AUTO_COPY_TEXT(event_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(request_message)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(event_origin)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	 {
+	binary = RSERVR_COMMAND_TYPE == binary_section;
+	RSERVR_COMMAND_COPY_DATA(request_message)
+	 }
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_service_request)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(service_request, type_service_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", event_origin)
+
+	if (binary) RSERVR_COMMAND_ADD_BINARY("", request_message)
+	else        RSERVR_COMMAND_ADD_TEXT("", request_message)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -122,30 +129,15 @@ RSERVR_AUTO_BUILTIN_TAG(service_response)
 
 	proto_service_response::proto_service_response(text_info mMessage) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(service_response)),
-	event_origin(entity_name()), response_message(mMessage? mMessage : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(service_response, type_resource_client, type_server)
-
-	RSERVR_COMMAND_ADD_TEXT(event_origin)
-	RSERVR_COMMAND_ADD_BINARY(response_message)
-	}
+	binary(false), event_origin(entity_name()), response_message(mMessage? mMessage : "") {}
 
 
 	proto_service_response::proto_service_response(binary_info mMessage, binary_size sSize) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(service_response)),
-	event_origin(entity_name())
+	binary(true), event_origin(entity_name())
 	{
-	RSERVR_COMMAND_BUILD_CHECK(service_response, type_resource_client, type_server)
-
-	set_property(this->command_properties, binary_label);
-
 	response_message.resize(sSize);
-
-	if (mMessage) for (unsigned int I = 0; I < sSize; I++)
-	response_message[I] = (char) mMessage[I];
-
-	RSERVR_COMMAND_ADD_TEXT(event_origin)
-	RSERVR_COMMAND_ADD_BINARY(response_message)
+	if (mMessage) memcpy(&response_message[0], mMessage, sSize);
 	}
 
 
@@ -166,9 +158,8 @@ RSERVR_AUTO_BUILTIN_TAG(service_response)
 	struct incoming_response_data response = {
 	  __dimension: single_message, __n1: { __n2: { __n3: {
 	    __message: response_message.c_str() },
-	       __size: is_property_set(this->command_properties, binary_label)?
-	                 response_message.size() : 0}},
-	     __type:      response_normal };
+	       __size: binary? response_message.size() : 0}},
+	       __type: response_normal };
 	bool outcome = RSERVR_CLIENT_ARG->register_response(RSERVR_INFO_ARG, &response);
 
 	if (!RSERVR_CHECK_FROM_REMOTE)
@@ -182,21 +173,42 @@ RSERVR_AUTO_BUILTIN_TAG(service_response)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_service_response)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(service_response, type_active_client, type_admin_client)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	event_origin.clear();
 	response_message.clear();
 
-	RSERVR_AUTO_COPY_TEXT(event_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(response_message)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(event_origin)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	 {
+	binary = RSERVR_COMMAND_TYPE == binary_section;
+	RSERVR_COMMAND_COPY_DATA(response_message)
+	 }
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_service_response)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(service_response, type_resource_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", event_origin)
+
+	if (binary) RSERVR_COMMAND_ADD_BINARY("", response_message)
+	else        RSERVR_COMMAND_ADD_TEXT("", response_message)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -218,21 +230,7 @@ RSERVR_AUTO_BUILTIN_TAG(service_response_list)
 	proto_service_response_list::proto_service_response_list(info_list lList) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(service_response_list)),
 	event_origin(entity_name())
-	{
-	RSERVR_COMMAND_BUILD_CHECK(service_response_list, type_resource_client, type_server)
-
-	RSERVR_COMMAND_ADD_TEXT(event_origin)
-
-	storage_section *new_section = NULL;
-
-	RSERVR_COMMAND_ADD_SECTION(new_section);
-
-	if (new_section && lList) while (*lList)
-	 {
-	RSERVR_COMMAND_ADD_BINARY_TO_SECTION(new_section, *lList)
-	response_data.push_back(*lList++);
-	 }
-	}
+	{ while (*lList) response_data.push_back(*lList++); }
 
 
 	RSERVR_CLIENT_EVAL_HEAD(proto_service_response_list)
@@ -271,21 +269,52 @@ RSERVR_AUTO_BUILTIN_TAG(service_response_list)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_service_response_list)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(service_response_list, type_active_client, type_admin_client)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	event_origin.clear();
 	response_data.clear();
 
-	RSERVR_AUTO_COPY_ANY(event_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_ADD_LIST(response_data)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(event_origin)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	 {
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_GROUP)
+
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_TYPE & (text_section | binary_section))
+	response_data.push_back(RSERVR_COMMAND_DATA);
+
+	RSERVR_COMMAND_DEFAULT return false;
+
+	RSERVR_COMMAND_PARSE_END
+	 }
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_service_response_list)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(service_response_list, type_resource_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", event_origin)
+
+	RSERVR_COMMAND_GROUP_START("")
+
+	for (int I = 0; I < (signed) response_data.size(); I++)
+	RSERVR_COMMAND_ADD_TEXT("", response_data[I])
+
+	RSERVR_COMMAND_GROUP_END
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -309,16 +338,7 @@ RSERVR_AUTO_BUILTIN_TAG(partial_response)
 	text_info mMessage) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(partial_response)),
 	event_origin(entity_name()), event_type(tType),
-	response_message(mMessage? mMessage : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(partial_response, type_resource_client, type_server)
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(event_origin)
-	RSERVR_CONVERT16_ADD(event_type)
-	RSERVR_COMMAND_ADD_BINARY(response_message)
-	}
+	response_message(mMessage? mMessage : "") {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(proto_partial_response)
@@ -352,24 +372,41 @@ RSERVR_AUTO_BUILTIN_TAG(partial_response)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_partial_response)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(partial_response, type_active_client, type_admin_client)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	event_origin.clear();
 	response_message.clear();
 
-	RSERVR_AUTO_COPY_TEXT(event_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(event_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(event_origin)
 
-	RSERVR_AUTO_COPY_ANY(response_message)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_PARSE16(event_type)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_COPY_DATA(response_message)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_partial_response)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(partial_response, type_resource_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", event_origin)
+	RSERVR_COMMAND_CONVERT16("", event_type)
+	RSERVR_COMMAND_ADD_TEXT("", response_message)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -393,24 +430,7 @@ RSERVR_AUTO_BUILTIN_TAG(partial_response_list)
 	info_list lList) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(partial_response_list)),
 	event_origin(entity_name()), event_type(tType)
-	{
-	RSERVR_COMMAND_BUILD_CHECK(partial_response_list, type_resource_client, type_server)
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(event_origin)
-	RSERVR_CONVERT16_ADD(event_type)
-
-	storage_section *new_section = NULL;
-
-	RSERVR_COMMAND_ADD_SECTION(new_section);
-
-	if (new_section && lList) while (*lList)
-	 {
-	RSERVR_COMMAND_ADD_BINARY_TO_SECTION(new_section, *lList)
-	response_data.push_back(*lList++);
-	 }
-	}
+	{ while (*lList) response_data.push_back(*lList++); }
 
 
 	RSERVR_CLIENT_EVAL_HEAD(proto_partial_response_list)
@@ -449,21 +469,56 @@ RSERVR_AUTO_BUILTIN_TAG(partial_response_list)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_partial_response_list)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(partial_response_list, type_active_client, type_admin_client)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	event_origin.clear();
 	response_data.clear();
 
-	RSERVR_AUTO_COPY_ANY(event_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_ADD_LIST(response_data)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(event_origin)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_PARSE16(event_type)
+
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	 {
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_GROUP)
+
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_TYPE & (text_section | binary_section))
+	response_data.push_back(RSERVR_COMMAND_DATA);
+
+	RSERVR_COMMAND_DEFAULT return false;
+
+	RSERVR_COMMAND_PARSE_END
+	 }
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_partial_response_list)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(partial_response_list, type_resource_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", event_origin)
+	RSERVR_COMMAND_CONVERT16("", event_type)
+
+	RSERVR_COMMAND_GROUP_START("")
+
+	for (int I = 0; I < (signed) response_data.size(); I++)
+	RSERVR_COMMAND_ADD_TEXT("", response_data[I])
+
+	RSERVR_COMMAND_GROUP_END
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -485,13 +540,7 @@ RSERVR_AUTO_BUILTIN_TAG(find_services)
 	proto_find_services::proto_find_services(text_info nName,
 	text_info tType) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(find_services)),
-	name_expression(nName? nName : ""), type_expression(tType? tType : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(find_services, type_service_client, type_server)
-
-	RSERVR_COMMAND_ADD_BINARY(name_expression)
-	RSERVR_COMMAND_ADD_BINARY(type_expression)
-	}
+	name_expression(nName? nName : ""), type_expression(tType? tType : "") {}
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_find_services)
@@ -504,21 +553,37 @@ RSERVR_AUTO_BUILTIN_TAG(find_services)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_find_services)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(find_services, type_active_client, type_none)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	name_expression.clear();
 	type_expression.clear();
 
-	RSERVR_AUTO_COPY_ANY(name_expression)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(type_expression)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(name_expression)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(type_expression)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_find_services)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(find_services, type_service_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", name_expression)
+	RSERVR_COMMAND_ADD_TEXT("", type_expression)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
