@@ -44,12 +44,7 @@ RSERVR_AUTO_BUILTIN_TAG(find_control_clients)
 
 	proto_find_control_clients::proto_find_control_clients(text_info nName) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(find_control_clients)),
-	name_expression(nName? nName : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(find_control_clients, type_control_client, type_server)
-
-	RSERVR_COMMAND_ADD_BINARY(name_expression)
-	}
+	name_expression(nName? nName : "") {}
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_find_control_clients)
@@ -61,18 +56,32 @@ RSERVR_AUTO_BUILTIN_TAG(find_control_clients)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_find_control_clients)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(find_control_clients, type_active_client, type_none)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	name_expression.clear();
 
-	RSERVR_AUTO_COPY_ANY(name_expression)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(name_expression)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_find_control_clients)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(find_control_clients, type_control_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", name_expression)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
