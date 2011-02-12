@@ -49,13 +49,7 @@ extern "C" {
 
 	rsvp_rqsrvc_register_services::rsvp_rqsrvc_register_services(text_info aAddress) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_rqsrvc_register_services_tag),
-	request_origin(get_client_name()), register_type(aAddress? aAddress : "")
-	{
-	PLUGIN_BUILD_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(register_services))
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_COMMAND_ADD_BINARY(register_type)
-	}
+	request_origin(get_client_name()), register_type(aAddress? aAddress : "") {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_rqsrvc_register_services)
@@ -72,21 +66,37 @@ extern "C" {
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_rqsrvc_register_services)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(register_services))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 	register_type.clear();
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(register_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(register_type)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_rqsrvc_register_services)
+	{
+	PLUGIN_BUILD_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(register_services))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", register_type)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -100,13 +110,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqsrvc_register_services, rsvp_rqsrvc_regist
 
 	rsvp_rqsrvc_deregister_services::rsvp_rqsrvc_deregister_services(text_info aAddress) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_rqsrvc_deregister_services_tag),
-	request_origin(get_client_name()), deregister_type(aAddress? aAddress : "")
-	{
-	PLUGIN_BUILD_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(deregister_services))
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_COMMAND_ADD_BINARY(deregister_type)
-	}
+	request_origin(get_client_name()), deregister_type(aAddress? aAddress : "") {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_rqsrvc_deregister_services)
@@ -123,21 +127,37 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqsrvc_register_services, rsvp_rqsrvc_regist
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_rqsrvc_deregister_services)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(deregister_services))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 	deregister_type.clear();
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(deregister_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(deregister_type)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_rqsrvc_deregister_services)
+	{
+	PLUGIN_BUILD_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(deregister_services))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", deregister_type)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
