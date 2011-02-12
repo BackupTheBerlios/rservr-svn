@@ -50,6 +50,7 @@ RSERVR_COMMAND_CLASS( proto_create_client, \
 	unsigned char create_type; \
 	uid_t user_id; \
 	gid_t group_id; \
+	bool return_pid; \
 	command_priority min_priority; \
 	permission_mask max_permissions; \
 	create_flags options; \

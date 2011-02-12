@@ -144,25 +144,25 @@ int            ATTR_UNUSED  RSERVR_TEMP_SVALUE = 0;
 #define RSERVR_COMMAND_COPY_DATA(variable) \
 { variable = RSERVR_COMMAND_DATA; }
 
-#define RSERVR_COMMAND_PARSE16(variable) { \
-unsigned int RSERVR_TEMP_UVALUE = 0; \
-if (!parse_integer16(RSERVR_COMMAND_DATA, &RSERVR_TEMP_UVALUE)) return false; \
-variable = RSERVR_TEMP_UVALUE; }
+#define RSERVR_COMMAND_PARSE16(variable) \
+{ unsigned int RSERVR_TEMP_UVALUE = 0; \
+  if (!parse_integer16(RSERVR_COMMAND_DATA, &RSERVR_TEMP_UVALUE)) return false; \
+  variable = RSERVR_TEMP_UVALUE; }
 
-#define RSERVR_COMMAND_PARSE10(variable) { \
-unsigned int RSERVR_TEMP_SVALUE = 0; \
-if (!parse_integer10(RSERVR_COMMAND_DATA.c_str(), &RSERVR_TEMP_SVALUE)) return false; \
-variable = RSERVR_TEMP_SVALUE; }
+#define RSERVR_COMMAND_PARSE10(variable) \
+{ int RSERVR_TEMP_SVALUE = 0; \
+  if (!parse_integer10(RSERVR_COMMAND_DATA, &RSERVR_TEMP_SVALUE)) return false; \
+  variable = RSERVR_TEMP_SVALUE; }
 
-#define RSERVR_COMMAND_PARSE16_MAYBE(result, variable) { \
-unsigned int RSERVR_TEMP_UVALUE = 0; \
-if ((result = parse_integer16(RSERVR_COMMAND_DATA, &RSERVR_TEMP_UVALUE))) \
-variable = RSERVR_TEMP_UVALUE; }
+#define RSERVR_COMMAND_PARSE16_MAYBE(result, variable) \
+{ unsigned int RSERVR_TEMP_UVALUE = 0; \
+  if ((result = parse_integer16(RSERVR_COMMAND_DATA, &RSERVR_TEMP_UVALUE))) \
+  variable = RSERVR_TEMP_UVALUE; }
 
-#define RSERVR_COMMAND_PARSE10_MAYBE(result, variable) { \
-unsigned int RSERVR_TEMP_SVALUE = 0; \
-if ((result = parse_integer10(RSERVR_COMMAND_DATA, &RSERVR_TEMP_SVALUE))) \
-variable = RSERVR_TEMP_SVALUE; }
+#define RSERVR_COMMAND_PARSE10_MAYBE(result, variable) \
+{ int RSERVR_TEMP_SVALUE = 0; \
+  if ((result = parse_integer10(RSERVR_COMMAND_DATA, &RSERVR_TEMP_SVALUE))) \
+  variable = RSERVR_TEMP_SVALUE; }
 
 #define RSERVR_CHECK_FROM_REMOTE external_command::is_command_from_remote(RSERVR_INFO_ARG)
 #define RSERVR_CHECK_TO_REMOTE   external_command::is_command_to_remote(RSERVR_INFO_ARG)

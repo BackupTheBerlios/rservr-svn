@@ -50,8 +50,11 @@ RSERVR_AUTO_BUILTIN_TAG(create_client)
 const text_data proto_create_client_system = "system";
 const text_data proto_create_client_exec   = "exec";
 
+#define CREATE_SYSTEM 0x01
+#define CREATE_EXEC   0x02
+
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_create_client),
-	create_type(0x00), user_id(0), group_id(0), min_priority(0),
+	create_type(0x00), user_id(0), group_id(0), return_pid(false), min_priority(0),
 	max_permissions(0), options(0x00) { }
 
 
@@ -59,64 +62,25 @@ const text_data proto_create_client_exec   = "exec";
 	gid_t gGid, command_priority pPriority, permission_mask pPerm,
 	create_flags fFlags, bool pProcess) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(create_client)),
-	create_type(0x01), user_id(uUid), group_id(gGid), min_priority(pPriority),
-	max_permissions(pPerm), options(fFlags)
-	{
-	RSERVR_COMMAND_BUILD_CHECK(create_client, type_admin_client, type_server)
-
-	if (pProcess) set_property(this->command_properties, return_pid_label);
-
-	RSERVR_TEMP_CONVERSION
-
-	command_text.push_back(cCommand? cCommand : "");
-
-	RSERVR_COMMAND_ADD_TEXT(proto_create_client_system)
-	RSERVR_CONVERT16_ADD(user_id)
-	RSERVR_CONVERT16_ADD(group_id)
-	RSERVR_CONVERT16_ADD(min_priority)
-	RSERVR_CONVERT16_ADD(max_permissions)
-	RSERVR_CONVERT16_ADD(options)
-	RSERVR_COMMAND_ADD_BINARY(cCommand? cCommand : "")
-	}
+	create_type(CREATE_SYSTEM), user_id(uUid), group_id(gGid), return_pid(pProcess),
+	min_priority(pPriority), max_permissions(pPerm), options(fFlags)
+	{ command_text.push_back(cCommand? cCommand : ""); }
 
 
 	proto_create_client::proto_create_client(info_list cCommand, uid_t uUid,
 	gid_t gGid, command_priority pPriority, permission_mask pPerm,
 	create_flags fFlags, bool pProcess) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(create_client)),
-	create_type(0x02), user_id(uUid), group_id(gGid), min_priority(pPriority),
-	max_permissions(pPerm), options(fFlags)
-	{
-	RSERVR_COMMAND_BUILD_CHECK(create_client, type_admin_client, type_server)
-
-	if (pProcess) set_property(this->command_properties, return_pid_label);
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(proto_create_client_exec)
-	RSERVR_CONVERT16_ADD(user_id)
-	RSERVR_CONVERT16_ADD(group_id)
-	RSERVR_CONVERT16_ADD(min_priority)
-	RSERVR_CONVERT16_ADD(max_permissions)
-	RSERVR_CONVERT16_ADD(options)
-
-	storage_section *new_section = NULL;
-
-	RSERVR_COMMAND_ADD_SECTION(new_section);
-
-	if (new_section && cCommand) while (*cCommand)
-	 {
-	RSERVR_COMMAND_ADD_BINARY_TO_SECTION(new_section, *cCommand)
-	command_text.push_back(*cCommand++);
-	 }
-	}
+	create_type(CREATE_EXEC), user_id(uUid), group_id(gGid), return_pid(pProcess),
+	min_priority(pPriority), max_permissions(pPerm), options(fFlags)
+	{ while (*cCommand) command_text.push_back(*cCommand++); }
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_create_client)
 	{
 	pid_t process = -1;
 
-	if (create_type == 0x01)
+	if (create_type == CREATE_SYSTEM)
 	 {
 	if (command_text.size() != 1) return RSERVR_EVAL_REJECTED;
 	std::string temporary = command_text[0];
@@ -126,7 +90,7 @@ const text_data proto_create_client_exec   = "exec";
 	return RSERVR_EVAL_REJECTED;
 	 }
 
-	else if (create_type == 0x02)
+	else if (create_type == CREATE_EXEC)
 	 {
 	if (command_text.size() < 1) return RSERVR_EVAL_REJECTED;
 	std::vector <text_data> temporary1 = command_text;
@@ -144,8 +108,7 @@ const text_data proto_create_client_exec   = "exec";
 
 	else return RSERVR_EVAL_REJECTED;
 
-	if (!is_property_set(this->command_properties, return_pid_label))
-	return RSERVR_EVAL_COMPLETE;
+	if (!return_pid) return RSERVR_EVAL_COMPLETE;
 
 	char conversion[RSERVR_MAX_CONVERT_SIZE] = { 0x00 };
 	convert_integer10(process, conversion);
@@ -159,53 +122,91 @@ const text_data proto_create_client_exec   = "exec";
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_create_client)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(create_client, type_server, type_any_client)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	command_text.clear();
 
-	RSERVR_EXTRACT_TEXT
-	RSERVR_SET_AUTO_DELETE(type_deleter)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	if      (RSERVR_TEMP_STRING == proto_create_client_system) create_type = 0x01;
-	else if (RSERVR_TEMP_STRING == proto_create_client_exec)   create_type = 0x02;
-	else return NULL;
-
-	RSERVR_UTILIZE(type_deleter)
-
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(user_id)
-
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(group_id)
-
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(min_priority)
-
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(max_permissions)
-
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(options)
-
-
-	if (create_type == 0x01)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_NAME == "type")
 	 {
-	RSERVR_AUTO_ADD_ANY
-	command_text.push_back(RSERVR_TEMP_STRING);
+	if      (proto_create_client_system == RSERVR_COMMAND_DATA)
+	create_type = CREATE_SYSTEM;
+
+	else if (proto_create_client_exec == RSERVR_COMMAND_DATA)
+	create_type = CREATE_EXEC;
+
+	else RSERVR_COMMAND_PARSE_ABORT
 	 }
 
-	else if (create_type == 0x02) RSERVR_AUTO_ADD_LIST(command_text)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_NAME == "uid")
+	RSERVR_COMMAND_PARSE16(user_id)
 
-	else return NULL;
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_NAME == "gid")
+	RSERVR_COMMAND_PARSE16(group_id)
 
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_NAME == "priority")
+	RSERVR_COMMAND_PARSE16(min_priority)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_NAME == "perms")
+	RSERVR_COMMAND_PARSE16(max_permissions)
+
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_NAME == "opt")
+	RSERVR_COMMAND_PARSE16(options)
+
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_NAME == "command")
+	 {
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_GROUP)
+
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_TYPE & (text_section | binary_section))
+	command_text.push_back(RSERVR_COMMAND_DATA);
+
+	RSERVR_COMMAND_DEFAULT return false;
+
+	RSERVR_COMMAND_PARSE_END
+	 }
+
+	RSERVR_COMMAND_DEFAULT return false;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
 	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_create_client)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(create_client, type_admin_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	if      (create_type == CREATE_SYSTEM)
+	RSERVR_COMMAND_ADD_TEXT("type", proto_create_client_system)
+
+	else if (create_type == CREATE_EXEC)
+	RSERVR_COMMAND_ADD_TEXT("type", proto_create_client_exec)
+
+	else RSERVR_COMMAND_BUILD_ABORT
+
+	RSERVR_COMMAND_CONVERT16("uid", user_id)
+	RSERVR_COMMAND_CONVERT16("gid", group_id)
+	RSERVR_COMMAND_CONVERT16("priority", min_priority)
+	RSERVR_COMMAND_CONVERT16("perms", max_permissions)
+	RSERVR_COMMAND_CONVERT16("opt", options)
+
+	RSERVR_COMMAND_GROUP_START("command")
+
+	for (int I = 0; I < (signed) command_text.size(); I++)
+	RSERVR_COMMAND_ADD_TEXT("", command_text[I])
+
+	RSERVR_COMMAND_GROUP_END
+
+	RSERVR_COMMAND_BUILD_END
+	}
+
+
+#undef CREATE_SYSTEM
+#undef CREATE_EXEC
 
 
 RSERVR_SERVER_COMMAND_DEFAULTS(proto_create_client, RSERVR_BUILTIN_TAG(create_client), type_admin_client)
@@ -228,17 +229,7 @@ RSERVR_AUTO_BUILTIN_TAG(detached_client)
 	command_priority pPriority, permission_mask pPerm, create_flags fFlags) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(detached_client)),
 	min_priority(pPriority), max_permissions(pPerm), options(fFlags),
-	socket_name(sSocket? sSocket : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(detached_client, type_admin_client | type_server_control, type_server)
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_CONVERT16_ADD(min_priority)
-	RSERVR_CONVERT16_ADD(max_permissions)
-	RSERVR_CONVERT16_ADD(options)
-	RSERVR_COMMAND_ADD_BINARY(socket_name)
-	}
+	socket_name(sSocket? sSocket : "") {}
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_detached_client)
@@ -250,27 +241,44 @@ RSERVR_AUTO_BUILTIN_TAG(detached_client)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_detached_client)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(detached_client, type_server, type_any_client)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	socket_name.clear();
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(min_priority)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(max_permissions)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(socket_name)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(options)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_PARSE16(min_priority)
 
-	RSERVR_AUTO_COPY_ANY(socket_name)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_PARSE16(max_permissions)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 3)
+	RSERVR_COMMAND_PARSE16(options)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_detached_client)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(detached_client, type_admin_client | type_server_control, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", socket_name)
+	RSERVR_COMMAND_CONVERT16("", min_priority)
+	RSERVR_COMMAND_CONVERT16("", max_permissions)
+	RSERVR_COMMAND_CONVERT16("", options)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -281,6 +289,10 @@ RSERVR_GENERATOR_DEFAULT( proto_detached_client, \
   type_server,                             type_any_client, \
   command_server | command_builtin | command_no_remote );
 //END proto_detached_client command=============================================
+
+
+#define CLIENT_TERM 0x01
+#define CLIENT_KILL 0x02
 
 
 //proto_remove_client command===================================================
@@ -294,34 +306,18 @@ const text_data proto_remove_client_kill = "kill";
 
 	proto_remove_client::proto_remove_client(text_info nName, bool tType) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(remove_client)),
-	remove_type(tType? 0x02 : 0x01), client_name(nName? nName : "")
-	{
-	if (remove_type == 0x01)
-	 {
-	RSERVR_COMMAND_BUILD_CHECK(remove_client, type_admin_client | type_server_control, type_server)
-	 }
-
-	else
-	 {
-	RSERVR_COMMAND_BUILD_CHECK(remove_client, type_admin_client, type_server)
-	 }
-
-	if (remove_type == 0x01)      RSERVR_COMMAND_ADD_TEXT(proto_remove_client_term)
-	else if (remove_type == 0x02) RSERVR_COMMAND_ADD_TEXT(proto_remove_client_kill)
-
-	RSERVR_COMMAND_ADD_TEXT(client_name)
-	}
+	remove_type(tType? CLIENT_KILL : CLIENT_TERM), client_name(nName? nName : "") {}
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_remove_client)
 	{
-	if (remove_type == 0x01)
+	if (remove_type == CLIENT_TERM)
 	 {
 	return RSERVR_SERVER_ARG->terminate_client(client_name.c_str())?
 	  RSERVR_EVAL_COMPLETE : RSERVR_EVAL_REJECTED;
 	 }
 
-	else if (remove_type == 0x02)
+	else if (remove_type == CLIENT_KILL)
 	 {
 	return RSERVR_SERVER_ARG->kill_client(client_name.c_str())?
 	  RSERVR_EVAL_COMPLETE : RSERVR_EVAL_REJECTED;
@@ -333,29 +329,62 @@ const text_data proto_remove_client_kill = "kill";
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_remove_client)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(remove_client, type_server, type_any_client)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	client_name.clear();
 
-	RSERVR_EXTRACT_TEXT
-	RSERVR_SET_AUTO_DELETE(type_deleter)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	if      (RSERVR_TEMP_STRING == proto_remove_client_term) remove_type = 0x01;
-	else if (RSERVR_TEMP_STRING == proto_remove_client_kill) remove_type = 0x02;
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	 {
+	if      (proto_remove_client_term == RSERVR_COMMAND_DATA)
+	remove_type = CLIENT_TERM;
+
+	else if (proto_remove_client_kill == RSERVR_COMMAND_DATA)
+	remove_type = CLIENT_KILL;
+
+	else RSERVR_COMMAND_PARSE_ABORT
+	 }
+
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(client_name)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_remove_client)
+	{
+	if      (remove_type == CLIENT_TERM)
+	 {
+	RSERVR_COMMAND_BUILD_CHECK(remove_client, type_admin_client | type_server_control, type_server)
+	 }
+
+	else if (remove_type == CLIENT_KILL)
+	 {
+	RSERVR_COMMAND_BUILD_CHECK(remove_client, type_admin_client, type_server)
+	 }
+
 	else return NULL;
 
-	RSERVR_UTILIZE(type_deleter)
+	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_AUTO_COPY_ANY(client_name)
+	if      (remove_type == CLIENT_TERM)
+	RSERVR_COMMAND_ADD_TEXT("", proto_remove_client_term)
 
-	RSERVR_PARSE_END
+	else if (remove_type == CLIENT_KILL)
+	RSERVR_COMMAND_ADD_TEXT("", proto_remove_client_kill)
+
+	else RSERVR_COMMAND_BUILD_ABORT
+
+	RSERVR_COMMAND_ADD_TEXT("", client_name)
+
+	RSERVR_COMMAND_BUILD_END
 	}
-	//----------------------------------------------------------------------
 
 
 RSERVR_SERVER_COMMAND_IMMEDIATE(proto_remove_client, RSERVR_BUILTIN_TAG(remove_client), type_admin_client)
@@ -376,34 +405,18 @@ RSERVR_AUTO_BUILTIN_TAG(remove_find_client)
 
 	proto_remove_find_client::proto_remove_find_client(text_info nName, bool tType) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(remove_find_client)),
-	remove_type(tType? 0x02 : 0x01), client_expression(nName? nName : "")
-	{
-	if (remove_type == 0x01)
-	 {
-	RSERVR_COMMAND_BUILD_CHECK(remove_find_client, type_admin_client | type_server_control, type_server)
-	 }
-
-	else
-	 {
-	RSERVR_COMMAND_BUILD_CHECK(remove_find_client, type_admin_client, type_server)
-	 }
-
-	if (remove_type == 0x01)      RSERVR_COMMAND_ADD_TEXT(proto_remove_client_term)
-	else if (remove_type == 0x02) RSERVR_COMMAND_ADD_TEXT(proto_remove_client_kill)
-
-	RSERVR_COMMAND_ADD_BINARY(client_expression)
-	}
+	remove_type(tType? CLIENT_KILL : CLIENT_TERM), client_expression(nName? nName : "") {}
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_remove_find_client)
 	{
-	if (remove_type == 0x01)
+	if (remove_type == CLIENT_TERM)
 	 {
 	return RSERVR_SERVER_ARG->terminate_find_client(client_expression.c_str())?
 	  RSERVR_EVAL_COMPLETE : RSERVR_EVAL_REJECTED;
 	 }
 
-	else if (remove_type == 0x02)
+	else if (remove_type == CLIENT_KILL)
 	 {
 	return RSERVR_SERVER_ARG->kill_find_client(client_expression.c_str())?
 	  RSERVR_EVAL_COMPLETE : RSERVR_EVAL_REJECTED;
@@ -415,27 +428,61 @@ RSERVR_AUTO_BUILTIN_TAG(remove_find_client)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_remove_find_client)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(remove_find_client, type_server, type_any_client)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	client_expression.clear();
 
-	RSERVR_EXTRACT_TEXT
-	RSERVR_SET_AUTO_DELETE(type_deleter)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	if      (RSERVR_TEMP_STRING == proto_remove_client_term) remove_type = 0x01;
-	else if (RSERVR_TEMP_STRING == proto_remove_client_kill) remove_type = 0x02;
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	 {
+	if      (proto_remove_client_term == RSERVR_COMMAND_DATA)
+	remove_type = CLIENT_TERM;
+
+	else if (proto_remove_client_kill == RSERVR_COMMAND_DATA)
+	remove_type = CLIENT_KILL;
+
+	else RSERVR_COMMAND_PARSE_ABORT
+	 }
+
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(client_expression)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_remove_find_client)
+	{
+	if      (remove_type == CLIENT_TERM)
+	 {
+	RSERVR_COMMAND_BUILD_CHECK(remove_find_client, type_admin_client | type_server_control, type_server)
+	 }
+
+	else if (remove_type == CLIENT_KILL)
+	 {
+	RSERVR_COMMAND_BUILD_CHECK(remove_find_client, type_admin_client, type_server)
+	 }
+
 	else return NULL;
 
-	RSERVR_UTILIZE(type_deleter)
+	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_AUTO_COPY_ANY(client_expression)
+	if      (remove_type == CLIENT_TERM)
+	RSERVR_COMMAND_ADD_TEXT("", proto_remove_client_term)
 
-	RSERVR_PARSE_END
+	else if (remove_type == CLIENT_KILL)
+	RSERVR_COMMAND_ADD_TEXT("", proto_remove_client_kill)
+
+	else RSERVR_COMMAND_BUILD_ABORT
+
+	RSERVR_COMMAND_ADD_TEXT("", client_expression)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -457,36 +504,18 @@ RSERVR_AUTO_BUILTIN_TAG(remove_pid_client)
 
 	proto_remove_pid_client::proto_remove_pid_client(pid_t pPid, bool tType) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(remove_pid_client)),
-	remove_type(tType? 0x02 : 0x01), client_pid(pPid)
-	{
-	if (remove_type == 0x01)
-	 {
-	RSERVR_COMMAND_BUILD_CHECK(remove_pid_client, type_admin_client | type_server_control, type_server)
-	 }
-
-	else
-	 {
-	RSERVR_COMMAND_BUILD_CHECK(remove_pid_client, type_admin_client, type_server)
-	 }
-
-	RSERVR_TEMP_CONVERSION
-
-	if (remove_type == 0x01)      RSERVR_COMMAND_ADD_TEXT(proto_remove_client_term)
-	else if (remove_type == 0x02) RSERVR_COMMAND_ADD_TEXT(proto_remove_client_kill)
-
-	RSERVR_CONVERT10_ADD(client_pid)
-	}
+	remove_type(tType? CLIENT_KILL : CLIENT_TERM), client_pid(pPid) {}
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_remove_pid_client)
 	{
-	if (remove_type == 0x01)
+	if (remove_type == CLIENT_TERM)
 	 {
 	return RSERVR_SERVER_ARG->terminate_pid_client(client_pid)?
 	  RSERVR_EVAL_COMPLETE : RSERVR_EVAL_REJECTED;
 	 }
 
-	else if (remove_type == 0x02)
+	else if (remove_type == CLIENT_KILL)
 	 {
 	return RSERVR_SERVER_ARG->kill_pid_client(client_pid)?
 	  RSERVR_EVAL_COMPLETE : RSERVR_EVAL_REJECTED;
@@ -498,26 +527,59 @@ RSERVR_AUTO_BUILTIN_TAG(remove_pid_client)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_remove_pid_client)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(remove_pid_client, type_server, type_any_client)
-	RSERVR_COMMAND_INPUT_SET
 
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_EXTRACT_TEXT
-	RSERVR_SET_AUTO_DELETE(type_deleter)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	 {
+	if      (proto_remove_client_term == RSERVR_COMMAND_DATA)
+	remove_type = CLIENT_TERM;
 
-	if      (RSERVR_TEMP_STRING == proto_remove_client_term) remove_type = 0x01;
-	else if (RSERVR_TEMP_STRING == proto_remove_client_kill) remove_type = 0x02;
+	else if (proto_remove_client_kill == RSERVR_COMMAND_DATA)
+	remove_type = CLIENT_KILL;
+
+	else RSERVR_COMMAND_PARSE_ABORT
+	 }
+
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_PARSE10(client_pid)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_remove_pid_client)
+	{
+	if      (remove_type == CLIENT_TERM)
+	 {
+	RSERVR_COMMAND_BUILD_CHECK(remove_pid_client, type_admin_client | type_server_control, type_server)
+	 }
+
+	else if (remove_type == CLIENT_KILL)
+	 {
+	RSERVR_COMMAND_BUILD_CHECK(remove_pid_client, type_admin_client, type_server)
+	 }
+
 	else return NULL;
 
-	RSERVR_UTILIZE(type_deleter)
+	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE10(client_pid)
+	if      (remove_type == CLIENT_TERM)
+	RSERVR_COMMAND_ADD_TEXT("", proto_remove_client_term)
 
-	RSERVR_PARSE_END
+	else if (remove_type == CLIENT_KILL)
+	RSERVR_COMMAND_ADD_TEXT("", proto_remove_client_kill)
+
+	else RSERVR_COMMAND_BUILD_ABORT
+
+	RSERVR_COMMAND_CONVERT10("", client_pid)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -530,6 +592,10 @@ RSERVR_GENERATOR_DEFAULT( proto_remove_pid_client, \
 //END proto_remove_pid_client command===========================================
 
 
+#undef CLIENT_TERM
+#undef CLIENT_KILL
+
+
 //proto_terminate_server command================================================
 RSERVR_AUTO_BUILTIN_TAG(terminate_server)
 
@@ -537,11 +603,7 @@ RSERVR_AUTO_BUILTIN_TAG(terminate_server)
 
 
 	proto_terminate_server::proto_terminate_server() :
-	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(terminate_server))
-	{
-	RSERVR_COMMAND_BUILD_CHECK(terminate_server, type_admin_client | type_server_control, type_server)
-	RSERVR_COMMAND_ADD_NULL
-	}
+	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(terminate_server)) {}
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_terminate_server)
@@ -550,14 +612,20 @@ RSERVR_AUTO_BUILTIN_TAG(terminate_server)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_terminate_server)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(terminate_server, type_server, type_any_client)
-	RSERVR_COMMAND_INPUT_SET
+	return true;
+	}
 
-	RSERVR_CLEAR_COMMAND
-	RSERVR_COMMAND_ADD_NULL
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_BUILD_HEAD(proto_terminate_server)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(terminate_server, type_admin_client | type_server_control, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_EMPTY
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -580,16 +648,7 @@ RSERVR_AUTO_BUILTIN_TAG(find_clients)
 	proto_find_clients::proto_find_clients(text_info nName,
 	permission_mask iInclude, permission_mask eExclude) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(find_clients)),
-	name_expression(nName? nName : ""), required(iInclude), denied(eExclude)
-	{
-	RSERVR_COMMAND_BUILD_CHECK(find_clients, type_admin_client, type_server)
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_BINARY(name_expression)
-	RSERVR_CONVERT16_ADD(required)
-	RSERVR_CONVERT16_ADD(denied)
-	}
+	name_expression(nName? nName : ""), required(iInclude), denied(eExclude) {}
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_find_clients)
@@ -601,24 +660,40 @@ RSERVR_AUTO_BUILTIN_TAG(find_clients)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_find_clients)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(find_clients, type_admin_client, type_none)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	name_expression.clear();
 
-	RSERVR_AUTO_COPY_ANY(name_expression)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(required)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(name_expression)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(denied)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_PARSE16(required)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_PARSE16(denied)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_find_clients)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(find_clients, type_admin_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", name_expression)
+	RSERVR_COMMAND_CONVERT16("", required)
+	RSERVR_COMMAND_CONVERT16("", denied)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 

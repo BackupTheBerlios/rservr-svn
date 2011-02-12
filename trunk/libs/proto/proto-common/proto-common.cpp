@@ -158,7 +158,7 @@ RSERVR_AUTO_BUILTIN_TAG(client_response_list)
 	{
 	unsigned int current_size = 0;
 
-	if (lList) while (*lList)
+	while (*lList)
 	 {
 	if ((current_size += strlen(*lList)) > PARAM_BYPASS_SIZE_MAX) break;
 	response_data.push_back(*lList);
@@ -405,6 +405,8 @@ const text_data proto_register_client_control    = "control";
 
 	else RSERVR_COMMAND_PARSE_ABORT
 	 }
+
+	RSERVR_COMMAND_DEFAULT return false;
 
 	RSERVR_COMMAND_PARSE_END
 

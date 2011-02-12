@@ -72,8 +72,6 @@ const text_data orig_entity_label = "_oe";
 const text_data orig_address_label = "_oa";
 const text_data target_entity_label = "_te";
 const text_data target_address_label = "_ta";
-const text_data disable_auto_label = "_da";
-const text_data return_pid_label = "_rp";
 const text_data silent_response_label = "_sr";
 
 const text_data client_scope_separator  = "?";

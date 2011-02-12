@@ -74,8 +74,6 @@ extern const text_data orig_entity_label;
 extern const text_data orig_address_label;
 extern const text_data target_entity_label;
 extern const text_data target_address_label;
-extern const text_data disable_auto_label;
-extern const text_data return_pid_label;
 extern const text_data silent_response_label;
 
 extern const text_data client_scope_separator;
