@@ -51,7 +51,7 @@ extern "C" {
 	RSERVR_COMMAND_INIT_BASE(rsvp_rqsrvc_register_services_tag),
 	request_origin(get_client_name()), register_type(aAddress? aAddress : "")
 	{
-	PLUGIN_CREATE_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(register_services))
+	PLUGIN_BUILD_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(register_services))
 
 	RSERVR_COMMAND_ADD_TEXT(request_origin)
 	RSERVR_COMMAND_ADD_BINARY(register_type)
@@ -102,7 +102,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqsrvc_register_services, rsvp_rqsrvc_regist
 	RSERVR_COMMAND_INIT_BASE(rsvp_rqsrvc_deregister_services_tag),
 	request_origin(get_client_name()), deregister_type(aAddress? aAddress : "")
 	{
-	PLUGIN_CREATE_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(deregister_services))
+	PLUGIN_BUILD_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(deregister_services))
 
 	RSERVR_COMMAND_ADD_TEXT(request_origin)
 	RSERVR_COMMAND_ADD_BINARY(deregister_type)

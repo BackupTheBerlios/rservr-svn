@@ -53,16 +53,7 @@ extern "C" {
 
 	rsvp_netcntl_connection_list::rsvp_netcntl_connection_list(int tType) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_netcntl_connection_list_tag),
-	request_origin(get_client_name()), connect_type(tType)
-	{
-	PLUGIN_CREATE_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(connection_list))
-	PLUGIN_ALT_CREATE_CHECK(netcntl, (connect_type != NETCNTL_NET && connect_type != NETCNTL_LOCAL), PLUGIN_COMMAND_REQUEST(connection_list))
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_CONVERT16_ADD(connect_type)
-	}
+	request_origin(get_client_name()), connect_type(tType) {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_netcntl_connection_list)
@@ -106,22 +97,39 @@ extern "C" {
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_netcntl_connection_list)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(netcntl, type_service_client, PLUGIN_COMMAND_REQUEST(connection_list))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 	connect_type = NETCNTL_DEFAULT;
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(connect_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_PARSE16(connect_type)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_netcntl_connection_list)
+	{
+	PLUGIN_BUILD_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(connection_list))
+	PLUGIN_ALT_BUILD_CHECK(netcntl, (connect_type != NETCNTL_NET && connect_type != NETCNTL_LOCAL), \
+	  PLUGIN_COMMAND_REQUEST(connection_list))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_CONVERT16("", connect_type)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -139,18 +147,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connection_list, rsvp_netcntl_connec
 	request_origin(get_client_name()),
 	connect_address(aAddress? aAddress : ""),
 	connect_port(pPort? pPort : ""),
-	connect_type(tType)
-	{
-	PLUGIN_CREATE_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(connect))
-	PLUGIN_ALT_CREATE_CHECK(netcntl, (connect_type != NETCNTL_NET && connect_type != NETCNTL_LOCAL), PLUGIN_COMMAND_REQUEST(connect))
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_COMMAND_ADD_BINARY(connect_address)
-	RSERVR_COMMAND_ADD_BINARY(connect_port)
-	RSERVR_CONVERT16_ADD(connect_type)
-	}
+	connect_type(tType) {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_netcntl_connect)
@@ -196,28 +193,49 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connection_list, rsvp_netcntl_connec
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_netcntl_connect)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(netcntl, type_service_client, PLUGIN_COMMAND_REQUEST(connect))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 	connect_address.clear();
 	connect_port.clear();
 	connect_type = NETCNTL_DEFAULT;
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(connect_address)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_AUTO_COPY_ANY(connect_port)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(connect_address)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(connect_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_COPY_DATA(connect_port)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 3)
+	RSERVR_COMMAND_PARSE16(connect_type)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_netcntl_connect)
+	{
+	PLUGIN_BUILD_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(connect))
+	PLUGIN_ALT_BUILD_CHECK(netcntl, (connect_type != NETCNTL_NET && connect_type != NETCNTL_LOCAL), \
+	  PLUGIN_COMMAND_REQUEST(connect))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", connect_address)
+	RSERVR_COMMAND_ADD_TEXT("", connect_port)
+	RSERVR_COMMAND_CONVERT16("", connect_type)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -237,19 +255,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connect, rsvp_netcntl_connect_tag, t
 	connect_address(aAddress? aAddress : ""),
 	connect_port(pPort? pPort : ""),
 	connect_filter(fFilter? fFilter : ""),
-	connect_type(tType)
-	{
-	PLUGIN_CREATE_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(connect))
-	PLUGIN_ALT_CREATE_CHECK(netcntl, (connect_type != NETCNTL_NET && connect_type != NETCNTL_LOCAL), PLUGIN_COMMAND_REQUEST(connect))
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_COMMAND_ADD_BINARY(connect_address)
-	RSERVR_COMMAND_ADD_BINARY(connect_port)
-	RSERVR_COMMAND_ADD_BINARY(connect_filter)
-	RSERVR_CONVERT16_ADD(connect_type)
-	}
+	connect_type(tType) {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_netcntl_filtered_connect)
@@ -294,30 +300,54 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connect, rsvp_netcntl_connect_tag, t
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_netcntl_filtered_connect)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
-	PLUGIN_PARSE_CHECK(netcntl, type_service_client, PLUGIN_COMMAND_REQUEST(connect))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
+	PLUGIN_PARSE_CHECK(netcntl, type_service_client, PLUGIN_COMMAND_REQUEST(filtered_connect))
 
 	request_origin.clear();
 	connect_address.clear();
 	connect_port.clear();
+	connect_filter.clear();
 	connect_type = NETCNTL_DEFAULT;
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(connect_address)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_AUTO_COPY_ANY(connect_port)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(connect_address)
 
-	RSERVR_AUTO_COPY_ANY(connect_filter)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_COPY_DATA(connect_port)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(connect_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 3)
+	RSERVR_COMMAND_COPY_DATA(connect_filter)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 4)
+	RSERVR_COMMAND_PARSE16(connect_type)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_netcntl_filtered_connect)
+	{
+	PLUGIN_BUILD_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(filtered_connect))
+	PLUGIN_ALT_BUILD_CHECK(netcntl, (connect_type != NETCNTL_NET && connect_type != NETCNTL_LOCAL), \
+	  PLUGIN_COMMAND_REQUEST(filtered_connect))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", connect_address)
+	RSERVR_COMMAND_ADD_TEXT("", connect_port)
+	RSERVR_COMMAND_ADD_TEXT("", connect_filter)
+	RSERVR_COMMAND_CONVERT16("", connect_type)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -334,17 +364,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_filtered_connect, rsvp_netcntl_filte
 	RSERVR_COMMAND_INIT_BASE(rsvp_netcntl_disconnect_tag),
 	request_origin(get_client_name()),
 	disconnect_address(aAddress? aAddress : ""),
-	disconnect_type(tType)
-	{
-	PLUGIN_CREATE_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(disconnect))
-	PLUGIN_ALT_CREATE_CHECK(netcntl, (disconnect_type != NETCNTL_NET && disconnect_type != NETCNTL_LOCAL), PLUGIN_COMMAND_REQUEST(disconnect))
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_COMMAND_ADD_BINARY(disconnect_address)
-	RSERVR_CONVERT16_ADD(disconnect_type)
-	}
+	disconnect_type(tType) {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_netcntl_disconnect)
@@ -371,25 +391,44 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_filtered_connect, rsvp_netcntl_filte
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_netcntl_disconnect)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(netcntl, type_service_client, PLUGIN_COMMAND_REQUEST(disconnect))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 	disconnect_address.clear();
 	disconnect_type = NETCNTL_DEFAULT;
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(disconnect_address)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(disconnect_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(disconnect_address)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_PARSE16(disconnect_type)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_netcntl_disconnect)
+	{
+	PLUGIN_BUILD_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(disconnect))
+	PLUGIN_ALT_BUILD_CHECK(netcntl, (disconnect_type != NETCNTL_NET && disconnect_type != NETCNTL_LOCAL), \
+	  PLUGIN_COMMAND_REQUEST(disconnect))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", disconnect_address)
+	RSERVR_COMMAND_CONVERT16("", disconnect_type)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -404,16 +443,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_disconnect, rsvp_netcntl_disconnect_
 
 	rsvp_netcntl_listen_list::rsvp_netcntl_listen_list(int tType) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_netcntl_listen_list_tag),
-	request_origin(get_client_name()), listen_type(tType)
-	{
-	PLUGIN_CREATE_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(listen_list))
-	PLUGIN_ALT_CREATE_CHECK(netcntl, (listen_type != NETCNTL_NET && listen_type != NETCNTL_LOCAL), PLUGIN_COMMAND_REQUEST(listen_list))
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_CONVERT16_ADD(listen_type)
-	}
+	request_origin(get_client_name()), listen_type(tType) {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_netcntl_listen_list)
@@ -457,22 +487,39 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_disconnect, rsvp_netcntl_disconnect_
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_netcntl_listen_list)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(listen_list))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 	listen_type = NETCNTL_DEFAULT;
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(listen_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_PARSE16(listen_type)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_netcntl_listen_list)
+	{
+	PLUGIN_BUILD_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(listen_list))
+	PLUGIN_ALT_BUILD_CHECK(netcntl, (listen_type != NETCNTL_NET && listen_type != NETCNTL_LOCAL), \
+	  PLUGIN_COMMAND_REQUEST(listen_list))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_CONVERT16("", listen_type)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -489,17 +536,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_listen_list, rsvp_netcntl_listen_lis
 	RSERVR_COMMAND_INIT_BASE(rsvp_netcntl_listen_tag),
 	request_origin(get_client_name()),
 	listen_location(lLocation? lLocation : ""),
-	listen_type(tType)
-	{
-	PLUGIN_CREATE_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(listen))
-	PLUGIN_ALT_CREATE_CHECK(netcntl, (listen_type != NETCNTL_NET && listen_type != NETCNTL_LOCAL), PLUGIN_COMMAND_REQUEST(listen))
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_COMMAND_ADD_BINARY(listen_location)
-	RSERVR_CONVERT16_ADD(listen_type)
-	}
+	listen_type(tType) {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_netcntl_listen)
@@ -526,25 +563,44 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_listen_list, rsvp_netcntl_listen_lis
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_netcntl_listen)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(listen))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 	listen_location.clear();
 	listen_type = NETCNTL_DEFAULT;
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(listen_location)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(listen_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(listen_location)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_PARSE16(listen_type)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_netcntl_listen)
+	{
+	PLUGIN_BUILD_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(listen))
+	PLUGIN_ALT_BUILD_CHECK(netcntl, (listen_type != NETCNTL_NET && listen_type != NETCNTL_LOCAL), \
+	  PLUGIN_COMMAND_REQUEST(listen))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", listen_location)
+	RSERVR_COMMAND_CONVERT16("", listen_type)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -561,17 +617,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_listen, rsvp_netcntl_listen_tag, typ
 	RSERVR_COMMAND_INIT_BASE(rsvp_netcntl_unlisten_tag),
 	request_origin(get_client_name()),
 	unlisten_location(lLocation? lLocation : ""),
-	unlisten_type(tType)
-	{
-	PLUGIN_CREATE_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(unlisten))
-	PLUGIN_ALT_CREATE_CHECK(netcntl, (unlisten_type != NETCNTL_NET && unlisten_type != NETCNTL_LOCAL), PLUGIN_COMMAND_REQUEST(unlisten))
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_COMMAND_ADD_BINARY(unlisten_location)
-	RSERVR_CONVERT16_ADD(unlisten_type)
-	}
+	unlisten_type(tType) {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_netcntl_unlisten)
@@ -598,25 +644,44 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_listen, rsvp_netcntl_listen_tag, typ
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_netcntl_unlisten)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(unlisten))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 	unlisten_location.clear();
 	unlisten_type = NETCNTL_DEFAULT;
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(unlisten_location)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(unlisten_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(unlisten_location)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_PARSE16(unlisten_type)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_netcntl_unlisten)
+	{
+	PLUGIN_BUILD_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(unlisten))
+	PLUGIN_ALT_BUILD_CHECK(netcntl, (unlisten_type != NETCNTL_NET && unlisten_type != NETCNTL_LOCAL), \
+	  PLUGIN_COMMAND_REQUEST(unlisten))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", unlisten_location)
+	RSERVR_COMMAND_CONVERT16("", unlisten_type)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 

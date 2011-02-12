@@ -78,27 +78,27 @@ int load_all_commands(struct local_commands *lLoader) \
 { return command(lLoader); }
 
 
-#define PLUGIN_CREATE_CHECK(name, type, label) \
+#define PLUGIN_BUILD_CHECK(name, type, label) \
 if (!(get_client_type() & type)) \
 { name##_log_create_rejected(label); \
-  return; }
+  return NULL; }
 
 
-#define PLUGIN_ALT_CREATE_CHECK(name, condition, label) \
+#define PLUGIN_ALT_BUILD_CHECK(name, condition, label) \
 if (condition) \
 { name##_log_create_rejected(label); \
-  return; }
+  return NULL; }
 
 
 #define PLUGIN_PARSE_CHECK(name, type, label) \
 if (!(get_client_type() & type)) \
 { name##_log_parse_rejected(label); \
-  return NULL; }
+  return false; }
 
 
 #define PLUGIN_ALT_PARSE_CHECK(name, condition, label) \
 if (condition) \
 { name##_log_parse_rejected(label); \
-  return NULL; }
+  return false; }
 
 #endif //plugin_macro_hpp

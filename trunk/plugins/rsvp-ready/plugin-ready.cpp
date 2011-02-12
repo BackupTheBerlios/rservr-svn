@@ -51,7 +51,7 @@ extern "C" {
 	RSERVR_COMMAND_INIT_BASE(rsvp_ready_system_ready_tag),
 	request_origin(get_client_name()), ready_type(aAddress? aAddress : "")
 	{
-	PLUGIN_CREATE_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready))
+	PLUGIN_BUILD_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready))
 
 	RSERVR_COMMAND_ADD_TEXT(request_origin)
 	RSERVR_COMMAND_ADD_BINARY(ready_type)
@@ -102,7 +102,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_ready, rsvp_ready_system_ready_
 	RSERVR_COMMAND_INIT_BASE(rsvp_ready_system_not_ready_tag),
 	request_origin(get_client_name()), not_ready_type(aAddress? aAddress : "")
 	{
-	PLUGIN_CREATE_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready))
+	PLUGIN_BUILD_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready))
 
 	RSERVR_COMMAND_ADD_TEXT(request_origin)
 	RSERVR_COMMAND_ADD_BINARY(not_ready_type)
@@ -153,7 +153,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_not_ready, rsvp_ready_system_no
 	RSERVR_COMMAND_INIT_BASE(rsvp_ready_system_never_ready_tag),
 	request_origin(get_client_name()), never_ready_type(aAddress? aAddress : "")
 	{
-	PLUGIN_CREATE_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready))
+	PLUGIN_BUILD_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready))
 
 	RSERVR_COMMAND_ADD_TEXT(request_origin)
 	RSERVR_COMMAND_ADD_BINARY(never_ready_type)
@@ -204,7 +204,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_never_ready, rsvp_ready_system_
 	RSERVR_COMMAND_INIT_BASE(rsvp_ready_system_ready_response_tag),
 	request_origin(get_client_name()), ready_type(aAddress? aAddress : "")
 	{
-	PLUGIN_CREATE_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready_response))
+	PLUGIN_BUILD_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready_response))
 
 	RSERVR_COMMAND_ADD_TEXT(request_origin)
 	RSERVR_COMMAND_ADD_BINARY(ready_type)
@@ -262,7 +262,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_ready_response, rsvp_ready_syst
 	RSERVR_COMMAND_INIT_BASE(rsvp_ready_system_not_ready_response_tag),
 	request_origin(get_client_name()), not_ready_type(aAddress? aAddress : "")
 	{
-	PLUGIN_CREATE_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready_response))
+	PLUGIN_BUILD_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready_response))
 
 	RSERVR_COMMAND_ADD_TEXT(request_origin)
 	RSERVR_COMMAND_ADD_BINARY(not_ready_type)
@@ -320,7 +320,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_not_ready_response, rsvp_ready_
 	RSERVR_COMMAND_INIT_BASE(rsvp_ready_system_never_ready_response_tag),
 	request_origin(get_client_name()), never_ready_type(aAddress? aAddress : "")
 	{
-	PLUGIN_CREATE_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready_response))
+	PLUGIN_BUILD_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready_response))
 
 	RSERVR_COMMAND_ADD_TEXT(request_origin)
 	RSERVR_COMMAND_ADD_BINARY(never_ready_type)

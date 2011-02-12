@@ -53,7 +53,7 @@ extern "C" {
 	request_origin(get_client_name()), data_location(lLocation? lLocation : ""),
 	location_reference(rReference), location_type(tType), open_mode(mMode)
 	{
-	PLUGIN_CREATE_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(open_reference))
+	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(open_reference))
 
 	RSERVR_TEMP_CONVERSION
 
@@ -121,7 +121,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_open_reference, rsvp_dataref_open_re
 	request_origin(get_client_name()), data_location(lLocation? lLocation : ""),
 	location_reference(rReference), location_type(tType), change_mode(mMode)
 	{
-	PLUGIN_CREATE_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(change_reference))
+	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(change_reference))
 
 	RSERVR_TEMP_CONVERSION
 
@@ -187,7 +187,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_change_reference, rsvp_dataref_chang
 	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_close_reference_tag),
 	request_origin(get_client_name()), location_reference(rReference)
 	{
-	PLUGIN_CREATE_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(close_reference))
+	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(close_reference))
 
 	RSERVR_TEMP_CONVERSION
 
@@ -242,7 +242,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_close_reference, rsvp_dataref_close_
 	request_origin(get_client_name()), location_reference(rReference), data_offset(oOffset),
 	data_size(sSize)
 	{
-	PLUGIN_CREATE_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(read_data))
+	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(read_data))
 
 	RSERVR_TEMP_CONVERSION
 
@@ -306,7 +306,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_read_data, rsvp_dataref_read_data_ta
 	request_origin(get_client_name()), location_reference(rReference), data_offset(oOffset),
 	data_size(sSize)
 	{
-	PLUGIN_CREATE_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(write_data))
+	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(write_data))
 
 	RSERVR_TEMP_CONVERSION
 
@@ -370,7 +370,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_write_data, rsvp_dataref_write_data_
 	request_origin(get_client_name()), location_reference(rReference), data_offset(oOffset),
 	data_size(sSize)
 	{
-	PLUGIN_CREATE_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(exchange_data))
+	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(exchange_data))
 
 	RSERVR_TEMP_CONVERSION
 
@@ -434,7 +434,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_exchange_data, rsvp_dataref_exchange
 	request_origin(get_client_name()), location_reference(rReference), data_offset(oOffset),
 	data_size(sSize)
 	{
-	PLUGIN_CREATE_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(alteration_response))
+	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(alteration_response))
 
 	RSERVR_TEMP_CONVERSION
 

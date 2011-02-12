@@ -51,7 +51,7 @@ extern "C" {
 	RSERVR_COMMAND_INIT_BASE(rsvp_trigger_system_trigger_tag),
 	request_origin(get_client_name()), trigger_action(aAction), trigger_type(tType? tType : "")
 	{
-	PLUGIN_CREATE_CHECK(trigger, type_active_client, PLUGIN_COMMAND_REQUEST(system_trigger))
+	PLUGIN_BUILD_CHECK(trigger, type_active_client, PLUGIN_COMMAND_REQUEST(system_trigger))
 
 	RSERVR_TEMP_CONVERSION
 
