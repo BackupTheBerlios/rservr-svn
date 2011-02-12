@@ -51,18 +51,7 @@ extern "C" {
 	int rReference, uint8_t tType, uint8_t mMode) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_open_reference_tag),
 	request_origin(get_client_name()), data_location(lLocation? lLocation : ""),
-	location_reference(rReference), location_type(tType), open_mode(mMode)
-	{
-	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(open_reference))
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_COMMAND_ADD_BINARY(data_location)
-	RSERVR_CONVERT10_ADD(location_reference)
-	RSERVR_CONVERT16_ADD(location_type)
-	RSERVR_CONVERT16_ADD(open_mode)
-	}
+	location_reference(rReference), location_type(tType), open_mode(mMode) {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_open_reference)
@@ -80,30 +69,49 @@ extern "C" {
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_open_reference)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(open_reference))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 	data_location.clear();
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(data_location)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE10(location_reference)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(data_location)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(location_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_PARSE10(location_reference)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(open_mode)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 3)
+	RSERVR_COMMAND_PARSE16(location_type)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 4)
+	RSERVR_COMMAND_PARSE16(open_mode)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_open_reference)
+	{
+	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(open_reference))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", data_location)
+	RSERVR_COMMAND_CONVERT10("", location_reference)
+	RSERVR_COMMAND_CONVERT16("", location_type)
+	RSERVR_COMMAND_CONVERT16("", open_mode)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -119,18 +127,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_open_reference, rsvp_dataref_open_re
 	int rReference, uint8_t tType, uint8_t mMode) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_change_reference_tag),
 	request_origin(get_client_name()), data_location(lLocation? lLocation : ""),
-	location_reference(rReference), location_type(tType), change_mode(mMode)
-	{
-	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(change_reference))
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_COMMAND_ADD_BINARY(data_location)
-	RSERVR_CONVERT10_ADD(location_reference)
-	RSERVR_CONVERT16_ADD(location_type)
-	RSERVR_CONVERT16_ADD(change_mode)
-	}
+	location_reference(rReference), location_type(tType), change_mode(mMode) {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_change_reference)
@@ -148,30 +145,49 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_open_reference, rsvp_dataref_open_re
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_change_reference)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(change_reference))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 	data_location.clear();
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(data_location)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE10(location_reference)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(data_location)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(location_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_PARSE10(location_reference)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(change_mode)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 3)
+	RSERVR_COMMAND_PARSE16(location_type)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 4)
+	RSERVR_COMMAND_PARSE16(change_mode)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_change_reference)
+	{
+	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(change_reference))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", data_location)
+	RSERVR_COMMAND_CONVERT10("", location_reference)
+	RSERVR_COMMAND_CONVERT16("", location_type)
+	RSERVR_COMMAND_CONVERT16("", change_mode)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -185,15 +201,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_change_reference, rsvp_dataref_chang
 
 	rsvp_dataref_close_reference::rsvp_dataref_close_reference(int rReference) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_close_reference_tag),
-	request_origin(get_client_name()), location_reference(rReference)
-	{
-	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(close_reference))
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_CONVERT10_ADD(location_reference)
-	}
+	request_origin(get_client_name()), location_reference(rReference) {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_close_reference)
@@ -210,21 +218,36 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_change_reference, rsvp_dataref_chang
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_close_reference)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(close_reference))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE10(location_reference)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_PARSE10(location_reference)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_close_reference)
+	{
+	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(close_reference))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_CONVERT10("", location_reference)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -240,17 +263,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_close_reference, rsvp_dataref_close_
 	ssize_t sSize) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_read_data_tag),
 	request_origin(get_client_name()), location_reference(rReference), data_offset(oOffset),
-	data_size(sSize)
-	{
-	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(read_data))
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_CONVERT10_ADD(location_reference)
-	RSERVR_CONVERT16_ADD(data_offset)
-	RSERVR_CONVERT16_ADD(data_size)
-	}
+	data_size(sSize) {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_read_data)
@@ -268,27 +281,44 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_close_reference, rsvp_dataref_close_
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_read_data)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(read_data))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE10(location_reference)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(data_offset)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_PARSE10(location_reference)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(data_size)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_PARSE10(data_offset)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 3)
+	RSERVR_COMMAND_PARSE10(data_size)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_read_data)
+	{
+	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(read_data))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_CONVERT10("", location_reference)
+	RSERVR_COMMAND_CONVERT10("", data_offset)
+	RSERVR_COMMAND_CONVERT10("", data_size)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -304,17 +334,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_read_data, rsvp_dataref_read_data_ta
 	ssize_t sSize) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_write_data_tag),
 	request_origin(get_client_name()), location_reference(rReference), data_offset(oOffset),
-	data_size(sSize)
-	{
-	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(write_data))
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_CONVERT10_ADD(location_reference)
-	RSERVR_CONVERT16_ADD(data_offset)
-	RSERVR_CONVERT16_ADD(data_size)
-	}
+	data_size(sSize) {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_write_data)
@@ -332,27 +352,44 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_read_data, rsvp_dataref_read_data_ta
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_write_data)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(write_data))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE10(location_reference)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(data_offset)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_PARSE10(location_reference)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(data_size)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_PARSE10(data_offset)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 3)
+	RSERVR_COMMAND_PARSE10(data_size)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_write_data)
+	{
+	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(write_data))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_CONVERT10("", location_reference)
+	RSERVR_COMMAND_CONVERT10("", data_offset)
+	RSERVR_COMMAND_CONVERT10("", data_size)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -368,17 +405,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_write_data, rsvp_dataref_write_data_
 	ssize_t sSize) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_exchange_data_tag),
 	request_origin(get_client_name()), location_reference(rReference), data_offset(oOffset),
-	data_size(sSize)
-	{
-	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(exchange_data))
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_CONVERT10_ADD(location_reference)
-	RSERVR_CONVERT16_ADD(data_offset)
-	RSERVR_CONVERT16_ADD(data_size)
-	}
+	data_size(sSize) {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_exchange_data)
@@ -396,27 +423,44 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_write_data, rsvp_dataref_write_data_
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_exchange_data)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(exchange_data))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE10(location_reference)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(data_offset)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_PARSE10(location_reference)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(data_size)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_PARSE10(data_offset)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 3)
+	RSERVR_COMMAND_PARSE10(data_size)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_exchange_data)
+	{
+	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(exchange_data))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_CONVERT10("", location_reference)
+	RSERVR_COMMAND_CONVERT10("", data_offset)
+	RSERVR_COMMAND_CONVERT10("", data_size)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -432,17 +476,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_exchange_data, rsvp_dataref_exchange
 	ssize_t sSize) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_alteration_response_tag),
 	request_origin(get_client_name()), location_reference(rReference), data_offset(oOffset),
-	data_size(sSize)
-	{
-	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(alteration_response))
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_CONVERT10_ADD(location_reference)
-	RSERVR_CONVERT16_ADD(data_offset)
-	RSERVR_CONVERT16_ADD(data_size)
-	}
+	data_size(sSize) {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_alteration_response)
@@ -460,27 +494,44 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_exchange_data, rsvp_dataref_exchange
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_alteration_response)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(alteration_response))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE10(location_reference)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(data_offset)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_PARSE10(location_reference)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(data_size)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_PARSE10(data_offset)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 3)
+	RSERVR_COMMAND_PARSE10(data_size)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_alteration_response)
+	{
+	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(alteration_response))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_CONVERT10("", location_reference)
+	RSERVR_COMMAND_CONVERT10("", data_offset)
+	RSERVR_COMMAND_CONVERT10("", data_size)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
