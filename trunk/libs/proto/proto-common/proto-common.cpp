@@ -360,7 +360,7 @@ const text_data proto_register_client_control    = "control";
 	return RSERVR_EVAL_REJECTED;
 
 	if (!external_command::manual_response( RSERVR_INFO_ARG,
-	      section_releaser( new proto_client_register_response(new_type) ) ))
+	       new proto_client_register_response(new_type) ) )
 	return RSERVR_EVAL_REJECTED;
 
 	return RSERVR_EVAL_NONE;

@@ -81,7 +81,7 @@ extern "C" {
 #define RSERVR_COMMAND_PARSE_START(node) \
 { const storage_section *RSERVR_COMMAND_TEMP = (node); /*necessary for nested loops*/ \
   unsigned int RSERVR_COMMAND_INDEX = 0; \
-  while (RSERVR_COMMAND_TEMP) { \
+  for (; RSERVR_COMMAND_TEMP; ++RSERVR_COMMAND_INDEX, RSERVR_COMMAND_TEMP = RSERVR_COMMAND_TEMP->next()) { \
     const storage_section *RSERVR_COMMAND_CURRENT = RSERVR_COMMAND_TEMP; \
     if (false);
 
@@ -92,8 +92,7 @@ extern "C" {
     else
 
 #define RSERVR_COMMAND_PARSE_END \
-    ++RSERVR_COMMAND_INDEX; \
-    RSERVR_COMMAND_TEMP = RSERVR_COMMAND_TEMP->next(); } }
+  } }
 
 
 #define RSERVR_COMMAND_DEFAULT_CONSTRUCT(name) name::name(const text_data &cCommand) : external_command(cCommand)

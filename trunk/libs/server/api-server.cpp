@@ -1108,7 +1108,7 @@ bool send_server_response_list(const transmit_block &cCommand, command_event eEv
 const data_list *dData)
 {
 	transmit_block response_command(cCommand);
-	COPY_TO_RESPONSE(section_releaser(new proto_server_response_list(eEvent, dData)),
+	COPY_TO_RESPONSE(new proto_server_response_list(eEvent, dData),
 	  response_command, cCommand)
 	response_command.silent_auto_response = true;
 	AUTO_SEND_COMMAND(response_command, cCommand)
@@ -1245,7 +1245,7 @@ bool send_server_directive(client_id *cClient, server_directive dDirective)
 {
 	if (!cClient) return false;
 	transmit_block directive_command;
-	if (!directive_command.set_command(section_releaser(new proto_server_directive(dDirective)))) return false;
+	if (!directive_command.set_command(new proto_server_directive(dDirective))) return false;
 
 	directive_command.target_entity = cClient->client_name;
 	directive_command.orig_entity   = entity_name();
@@ -1260,14 +1260,13 @@ bool send_timing_table(const struct server_timing_table *tTiming, const client_i
 	if (!cClient || !tTiming) return false;
 
 	transmit_block timing_command;
-	section_releaser new_command(new proto_set_timing(&tTiming->client));
-	if (!timing_command.set_command(new_command)) return false;
+	if (!timing_command.set_command(new proto_set_timing(&tTiming->client))) return false;
 
 	timing_command.target_entity = cClient->client_name;
 	timing_command.orig_entity   = entity_name();
 
 	send_protected_output new_output(cClient->attached_client);
-	return directive_command.command_sendable() && new_output(&timing_command);
+	return timing_command.command_sendable() && new_output(&timing_command);
 }
 
 
@@ -1275,8 +1274,8 @@ bool notify_register_attempt(const client_id *cClient, command_reference rRefere
 {
 	if (!cClient || !rReference) return false;
 	transmit_block notify_command;
-	section_releaser new_command(new proto_server_response(sSuccess? event_register : event_error));
-	if (!notify_command.set_command(new_command)) return false;
+	if (!notify_command.set_command(new proto_server_response(sSuccess? event_register : event_error)))
+	return false;
 
 	notify_command.target_reference = rReference;
 	notify_command.creator_pid      = cClient->process_id;
@@ -1285,7 +1284,7 @@ bool notify_register_attempt(const client_id *cClient, command_reference rRefere
 
 	notify_command.silent_auto_response = true;
 	send_protected_output new_output(cClient->attached_client);
-	return directive_command.command_sendable() && new_output(&notify_command);
+	return notify_command.command_sendable() && new_output(&notify_command);
 }
 
 //END directives and broadcasts-------------------------------------------------
@@ -1334,10 +1333,14 @@ void enable_io_inherit(io_device dDevices)
 //server interface--------------------------------------------------------------
 
 //(for 'auto-response.hpp')
-result create_manual_response(const command_info &cCommand, section_releaser rResponse)
+result create_manual_response(const command_info &cCommand, external_command *rResponse)
 {
 	transmit_block response_command, command_copy;
-	if (!cCommand.copy_base(response_command)) return false;
+	if (!cCommand.copy_base(response_command))
+	{
+	delete rResponse;
+	return false;
+	}
 	command_copy = response_command;
 
 	COPY_TO_RESPONSE(rResponse, response_command, command_copy)
@@ -1347,8 +1350,11 @@ result create_manual_response(const command_info &cCommand, section_releaser rRe
 
 //(for 'auto-response.hpp')
 //NOTE: do not implement!
-result create_server_command(section_releaser)
-{ return false; }
+result create_server_command(external_command *cCommand)
+{
+	delete cCommand;
+	return false;
+}
 
 //(for 'auto-response.hpp')
 result create_auto_response(const command_info &cCommand, command_event rResult,
@@ -1358,7 +1364,7 @@ text_info mMessage)
 	if (!cCommand.copy_base(response_command)) return false;
 	command_copy = response_command;
 
-	COPY_TO_RESPONSE(section_releaser(new proto_server_response(rResult, mMessage)), \
+	COPY_TO_RESPONSE(new proto_server_response(rResult, mMessage), \
 	  response_command, command_copy)
 
 	response_command.silent_auto_response = true;

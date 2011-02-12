@@ -37,4 +37,4 @@
 
 
 command_handle find_services(text_info nName, text_info tType)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_find_services(nName, tType))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_find_services(nName, tType)) }

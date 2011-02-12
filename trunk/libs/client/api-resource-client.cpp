@@ -42,20 +42,20 @@ result register_resource_client(text_info nName)
 
 
 command_handle find_resource_clients(text_info nName)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_find_resource_clients(nName))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_find_resource_clients(nName)) }
 
 
 command_handle register_service(text_info nName, text_info tType)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_register_service(nName, tType))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_register_service(nName, tType)) }
 
 
 command_handle deregister_own_service(text_info nName)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_deregister_own_service(nName))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_deregister_own_service(nName)) }
 
 
 command_handle deregister_all_own_services()
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_deregister_all_own_services)) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_deregister_all_own_services) }
 
 
 command_handle deregister_remote_services(text_info aAddress)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_deregister_remote_services(aAddress))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_deregister_remote_services(aAddress)) }

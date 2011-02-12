@@ -183,7 +183,7 @@ monitor_event eEvent, const data_list *dData)
 	return true;
 
 	transmit_block monitor_command;
-	if (!monitor_command.set_command( section_releaser(new proto_monitor_data(eEvent, dData)) ))
+	if (!monitor_command.set_command(new proto_monitor_data(eEvent, dData)))
 	return false;
 
 	if (!monitor_command.command_ready()) return false;
@@ -216,7 +216,7 @@ entity_handle cClient, text_info nName)
 
 	for (unsigned int I = 0; I < sending_list.size(); I++)
 	{
-	if ( !monitor_command.set_command(section_releaser(new proto_resource_exit(sending_list[I].value().c_str()))) ||
+	if ( !monitor_command.set_command(new proto_resource_exit(sending_list[I].value().c_str())) ||
 	     !monitor_command.command_ready() )
 	continue;
 

@@ -52,9 +52,7 @@ extern "C" {
   if (!copy_response(arg, *new_block)) \
   { delete new_block; \
     return NULL; } \
-  if (!new_block->set_command(command)) \
-  { delete new_block; \
-    return NULL; } \
+  if (!new_block->set_command(command)) return NULL; \
   if (!lookup_command(new_block->command_name(), new_block->execute_type)) \
   { delete new_block; \
     return NULL; } \

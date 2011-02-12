@@ -55,6 +55,9 @@ extern "C" {
 }
 
 
+	null_command::null_command(const text_data &nName) :
+	external_command(nName) {}
+
 	bool null_command::compile_command(const storage_section *tTree)
 	{ return false; }
 
@@ -122,7 +125,7 @@ extern "C" {
 	{ return iInfo.orig_address.c_str(); }
 
 	result external_command::manual_response(const command_info &iInfo,
-	section_releaser cCommand)
+	external_command *cCommand)
 	{ return create_manual_response(iInfo, cCommand); }
 
 	result external_command::auto_response(const command_info &iInfo,

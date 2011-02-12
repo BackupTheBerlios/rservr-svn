@@ -92,7 +92,8 @@ struct command_info
 class transmit_block :
 	public command_info,
 	public structure_base,
-	public data_exporter
+	public data_exporter,
+	private data_output
 {
 public:
 	transmit_block(const command_finder* = NULL);
@@ -103,8 +104,10 @@ public:
 	bool find_command();
 	bool command_ready() const;
 	bool command_sendable();
+	text_info extract();
 
 	//TODO: rename these functions
+	void clear_command();
 	void set_command_name(const text_data&);
 	text_info command_name() const;
 	void set_command_data(storage_section*);
@@ -145,11 +148,15 @@ private:
 	void export_tree(const storage_section *sSection, data_output *oOutput,
 	  text_data pPrefix) const;
 
+	//from 'data_output'----------------------------------------------------
+	bool send_output(const output_section&);
+	bool is_closed() const;
+	//----------------------------------------------------------------------
+
 	external_command *command;
 
 	const command_finder *finder;
-	unsigned char output_mode;
-	text_data command_label;
+	text_data command_label, extracted_command;
 };
 
 #endif //command_transmit_hpp

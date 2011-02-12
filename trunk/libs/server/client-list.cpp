@@ -36,6 +36,7 @@
 
 extern "C" {
 #include "param.h"
+#include "attributes.h"
 #include "api/tools.h"
 }
 
@@ -285,7 +286,7 @@ int &iInput, int &oOutput)
 	  {
 	//this isn't a reliable indication of failure since the new niceness
 	//could be -1 (also the error return). storing prevents a warning.
-	int ignore = nice(get_new_client_niceness());
+	int ATTR_UNUSED ignore = nice(get_new_client_niceness());
 
 	errno = 0;
 	new_nice = getpriority(PRIO_PROCESS, 0);
@@ -508,7 +509,7 @@ bool cCritical, command_reference rReference, const client_id *nNotify)
 
 	if ( !initialize_attributes(attributes) ||
 	     pthread_create(&lList->last_element().response_thread,
-	       &attributes, &client_thread, &lList->last_element()) != 0 )
+	       &attributes, &client_thread, static_cast <client_thread_data> (&lList->last_element())) != 0 )
 	 {
 	lList->p_last_element();
     log_server_new_client_error(error_internal);
@@ -753,7 +754,7 @@ permission_mask pPerm, command_reference rReference, entity_handle nNotify)
 
 	if ( !initialize_attributes(attributes) ||
 	     pthread_create(&lList->last_element().response_thread,
-	       NULL, &client_thread, &lList->last_element()) != 0 )
+	       NULL, &client_thread, static_cast <client_thread_data> (&lList->last_element())) != 0 )
 	{
 	lList->p_last_element();
 	shutdown(detached_socket, SHUT_RDWR);
@@ -1111,7 +1112,7 @@ entity_handle hHandle, transmit_block *cCommand)
 	return false;
 	   }
 
-	if (!copied_command->find_command())
+	if (!copied_command->value().find_command())
 	   {
 	delete copied_command;
 	send_server_response(*cCommand, event_error);

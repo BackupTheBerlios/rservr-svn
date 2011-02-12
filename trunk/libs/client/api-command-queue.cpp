@@ -632,7 +632,7 @@ text_info nName, text_info aAddress)
 
 	internal_stream_input.reset_transmission_limit();
 
-	if (!import_data(new_command, &internal_stream_input) || internal_stream_input.is_terminated())
+	if (!internal_stream_input.parse_command(new_command) || internal_stream_input.is_terminated())
 	{
 	delete new_command;
 	if (internal_stream_input.is_terminated()) return result_invalid;
@@ -700,7 +700,7 @@ receive_short_func rReceive)
 	return result_fail;
 	}
 
-	if (!import_data(new_command, &buffered_stream_input) || buffered_stream_input.is_terminated())
+	if (!buffered_stream_input.parse_command(new_command) || buffered_stream_input.is_terminated())
 	{
 	delete new_command;
 	if (buffered_stream_input.is_terminated()) return result_invalid;
@@ -825,14 +825,11 @@ command_handle manual_command(text_info nName, external_command *cCommand)
 	return NULL;
 	}
 
-	if (!new_block->set_command(new_command))
+	if (!new_block->set_command(cCommand))
 	{
-	delete cCommand;
 	delete new_block;
 	return NULL;
 	}
-
-	//NOTE: 'new_block' now owns 'new_command'
 
 	if (!lookup_command(new_block->command_name(), new_block->execute_type))
 	{
@@ -857,8 +854,5 @@ command_handle manual_command(text_info nName, external_command *cCommand)
 //(from 'plugin-dev/manual-command.hpp')
 command_handle manual_response(message_handle rRequest, struct external_command *cCommand)
 {
-	//NOTE: this goes first in case we return early
-	section_releaser new_command(cCommand);
-
-	GENERAL_RESPONSE(rRequest, new_command)
+	GENERAL_RESPONSE(rRequest, cCommand)
 }

@@ -36,8 +36,8 @@
 #include "plugin-dev/external-command.hpp"
 
 
-extern result create_manual_response(const command_info&, section_releaser);
-extern result create_server_command(section_releaser);
+extern result create_manual_response(const command_info&, external_command*);
+extern result create_server_command(external_command*);
 extern result create_auto_response(const command_info&, command_event, text_info);
 extern result create_auto_response_list(const command_info&, command_event, info_list);
 

@@ -84,7 +84,7 @@ RSERVR_AUTO_BUILTIN_TAG(register_service)
 	  return RSERVR_EVAL_REJECTED;
 
 	external_command::manual_response( RSERVR_INFO_ARG,
-	  section_releaser( new proto_remote_service_action(RSERVR_REMOTE_MONITOR, service_name.c_str(),
+	   new proto_remote_service_action(RSERVR_REMOTE_MONITOR, service_name.c_str(,
 	    external_command::get_sender_address(RSERVR_INFO_ARG)) ) );
 
 	return RSERVR_EVAL_NONE;
@@ -142,7 +142,7 @@ RSERVR_AUTO_BUILTIN_TAG(deregister_own_service)
 	  return RSERVR_EVAL_REJECTED;
 
 	external_command::manual_response( RSERVR_INFO_ARG,
-	  section_releaser( new proto_remote_service_action(RSERVR_REMOTE_UNMONITOR, service_name.c_str(),
+	   new proto_remote_service_action(RSERVR_REMOTE_UNMONITOR, service_name.c_str(,
 	    external_command::get_sender_address(RSERVR_INFO_ARG)) ) );
 
 	return RSERVR_EVAL_NONE;
@@ -364,18 +364,18 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_action)
 	    service_name.c_str(), external_command::get_target_address(RSERVR_INFO_ARG), complete_address.c_str()) ) );
 
 	if (action == RSERVR_REMOTE_MONITOR)
-	create_server_command( section_releaser(new proto_monitor_resource_exit(external_command::get_sender_name(RSERVR_INFO_ARG))) );
+	create_server_command(new proto_monitor_resource_exit(external_command::get_sender_name(RSERVR_INFO_ARG)));
 	else if (action == RSERVR_REMOTE_UNMONITOR)
-	create_server_command( section_releaser(new proto_unmonitor_resource_exit(external_command::get_sender_name(RSERVR_INFO_ARG))) );
+	create_server_command(new proto_unmonitor_resource_exit(external_command::get_sender_name(RSERVR_INFO_ARG)));
 	 }
 
 
 	else if (!RSERVR_CHECK_FROM_REMOTE)
 	 {
 	if (action == RSERVR_REMOTE_MONITOR)
-	create_server_command( section_releaser(new proto_monitor_resource_exit(service_name.c_str())) );
+	create_server_command(new proto_monitor_resource_exit(service_name.c_str()));
 	else if (action == RSERVR_REMOTE_UNMONITOR)
-	create_server_command( section_releaser(new proto_unmonitor_resource_exit(service_name.c_str())) );
+	create_server_command(new proto_unmonitor_resource_exit(service_name.c_str()));
 	 }
 
 
@@ -514,9 +514,9 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_back_action)
 
 
 	if (action == RSERVR_REMOTE_MONITOR)
-	create_server_command( section_releaser(new proto_monitor_resource_exit(external_command::get_sender_name(RSERVR_INFO_ARG))) );
+	create_server_command(new proto_monitor_resource_exit(external_command::get_sender_name(RSERVR_INFO_ARG)));
 	else if (action == RSERVR_REMOTE_UNMONITOR)
-	create_server_command( section_releaser(new proto_unmonitor_resource_exit(external_command::get_sender_name(RSERVR_INFO_ARG))) );
+	create_server_command(new proto_unmonitor_resource_exit(external_command::get_sender_name(RSERVR_INFO_ARG)));
 
 
 	text_data new_monitor_connection = external_command::get_target_address(RSERVR_INFO_ARG);
@@ -644,7 +644,7 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_disconnect)
 	  section_releaser( new proto_remote_service_back_action(~direction, RSERVR_REMOTE_UNMONITOR,
 	    service_name.c_str(), external_command::get_target_address(RSERVR_INFO_ARG), complete_address.c_str()) ) );
 
-	create_server_command( section_releaser(new proto_unmonitor_resource_exit(external_command::get_sender_name(RSERVR_INFO_ARG))) );
+	create_server_command(new proto_unmonitor_resource_exit(external_command::get_sender_name(RSERVR_INFO_ARG)));
 	 }
 
 

@@ -45,7 +45,7 @@ extern "C" {
 
 #include "external/global-sentry.hpp"
 
-#include "constants.hpp"
+#include "../constants.hpp"
 #include "command-transmit.hpp"
 
 extern "C" {

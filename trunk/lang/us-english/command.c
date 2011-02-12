@@ -92,12 +92,6 @@ int log_command_extract_holding_exceeded()
 { return local_log(logging_normal, "/n/ command extraction memory limit exceeded"); }
 
 /*extended____________________________________________________________________*/
-int log_command_command_dump(text_string dData)
-{ return local_log(logging_extended, "/e/ command dump:\n") && direct_log(logging_extended, dData); }
-
-int log_command_discard_dump(text_string dData)
-{ return local_log(logging_extended, "/e/ discard dump:\n") && direct_log(logging_extended, dData); }
-
 /*debug_______________________________________________________________________*/
 int log_command_command_sent(text_string cCommand, unsigned int rRefFrom,
 text_string tTo)

@@ -245,7 +245,7 @@ static const input_section default_input_section;
 
 	queue_outcome = result_fail;
 
-	if (import_data(&internal_command->value(), this))
+	if (this->parse_command(&internal_command->value()))
 	  {
 	if (internal_command->value().command_ready())
 	   {

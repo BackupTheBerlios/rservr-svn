@@ -494,11 +494,7 @@ bool empty_server_command(transmit_block &bBase, const text_data &nName)
 	new_command = server_commands.get_element(position).new_command(nName);
 	}
 
-	if (!bBase.set_command(new_command))
-	{
-	delete new_command;
-	return false;
-	}
+	if (!bBase.set_command(new_command)) return false;
 
 	else
 	{

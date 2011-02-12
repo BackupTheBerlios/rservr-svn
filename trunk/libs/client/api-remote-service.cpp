@@ -62,13 +62,7 @@ result remote_service_broken_connection(const struct remote_service_data *dData)
 
 	if (dData->direction == RSERVR_REMOTE_TOWARD_CLIENT && dData->notify_entity && dData->notify_address)
 	{
-	external_command *new_command = new proto_deregister_own_service(dData->service_name);
-	if (!new_block.set_command(new_command))
-	 {
-	delete new_command;
-	return false;
-	 }
-	//NOTE: 'new_block' now owns 'new_command'
+	if (!new_block.set_command(new proto_deregister_own_service(dData->service_name))) return false;
 	if (!lookup_command(new_block.command_name(), new_block.execute_type)) return false;
 	new_block.orig_entity = dData->current_target;
 
@@ -82,14 +76,9 @@ result remote_service_broken_connection(const struct remote_service_data *dData)
 
 	if (strlen(dData->notify_address) && dData->notify_entity)
 	{
-	external_command *new_command = new proto_remote_service_disconnect(dData->direction,
-	    dData->service_name, dData->complete_address);
-	if (!new_block.set_command(new_command))
-	 {
-	delete new_command;
+	if (!new_block.set_command(new proto_remote_service_disconnect(dData->direction,
+	    dData->service_name, dData->complete_address)))
 	return false;
-	 }
-	//NOTE: 'new_block' now owns 'new_command'
 	if (!lookup_command(new_block.command_name(), new_block.execute_type)) return false;
 	new_block.orig_entity    = dData->current_target;
 	new_block.target_entity  = dData->notify_entity;

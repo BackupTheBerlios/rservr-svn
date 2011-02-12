@@ -847,14 +847,30 @@ struct external_client_interface : public client_interface
 	bool ATTR_INT register_alt_remote(const command_info &iInfo, external_command *cCommand)
 	{
 	//TODO: combine with 'register_remote'
-	if (!iInfo.show_command()) return false;
-	if (requirement_fail(command_remote) || block_remote_status()) return false;
+	if (!iInfo.show_command())
+	 {
+	delete cCommand;
+	return false;
+	 }
+	if (requirement_fail(command_remote) || block_remote_status())
+	 {
+	delete cCommand;
+	return false;
+	 }
 
 	transmit_block *command_copy = NULL;
 	command_copy = new transmit_block;
-	if (!command_copy) return false;
+	if (!command_copy)
+	 {
+	delete cCommand;
+	return false;
+	 }
 	iInfo.show_command()->copy_base(*command_copy);
-	command_copy->set_command(cCommand);
+	if (!command_copy->set_command(cCommand))
+	 {
+	delete command_copy;
+	return false;
+	 }
 
 	if (!lookup_command(command_copy->command_name(), command_copy->execute_type))
 	 {
@@ -1100,7 +1116,7 @@ static bool internal_queue_loop()
 	local_client_interface.current_command_type = internal_command.execute_type;
 	execute_client_command(internal_command);
 	local_client_interface.current_command_type = command_none;
-	internal_command.set_command(section_releaser(NULL));
+	internal_command.set_command(NULL);
 	 }
 	}
 
@@ -1266,6 +1282,7 @@ result message_queue_pause_state()
 static pthread_t current_timeout_thread = (pthread_t) NULL;
 static long_time pause_thread_timeout = 0.0;
 
+typedef long_time *timeout_thread_data;
 static void *pause_timeout_thread(void*);
 
 static void cancel_pause_timeout()
@@ -1287,7 +1304,7 @@ result message_queue_timed_pause(long_time tTime)
 
 	pause_thread_timeout = tTime;
 	if ( pthread_create(&current_timeout_thread, NULL, &pause_timeout_thread,
-	       (long_time*) &pause_thread_timeout) != 0 )
+	       static_cast <timeout_thread_data> (&pause_thread_timeout)) != 0 )
 	return false;
 
 	return true;
@@ -1351,7 +1368,7 @@ static void *pause_timeout_thread(void *tTimeout)
 	return NULL;
 	}
 
-	long_time timeout = *(long_time*) tTimeout;
+	long_time timeout = *(timeout_thread_data) tTimeout;
 	*(long_time*) tTimeout = 0.0;
 
 	//TODO: make the conversion function from protocol lib available for this

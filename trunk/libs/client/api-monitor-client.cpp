@@ -49,4 +49,4 @@ result monitoring_allowed()
 { return check_permission_all(entity_type(), type_monitor_client); }
 
 command_handle set_monitor_flags(monitor_event eEvent)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_set_monitor_types(eEvent & monitor_set_mask))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_set_monitor_types(eEvent & monitor_set_mask)) }

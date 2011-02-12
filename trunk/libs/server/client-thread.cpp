@@ -60,7 +60,7 @@ void *client_thread(void *cClient)
 	return NULL;
 	}
 
-	client_id *const this_client = static_cast <client_id*> (cClient);
+	const client_thread_data this_client = (client_thread_data) (cClient);
 
 	pthread_t     thread_id     = this_client->response_thread;
 	pid_t         thread_pid    = this_client->process_id;

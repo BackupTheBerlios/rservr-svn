@@ -39,7 +39,7 @@
 
 
 command_handle service_request(text_info nName, text_info mMessage)
-{ DEFAULT_QUEUE_CLIENT_COMMAND(nName, section_releaser(new proto_service_request(mMessage))) }
+{ DEFAULT_QUEUE_CLIENT_COMMAND(nName, new proto_service_request(mMessage)) }
 
 command_handle binary_service_request(text_info nName, binary_info mMessage, binary_size sSize)
-{ DEFAULT_QUEUE_CLIENT_COMMAND(nName, section_releaser(new proto_service_request(mMessage, sSize))) }
+{ DEFAULT_QUEUE_CLIENT_COMMAND(nName, new proto_service_request(mMessage, sSize)) }

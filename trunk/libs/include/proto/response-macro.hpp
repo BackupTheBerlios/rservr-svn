@@ -44,9 +44,7 @@ extern "C" {
 #define COPY_TO_RESPONSE(command, left, right) \
 { if (!left.send_to) return false; \
   left.send_to = NULL; \
-  if (!left.set_command(command)) \
-  { delete command; \
-    return false; } \
+  if (!left.set_command(command)) return false; \
   left.orig_entity      = is_server()? entity_name() : right.target_entity; \
   left.orig_address     = ""; \
   left.orig_reference   = 0; \

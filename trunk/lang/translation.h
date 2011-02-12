@@ -326,9 +326,6 @@ extern int log_command_transmission_exceeded(text_string);
 extern int log_command_extract_holding_exceeded();
 
 /*extended____________________________________________________________________*/
-extern int log_command_command_dump(text_string);
-extern int log_command_discard_dump(text_string);
-
 /*debug_______________________________________________________________________*/
 extern int log_command_command_sent(text_string, unsigned int, text_string);
 extern int log_command_command_received(text_string, unsigned int, text_string);

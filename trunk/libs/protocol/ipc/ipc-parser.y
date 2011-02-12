@@ -32,6 +32,7 @@
 
 %{
 extern "C" {
+#include "lang/translation.h"
 #include "ipc/ipc-parser.tab.h"
 }
 
@@ -214,9 +215,14 @@ content:
 %%
 
 
-//*****TEMP***** TODO: use logging system here
 void protocol_error(protocol_scanner_context *cContext, void *sScanner, char *eError)
-{ fprintf(stderr, "ERROR: %s\n", eError); }
+{
+	if (cContext && cContext->command)
+    log_command_command_parse_error(eError, cContext->command->command_name(),
+      cContext->command->orig_reference, cContext->command->orig_entity.c_str());
+	else
+    log_command_command_parse_error(eError, "", 0, "");
+}
 
 
 extern "C" {

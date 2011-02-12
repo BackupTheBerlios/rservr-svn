@@ -104,8 +104,7 @@ result manual_indicate_ready()
 	return false;
 	}
 
-	SEND_SERVER_COMMAND_NO_EVENT(section_releaser(new proto_indicate_ready),
-	  client_timing_specs->register_wait)
+	SEND_SERVER_COMMAND_NO_EVENT(new proto_indicate_ready, client_timing_specs->register_wait)
 
 	return (readiness_sent |= check_event_all(SEND_SERVER_COMMAND_OUTCOME, event_complete));
 }
@@ -131,14 +130,7 @@ bool master_register_client(text_info nName, permission_mask tType)
 
 	if (tType != type_none && local_type() != type_none) return false;
 	transmit_block new_block;
-	external_command *new_command = new proto_register_client(nName, tType, disable_ready);
-	if (!new_block.set_command(new_command))
-	 {
-	delete new_command;
-	return false;
-	 }
-	new_command = NULL;
-	//NOTE: 'new_block' now owns 'new_command'
+	if (!new_block.set_command(new proto_register_client(nName, tType, disable_ready))) return false;
 	if (!lookup_command(new_block.command_name(), new_block.execute_type)) return false;
 
 	new_block.orig_reference = manual_message_number();
@@ -193,20 +185,28 @@ result deregister_client()
 
 
 command_handle short_response(message_handle rRequest, command_event eEvent)
-{ GENERAL_RESPONSE(rRequest, section_releaser(new proto_short_response(eEvent))) }
+{ GENERAL_RESPONSE(rRequest, new proto_short_response(eEvent)) }
 
 
 command_handle client_response(message_handle rRequest, command_event eEvent,
 text_info mMessage)
-{ GENERAL_RESPONSE(rRequest, section_releaser(new proto_client_response(eEvent, mMessage))) }
+{ GENERAL_RESPONSE(rRequest, new proto_client_response(eEvent, mMessage)) }
 
 
 //(for 'auto-response.hpp')
-result create_manual_response(const command_info &cCommand, section_releaser rResponse)
+result create_manual_response(const command_info &cCommand, external_command *rResponse)
 {
-	if (!cCommand.target_entity.size()) return false;
+	if (!cCommand.target_entity.size())
+	{
+	delete rResponse;
+	return false;
+	}
 	transmit_block response_command, command_copy;
-	if (!cCommand.copy_base(response_command)) return false;
+	if (!cCommand.copy_base(response_command))
+	{
+	delete rResponse;
+	return false;
+	}
 	command_copy = response_command;
 
 	COPY_TO_RESPONSE(rResponse, response_command, command_copy)
@@ -216,7 +216,7 @@ result create_manual_response(const command_info &cCommand, section_releaser rRe
 
 
 //(for 'auto-response.hpp')
-result create_server_command(section_releaser cCommand)
+result create_server_command(external_command *cCommand)
 { SILENT_SEND_SERVER_COMMAND(cCommand) }
 
 
@@ -229,7 +229,7 @@ text_info mMessage)
 	if (!cCommand.copy_base(response_command)) return false;
 	command_copy = response_command;
 
-	COPY_TO_RESPONSE(section_releaser(new proto_client_response(rResult, mMessage)), \
+	COPY_TO_RESPONSE(new proto_client_response(rResult, mMessage), \
 	  response_command, command_copy)
 
 	AUTO_SEND_COMMAND(response_command, command_copy)
@@ -245,7 +245,7 @@ info_list lList)
 	if (!cCommand.copy_base(response_command)) return false;
 	command_copy = response_command;
 
-	COPY_TO_RESPONSE(section_releaser(new proto_client_response_list(rResult, lList)), \
+	COPY_TO_RESPONSE(new proto_client_response_list(rResult, lList), \
 	  response_command, command_copy)
 
 	AUTO_SEND_COMMAND(response_command, command_copy)
@@ -253,15 +253,15 @@ info_list lList)
 
 
 command_handle client_message(text_info nName, text_info mMessage)
-{ DEFAULT_QUEUE_CLIENT_COMMAND(nName, section_releaser(new proto_client_message(mMessage))) }
+{ DEFAULT_QUEUE_CLIENT_COMMAND(nName, new proto_client_message(mMessage)) }
 
 
 command_handle ping_client(text_info nName)
-{ DEFAULT_QUEUE_CLIENT_COMMAND(nName, section_releaser(new proto_ping_client)) }
+{ DEFAULT_QUEUE_CLIENT_COMMAND(nName, new proto_ping_client) }
 
 
 command_handle ping_server()
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_ping_server)) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_ping_server) }
 
 
 command_event request_terminal(int *fFile)
@@ -294,7 +294,7 @@ command_event request_terminal(int *fFile)
 	struct termios current_settings;
 	if (tcgetattr(execute_terminal, &current_settings) < 0) return event_unsent;
 
-	DEFAULT_SEND_SERVER_COMMAND(section_releaser(new proto_term_request), client_timing_specs->terminal_wait)
+	DEFAULT_SEND_SERVER_COMMAND(new proto_term_request, client_timing_specs->terminal_wait)
 
 	if (check_event_all(SEND_SERVER_COMMAND_OUTCOME, event_complete))
 	{
@@ -330,8 +330,7 @@ result return_terminal()
 	return false;
 	}
 
-	SEND_SERVER_COMMAND_NO_EVENT(section_releaser(new proto_term_return),
-	  client_timing_specs->terminal_wait)
+	SEND_SERVER_COMMAND_NO_EVENT(new proto_term_return, client_timing_specs->terminal_wait)
 
 	return check_event_all(SEND_SERVER_COMMAND_OUTCOME, event_complete);
 }

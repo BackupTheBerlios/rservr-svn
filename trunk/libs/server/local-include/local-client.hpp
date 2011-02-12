@@ -116,7 +116,7 @@ struct client_id :
 class local_client :
 	protected multi_source,
 	protected multi_destination,
-	virtual private data_input,
+	private lexer_input,
 	virtual public protect::capsule <data_output>
 {
 public:

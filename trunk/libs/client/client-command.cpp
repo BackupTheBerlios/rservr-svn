@@ -656,11 +656,5 @@ bool empty_client_command(transmit_block &bBase, const text_data &nName)
 	 }
 	}
 
-	if (!bBase.set_command(new_command))
-	{
-	delete new_command;
-	return false;
-	}
-
-	else return true;
+	return bBase.set_command(new_command);
 }

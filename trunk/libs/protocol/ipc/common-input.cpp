@@ -110,8 +110,7 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 
 	if (!outcome)
 	 {
-	cCommand->set_command_data(NULL);
-	cCommand->set_command(NULL);
+	cCommand->clear_command();
 	return outcome;
 	 }
 

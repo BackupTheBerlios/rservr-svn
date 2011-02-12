@@ -42,4 +42,4 @@ result register_control_client(text_info nName)
 
 
 command_handle find_control_clients(text_info nName)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_find_control_clients(nName))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_find_control_clients(nName)) }

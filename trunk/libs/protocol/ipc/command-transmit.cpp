@@ -88,14 +88,13 @@ inline static bool ATTR_INL local_check_su()
 
 	transmit_block::transmit_block(const command_finder *fFinder) :
 	wait_start(0), execute_type(0), no_send(false), send_to(NULL), command(NULL),
-	finder(fFinder), output_mode(0x00)
-	{ }
+	finder(fFinder) {}
 
 	transmit_block::transmit_block(const transmit_block &eEqual) :
 	wait_start(eEqual.wait_start), no_send(eEqual.no_send),
 	send_to(eEqual.send_to), command(eEqual.command? eEqual.command->copy() : NULL),
-	finder(eEqual.finder), output_mode(eEqual.output_mode)
-	{ }
+	finder(eEqual.finder), command_label(eEqual.command_label),
+	extracted_command(eEqual.extracted_command) {}
 
 	transmit_block &transmit_block::operator = (const transmit_block &eEqual)
 	{
@@ -124,10 +123,10 @@ inline static bool ATTR_INL local_check_su()
 	{
         if (!finder->new_command(*this, command_label) ||
 	    (this->orig_address.size() && check_command_all(execute_type, command_no_remote)))
-         {
+	 {
      log_command_parse_rejected(command_label.c_str());
-         return false;
-         }
+	return false;
+	 }
 
 	return true;
 	}
@@ -141,8 +140,19 @@ inline static bool ATTR_INL local_check_su()
 	return this->assemble_command();
 	}
 
+	text_info transmit_block::extract()
+	{
+	extracted_command.clear();
+	::export_data(this, this);
+	return extracted_command.c_str();
+	}
 
-	//NOTE: WORKING!!!
+	void transmit_block::clear_command()
+	{
+	this->set_command_name("");
+	this->set_command_data(NULL);
+	this->set_command(NULL);
+	}
 
 	void transmit_block::set_command_name(const text_data &nName)
 	{ command_label = nName; }
@@ -155,7 +165,11 @@ inline static bool ATTR_INL local_check_su()
 
 	bool transmit_block::set_command(external_command *cCommand)
 	{
-	if (cCommand && this->get_tree() && !cCommand->compile_command(this->get_tree())) return false;
+	if (cCommand && this->get_tree() && !cCommand->compile_command(this->get_tree()))
+	 {
+	delete cCommand;
+	return false;
+	 }
 	delete command;
 	command = cCommand;
 	return true;
@@ -385,9 +399,9 @@ inline static bool ATTR_INL local_check_su()
 	no_send      = eEqual.no_send;
 	send_to      = eEqual.send_to;
 
-	finder        = eEqual.finder;
-	output_mode   = eEqual.output_mode;
-	command_label = eEqual.command_label;
+	finder            = eEqual.finder;
+	command_label     = eEqual.command_label;
+	extracted_command = eEqual.extracted_command;
 	}
 
 
@@ -455,3 +469,20 @@ inline static bool ATTR_INL local_check_su()
 	current = current->next();
 	 }
 	}
+
+	//from 'data_output'----------------------------------------------------
+	bool transmit_block::send_output(const output_section &dData)
+	{
+	if (extracted_command.size() + dData.size() > PARAM_MAX_COMMAND_DATA)
+	 {
+     log_command_extract_holding_exceeded();
+	return false;
+	 }
+
+	extracted_command += dData;
+	return true;
+	}
+
+	bool transmit_block::is_closed() const
+	{ return false; }
+	//----------------------------------------------------------------------

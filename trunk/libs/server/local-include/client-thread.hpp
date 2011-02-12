@@ -36,6 +36,9 @@
 #include "attributes.h"
 
 
+struct client_id;
+typedef client_id *client_thread_data;
+
 void *client_thread(void*) ATTR_INT;
 
 #endif //client_thread_hpp

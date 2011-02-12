@@ -61,51 +61,51 @@ result have_server_control()
 
 command_handle create_new_system_client(text_info cCommand, uid_t uUid, gid_t gGid,
 command_priority pPriority, permission_mask pPerm, create_flags fFlags)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_create_client(cCommand, uUid, gGid, pPriority, pPerm, fFlags, false))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_create_client(cCommand, uUid, gGid, pPriority, pPerm, fFlags, false)) }
 
 
 command_handle create_new_system_client_pid(text_info cCommand, uid_t uUid, gid_t gGid,
 command_priority pPriority, permission_mask pPerm, create_flags fFlags)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_create_client(cCommand, uUid, gGid, pPriority, pPerm, fFlags, true))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_create_client(cCommand, uUid, gGid, pPriority, pPerm, fFlags, true)) }
 
 
 command_handle create_new_exec_client(info_list cCommand, uid_t uUid, gid_t gGid,
 command_priority pPriority, permission_mask pPerm, create_flags fFlags)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_create_client(cCommand, uUid, gGid, pPriority, pPerm, fFlags, false))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_create_client(cCommand, uUid, gGid, pPriority, pPerm, fFlags, false)) }
 
 
 command_handle create_new_exec_client_pid(info_list cCommand, uid_t uUid, gid_t gGid,
 command_priority pPriority, permission_mask pPerm, create_flags fFlags)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_create_client(cCommand, uUid, gGid, pPriority, pPerm, fFlags, true))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_create_client(cCommand, uUid, gGid, pPriority, pPerm, fFlags, true)) }
 
 
 command_handle connect_detached_client(text_info sSocket, command_priority pPriority,
 permission_mask pPerm, create_flags fFlags)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_detached_client(sSocket, pPriority, pPerm, fFlags))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_detached_client(sSocket, pPriority, pPerm, fFlags)) }
 
 
 command_handle terminate_client(text_info nName)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_remove_client(nName, false))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_remove_client(nName, false)) }
 
 
 command_handle kill_client(text_info nName)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_remove_client(nName, true))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_remove_client(nName, true)) }
 
 
 command_handle terminate_client_pattern(text_info nName)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_remove_find_client(nName, false))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_remove_find_client(nName, false)) }
 
 
 command_handle kill_client_pattern(text_info nName)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_remove_find_client(nName, true))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_remove_find_client(nName, true)) }
 
 
 command_handle terminate_client_pid(pid_t pPid)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_remove_pid_client(pPid, false))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_remove_pid_client(pPid, false)) }
 
 
 command_handle kill_client_pid(pid_t pPid)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_remove_pid_client(pPid, true))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_remove_pid_client(pPid, true)) }
 
 
 result terminate_server()
@@ -122,7 +122,7 @@ result terminate_server()
 	return false;
 	}
 
-	SEND_SERVER_COMMAND_NO_EVENT(section_releaser(new proto_terminate_server), client_timing_specs->terminate_wait)
+	SEND_SERVER_COMMAND_NO_EVENT(new proto_terminate_server, client_timing_specs->terminate_wait)
 
 	return check_event_all(SEND_SERVER_COMMAND_OUTCOME, event_complete);
 }
@@ -131,4 +131,4 @@ result terminate_server()
 
 command_handle find_registered_clients(text_info nName,
 permission_mask iInclude, permission_mask eExclude)
-{ DEFAULT_QUEUE_SERVER_COMMAND(section_releaser(new proto_find_clients(nName, iInclude, eExclude))) }
+{ DEFAULT_QUEUE_SERVER_COMMAND(new proto_find_clients(nName, iInclude, eExclude)) }

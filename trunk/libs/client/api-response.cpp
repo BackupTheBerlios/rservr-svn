@@ -37,15 +37,15 @@
 
 
 command_handle service_response(message_handle rRequest, text_info mMessage)
-{ GENERAL_RESPONSE(rRequest, section_releaser(new proto_service_response(mMessage))) }
+{ GENERAL_RESPONSE(rRequest, new proto_service_response(mMessage)) }
 
 command_handle binary_service_response(message_handle rRequest, binary_info mMessage, binary_size sSize)
-{ GENERAL_RESPONSE(rRequest, section_releaser(new proto_service_response(mMessage, sSize))) }
+{ GENERAL_RESPONSE(rRequest, new proto_service_response(mMessage, sSize)) }
 
 extern command_handle partial_service_response(message_handle rRequest, text_info mMessage,
 response_type tType)
-{ GENERAL_RESPONSE(rRequest, section_releaser(new proto_partial_response(tType, mMessage))) }
+{ GENERAL_RESPONSE(rRequest, new proto_partial_response(tType, mMessage)) }
 
 extern command_handle partial_service_response(message_handle rRequest, info_list mMessages,
 response_type tType)
-{ GENERAL_RESPONSE(rRequest, section_releaser(new proto_partial_response_list(tType, mMessages))) }
+{ GENERAL_RESPONSE(rRequest, new proto_partial_response_list(tType, mMessages)) }

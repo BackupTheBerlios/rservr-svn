@@ -175,7 +175,7 @@ command_handle cCommand)
 
 	if (!(object = RETAINED_ENTRY_ARG)) return protect::exit_forced;
 
-	bool outcome = &object->get_element(position).command_sendable() &&
+	bool outcome = object->get_element(position).command_sendable() &&
 	  new_output( &object->get_element(position) );
 
 	if (!reference_set)
