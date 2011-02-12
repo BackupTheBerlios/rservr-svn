@@ -57,13 +57,7 @@ RSERVR_AUTO_BUILTIN_TAG(register_service)
 
 	proto_register_service::proto_register_service(text_info nName, text_info tType) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(register_service)),
-	service_name(nName? nName : ""), service_type(tType? tType : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(register_service, type_resource_client, type_server)
-
-	RSERVR_COMMAND_ADD_TEXT(service_name)
-	RSERVR_COMMAND_ADD_TEXT(service_type)
-	}
+	service_name(nName? nName : ""), service_type(tType? tType : "") {}
 
 
 	bool proto_register_service::allow_sender(text_info nName, text_info, text_info aAddress) const
@@ -84,8 +78,8 @@ RSERVR_AUTO_BUILTIN_TAG(register_service)
 	  return RSERVR_EVAL_REJECTED;
 
 	external_command::manual_response( RSERVR_INFO_ARG,
-	   new proto_remote_service_action(RSERVR_REMOTE_MONITOR, service_name.c_str(,
-	    external_command::get_sender_address(RSERVR_INFO_ARG)) ) );
+	   new proto_remote_service_action(RSERVR_REMOTE_MONITOR, service_name.c_str(),
+	    external_command::get_sender_address(RSERVR_INFO_ARG)) );
 
 	return RSERVR_EVAL_NONE;
 	}
@@ -93,21 +87,37 @@ RSERVR_AUTO_BUILTIN_TAG(register_service)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_register_service)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(register_service, type_none, type_admin_client)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	service_name.clear();
 	service_type.clear();
 
-	RSERVR_AUTO_COPY_TEXT(service_name)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_TEXT(service_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(service_name)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(service_type)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_register_service)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(register_service, type_resource_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", service_name)
+	RSERVR_COMMAND_ADD_TEXT("", service_type)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -128,12 +138,7 @@ RSERVR_AUTO_BUILTIN_TAG(deregister_own_service)
 
 	proto_deregister_own_service::proto_deregister_own_service(text_info nName) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(deregister_own_service)),
-	service_name(nName? nName : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(deregister_own_service, type_resource_client, type_server)
-
-	RSERVR_COMMAND_ADD_BINARY(service_name)
-	}
+	service_name(nName? nName : "") {}
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_deregister_own_service)
@@ -142,8 +147,8 @@ RSERVR_AUTO_BUILTIN_TAG(deregister_own_service)
 	  return RSERVR_EVAL_REJECTED;
 
 	external_command::manual_response( RSERVR_INFO_ARG,
-	   new proto_remote_service_action(RSERVR_REMOTE_UNMONITOR, service_name.c_str(,
-	    external_command::get_sender_address(RSERVR_INFO_ARG)) ) );
+	   new proto_remote_service_action(RSERVR_REMOTE_UNMONITOR, service_name.c_str(),
+	    external_command::get_sender_address(RSERVR_INFO_ARG)) );
 
 	return RSERVR_EVAL_NONE;
 	}
@@ -151,18 +156,32 @@ RSERVR_AUTO_BUILTIN_TAG(deregister_own_service)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_deregister_own_service)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(deregister_own_service, type_none, type_admin_client)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	service_name.clear();
 
-	RSERVR_AUTO_COPY_ANY(service_name)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(service_name)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_deregister_own_service)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(deregister_own_service, type_resource_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", service_name)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -182,11 +201,7 @@ RSERVR_AUTO_BUILTIN_TAG(deregister_all_own_services)
 
 
 	proto_deregister_all_own_services::proto_deregister_all_own_services() :
-	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(deregister_all_own_services))
-	{
-	RSERVR_COMMAND_BUILD_CHECK(deregister_all_own_services, type_resource_client, type_server)
-	RSERVR_COMMAND_ADD_NULL
-	}
+	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(deregister_all_own_services)) {}
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_deregister_all_own_services)
@@ -198,14 +213,20 @@ RSERVR_AUTO_BUILTIN_TAG(deregister_all_own_services)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_deregister_all_own_services)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(deregister_all_own_services, type_none, type_admin_client)
-	RSERVR_COMMAND_INPUT_SET
+	return true;
+	}
 
-	RSERVR_CLEAR_COMMAND
-	RSERVR_COMMAND_ADD_NULL
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_BUILD_HEAD(proto_deregister_all_own_services)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(deregister_all_own_services, type_resource_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_EMPTY
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -226,12 +247,7 @@ RSERVR_AUTO_BUILTIN_TAG(deregister_remote_services)
 
 	proto_deregister_remote_services::proto_deregister_remote_services(text_info lLocation) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(deregister_remote_services)),
-	service_location(lLocation? lLocation : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(deregister_remote_services, type_resource_client, type_server)
-
-	RSERVR_COMMAND_ADD_BINARY(service_location)
-	}
+	service_location(lLocation? lLocation : "") {}
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_deregister_remote_services)
@@ -243,18 +259,32 @@ RSERVR_AUTO_BUILTIN_TAG(deregister_remote_services)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_deregister_remote_services)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(deregister_remote_services, type_none, type_admin_client)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	service_location.clear();
 
-	RSERVR_AUTO_COPY_TEXT(service_location)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(service_location)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_deregister_remote_services)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(deregister_remote_services, type_resource_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", service_location)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -275,12 +305,7 @@ RSERVR_AUTO_BUILTIN_TAG(find_resource_clients)
 
 	proto_find_resource_clients::proto_find_resource_clients(text_info nName) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(find_resource_clients)),
-	name_expression(nName? nName : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(find_resource_clients, type_resource_client, type_server)
-
-	RSERVR_COMMAND_ADD_BINARY(name_expression)
-	}
+	name_expression(nName? nName : "") {}
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_find_resource_clients)
@@ -292,18 +317,32 @@ RSERVR_AUTO_BUILTIN_TAG(find_resource_clients)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_find_resource_clients)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(find_resource_clients, type_active_client, type_none)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	name_expression.clear();
 
-	RSERVR_AUTO_COPY_ANY(name_expression)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(name_expression)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_find_resource_clients)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(find_resource_clients, type_resource_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", name_expression)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -328,16 +367,7 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_action)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(remote_service_action)),
 	action(aAction),
 	service_name(nName? nName : ""),
-	complete_address(aAddress? aAddress : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(remote_service_action, type_server, type_any_client)
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_CONVERT16_ADD(action)
-	RSERVR_COMMAND_ADD_BINARY(service_name)
-	RSERVR_COMMAND_ADD_BINARY(complete_address)
-	}
+	complete_address(aAddress? aAddress : "") {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(proto_remote_service_action)
@@ -360,8 +390,8 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_action)
 	if (RSERVR_CHECK_FROM_REMOTE && !is_next_server(external_command::get_sender_address(RSERVR_INFO_ARG)))
 	 {
 	external_command::manual_response( RSERVR_INFO_ARG,
-	  section_releaser( new proto_remote_service_back_action(RSERVR_REMOTE_TOWARD_SERVER, action,
-	    service_name.c_str(), external_command::get_target_address(RSERVR_INFO_ARG), complete_address.c_str()) ) );
+	  new proto_remote_service_back_action(RSERVR_REMOTE_TOWARD_SERVER, action,
+	    service_name.c_str(), external_command::get_target_address(RSERVR_INFO_ARG), complete_address.c_str()) );
 
 	if (action == RSERVR_REMOTE_MONITOR)
 	create_server_command(new proto_monitor_resource_exit(external_command::get_sender_name(RSERVR_INFO_ARG)));
@@ -445,24 +475,41 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_action)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_remote_service_action)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(remote_service_action, type_none, type_admin_client)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	service_name.clear();
 	complete_address.clear();
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(action)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(service_name)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_PARSE16(action)
 
-	RSERVR_AUTO_COPY_ANY(complete_address)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(service_name)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_COPY_DATA(complete_address)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_remote_service_action)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(remote_service_action, type_server, type_any_client)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_CONVERT16("", action)
+	RSERVR_COMMAND_ADD_TEXT("", service_name)
+	RSERVR_COMMAND_ADD_TEXT("", complete_address)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -490,18 +537,7 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_back_action)
 	action(aAction),
 	service_name(nName? nName : ""),
 	address_supplement(sSupplement? sSupplement : ""),
-	complete_address(aAddress? aAddress : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(remote_service_back_action, type_resource_client, type_server)
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_CONVERT16_ADD(direction)
-	RSERVR_CONVERT16_ADD(action)
-	RSERVR_COMMAND_ADD_BINARY(service_name)
-	RSERVR_COMMAND_ADD_BINARY(address_supplement)
-	RSERVR_COMMAND_ADD_BINARY(complete_address)
-	}
+	complete_address(aAddress? aAddress : "") {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(proto_remote_service_back_action)
@@ -571,30 +607,50 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_back_action)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_remote_service_back_action)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(remote_service_back_action, type_none, type_admin_client)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	service_name.clear();
 	address_supplement.clear();
 	complete_address.clear();
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(direction)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(action)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_PARSE16(direction)
 
-	RSERVR_AUTO_COPY_ANY(service_name)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_PARSE16(action)
 
-	RSERVR_AUTO_COPY_ANY(address_supplement)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_COPY_DATA(service_name)
 
-	RSERVR_AUTO_COPY_ANY(complete_address)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 3)
+	RSERVR_COMMAND_COPY_DATA(address_supplement)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 4)
+	RSERVR_COMMAND_COPY_DATA(complete_address)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_remote_service_back_action)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(remote_service_back_action, type_resource_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_CONVERT16("", direction)
+	RSERVR_COMMAND_CONVERT16("", action)
+	RSERVR_COMMAND_ADD_TEXT("", service_name)
+	RSERVR_COMMAND_ADD_TEXT("", address_supplement)
+	RSERVR_COMMAND_ADD_TEXT("", complete_address)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -620,16 +676,7 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_disconnect)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(remote_service_disconnect)),
 	direction(dDirection),
 	service_name(nName? nName : ""),
-	complete_address(aAddress? aAddress : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(remote_service_disconnect, type_resource_client, type_server)
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_CONVERT16_ADD(direction)
-	RSERVR_COMMAND_ADD_BINARY(service_name)
-	RSERVR_COMMAND_ADD_BINARY(complete_address)
-	}
+	complete_address(aAddress? aAddress : "") {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(proto_remote_service_disconnect)
@@ -641,8 +688,8 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_disconnect)
 	if (!is_next_server(external_command::get_sender_address(RSERVR_INFO_ARG)))
 	 {
 	external_command::manual_response( RSERVR_INFO_ARG,
-	  section_releaser( new proto_remote_service_back_action(~direction, RSERVR_REMOTE_UNMONITOR,
-	    service_name.c_str(), external_command::get_target_address(RSERVR_INFO_ARG), complete_address.c_str()) ) );
+	  new proto_remote_service_back_action(~direction, RSERVR_REMOTE_UNMONITOR,
+	    service_name.c_str(), external_command::get_target_address(RSERVR_INFO_ARG), complete_address.c_str()) );
 
 	create_server_command(new proto_unmonitor_resource_exit(external_command::get_sender_name(RSERVR_INFO_ARG)));
 	 }
@@ -703,24 +750,41 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_disconnect)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_remote_service_disconnect)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(remote_service_disconnect, type_resource_client, type_none)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	service_name.clear();
 	complete_address.clear();
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(direction)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(service_name)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_PARSE16(direction)
 
-	RSERVR_AUTO_COPY_ANY(complete_address)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(service_name)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_COPY_DATA(complete_address)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_remote_service_disconnect)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(remote_service_disconnect, type_resource_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_CONVERT16("", direction)
+	RSERVR_COMMAND_ADD_TEXT("", service_name)
+	RSERVR_COMMAND_ADD_TEXT("", complete_address)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -742,12 +806,7 @@ RSERVR_AUTO_BUILTIN_TAG(monitor_resource_exit)
 	proto_monitor_resource_exit::
 	  proto_monitor_resource_exit(text_info nName) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(monitor_resource_exit)),
-	resource_name(nName? nName : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(monitor_resource_exit, type_resource_client, type_server)
-
-	RSERVR_COMMAND_ADD_TEXT(resource_name)
-	}
+	resource_name(nName? nName : "") {}
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_monitor_resource_exit)
@@ -759,18 +818,32 @@ RSERVR_AUTO_BUILTIN_TAG(monitor_resource_exit)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_monitor_resource_exit)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(monitor_resource_exit, type_resource_client, type_none)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	resource_name.clear();
 
-	RSERVR_AUTO_COPY_ANY(resource_name)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(resource_name)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_monitor_resource_exit)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(monitor_resource_exit, type_resource_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", resource_name)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -792,12 +865,7 @@ RSERVR_AUTO_BUILTIN_TAG(unmonitor_resource_exit)
 	proto_unmonitor_resource_exit::
 	  proto_unmonitor_resource_exit(text_info nName) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(unmonitor_resource_exit)),
-	resource_name(nName? nName : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(unmonitor_resource_exit, type_resource_client, type_server)
-
-	RSERVR_COMMAND_ADD_TEXT(resource_name)
-	}
+	resource_name(nName? nName : "") {}
 
 
 	RSERVR_SERVER_EVAL_HEAD(proto_unmonitor_resource_exit)
@@ -809,18 +877,32 @@ RSERVR_AUTO_BUILTIN_TAG(unmonitor_resource_exit)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_unmonitor_resource_exit)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(unmonitor_resource_exit, type_resource_client, type_none)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	resource_name.clear();
 
-	RSERVR_AUTO_COPY_ANY(resource_name)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(resource_name)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_unmonitor_resource_exit)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(unmonitor_resource_exit, type_resource_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", resource_name)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -842,12 +924,7 @@ RSERVR_AUTO_BUILTIN_TAG(resource_exit)
 	proto_resource_exit::
 	  proto_resource_exit(text_info nName) :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(resource_exit)),
-	resource_name(nName? nName : "")
-	{
-	RSERVR_COMMAND_BUILD_CHECK(resource_exit, type_server, type_any_client)
-
-	RSERVR_COMMAND_ADD_TEXT(resource_name)
-	}
+	resource_name(nName? nName : "") {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(proto_resource_exit)
@@ -859,18 +936,32 @@ RSERVR_AUTO_BUILTIN_TAG(resource_exit)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_resource_exit)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	RSERVR_COMMAND_PARSE_CHECK(resource_exit, type_resource_client, type_none)
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	resource_name.clear();
 
-	RSERVR_AUTO_COPY_ANY(resource_name)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(resource_name)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_resource_exit)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(resource_exit, type_server, type_any_client)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", resource_name)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
