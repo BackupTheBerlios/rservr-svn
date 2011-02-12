@@ -118,7 +118,7 @@ RSERVR_AUTO_BUILTIN_TAG(server_response)
 
 	RSERVR_COMMAND_BUILD_HEAD(proto_server_response)
 	{
-	RSERVR_COMMAND_CREATE_CHECK(server_response, type_server, type_any_client)
+	RSERVR_COMMAND_BUILD_CHECK(server_response, type_server, type_any_client)
 
 	RSERVR_COMMAND_BUILD_START
 
@@ -223,7 +223,7 @@ RSERVR_AUTO_BUILTIN_TAG(server_response_list)
 
 	RSERVR_COMMAND_BUILD_HEAD(proto_server_response_list)
 	{
-	RSERVR_COMMAND_CREATE_CHECK(server_response_list, type_server, type_any_client)
+	RSERVR_COMMAND_BUILD_CHECK(server_response_list, type_server, type_any_client)
 
 	RSERVR_COMMAND_BUILD_START
 
@@ -287,7 +287,7 @@ RSERVR_AUTO_BUILTIN_TAG(server_directive)
 
 	RSERVR_COMMAND_BUILD_HEAD(proto_server_directive)
 	{
-	RSERVR_COMMAND_CREATE_CHECK(server_directive, type_server, type_any_client)
+	RSERVR_COMMAND_BUILD_CHECK(server_directive, type_server, type_any_client)
 
 	RSERVR_COMMAND_BUILD_START
 
@@ -354,7 +354,7 @@ RSERVR_AUTO_BUILTIN_TAG(set_timing)
 
 	RSERVR_COMMAND_BUILD_HEAD(proto_set_timing)
 	{
-	RSERVR_COMMAND_CREATE_CHECK(set_timing, type_server, type_any_client)
+	RSERVR_COMMAND_BUILD_CHECK(set_timing, type_server, type_any_client)
 
 	RSERVR_COMMAND_BUILD_START
 
@@ -426,7 +426,7 @@ RSERVR_AUTO_BUILTIN_TAG(update_timing)
 
 	RSERVR_COMMAND_BUILD_HEAD(proto_update_timing)
 	{
-	RSERVR_COMMAND_CREATE_CHECK(update_timing, type_server, type_any_client)
+	RSERVR_COMMAND_BUILD_CHECK(update_timing, type_server, type_any_client)
 
 	RSERVR_COMMAND_BUILD_START
 
@@ -512,7 +512,7 @@ RSERVR_AUTO_BUILTIN_TAG(monitor_data)
 
 	RSERVR_COMMAND_BUILD_HEAD(proto_monitor_data)
 	{
-	RSERVR_COMMAND_CREATE_CHECK(monitor_data, type_server, type_any_client)
+	RSERVR_COMMAND_BUILD_CHECK(monitor_data, type_server, type_any_client)
 
 	RSERVR_COMMAND_BUILD_START
 

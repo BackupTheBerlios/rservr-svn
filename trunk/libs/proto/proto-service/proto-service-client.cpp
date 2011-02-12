@@ -47,7 +47,7 @@ RSERVR_AUTO_BUILTIN_TAG(service_request)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(service_request)),
 	event_origin(entity_name()), request_message(mMessage? mMessage : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(service_request, type_service_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(service_request, type_service_client, type_server)
 
 	RSERVR_COMMAND_ADD_TEXT(event_origin)
 	RSERVR_COMMAND_ADD_BINARY(request_message)
@@ -58,7 +58,7 @@ RSERVR_AUTO_BUILTIN_TAG(service_request)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(service_request)),
 	event_origin(entity_name())
 	{
-	RSERVR_COMMAND_CREATE_CHECK(service_request, type_service_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(service_request, type_service_client, type_server)
 
 	set_property(this->command_properties, binary_label);
 
@@ -124,7 +124,7 @@ RSERVR_AUTO_BUILTIN_TAG(service_response)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(service_response)),
 	event_origin(entity_name()), response_message(mMessage? mMessage : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(service_response, type_resource_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(service_response, type_resource_client, type_server)
 
 	RSERVR_COMMAND_ADD_TEXT(event_origin)
 	RSERVR_COMMAND_ADD_BINARY(response_message)
@@ -135,7 +135,7 @@ RSERVR_AUTO_BUILTIN_TAG(service_response)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(service_response)),
 	event_origin(entity_name())
 	{
-	RSERVR_COMMAND_CREATE_CHECK(service_response, type_resource_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(service_response, type_resource_client, type_server)
 
 	set_property(this->command_properties, binary_label);
 
@@ -219,7 +219,7 @@ RSERVR_AUTO_BUILTIN_TAG(service_response_list)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(service_response_list)),
 	event_origin(entity_name())
 	{
-	RSERVR_COMMAND_CREATE_CHECK(service_response_list, type_resource_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(service_response_list, type_resource_client, type_server)
 
 	RSERVR_COMMAND_ADD_TEXT(event_origin)
 
@@ -311,7 +311,7 @@ RSERVR_AUTO_BUILTIN_TAG(partial_response)
 	event_origin(entity_name()), event_type(tType),
 	response_message(mMessage? mMessage : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(partial_response, type_resource_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(partial_response, type_resource_client, type_server)
 
 	RSERVR_TEMP_CONVERSION
 
@@ -394,7 +394,7 @@ RSERVR_AUTO_BUILTIN_TAG(partial_response_list)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(partial_response_list)),
 	event_origin(entity_name()), event_type(tType)
 	{
-	RSERVR_COMMAND_CREATE_CHECK(partial_response_list, type_resource_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(partial_response_list, type_resource_client, type_server)
 
 	RSERVR_TEMP_CONVERSION
 
@@ -487,7 +487,7 @@ RSERVR_AUTO_BUILTIN_TAG(find_services)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(find_services)),
 	name_expression(nName? nName : ""), type_expression(tType? tType : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(find_services, type_service_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(find_services, type_service_client, type_server)
 
 	RSERVR_COMMAND_ADD_BINARY(name_expression)
 	RSERVR_COMMAND_ADD_BINARY(type_expression)

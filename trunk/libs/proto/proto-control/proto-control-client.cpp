@@ -46,7 +46,7 @@ RSERVR_AUTO_BUILTIN_TAG(find_control_clients)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(find_control_clients)),
 	name_expression(nName? nName : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(find_control_clients, type_control_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(find_control_clients, type_control_client, type_server)
 
 	RSERVR_COMMAND_ADD_BINARY(name_expression)
 	}

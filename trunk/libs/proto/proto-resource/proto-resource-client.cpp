@@ -59,7 +59,7 @@ RSERVR_AUTO_BUILTIN_TAG(register_service)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(register_service)),
 	service_name(nName? nName : ""), service_type(tType? tType : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(register_service, type_resource_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(register_service, type_resource_client, type_server)
 
 	RSERVR_COMMAND_ADD_TEXT(service_name)
 	RSERVR_COMMAND_ADD_TEXT(service_type)
@@ -130,7 +130,7 @@ RSERVR_AUTO_BUILTIN_TAG(deregister_own_service)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(deregister_own_service)),
 	service_name(nName? nName : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(deregister_own_service, type_resource_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(deregister_own_service, type_resource_client, type_server)
 
 	RSERVR_COMMAND_ADD_BINARY(service_name)
 	}
@@ -184,7 +184,7 @@ RSERVR_AUTO_BUILTIN_TAG(deregister_all_own_services)
 	proto_deregister_all_own_services::proto_deregister_all_own_services() :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(deregister_all_own_services))
 	{
-	RSERVR_COMMAND_CREATE_CHECK(deregister_all_own_services, type_resource_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(deregister_all_own_services, type_resource_client, type_server)
 	RSERVR_COMMAND_ADD_NULL
 	}
 
@@ -228,7 +228,7 @@ RSERVR_AUTO_BUILTIN_TAG(deregister_remote_services)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(deregister_remote_services)),
 	service_location(lLocation? lLocation : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(deregister_remote_services, type_resource_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(deregister_remote_services, type_resource_client, type_server)
 
 	RSERVR_COMMAND_ADD_BINARY(service_location)
 	}
@@ -277,7 +277,7 @@ RSERVR_AUTO_BUILTIN_TAG(find_resource_clients)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(find_resource_clients)),
 	name_expression(nName? nName : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(find_resource_clients, type_resource_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(find_resource_clients, type_resource_client, type_server)
 
 	RSERVR_COMMAND_ADD_BINARY(name_expression)
 	}
@@ -330,7 +330,7 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_action)
 	service_name(nName? nName : ""),
 	complete_address(aAddress? aAddress : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(remote_service_action, type_server, type_any_client)
+	RSERVR_COMMAND_BUILD_CHECK(remote_service_action, type_server, type_any_client)
 
 	RSERVR_TEMP_CONVERSION
 
@@ -492,7 +492,7 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_back_action)
 	address_supplement(sSupplement? sSupplement : ""),
 	complete_address(aAddress? aAddress : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(remote_service_back_action, type_resource_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(remote_service_back_action, type_resource_client, type_server)
 
 	RSERVR_TEMP_CONVERSION
 
@@ -622,7 +622,7 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_disconnect)
 	service_name(nName? nName : ""),
 	complete_address(aAddress? aAddress : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(remote_service_disconnect, type_resource_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(remote_service_disconnect, type_resource_client, type_server)
 
 	RSERVR_TEMP_CONVERSION
 
@@ -744,7 +744,7 @@ RSERVR_AUTO_BUILTIN_TAG(monitor_resource_exit)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(monitor_resource_exit)),
 	resource_name(nName? nName : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(monitor_resource_exit, type_resource_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(monitor_resource_exit, type_resource_client, type_server)
 
 	RSERVR_COMMAND_ADD_TEXT(resource_name)
 	}
@@ -794,7 +794,7 @@ RSERVR_AUTO_BUILTIN_TAG(unmonitor_resource_exit)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(unmonitor_resource_exit)),
 	resource_name(nName? nName : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(unmonitor_resource_exit, type_resource_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(unmonitor_resource_exit, type_resource_client, type_server)
 
 	RSERVR_COMMAND_ADD_TEXT(resource_name)
 	}
@@ -844,7 +844,7 @@ RSERVR_AUTO_BUILTIN_TAG(resource_exit)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(resource_exit)),
 	resource_name(nName? nName : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(resource_exit, type_server, type_any_client)
+	RSERVR_COMMAND_BUILD_CHECK(resource_exit, type_server, type_any_client)
 
 	RSERVR_COMMAND_ADD_TEXT(resource_name)
 	}

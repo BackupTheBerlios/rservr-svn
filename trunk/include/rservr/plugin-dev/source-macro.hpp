@@ -91,6 +91,9 @@ extern "C" {
 #define RSERVR_COMMAND_DEFAULT \
     else
 
+#define RSERVR_COMMAND_PARSE_ABORT \
+  return false;
+
 #define RSERVR_COMMAND_PARSE_END \
   } }
 
@@ -103,7 +106,7 @@ extern "C" {
 external_command *name::generate(const text_data &cCommand) \
 { if (cCommand != tag) return NULL; \
   return new name(cCommand); } \
-external_command *copy() const \
+external_command *name::copy() const \
 { return new name(*this); } \
 command_event name::evaluate_server(const command_info&, server_interface*) const \
 { return event_rejected; } \

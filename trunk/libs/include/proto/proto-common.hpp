@@ -69,6 +69,7 @@ RSERVR_COMMAND_CLASS( proto_register_client, \
 	/*constructors*/ \
 	proto_register_client(text_info, entity_type, bool = false);, \
 	/*members*/ \
+	bool        disable; \
 	text_data   client_name; \
 	entity_type register_type; )
 

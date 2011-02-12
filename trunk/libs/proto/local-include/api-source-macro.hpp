@@ -49,7 +49,7 @@ extern "C" {
 #define RSERVR_BUILTIN_TAG(name) proto_##name##_tag
 #define RSERVR_AUTO_BUILTIN_TAG(name) const text_data RSERVR_BUILTIN_TAG(name) = "proto_" #name;
 
-#define RSERVR_COMMAND_CREATE_CHECK(name, require, exclude) \
+#define RSERVR_COMMAND_BUILD_CHECK(name, require, exclude) \
 if (!allow_create_builtin(require, exclude)) { \
 log_command_create_rejected(RSERVR_BUILTIN_TAG(name).c_str()); \
 return NULL; }

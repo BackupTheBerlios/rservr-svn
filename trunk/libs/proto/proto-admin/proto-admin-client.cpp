@@ -62,7 +62,7 @@ const text_data proto_create_client_exec   = "exec";
 	create_type(0x01), user_id(uUid), group_id(gGid), min_priority(pPriority),
 	max_permissions(pPerm), options(fFlags)
 	{
-	RSERVR_COMMAND_CREATE_CHECK(create_client, type_admin_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(create_client, type_admin_client, type_server)
 
 	if (pProcess) set_property(this->command_properties, return_pid_label);
 
@@ -87,7 +87,7 @@ const text_data proto_create_client_exec   = "exec";
 	create_type(0x02), user_id(uUid), group_id(gGid), min_priority(pPriority),
 	max_permissions(pPerm), options(fFlags)
 	{
-	RSERVR_COMMAND_CREATE_CHECK(create_client, type_admin_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(create_client, type_admin_client, type_server)
 
 	if (pProcess) set_property(this->command_properties, return_pid_label);
 
@@ -230,7 +230,7 @@ RSERVR_AUTO_BUILTIN_TAG(detached_client)
 	min_priority(pPriority), max_permissions(pPerm), options(fFlags),
 	socket_name(sSocket? sSocket : "")
 	{
-	RSERVR_COMMAND_CREATE_CHECK(detached_client, type_admin_client | type_server_control, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(detached_client, type_admin_client | type_server_control, type_server)
 
 	RSERVR_TEMP_CONVERSION
 
@@ -298,12 +298,12 @@ const text_data proto_remove_client_kill = "kill";
 	{
 	if (remove_type == 0x01)
 	 {
-	RSERVR_COMMAND_CREATE_CHECK(remove_client, type_admin_client | type_server_control, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(remove_client, type_admin_client | type_server_control, type_server)
 	 }
 
 	else
 	 {
-	RSERVR_COMMAND_CREATE_CHECK(remove_client, type_admin_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(remove_client, type_admin_client, type_server)
 	 }
 
 	if (remove_type == 0x01)      RSERVR_COMMAND_ADD_TEXT(proto_remove_client_term)
@@ -380,12 +380,12 @@ RSERVR_AUTO_BUILTIN_TAG(remove_find_client)
 	{
 	if (remove_type == 0x01)
 	 {
-	RSERVR_COMMAND_CREATE_CHECK(remove_find_client, type_admin_client | type_server_control, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(remove_find_client, type_admin_client | type_server_control, type_server)
 	 }
 
 	else
 	 {
-	RSERVR_COMMAND_CREATE_CHECK(remove_find_client, type_admin_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(remove_find_client, type_admin_client, type_server)
 	 }
 
 	if (remove_type == 0x01)      RSERVR_COMMAND_ADD_TEXT(proto_remove_client_term)
@@ -461,12 +461,12 @@ RSERVR_AUTO_BUILTIN_TAG(remove_pid_client)
 	{
 	if (remove_type == 0x01)
 	 {
-	RSERVR_COMMAND_CREATE_CHECK(remove_pid_client, type_admin_client | type_server_control, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(remove_pid_client, type_admin_client | type_server_control, type_server)
 	 }
 
 	else
 	 {
-	RSERVR_COMMAND_CREATE_CHECK(remove_pid_client, type_admin_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(remove_pid_client, type_admin_client, type_server)
 	 }
 
 	RSERVR_TEMP_CONVERSION
@@ -539,7 +539,7 @@ RSERVR_AUTO_BUILTIN_TAG(terminate_server)
 	proto_terminate_server::proto_terminate_server() :
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(terminate_server))
 	{
-	RSERVR_COMMAND_CREATE_CHECK(terminate_server, type_admin_client | type_server_control, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(terminate_server, type_admin_client | type_server_control, type_server)
 	RSERVR_COMMAND_ADD_NULL
 	}
 
@@ -582,7 +582,7 @@ RSERVR_AUTO_BUILTIN_TAG(find_clients)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(find_clients)),
 	name_expression(nName? nName : ""), required(iInclude), denied(eExclude)
 	{
-	RSERVR_COMMAND_CREATE_CHECK(find_clients, type_admin_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(find_clients, type_admin_client, type_server)
 
 	RSERVR_TEMP_CONVERSION
 

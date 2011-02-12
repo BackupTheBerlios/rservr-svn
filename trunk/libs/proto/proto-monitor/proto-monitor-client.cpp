@@ -46,7 +46,7 @@ RSERVR_AUTO_BUILTIN_TAG(set_monitor_types)
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(set_monitor_types)),
 	monitor_types(eEvent)
 	{
-	RSERVR_COMMAND_CREATE_CHECK(set_monitor_types, type_monitor_client, type_server)
+	RSERVR_COMMAND_BUILD_CHECK(set_monitor_types, type_monitor_client, type_server)
 
 	RSERVR_TEMP_CONVERSION
 
