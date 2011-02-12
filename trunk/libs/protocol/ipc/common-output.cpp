@@ -64,7 +64,7 @@ extern "C" {
 	if (total_transmission + oOutput.size() > PARAM_MAX_TRANSMISSION)
     #endif
 	 {
-    log_command_transmission_exceeded("common_output");
+    log_protocol_transmission_exceeded("common_output");
 	return false;
 	 }
 

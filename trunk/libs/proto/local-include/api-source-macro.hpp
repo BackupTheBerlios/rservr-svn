@@ -51,12 +51,12 @@ extern "C" {
 
 #define RSERVR_COMMAND_BUILD_CHECK(name, require, exclude) \
 if (!allow_create_builtin(require, exclude)) { \
-log_command_create_rejected(RSERVR_BUILTIN_TAG(name).c_str()); \
+log_protocol_create_rejected(RSERVR_BUILTIN_TAG(name).c_str()); \
 return NULL; }
 
 #define RSERVR_COMMAND_PARSE_CHECK(name, require, exclude) \
 if (!allow_parse_builtin(require, exclude)) { \
-log_command_parse_rejected(RSERVR_BUILTIN_TAG(name).c_str()); \
+log_protocol_parse_rejected(RSERVR_BUILTIN_TAG(name).c_str()); \
 return false; }
 
 #define RSERVR_COMMAND_DEFAULT_GEN(name, tag) \

@@ -158,7 +158,7 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	if ( buffer->current_data.size() + buffer->current_line.size() +
 	       buffer->loaded_data.size() > PARAM_MAX_HOLDING_INPUT )
 	  {
-    log_command_input_holding_exceeded("input_base [binary]");
+    log_protocol_input_holding_exceeded("input_base [binary]");
 	this->clear_buffer();
 	return buffer->current_data;
 	  }
@@ -186,7 +186,7 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 
 	if ((total_transmission += next_size) > PARAM_MAX_TRANSMISSION)
 	 {
-    log_command_transmission_exceeded("input_base");
+    log_protocol_transmission_exceeded("input_base");
 	return false;
 	 }
 
@@ -210,7 +210,7 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	if (current_mode != mMode && (mMode & input_binary))
 	 {
 	//NOTE: leave 'loaded_data' and 'current_data' alone here
-     if (buffer->current_line.size()) log_command_line_discard(buffer->current_line.c_str());
+     if (buffer->current_line.size()) log_protocol_line_discard(buffer->current_line.c_str());
 	buffer->current_line.clear(); //NOTE: leftover line segments are malformed
 	 }
 
@@ -262,7 +262,7 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	unsigned int current = buffer->loaded_data.size();
 	if (current >= PARAM_MAX_HOLDING_INPUT)
 	  {
-    log_command_input_holding_exceeded("buffered_common_input");
+    log_protocol_input_holding_exceeded("buffered_common_input");
 	this->clear_buffer();
 	return false;
 	  }
@@ -299,7 +299,7 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	if ( buffer->current_data.size() + buffer->current_line.size() +
 	       buffer->loaded_data.size() > PARAM_MAX_HOLDING_INPUT )
 	  {
-    log_command_input_holding_exceeded("buffered_common_input");
+    log_protocol_input_holding_exceeded("buffered_common_input");
 	this->clear_buffer();
 	return false;
 	  }

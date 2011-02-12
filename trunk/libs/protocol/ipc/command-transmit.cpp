@@ -124,7 +124,7 @@ inline static bool ATTR_INL local_check_su()
         if (!finder->new_command(*this, command_label) ||
 	    (this->orig_address.size() && check_command_all(execute_type, command_no_remote)))
 	 {
-     log_command_parse_rejected(command_label.c_str());
+    log_protocol_parse_rejected(command_label.c_str());
 	return false;
 	 }
 
@@ -285,19 +285,19 @@ inline static bool ATTR_INL local_check_su()
 	{
 	if (!strlen(this->command_name()))
 	 {
-    log_command_empty_execution();
+    log_protocol_empty_execution();
 	return false;
 	 }
 
 	if (this->orig_address.size() && check_command_all(execute_type, command_no_remote))
 	 {
-    log_command_remote_rejected(this->command_name());
+    log_protocol_remote_rejected(this->command_name());
 	return false;
 	 }
 
 	if (!allow_execute_server(execute_type))
 	 {
-    log_command_server_eval_error(error_invalid, this->command_name(),
+    log_protocol_server_eval_error(error_invalid, this->command_name(),
       this->orig_reference, this->orig_entity.c_str());
 
 	if (silent_auto_response) return false;
@@ -309,7 +309,7 @@ inline static bool ATTR_INL local_check_su()
 	 {
 	command_event current_event = command->evaluate_server(*this, sServer);
 
-    log_command_server_eval(this->command_name(), this->orig_reference,
+    log_protocol_server_eval(this->command_name(), this->orig_reference,
       this->orig_entity.c_str());
 
 	if (current_event != event_none && !silent_auto_response)
@@ -318,7 +318,7 @@ inline static bool ATTR_INL local_check_su()
 	 }
 
 	else
-    log_command_empty_execution();
+    log_protocol_empty_execution();
 
 	return true;
 	}
@@ -327,26 +327,26 @@ inline static bool ATTR_INL local_check_su()
 	{
 	if (local_check_su())
 	 {
-    log_command_client_eval_error(error_su_violation, this->command_name(),
+    log_protocol_client_eval_error(error_su_violation, this->command_name(),
       this->orig_reference, this->orig_entity.c_str());
 	return false;
 	 }
 
 	if (!strlen(this->command_name()))
 	 {
-    log_command_empty_execution();
+    log_protocol_empty_execution();
 	return false;
 	 }
 
 	if (this->orig_address.size() && check_command_all(execute_type, command_no_remote))
 	 {
-    log_command_remote_rejected(this->command_name());
+    log_protocol_remote_rejected(this->command_name());
 	return false;
 	 }
 
 	if (!allow_execute_client(execute_type))
 	 {
-    log_command_client_eval_error(error_invalid, this->command_name(),
+    log_protocol_client_eval_error(error_invalid, this->command_name(),
       this->orig_reference, this->orig_entity.c_str());
 
 	if (silent_auto_response) return false;
@@ -362,7 +362,7 @@ inline static bool ATTR_INL local_check_su()
 	    ( check_command_all(execute_type, command_null) &&
 	      !check_command_all(execute_type, command_builtin) )? NULL : cClient );
 
-    log_command_client_eval(this->command_name(), this->orig_reference,
+    log_protocol_client_eval(this->command_name(), this->orig_reference,
       this->orig_entity.c_str());
 
 	if (current_event != event_none && !silent_auto_response)
@@ -371,7 +371,7 @@ inline static bool ATTR_INL local_check_su()
 	 }
 
 	else
-    log_command_empty_execution();
+    log_protocol_empty_execution();
 
 	return true;
 	}
@@ -475,7 +475,7 @@ inline static bool ATTR_INL local_check_su()
 	{
 	if (extracted_command.size() + dData.size() > PARAM_MAX_COMMAND_DATA)
 	 {
-     log_command_extract_holding_exceeded();
+    log_protocol_extract_holding_exceeded();
 	return false;
 	 }
 

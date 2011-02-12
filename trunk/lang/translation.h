@@ -302,44 +302,36 @@ extern int log_client_message_monitor_end();
 /*protocol library============================================================*/
 /*minimal_____________________________________________________________________*/
 /*normal______________________________________________________________________*/
+extern int log_protocol_create_rejected(text_string);
+extern int log_protocol_parse_rejected(text_string);
+extern int log_protocol_empty_execution();
+extern int log_protocol_remote_rejected(text_string);
+extern int log_protocol_empty_send();
+
+extern int log_protocol_null_execution();
+extern int log_protocol_input_holding_exceeded(text_string);
+extern int log_protocol_transmission_exceeded(text_string);
+extern int log_protocol_extract_holding_exceeded();
+
 /*extended____________________________________________________________________*/
 extern int log_protocol_input_underrun(text_string);
 
 /*debug_______________________________________________________________________*/
 extern int log_protocol_null_data_error();
 
+extern int log_protocol_command_sent(text_string, unsigned int, text_string);
+extern int log_protocol_command_received(text_string, unsigned int, text_string);
+extern int log_protocol_command_send_error(text_string, text_string, unsigned int, text_string);
+extern int log_protocol_command_parse_error(text_string, text_string, unsigned int, text_string);
+
+extern int log_protocol_server_eval(text_string, unsigned int, text_string);
+extern int log_protocol_server_eval_error(text_string, text_string, unsigned int, text_string);
+extern int log_protocol_client_eval(text_string, unsigned int, text_string);
+extern int log_protocol_client_eval_error(text_string, text_string, unsigned int, text_string);
+
+extern int log_protocol_line_discard(text_string);
+
 /*END protocol library========================================================*/
-
-
-/*command library=============================================================*/
-/*minimal_____________________________________________________________________*/
-/*normal______________________________________________________________________*/
-extern int log_command_create_rejected(text_string);
-extern int log_command_parse_rejected(text_string);
-extern int log_command_empty_execution();
-extern int log_command_remote_rejected(text_string);
-extern int log_command_empty_send();
-
-extern int log_command_null_execution();
-extern int log_command_input_holding_exceeded(text_string);
-extern int log_command_transmission_exceeded(text_string);
-extern int log_command_extract_holding_exceeded();
-
-/*extended____________________________________________________________________*/
-/*debug_______________________________________________________________________*/
-extern int log_command_command_sent(text_string, unsigned int, text_string);
-extern int log_command_command_received(text_string, unsigned int, text_string);
-extern int log_command_command_send_error(text_string, text_string, unsigned int, text_string);
-extern int log_command_command_parse_error(text_string, text_string, unsigned int, text_string);
-
-extern int log_command_server_eval(text_string, unsigned int, text_string);
-extern int log_command_server_eval_error(text_string, text_string, unsigned int, text_string);
-extern int log_command_client_eval(text_string, unsigned int, text_string);
-extern int log_command_client_eval_error(text_string, text_string, unsigned int, text_string);
-
-extern int log_command_line_discard(text_string);
-
-/*END command library=========================================================*/
 
 
 /*proto libraries=============================================================*/

@@ -70,8 +70,8 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 librservr_i18n_us_english_la_DEPENDENCIES =
-am_librservr_i18n_us_english_la_OBJECTS = client.lo command.lo \
-	general.lo proto.lo protocol.lo server.lo command-info.lo
+am_librservr_i18n_us_english_la_OBJECTS = client.lo general.lo \
+	proto.lo protocol.lo server.lo command-info.lo
 librservr_i18n_us_english_la_OBJECTS =  \
 	$(am_librservr_i18n_us_english_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -219,7 +219,7 @@ AM_LDFLAGS = -version-info 3:0:3
 ALL_INCLUDES = $(STANDARD_INCLUDES) -I$(srcdir)/../.. -I$(srcdir)/../../include/rservr -I$(srcdir)/.. -I$(srcdir)/../../libs/include/protocol
 AM_CPPFLAGS = -DENABLE_VIRT_ARRAY_ALL $(ALL_INCLUDES)
 lib_LTLIBRARIES = librservr-i18n-us-english.la
-librservr_i18n_us_english_la_SOURCES = client.c command.c general.c proto.c protocol.c server.c command-info.c
+librservr_i18n_us_english_la_SOURCES = client.c general.c proto.c protocol.c server.c command-info.c
 librservr_i18n_us_english_la_LIBADD = 
 EXTRA_DIST = ../translation.h
 all: all-am
@@ -298,7 +298,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/command-info.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/command.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/general.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/proto.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/protocol.Plo@am__quote@

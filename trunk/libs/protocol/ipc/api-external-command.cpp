@@ -69,7 +69,7 @@ extern "C" {
 
 	command_event null_command::evaluate_server(const command_info&, server_interface*) const
 	{
-    log_command_null_execution();
+    log_protocol_null_execution();
 	return event_none;
 	}
 
@@ -81,7 +81,7 @@ extern "C" {
 
 	//all others prompt an error...
 	else
-     log_command_null_execution();
+    log_protocol_null_execution();
 	return event_none;
         }
 

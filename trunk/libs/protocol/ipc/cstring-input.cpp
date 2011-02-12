@@ -51,7 +51,7 @@ extern "C" {
 	{
 	if (!iInput) return;
 	if (strlen(iInput) > PARAM_MAX_COMMAND_DATA)
-    log_command_input_holding_exceeded("cstring_input");
+    log_protocol_input_holding_exceeded("cstring_input");
 	else loaded_data = iInput;
 	}
 

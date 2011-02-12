@@ -44,6 +44,53 @@ static const unsigned int max_message = PARAM_DEFAULT_FORMAT_BUFFER;
 /*protocol library============================================================*/
 /*minimal_____________________________________________________________________*/
 /*normal______________________________________________________________________*/
+int log_protocol_create_rejected(text_string cCommand)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/n/ command creation rejected: '%s'", cCommand);
+	return local_log(logging_normal, message_string);
+}
+
+int log_protocol_parse_rejected(text_string cCommand)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/n/ command parse rejected: '%s'", cCommand);
+	return local_log(logging_normal, message_string);
+}
+
+int log_protocol_empty_execution()
+{ return local_log(logging_normal, "/n/ attempted execution of empty command"); }
+
+int log_protocol_remote_rejected(text_string cCommand)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/n/ remote execution not allowed: '%s'", cCommand);
+	return local_log(logging_normal, message_string);
+}
+
+int log_protocol_empty_send()
+{ return local_log(logging_normal, "/n/ attempted send of empty command"); }
+
+int log_protocol_null_execution()
+{ return local_log(logging_normal, "/n/ attempted execution of null command"); }
+
+int log_protocol_input_holding_exceeded(text_string mMessage)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/n/ command input memory limit exceeded (%s)", mMessage);
+	return local_log(logging_normal, message_string);
+}
+
+int log_protocol_transmission_exceeded(text_string mMessage)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/n/ command transmission size limit exceeded (%s)", mMessage);
+	return local_log(logging_normal, message_string);
+}
+
+int log_protocol_extract_holding_exceeded()
+{ return local_log(logging_normal, "/n/ command extraction memory limit exceeded"); }
+
 /*extended____________________________________________________________________*/
 int log_protocol_input_underrun(text_string mMessage)
 {
@@ -55,5 +102,83 @@ int log_protocol_input_underrun(text_string mMessage)
 /*debug_______________________________________________________________________*/
 int log_protocol_null_data_error()
 { return local_log(logging_debug, "/d/ null character found in formatted data"); }
+int log_protocol_command_sent(text_string cCommand, unsigned int rRefFrom,
+text_string tTo)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/d/ command sent: %s [%u] -> '%s'",
+	  cCommand, rRefFrom, tTo);
+	return local_log(logging_debug, message_string);
+}
+
+int log_protocol_command_received(text_string cCommand, unsigned int rRefFrom,
+text_string fFrom)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/d/ command received: %s [%u] <- '%s'",
+	  cCommand, rRefFrom, fFrom);
+	return local_log(logging_debug, message_string);
+}
+
+int log_protocol_command_send_error(text_string mMessage, text_string cCommand,
+unsigned int rRefFrom, text_string fFrom)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/d/ command send error: %s (%s [%u] -> '%s')",
+	  mMessage, cCommand, rRefFrom, fFrom);
+	return local_log(logging_debug, message_string);
+}
+
+int log_protocol_command_parse_error(text_string mMessage, text_string cCommand,
+unsigned int rRefFrom, text_string fFrom)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/d/ command parse error: %s (%s [%u] <- '%s')",
+	  mMessage, cCommand, rRefFrom, fFrom);
+	return local_log(logging_debug, message_string);
+}
+
+int log_protocol_server_eval(text_string cCommand, unsigned int rRefFrom,
+text_string fFrom)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/d/ server command eval complete: %s [%u] <- '%s'",
+	  cCommand, rRefFrom, fFrom);
+	return local_log(logging_debug, message_string);
+}
+
+int log_protocol_server_eval_error(text_string mMessage, text_string cCommand,
+unsigned int rRefFrom, text_string fFrom)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/d/ server command eval error: %s (%s [%u] <- '%s')",
+	  mMessage, cCommand, rRefFrom, fFrom);
+	return local_log(logging_debug, message_string);
+}
+
+int log_protocol_client_eval(text_string cCommand, unsigned int rRefFrom,
+text_string fFrom)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/d/ client command eval complete: %s [%u] <- '%s'",
+	  cCommand, rRefFrom, fFrom);
+	return local_log(logging_debug, message_string);
+}
+
+int log_protocol_client_eval_error(text_string mMessage, text_string cCommand,
+unsigned int rRefFrom, text_string fFrom)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/d/ client command eval error: %s (%s [%u] <- '%s')",
+	  mMessage, cCommand, rRefFrom, fFrom);
+	return local_log(logging_debug, message_string);
+}
+
+int log_protocol_line_discard(text_string lLine)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/d/ residual line data discarded: '%s'", lLine);
+	return local_log(logging_debug, message_string);
+}
 
 /*END protocol library========================================================*/
