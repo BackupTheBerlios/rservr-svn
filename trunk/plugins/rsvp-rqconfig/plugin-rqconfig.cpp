@@ -49,13 +49,7 @@ extern "C" {
 
 	rsvp_rqconfig_configure::rsvp_rqconfig_configure(text_info tType) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_rqconfig_configure_tag),
-	request_origin(get_client_name()), configure_type(tType? tType : "")
-	{
-	PLUGIN_BUILD_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(configure))
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_COMMAND_ADD_BINARY(configure_type)
-	}
+	request_origin(get_client_name()), configure_type(tType? tType : "") {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_rqconfig_configure)
@@ -72,21 +66,37 @@ extern "C" {
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_rqconfig_configure)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(rqconfig, type_active_client, PLUGIN_COMMAND_REQUEST(configure))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 	configure_type.clear();
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(configure_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(configure_type)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_rqconfig_configure)
+	{
+	PLUGIN_BUILD_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(configure))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", configure_type)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
@@ -100,13 +110,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqconfig_configure, rsvp_rqconfig_configure_
 
 	rsvp_rqconfig_deconfigure::rsvp_rqconfig_deconfigure(text_info tType) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_rqconfig_deconfigure_tag),
-	request_origin(get_client_name()), deconfigure_type(tType? tType : "")
-	{
-	PLUGIN_BUILD_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(deconfigure))
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_COMMAND_ADD_BINARY(deconfigure_type)
-	}
+	request_origin(get_client_name()), deconfigure_type(tType? tType : "") {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_rqconfig_deconfigure)
@@ -123,21 +127,37 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqconfig_configure, rsvp_rqconfig_configure_
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_rqconfig_deconfigure)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(rqconfig, type_active_client, PLUGIN_COMMAND_REQUEST(deconfigure))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 	deconfigure_type.clear();
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_COPY_ANY(deconfigure_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_COPY_DATA(deconfigure_type)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_rqconfig_deconfigure)
+	{
+	PLUGIN_BUILD_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(deconfigure))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", deconfigure_type)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
