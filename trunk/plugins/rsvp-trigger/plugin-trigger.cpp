@@ -49,16 +49,7 @@ extern "C" {
 
 	rsvp_trigger_system_trigger::rsvp_trigger_system_trigger(uint8_t aAction, text_info tType) :
 	RSERVR_COMMAND_INIT_BASE(rsvp_trigger_system_trigger_tag),
-	request_origin(get_client_name()), trigger_action(aAction), trigger_type(tType? tType : "")
-	{
-	PLUGIN_BUILD_CHECK(trigger, type_active_client, PLUGIN_COMMAND_REQUEST(system_trigger))
-
-	RSERVR_TEMP_CONVERSION
-
-	RSERVR_COMMAND_ADD_TEXT(request_origin)
-	RSERVR_CONVERT16_ADD(trigger_action)
-	RSERVR_COMMAND_ADD_BINARY(trigger_type)
-	}
+	request_origin(get_client_name()), trigger_action(aAction), trigger_type(tType? tType : "") {}
 
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_trigger_system_trigger)
@@ -75,24 +66,41 @@ extern "C" {
 
 	RSERVR_COMMAND_PARSE_HEAD(rsvp_trigger_system_trigger)
 	{
-	RSERVR_COMMAND_INPUT_CHECK
 	PLUGIN_PARSE_CHECK(trigger, type_active_client, PLUGIN_COMMAND_REQUEST(system_trigger))
-	RSERVR_COMMAND_INPUT_SET
-
-	RSERVR_CLEAR_COMMAND
-	RSERVR_TEMP_STORAGE
 
 	request_origin.clear();
 	trigger_type.clear();
 
-	RSERVR_AUTO_COPY_TEXT(request_origin)
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
-	RSERVR_AUTO_ADD_TEXT
-	RSERVR_PARSE16(trigger_action)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_AUTO_COPY_ANY(trigger_type)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	RSERVR_COMMAND_PARSE16(trigger_action)
 
-	RSERVR_PARSE_END
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_COPY_DATA(trigger_type)
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_trigger_system_trigger)
+	{
+	PLUGIN_BUILD_CHECK(trigger, type_active_client, PLUGIN_COMMAND_REQUEST(system_trigger))
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_CONVERT16("", trigger_action)
+	RSERVR_COMMAND_ADD_TEXT("", trigger_type)
+
+	RSERVR_COMMAND_BUILD_END
 	}
 
 
