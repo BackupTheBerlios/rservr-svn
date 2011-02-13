@@ -132,11 +132,11 @@ inline static bool ATTR_INL local_check_su()
 	}
 
 	bool transmit_block::command_ready() const
-	{ return this->get_tree(); }
+	{ return command; }
 
 	bool transmit_block::command_sendable()
 	{
-	if (this->command_ready()) return true;
+	if (this->get_tree()) return true;
 	return this->assemble_command();
 	}
 
