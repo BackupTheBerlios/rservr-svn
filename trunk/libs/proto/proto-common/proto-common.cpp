@@ -356,7 +356,6 @@ const text_data proto_register_client_control    = "control";
 	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(register_client)),
 	disable(dDisable), client_name(nName? nName : ""), register_type(tType) {}
 
-
 	RSERVR_SERVER_EVAL_HEAD(proto_register_client)
 	{
 	permission_mask new_type = register_type;

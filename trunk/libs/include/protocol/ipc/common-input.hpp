@@ -49,6 +49,7 @@ extern "C" {
 #include "command-transmit.hpp"
 
 extern "C" {
+#include "ipc-context.h"
 #include "ipc-parser.tab.h"
 }
 
@@ -63,19 +64,22 @@ public:
 	lexer_input &operator = (const lexer_input&);
 
 	bool parse_command(transmit_block*);
+	bool empty_read() const;
 
 	~lexer_input();
 
+	int last_read;
+
 private:
-	int                     input_pipe;
-	void                   *scanner;
-	struct protocol_pstate *state;
+	void                            *scanner;
+	struct protocol_pstate          *state;
+	struct protocol_scanner_context  context;
 };
 
 //END lexer/parser logic--------------------------------------------------------
 
 
-class input_base : public lexer_input
+class input_base : virtual public data_input
 {
 public:
 	input_base(external_buffer*);
@@ -99,16 +103,17 @@ private:
 protected:
 	void clear_buffer() const;
 
+	bool last_empty;
 	input_mode current_mode;
 	unsigned int total_transmission;
 	external_buffer *const buffer;
 };
 
 
-class buffered_common_input : public input_base
+class buffered_common_input_nolex : public input_base
 {
 public:
-	buffered_common_input(int, external_buffer*);
+	buffered_common_input_nolex(int, external_buffer*);
 
 	//from 'data_input'-----------------------------------------------------
 	bool end_of_data() const;
@@ -131,14 +136,26 @@ protected:
 };
 
 
-struct common_input : public buffered_common_input, private external_buffer
+struct buffered_common_input : public buffered_common_input_nolex, public lexer_input
 {
-	common_input(int = -1);
-	common_input(const common_input&);
+	buffered_common_input(int, external_buffer*);
+};
+
+
+struct common_input_nolex : public buffered_common_input_nolex, private external_buffer
+{
+	common_input_nolex(int = -1);
+	common_input_nolex(const common_input_nolex&);
 
 	void file_swap(int);
 	bool residual_data() const;
 	void close_input_pipe();
+};
+
+
+struct common_input : public common_input_nolex, public lexer_input
+{
+	common_input(int = -1);
 };
 
 

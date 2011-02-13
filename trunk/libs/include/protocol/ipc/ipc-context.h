@@ -39,12 +39,13 @@ extern "C" {
 
 
 struct transmit_block;
-struct data_input;
+struct lexer_input;
 
-typedef struct data_input *lexer_input_type;
+typedef struct lexer_input *lexer_input_type;
 
 struct protocol_scanner_context
 {
+	int                    complete;
 	struct transmit_block *command;
 	lexer_input_type       input;
 };

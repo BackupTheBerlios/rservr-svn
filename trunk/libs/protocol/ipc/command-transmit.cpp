@@ -414,7 +414,7 @@ inline static bool ATTR_INL local_check_su()
 	no_send      = eEqual.no_send;
 	send_to      = eEqual.send_to;
 
-	finder            = eEqual.finder;
+	//finder            = eEqual.finder; //NOTE: don't copy this!
 	command_label     = eEqual.command_label;
 	extracted_command = eEqual.extracted_command;
 	}

@@ -155,8 +155,8 @@ private:
 
 	int input_source() const ATTR_INT;
 
-	common_input  pipe_input;
-	common_output pipe_output;
+	common_input_nolex pipe_input;
+	common_output      pipe_output;
 };
 
 
@@ -182,8 +182,8 @@ private:
 	int input_source() const ATTR_INT;
 
 	int socket_file;
-	common_input  socket_input;
-	common_output socket_output;
+	common_input_nolex socket_input;
+	common_output      socket_output;
 };
 
 #endif //local_client_hpp

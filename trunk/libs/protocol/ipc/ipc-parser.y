@@ -104,7 +104,8 @@ command:
 		$7 = NULL;
 		cContext->command->set_command_name($3.string);
 		free($3.string);
-		$3.string = NULL; }
+		$3.string = NULL;
+		cContext->complete = 0x01; }
 	|;
 
 route:

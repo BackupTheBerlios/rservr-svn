@@ -218,7 +218,7 @@ static const input_section default_input_section;
 	                          server_timing_specs->read_standby_retry,
 	                          server_timing_specs->read_standby_wait);
 
-	while ( !this->receive_input().size() && !this->is_terminated() && active &&
+	while ( this->empty_read() && !this->receive_input().size() && !this->is_terminated() && active &&
 	        ( identity->process_id == 0 ||
 	          waitpid(-getpgid(identity->process_id), NULL, WNOHANG) >= 0 || errno == EINTR ) )
 	//NOTE: 'select' maintains symmetry with client message queue
@@ -308,18 +308,18 @@ static const input_section default_input_section;
 	 }
 
 	if (identity->total_errors >= server_settings->max_client_error)
-	{
+	 {
     log_server_client_disconnect_errors(identity->process_id, identity->logging_name());
 	monitor_client_limit("max_client_error", identity->process_id,
 	  server_settings->max_client_error);
-	}
+	 }
 
 	if (identity->total_invalid >= server_settings->max_client_invalid)
-	{
+	 {
     log_server_client_disconnect_invalid(identity->process_id, identity->logging_name());
 	monitor_client_limit("max_client_invalid", identity->process_id,
 	  server_settings->max_client_invalid);
-	}
+	 }
 
 	identity = NULL;
 	active = false;
@@ -360,7 +360,7 @@ static const input_section default_input_section;
 	if (this->condemn_status() || !active) return NULL;
 
 	if (!pipe_input.is_terminated())
-	return static_cast <data_input*> (const_cast <common_input*> (&pipe_input));
+	return static_cast <data_input*> (const_cast <common_input_nolex*> (&pipe_input));
 
 	return NULL;
 	}
@@ -422,7 +422,7 @@ static const input_section default_input_section;
 	if (this->condemn_status()) return NULL;
 
 	if (!socket_input.is_terminated())
-	return static_cast <data_input*> (const_cast <common_input*> (&socket_input));
+	return static_cast <data_input*> (const_cast <common_input_nolex*> (&socket_input));
 
 	return NULL;
 	}

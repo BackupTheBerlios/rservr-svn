@@ -39,7 +39,7 @@
 #include "common-input.hpp"
 
 
-class cstring_input : public input_base, private external_buffer
+class cstring_input : public input_base, private external_buffer, public lexer_input
 {
 public:
 	cstring_input(const char*);

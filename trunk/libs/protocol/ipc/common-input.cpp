@@ -62,18 +62,18 @@ int protocol_lex_destroy(void*);
 void protocol_set_extra(YY_EXTRA_TYPE, void*);
 int protocol_lex(void*, YYSTYPE*);
 void protocol_set_out(FILE*, void*);
-ssize_t get_input(struct data_input*, char*, ssize_t);
+ssize_t get_input(struct lexer_input*, char*, ssize_t);
 }
 
 
-ssize_t get_input(data_input *iInput, char *bBuffer, ssize_t mMax)
+ssize_t get_input(lexer_input *iInput, char *bBuffer, ssize_t mMax)
 {
 	if (!iInput) return 0;
 
 	iInput->set_input_mode(input_binary | input_allow_underrun);
 
 	const input_section &input = iInput->receive_input();
-	ssize_t used = ((signed) input.size() < mMax)? input.size() : mMax;
+	ssize_t used = iInput->last_read = ((signed) input.size() < mMax)? input.size() : mMax;
 
 	memcpy(bBuffer, &input[0], used);
 	iInput->next_input(used);
@@ -92,23 +92,30 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	do
 	status = protocol_push_parse(sState, protocol_lex(&transfer, (YYSTYPE*) sScanner),
 	  &transfer, cContext, sScanner);
-	while (status == YYPUSH_MORE);
+	while (status == YYPUSH_MORE && !cContext->complete);
 
-	return status;
+	return cContext->complete;
 }
 
 
-	lexer_input::lexer_input() : scanner(NULL), state(NULL)
+	lexer_input::lexer_input() : last_read(0), scanner(NULL), state(NULL)
 	{
+	context.command = NULL;
+	context.input   = this;
 	protocol_lex_init(&scanner);
 	protocol_set_out(NULL, scanner);
+	protocol_set_extra(static_cast <YY_EXTRA_TYPE> (&context), scanner);
 	state = protocol_pstate_new();
 	}
 
-	lexer_input::lexer_input(const lexer_input &eEqual) : scanner(NULL), state(NULL)
+	lexer_input::lexer_input(const lexer_input &eEqual) : last_read(0),
+	scanner(NULL), state(NULL)
 	{
+	context.command = NULL;
+	context.input   = this;
 	protocol_lex_init(&scanner);
 	protocol_set_out(NULL, scanner);
+	protocol_set_extra(static_cast <YY_EXTRA_TYPE> (&context), scanner);
 	state = protocol_pstate_new();
 	}
 
@@ -125,29 +132,32 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	this->set_input_mode(universal_transmission_reset);
 	this->set_input_mode(input_binary); //disable underrun for first read
 
-	struct protocol_scanner_context context =
-	  { command: cCommand,
-	    input:   static_cast <lexer_input_type> (this) };
+	//NOTE: assume that this entity will always use the same template
+	if (!context.command) context.command = new transmit_block(*cCommand);
+	context.complete = false;
 
-	protocol_set_extra(static_cast <YY_EXTRA_TYPE> (&context), scanner);
-	bool outcome = parse_loop(&context, scanner, state) == 0;
+	bool outcome = parse_loop(&context, scanner, state);
 
-	if (!outcome)
-	 {
-	cCommand->clear_command();
-	return outcome;
-	 }
+	if (!outcome) return outcome;
 
 	else
 	 {
+	*cCommand = *context.command;
+	delete context.command;
+	context.command = NULL;
 	if (!cCommand->get_tree()) cCommand->set_command_data(new empty_data_section(""));
 	return cCommand->find_command();
 	 }
 	}
 
 
+	bool lexer_input::empty_read() const
+	{ return last_read == 0; }
+
+
 	lexer_input::~lexer_input()
 	{
+	delete context.command;
 	protocol_pstate_delete(state);
 	protocol_lex_destroy(scanner);
 	}
@@ -243,6 +253,7 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	}
 	//----------------------------------------------------------------------
 
+
 	void input_base::reset_transmission_limit()
 	{ total_transmission = 0; }
 
@@ -256,23 +267,24 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 
 
 
-	buffered_common_input::buffered_common_input(int fFile, external_buffer *bBuffer) :
+	buffered_common_input_nolex::buffered_common_input_nolex(int fFile,
+	external_buffer *bBuffer) :
 	input_base(bBuffer), socket((socket_reference) 0x00), input_receiver(NULL),
 	input_pipe(fFile), input_underrun(false), eof_reached(false),
 	required_section(0), read_cancel(-1) { }
 
 
 	//from 'data_input'-----------------------------------------------------
-	bool buffered_common_input::end_of_data() const
+	bool buffered_common_input_nolex::end_of_data() const
 	{ return input_underrun || this->is_terminated(); }
 
 
-	bool buffered_common_input::is_terminated() const
+	bool buffered_common_input_nolex::is_terminated() const
 	{ return eof_reached || input_pipe < 0; }
 	//----------------------------------------------------------------------
 
 
-	bool buffered_common_input::read_binary_input()
+	bool buffered_common_input_nolex::read_binary_input()
 	{
 	if (eof_reached) return false;
 
@@ -343,11 +355,11 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	}
 
 
-	void buffered_common_input::reset_underrun()
+	void buffered_common_input_nolex::reset_underrun()
 	{ input_underrun = false; }
 
 
-	void buffered_common_input::clear_cancel()
+	void buffered_common_input_nolex::clear_cancel()
 	{
 	if (read_cancel >= 0)
 	 {
@@ -358,15 +370,21 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 
 
 
-	common_input::common_input(int fFile) : buffered_common_input(fFile, this) { }
+	buffered_common_input::buffered_common_input(int fFile, external_buffer *bBuffer) :
+	buffered_common_input_nolex(fFile, bBuffer) { }
 
 
-	common_input::common_input(const common_input &eEqual) :
-	buffered_common_input(eEqual.input_pipe, this)
-	{ this->buffered_common_input::operator = (eEqual); }
+
+	common_input_nolex::common_input_nolex(int fFile) :
+	buffered_common_input_nolex(fFile, this) { }
 
 
-	void common_input::file_swap(int fFile)
+	common_input_nolex::common_input_nolex(const common_input_nolex &eEqual) :
+	buffered_common_input_nolex(eEqual.input_pipe, this)
+	{ this->buffered_common_input_nolex::operator = (eEqual); }
+
+
+	void common_input_nolex::file_swap(int fFile)
 	{
 	//NOTE: a negative file descriptor will allow use of what remains in the buffers
 	if (fFile >= 0 && fFile != input_pipe)
@@ -382,17 +400,19 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	}
 
 
-	bool common_input::residual_data() const
+	bool common_input_nolex::residual_data() const
 	{ return current_data.size() || current_line.size() || loaded_data.size(); }
 
 
-	void common_input::close_input_pipe()
+	void common_input_nolex::close_input_pipe()
 	{
 	if (input_pipe >= 0) close(input_pipe);
 	eof_reached = false;
 	input_pipe = -1;
 	}
 
+
+	common_input::common_input(int fFile) : common_input_nolex(fFile) { }
 
 
 	receive_protected_input::receive_protected_input(protected_input *iInput) :
@@ -436,7 +456,7 @@ class is_input_waiting : public protected_input::modifier
 
 	//NOTE: blocking should be turned off for the input source
 	if (!object->set_input_mode(input_binary)) return protect::entry_fail; //removes "input_allow_underrun"
-	bool outcome = object->receive_input().size();
+	bool outcome = !object->empty_read() || object->receive_input().size();
 	if (!outcome && (!(object = oObject) || object->is_terminated())) return protect::exit_forced;
 
 	return outcome? protect::entry_success : protect::entry_retry;

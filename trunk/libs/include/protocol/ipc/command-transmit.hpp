@@ -156,7 +156,7 @@ private:
 
 	external_command *command;
 
-	const command_finder *finder;
+	const command_finder *const finder;
 	text_data command_label, extracted_command;
 };
 
