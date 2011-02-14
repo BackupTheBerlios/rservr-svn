@@ -92,10 +92,12 @@ inline static bool ATTR_INL local_check_su()
 	finder(fFinder) {}
 
 	transmit_block::transmit_block(const transmit_block &eEqual) :
-	wait_start(eEqual.wait_start), no_send(eEqual.no_send),
-	send_to(eEqual.send_to), command(eEqual.command? eEqual.command->copy() : NULL),
-	finder(eEqual.finder), command_label(eEqual.command_label),
-	extracted_command(eEqual.extracted_command) {}
+ 	command_info(eEqual), structure_base(eEqual),
+	wait_start(eEqual.wait_start), execute_type(eEqual.execute_type),
+	no_send(eEqual.no_send), send_to(eEqual.send_to),
+	command(eEqual.command? eEqual.command->copy() : NULL),
+	finder(eEqual.finder), command_label(eEqual.command_label)/*,
+	extracted_command(eEqual.extracted_command)*/ {}
 
 	transmit_block &transmit_block::operator = (const transmit_block &eEqual)
 	{

@@ -155,6 +155,7 @@ text_info   entity_name()   { return client_name.c_str(); } //from 'local-types.
 
 void cleanup_client_command()
 {
+	client_commands.reset_list();
 	FILE *old_file = log_file;
 	log_file = NULL;
 	if (old_file) fclose(old_file);
@@ -220,7 +221,9 @@ void debug_output(text_info fFormat, ...)
 	va_end(items);
 	time_t current_time = time(NULL);
 	strftime(time_string, PARAM_DEFAULT_FORMAT_BUFFER, PARAM_LOG_TIME_FORMAT, localtime(&current_time));
-	fprintf(stderr, "[%s DEBUG: '%s' (%i)] %s\n", time_string, entity_name(), getpid(), debug_string);
+	fprintf(stderr, "[%s DEBUG: '%s' (%i)] %s\n", time_string,
+	  client_name.size()? client_name.c_str() : alternate_name.c_str(), getpid(), debug_string);
+	fflush(stderr);
 }
 
 

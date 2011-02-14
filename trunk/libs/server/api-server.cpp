@@ -1107,7 +1107,7 @@ bool waiting_command_available()
 bool send_server_response_list(const transmit_block &cCommand, command_event eEvent,
 const data_list *dData)
 {
-	transmit_block response_command(cCommand);
+	transmit_block response_command;
 	COPY_TO_RESPONSE(new proto_server_response_list(eEvent, dData),
 	  response_command, cCommand)
 	response_command.silent_auto_response = true;

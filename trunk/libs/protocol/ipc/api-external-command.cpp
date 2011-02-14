@@ -62,7 +62,7 @@ extern "C" {
 	{ return true; }
 
 	storage_section *null_command::assemble_command() const
-	{ return new empty_data_section(""); }
+	{ return NULL; }
 
 	external_command *null_command::copy() const
 	{ return new null_command(*this); }

@@ -178,7 +178,8 @@ void debug_output(text_info fFormat, ...)
 	va_end(items);
 	time_t current_time = time(NULL);
 	strftime(time_string, PARAM_DEFAULT_FORMAT_BUFFER, PARAM_LOG_TIME_FORMAT, localtime(&current_time));
-	fprintf(stderr, "[%s DEBUG: '%s' (%i)] %s\n", time_string, entity_name(), getpid(), debug_string);
+	fprintf(stderr, "[%s DEBUG: '%s' (%i)] %s\n", time_string, server_name.c_str(), getpid(), debug_string);
+	fflush(stderr);
 }
 
 

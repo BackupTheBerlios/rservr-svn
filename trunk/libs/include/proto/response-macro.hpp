@@ -42,8 +42,7 @@ extern "C" {
 
 
 #define COPY_TO_RESPONSE(command, left, right) \
-{ if (!left.send_to) return false; \
-  left.send_to = NULL; \
+{ left.send_to = NULL; \
   if (!left.set_command(command)) return false; \
   left.orig_entity      = is_server()? entity_name() : right.target_entity; \
   left.orig_address     = ""; \
@@ -66,7 +65,7 @@ extern "C" {
 #define DEFAULT_INTERNAL_RESPONSE(name, command, check) \
 result name(const transmit_block &RESPONSE_ORIGINAL_ARG, command_event rResult) \
 { check \
-  transmit_block response_command(RESPONSE_ORIGINAL_ARG); \
+  transmit_block response_command; \
   COPY_TO_RESPONSE(new command(rResult), response_command, RESPONSE_ORIGINAL_ARG) \
   AUTO_SEND_COMMAND(response_command, RESPONSE_ORIGINAL_ARG) }
 

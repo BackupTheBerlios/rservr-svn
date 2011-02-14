@@ -1,9 +1,24 @@
 12feb11
+- *****figure out why there's a pure-virtual call in rservr and double-free (fclose) in rservrd
 - review all commands to make sure that:
   - all members are initialized when constructed
-  - all members are set when parsing
+  - all members are *reset* then set (if necessary) when parsing
   - all members are added when building
   - parsing and building match (either order or labels)
+- figure out why send_time is still around, maybe implement it
+- do thing with rsv-forward where it reutilizes a socket for data transmission
+  - need two identical connections; one becomes the data connection
+  - rsv-forward will perform pass-through with loaded filters
+  - need both clients to create a local socket
+  - what the forwarders do:
+    - fork; parent closes socket to be used for data, child closes all other descriptors, even log and server IPC
+    - child creates thread; main thread in one direction, other thread in other direction (blocking)
+  - setup process:
+    - clients on either end send request to forwarder to "steal" connection with name of existing local socket
+    - forwarder complies (maybe add restrictions in config file?)
+    - recommended, but not built-in: one client sends message to another to tell it to take over other end of same connection
+- set up flex/bison parser for config files, and maybe for rservrd
+  - use this to improve flexibility of syntax?
 - update docs
   - new library structure
   - remove old filter-parser script

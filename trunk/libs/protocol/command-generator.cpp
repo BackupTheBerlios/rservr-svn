@@ -56,7 +56,7 @@ extern "C" {
 
 	command_generator::command_generator(const command_generator &eEqual,
 	command_type tType) :
-	name(eEqual.name), alias(eEqual.info), info(eEqual.info),
+	name(eEqual.name), alias(eEqual.alias), info(eEqual.info),
 	create_require(eEqual.create_require), create_exclude(eEqual.create_exclude),
 	parse_require(eEqual.parse_require), parse_exclude(eEqual.parse_exclude),
 	type(tType), parse_callback(eEqual.parse_callback),

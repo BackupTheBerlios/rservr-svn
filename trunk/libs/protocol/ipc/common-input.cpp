@@ -132,8 +132,11 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	this->set_input_mode(universal_transmission_reset);
 	this->set_input_mode(input_binary); //disable underrun for first read
 
-	//NOTE: assume that this entity will always use the same template
-	if (!context.command) context.command = new transmit_block(*cCommand);
+	if (!context.command)
+	 {
+	context.command = new transmit_block;
+	cCommand->copy_base(*context.command);
+	 }
 	context.complete = false;
 
 	bool outcome = parse_loop(&context, scanner, state);
