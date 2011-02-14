@@ -1031,10 +1031,6 @@ static bool internal_queue_loop()
 	if (!inline_queue && pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) return false;
 
 	transmit_block internal_command(&internal_finder);
-	internal_command.send_to = &local_client_response_receiver;
-
-	transmit_block error_command(NULL);
-	error_command.send_to = &local_client_response_receiver;
 
 	receive_protected_input new_input(pipe_input);
 
@@ -1101,6 +1097,8 @@ static bool internal_queue_loop()
 
 	input_test = new_input(&internal_command);
 	if (input_test == protect::entry_denied || input_test == protect::exit_forced) break;
+
+	internal_command.send_to = &local_client_response_receiver;
 
 	if (internal_command.command_ready())
 	 {

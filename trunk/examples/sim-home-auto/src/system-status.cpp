@@ -126,7 +126,7 @@ text_info sSystem)
 	send_command_no_status(new_command);
 	destroy_command(new_command);
 	}
-;
+
 	return event_none;
 }
 
@@ -213,6 +213,11 @@ static int configure_sub_function(text_info sSystem)
 	}
 
 
+	//cache command references here so they're all sent before waiting for
+	//their final outcomes
+	std::vector <command_reference> command_list;
+
+
 	for (unsigned int I = 0; I < local_connections.size(); I++)
 	//iterate in this loop once per available connection via a relay
 	{
@@ -252,11 +257,17 @@ static int configure_sub_function(text_info sSystem)
 
 	new_reference = send_command(new_command);
 	destroy_command(new_command);
-	wait_command_event(new_reference, event_complete, local_default_timeout());
+	if (new_reference) command_list.push_back(new_reference);
 	 }
 
 	remove_responses(new_reference);
 	}
 
+
+	//wait for clients to respond to service request
+	for (int I = 0; I < (signed) command_list.size(); I++)
+	wait_command_event(command_list[I], event_complete, local_default_short_timeout());
+
 	clear_messages();
+	return 0;
 }

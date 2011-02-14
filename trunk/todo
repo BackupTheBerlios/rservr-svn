@@ -1,5 +1,11 @@
 12feb11
 - *****figure out why there's a pure-virtual call in rservr and double-free (fclose) in rservrd
+- *****figure out why plugin thread (rqconfig, in particular) freezes sometimes
+- *****fix status-updating for remote responses, e.g. in examples/sim-home-auto, responding to rqsrvc
+  - gets sent, response arrives at 'status'; why does it take so long arrive/update?
+  - success with rsv-echo (i.e. auto), fail with rsv-forward (see remote-demo.sh)
+    - success with rsv-forward if it's the first command sent from the terminal
+    - success for first service request at all?
 - review all commands to make sure that:
   - all members are initialized when constructed
   - all members are *reset* then set (if necessary) when parsing

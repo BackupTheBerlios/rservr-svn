@@ -152,6 +152,7 @@ inline static bool ATTR_INL local_check_su()
 
 	void transmit_block::clear_command()
 	{
+	this->clear_info();
 	this->set_command_name("");
 	this->set_command_data(NULL);
 	this->set_command(NULL);

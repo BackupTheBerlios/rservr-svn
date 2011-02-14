@@ -17,7 +17,8 @@ fi
 
 { echo "execute_critical rservrd -dxr";
   echo "execute rsv-fsrelay system-connect";
-  echo "execute ./system-status status";
+#  echo "execute ./system-status status";
+  echo "execute rsvf-log '~status' ./system-status status";
   echo "register_all_wait"; } | \
 rservr system "$output"
 

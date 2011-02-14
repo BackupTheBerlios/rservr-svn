@@ -192,7 +192,6 @@ static const input_section default_input_section;
 
 	server_command_finder internal_finder;
 	transmit_block base_command(&internal_finder);
-	base_command.send_to = identity;
 
 	monitor_standby local_standby(server_timing_specs->read_normal_retry,
 	                              server_timing_specs->read_standby_retry,
@@ -247,6 +246,8 @@ static const input_section default_input_section;
 
 	if (this->parse_command(&internal_command->value()))
 	  {
+	internal_command->value().send_to = identity;
+
 	if (internal_command->value().command_ready())
 	   {
 	internal_command->value().priority =
