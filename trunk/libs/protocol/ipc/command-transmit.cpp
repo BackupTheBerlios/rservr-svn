@@ -124,6 +124,8 @@ inline static bool ATTR_INL local_check_su()
 
 	bool transmit_block::find_command()
 	{
+	if (!finder) return false;
+
         if (!finder->new_command(*this, command_label) ||
 	    (this->orig_address.size() && check_command_all(execute_type, command_no_remote)))
 	 {
@@ -422,9 +424,8 @@ inline static bool ATTR_INL local_check_su()
 	no_send      = eEqual.no_send;
 	send_to      = eEqual.send_to;
 
-	//finder            = eEqual.finder; //NOTE: don't copy this!
 	command_label     = eEqual.command_label;
-	extracted_command = eEqual.extracted_command;
+//	extracted_command = eEqual.extracted_command; //NOTE: waste of space to copy this
 	}
 
 
