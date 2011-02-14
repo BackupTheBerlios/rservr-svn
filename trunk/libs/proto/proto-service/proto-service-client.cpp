@@ -42,7 +42,7 @@
 //proto_service_request command=================================================
 RSERVR_AUTO_BUILTIN_TAG(service_request)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_service_request) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_service_request), binary(false) { }
 
 
 	proto_service_request::proto_service_request(text_info mMessage) :
@@ -124,7 +124,7 @@ RSERVR_GENERATOR_DEFAULT( proto_service_request, \
 //proto_service_response command================================================
 RSERVR_AUTO_BUILTIN_TAG(service_response)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_service_response) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_service_response), binary(false) { }
 
 
 	proto_service_response::proto_service_response(text_info mMessage) :

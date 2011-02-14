@@ -73,10 +73,16 @@ int initialize_label_check()
 
 void cleanup_label_check()
 {
+	if (entity_initialized)
+	{
+	entity_initialized = false;
 	regfree(&entity_expression);
-	regfree(&address_expression);
-	entity_initialized  = false;
+	}
+	if (address_initialized)
+	{
 	address_initialized = false;
+	regfree(&address_expression);
+	}
 }
 
 

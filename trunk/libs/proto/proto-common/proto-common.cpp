@@ -348,7 +348,7 @@ const text_data proto_register_client_resource   = "resource";
 const text_data proto_register_client_control    = "control";
 
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_register_client),
-	register_type(type_none) { }
+	disable(false), register_type(type_none) { }
 
 
 	proto_register_client::proto_register_client(text_info nName, entity_type tType,

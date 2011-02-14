@@ -75,6 +75,7 @@ extern "C" {
 	remote_reference = 0;
 	creator_pid      = getpid();
 	send_time        = 0x00;
+	silent_auto_response = false;
 	orig_entity.clear();
 	orig_address.clear();
 	target_entity.clear();
@@ -254,11 +255,15 @@ inline static bool ATTR_INL local_check_su()
 	snprintf(buffer, sizeof buffer, "    %s = !x%X\n", creator_pid_label.c_str(), (unsigned int) creator_pid);
 	oOutput->send_output(buffer);
 
-	snprintf(buffer, sizeof buffer, "    %s = !x%X\n", silent_response_label.c_str(), (unsigned int) send_time);
+	snprintf(buffer, sizeof buffer, "    %s = !x%X\n", time_label.c_str(),
+	  (unsigned int) (send_time? send_time : time(NULL)));
 	oOutput->send_output(buffer);
 
-	snprintf(buffer, sizeof buffer, "    %s = !x%X\n", time_label.c_str(), (unsigned int) silent_auto_response);
+	if (silent_auto_response)
+	 {
+	snprintf(buffer, sizeof buffer, "    %s = !x1\n", silent_response_label.c_str());
 	oOutput->send_output(buffer);
+	 }
 
 	if (orig_entity.size())
 	 {

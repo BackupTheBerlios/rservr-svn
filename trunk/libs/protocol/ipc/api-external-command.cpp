@@ -59,7 +59,7 @@ extern "C" {
 	external_command(nName) {}
 
 	bool null_command::compile_command(const storage_section *tTree)
-	{ return false; }
+	{ return true; }
 
 	storage_section *null_command::assemble_command() const
 	{ return new empty_data_section(""); }

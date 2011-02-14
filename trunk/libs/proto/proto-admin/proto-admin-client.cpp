@@ -139,6 +139,9 @@ const text_data proto_create_client_exec   = "exec";
 	else RSERVR_COMMAND_PARSE_ABORT
 	 }
 
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_NAME == "pid")
+	RSERVR_COMMAND_PARSE16(return_pid)
+
 	RSERVR_COMMAND_CASE(RSERVR_COMMAND_NAME == "uid")
 	RSERVR_COMMAND_PARSE16(user_id)
 
@@ -187,6 +190,9 @@ const text_data proto_create_client_exec   = "exec";
 	RSERVR_COMMAND_ADD_TEXT("type", proto_create_client_exec)
 
 	else RSERVR_COMMAND_BUILD_ABORT
+
+	if (return_pid)
+	RSERVR_COMMAND_CONVERT16("pid", true)
 
 	RSERVR_COMMAND_CONVERT16("uid", user_id)
 	RSERVR_COMMAND_CONVERT16("gid", group_id)

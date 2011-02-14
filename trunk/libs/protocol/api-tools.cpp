@@ -124,12 +124,12 @@ text_info convert_integer16(unsigned int rReference, char *dData)
 	static char output[RSERVR_MAX_CONVERT_SIZE];
 	if (!dData)
 	{
-	if (!snprintf(output, RSERVR_MAX_CONVERT_SIZE, "%.8x", rReference)) return NULL;
+	if (!snprintf(output, RSERVR_MAX_CONVERT_SIZE, "%x", rReference)) return NULL;
 	return output;
 	}
 	else
 	{
-	if (!snprintf(dData, RSERVR_MAX_CONVERT_SIZE, "%.8x", rReference)) return NULL;
+	if (!snprintf(dData, RSERVR_MAX_CONVERT_SIZE, "%x", rReference)) return NULL;
 	return dData;
 	}
 }

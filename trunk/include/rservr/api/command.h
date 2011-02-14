@@ -216,6 +216,9 @@ extern const monitor_event monitor_terminal_status;     /**< Terminal status eve
 extern const monitor_event monitor_server;              /**< General server events.*/
 extern const monitor_event monitor_clients;             /**< General client events.*/
 
+//NOTE: keep in this header so it's available in all sources by default
+extern void debug_output(text_info, ...) __attribute__ ((deprecated));
+
 #ifdef __cplusplus
 }
 #endif
@@ -223,7 +226,7 @@ extern const monitor_event monitor_clients;             /**< General client even
 #endif /*rservr_command_h*/
 
 /*! \mainpage Resourcerver API Reference
- * 
+ *
  * <!-- this is just some info for the API index HTML page -->
  *
  * <h2 align="center"><a href="http://rservr.berlios.de/" target="_blank"><b>Resourcerver Main Page</b></a><br /><br /></h2>

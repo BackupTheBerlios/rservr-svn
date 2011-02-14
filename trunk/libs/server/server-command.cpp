@@ -49,6 +49,7 @@ extern "C" {
 #include <termios.h> //terminal state
 #include <time.h> //'strftime'
 #include <stdlib.h> //environment
+#include <stdarg.h> //'va_list', etc.
 
 #include "external/clist.hpp"
 
@@ -138,13 +139,15 @@ text_info   entity_name()   { return server_name.c_str(); } //from 'local-types.
 
 void cleanup_server_command()
 {
-	fclose(log_file);
+	FILE *old_file = log_file;
 	log_file = NULL;
+	if (old_file) fclose(old_file);
 }
 
 
 result local_log(logging_mode mMode, const char *sString)
 {
+	//TODO: protect this with a mutex?
 	if (!log_file && !start_logging()) return false;
 
 	static char time_string[PARAM_DEFAULT_FORMAT_BUFFER];
@@ -161,6 +164,21 @@ result local_log(logging_mode mMode, const char *sString)
 	}
 
 	return true;
+}
+
+
+void debug_output(text_info fFormat, ...)
+{
+	//TODO: protect this with a mutex?
+	static char debug_string[PARAM_DEFAULT_FORMAT_BUFFER];
+	static char time_string[PARAM_DEFAULT_FORMAT_BUFFER];
+	va_list items;
+	va_start(items, fFormat);
+	vsnprintf(debug_string, sizeof debug_string, fFormat, items);
+	va_end(items);
+	time_t current_time = time(NULL);
+	strftime(time_string, PARAM_DEFAULT_FORMAT_BUFFER, PARAM_LOG_TIME_FORMAT, localtime(&current_time));
+	fprintf(stderr, "[%s DEBUG: '%s' (%i)] %s\n", time_string, entity_name(), getpid(), debug_string);
 }
 
 
