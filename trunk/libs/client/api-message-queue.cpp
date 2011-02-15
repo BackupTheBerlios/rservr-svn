@@ -163,7 +163,7 @@ typedef protect::capsule <message_list> protected_message_list;
 static protect::literal_capsule <message_list, global_sentry_pthread <> >
 local_message_list(PARAM_DEFAULT_MAX_MESSAGES);
 
-static pthread_t internal_thread = (pthread_t) NULL;
+static pthread_t internal_thread = pthread_t();
 static auto_condition message_sync_resume;
 
 
@@ -1145,8 +1145,9 @@ static void *message_queue_thread(void*)
 
 	if (pthread_mutex_trylock(queue_exit_mutex) == 0)
 	{
-	if (internal_thread && !inline_queue) pthread_detach(pthread_self());
-	internal_thread = (pthread_t) NULL;
+	if (!pthread_equal(internal_thread, pthread_t()) && !inline_queue)
+	pthread_detach(pthread_self());
+	internal_thread = pthread_t();
 	pthread_mutex_unlock(queue_exit_mutex);
 	}
 
@@ -1181,14 +1182,11 @@ static bool common_start()
 
 result start_message_queue()
 {
-	if (internal_thread != (pthread_t) NULL) return true;
+	if (!pthread_equal(internal_thread, pthread_t())) return true;
 
 	if (!common_start()) return false;
 
 	if (pthread_create(&internal_thread, NULL, &message_queue_thread, NULL) != 0) return false;
-
-	struct timespec start_latency = client_timing_specs->message_thread_start_wait;
-	nanosleep(&start_latency, NULL);
 
 	return message_queue_status();
 }
@@ -1201,13 +1199,27 @@ result inline_message_queue()
 	inline_queue = true;
 	message_queue_thread(NULL);
 	inline_queue = false;
-	internal_thread = (pthread_t) NULL;
+	internal_thread = pthread_t();
 	return true;
 }
 
 
 bool calling_from_message_queue()
-{ return pthread_self() == internal_thread; }
+{ return pthread_equal(pthread_self(), internal_thread); }
+
+
+#if defined(PARAM_STOP_MESSAGE_SIGNAL) && PARAM_STOP_MESSAGE_SIGNAL != 0
+static void message_queue_stop_signal(int sSignal)
+{ }
+#endif
+
+
+void restore_stop_message_queue_signal(int sSignal, sighandler_t hHandler)
+{
+#if defined(PARAM_STOP_MESSAGE_SIGNAL) && PARAM_STOP_MESSAGE_SIGNAL != 0
+	signal(sSignal, hHandler);
+#endif
+}
 
 
 result stop_message_queue()
@@ -1218,16 +1230,13 @@ result stop_message_queue()
 	return false;
 	}
 
-	if (internal_thread == (pthread_t) NULL) return false;
+	if (pthread_equal(internal_thread, pthread_t())) return false;
 
 	bool have_lock = pthread_mutex_trylock(queue_exit_mutex) == 0;
 
 	pthread_t temp_thread = internal_thread;
-	internal_thread = (pthread_t) NULL;
+	internal_thread = pthread_t();
 	exit_state = true;
-
-	struct timespec stop_latency = client_timing_specs->message_thread_exit_wait;
-	nanosleep(&stop_latency, NULL);
 
 	message_queue_unpause();
 
@@ -1235,7 +1244,17 @@ result stop_message_queue()
 
 	if (have_lock)
 	{
-	if (pthread_cancel(temp_thread) == 0) pthread_detach(temp_thread);
+	if (pthread_cancel(temp_thread) == 0)
+	 {
+#if defined(PARAM_STOP_MESSAGE_SIGNAL) && PARAM_STOP_MESSAGE_SIGNAL != 0
+	sighandler_t old_signal = signal(PARAM_STOP_MESSAGE_SIGNAL, &message_queue_stop_signal);
+	pthread_kill(temp_thread, PARAM_STOP_MESSAGE_SIGNAL);
+#endif
+	pthread_join(temp_thread, NULL);
+#if defined(PARAM_STOP_MESSAGE_SIGNAL) && PARAM_STOP_MESSAGE_SIGNAL != 0
+	restore_stop_message_queue_signal(PARAM_STOP_MESSAGE_SIGNAL, old_signal);
+#endif
+	 }
 	pthread_mutex_unlock(queue_exit_mutex);
 	}
 
@@ -1248,7 +1267,7 @@ result stop_message_queue()
 
 
 result message_queue_status()
-{ return inline_queue || internal_thread != (pthread_t) NULL; }
+{ return inline_queue || !pthread_equal(internal_thread, pthread_t()); }
 
 
 static void cancel_pause_timeout();
@@ -1277,7 +1296,7 @@ result message_queue_pause_state()
 	return message_queue_status() && queue_pause_condition.active();
 }
 
-static pthread_t current_timeout_thread = (pthread_t) NULL;
+static pthread_t current_timeout_thread = pthread_t();
 static long_time pause_thread_timeout = 0.0;
 
 typedef long_time *timeout_thread_data;
@@ -1286,10 +1305,10 @@ static void *pause_timeout_thread(void*);
 static void cancel_pause_timeout()
 {
 	//NOTE: don't unpause queue here
-	if (current_timeout_thread != (pthread_t) NULL)
+	if (!pthread_equal(current_timeout_thread, pthread_t()))
 	{
 	pthread_t old_timeout = current_timeout_thread;
-	current_timeout_thread = (pthread_t) NULL;
+	current_timeout_thread = pthread_t();
 	pthread_cancel(old_timeout);
 	pthread_detach(old_timeout);
 	}
@@ -1354,14 +1373,14 @@ static void *pause_timeout_thread(void *tTimeout)
 {
 	if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0)
 	{
-	current_timeout_thread = (pthread_t) NULL;
+	current_timeout_thread = pthread_t();
 	pthread_detach(pthread_self());
 	return NULL;
 	}
 
 	if (!tTimeout || !message_queue_pause())
 	{
-	current_timeout_thread = (pthread_t) NULL;
+	current_timeout_thread = pthread_t();
 	pthread_detach(pthread_self());
 	return NULL;
 	}
@@ -1377,7 +1396,7 @@ static void *pause_timeout_thread(void *tTimeout)
 
 	if (pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) != 0)
 	{
-	current_timeout_thread = (pthread_t) NULL;
+	current_timeout_thread = pthread_t();
 	pthread_detach(pthread_self());
 	return NULL;
 	}
@@ -1386,14 +1405,14 @@ static void *pause_timeout_thread(void *tTimeout)
 
 	if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0)
 	{
-	current_timeout_thread = (pthread_t) NULL;
+	current_timeout_thread = pthread_t();
 	pthread_detach(pthread_self());
 	return NULL;
 	}
 
 	message_queue_unpause();
 
-	current_timeout_thread = (pthread_t) NULL;
+	current_timeout_thread = pthread_t();
 	pthread_detach(pthread_self());
 	return NULL;
 }

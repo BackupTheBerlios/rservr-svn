@@ -58,7 +58,7 @@ result initialize_timing_table()
 }
 
 //NOTE: defined for 'local-timing.h'
-const short_time *local_discard_latency()
+const short_time *local_discard_latency() //TODO: remove
 { return &internal_client_timing_specs.discard_latency; }
 
 const timing_value *local_underrun_retry()

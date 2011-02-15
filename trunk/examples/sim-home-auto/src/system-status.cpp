@@ -265,8 +265,9 @@ static int configure_sub_function(text_info sSystem)
 
 
 	//wait for clients to respond to service request
+	//NOTE: combined wait should be less-than 'local_default_timeout'
 	for (int I = 0; I < (signed) command_list.size(); I++)
-	wait_command_event(command_list[I], event_complete, local_default_short_timeout());
+	wait_command_event(command_list[I], event_complete, local_default_timeout());
 
 	clear_messages();
 	return 0;

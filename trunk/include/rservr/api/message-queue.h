@@ -62,6 +62,7 @@ extern "C" {
 #include <sys/types.h> /* 'pid_t' */
 #include <stdint.h> /* 'uint32_t' */
 #include <pthread.h> /* 'pthread_mutex_t' */
+#include <signal.h> /* 'sighandler_t' */
 
 #include "command.h"
 
@@ -315,6 +316,20 @@ extern result inline_message_queue();
  * \return success (true) or failure (false)
  */
 extern result stop_message_queue();
+
+/*! \brief Restore old signal handler.
+ *
+ * Redefine this to manually restore the signal handler for
+ * PARAM_STOP_MESSAGE_SIGNAL (see param.h) after stop_message_queue changes it
+ * to break blocking system calls in the message queue; otherwise, leave this
+ * function alone.
+ * \note By default, signal(Signal, Handler); is called.
+ * \note Don't call this function.
+ *
+ * \param Signal PARAM_STOP_MESSAGE_SIGNAL
+ * \param Handler previous signal handler
+ */
+extern void restore_stop_message_queue_signal(int Signal, sighandler_t Handler);
 
 /*! \brief Determine the message queue's status.
  *

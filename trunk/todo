@@ -24,7 +24,8 @@
   - use this to improve flexibility of syntax?
 - update docs
   - new library structure
-  - remove old filter-parser script
+  - remove old filter-parser script shown in rsvf-log docs
+  - annotate that PARAM_STOP_MESSAGE_SIGNAL is taken over by stop_message_queue
 - update structure
   - merge proto- into a single library
   - rename transmit_block or command-transmit.hpp

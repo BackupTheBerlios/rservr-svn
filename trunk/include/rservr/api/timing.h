@@ -129,8 +129,8 @@ struct client_timing_table
 
 	timing_spec command_send_regulate;
 	timing_spec command_status_retry;
-	timing_spec message_thread_start_wait;
-	timing_spec message_thread_exit_wait;
+	timing_spec message_thread_start_wait; //TODO: remove
+	timing_spec message_thread_exit_wait; //TODO: remove
 	timing_spec register_wait;
 	timing_spec terminate_wait;
 	timing_spec terminal_wait;
