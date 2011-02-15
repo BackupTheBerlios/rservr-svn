@@ -82,6 +82,7 @@ extern int load_line(const char *Line, const char *Path);
  * the buffered line. Call using NULL to clear the buffer after the last line.
  *
  * \param Line from a file line
+ * \param Path optional path to execute substitution
  * \return parsed (RSERVR_LINE_LOADED), parsed and execution failure is allowed
  * (RSERVR_LINE_FALLIBLE), line error (RSERVR_LINE_ERROR), or continued to the
  * next line (RSERVR_LINE_CONTINUE)
@@ -180,7 +181,7 @@ extern struct config_arguments *steal_config_arguments(struct config_arguments
  *
  * @see steal_config_arguments
  *
- * \param List list to free
+ * \param Arguments list to free
  * \return success (0) or error (-1)
  */
 extern int free_config_arguments(struct config_arguments *Arguments);
