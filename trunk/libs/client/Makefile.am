@@ -6,7 +6,7 @@ if LINK_LIBPTHREAD
   USE_LIBPTHREAD=-lpthread
 endif
 
-AM_LDFLAGS=-version-info 3:0:3
+AM_LDFLAGS=-version-info 3:1:3
 ALL_INCLUDES=$(STANDARD_INCLUDES) -I$(srcdir)/local-include -I$(srcdir)/../.. -I$(srcdir)/../../include/rservr -I$(srcdir)/../../include -I$(srcdir)/../include
 AM_CPPFLAGS=-DENABLE_VIRT_ARRAY_ALL -DPLUGIN_PATH=\"$(PLUGIN_PATH)\" $(ALL_INCLUDES)
 lib_LTLIBRARIES=librservr-client.la
