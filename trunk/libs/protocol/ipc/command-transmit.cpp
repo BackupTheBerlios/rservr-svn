@@ -444,7 +444,7 @@ inline static bool ATTR_INL local_check_su()
 	{
 	const storage_section *current = sSection;
 
-	char buffer[256];
+	char buffer[PARAM_SCOPE_LIMIT];
 
 	while (current)
 	 {

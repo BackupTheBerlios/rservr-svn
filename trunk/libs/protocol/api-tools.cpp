@@ -36,6 +36,8 @@
 #include <stdlib.h> //'strtoul'
 #include <stdio.h> //'snprintf'
 
+#include "global/regex-check.hpp"
+
 extern "C" {
 #include "api-command.h"
 }
@@ -171,4 +173,14 @@ result parse_double(text_info dData, double *vValue)
 	char *endpoint = NULL;
 	*vValue = strtod(dData, &endpoint);
 	return endpoint && (*endpoint == 0x00);
+}
+
+
+//from 'command.h'
+result regex_compare(text_info eExpression, text_info sString)
+{
+	//NOTE: it doesn't matter that this is inefficient since it's for debugging
+	regex_check compare(true);
+	if (!(compare = eExpression)) return false;
+	return compare == sString;
 }

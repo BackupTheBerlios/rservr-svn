@@ -613,6 +613,7 @@ static common_input internal_stream_input(-1);
 multi_result receive_stream_command(command_handle *cCommand, int fFile,
 text_info nName, text_info aAddress)
 {
+	//TODO: protect this with a mutex or annotate that it's not reentrant
 	if (!aAddress || !check_entity_label(aAddress) || !cCommand) return result_fail;
 
 	internal_stream_input.file_swap(fFile);
@@ -683,9 +684,13 @@ receive_short_func rReceive)
 {
 	if (!aAddress || !check_entity_label(aAddress) || !bBuffer || !cCommand) return result_fail;
 
-	buffered_common_input buffered_stream_input(fFile, bBuffer);
-	buffered_stream_input.socket         = sSocket;
-	buffered_stream_input.input_receiver = rReceive;
+	if (!bBuffer->input_source)
+	bBuffer->input_source = new buffered_common_input(fFile, bBuffer);
+	else
+	bBuffer->input_source->file_swap(fFile);
+
+	bBuffer->input_source->socket         = sSocket;
+	bBuffer->input_source->input_receiver = rReceive;
 	local_command_finder local_finder;
 	transmit_block *new_command          = NULL;
 	const transmit_block *queued_command = NULL;
@@ -693,16 +698,16 @@ receive_short_func rReceive)
 	new_command = new transmit_block(&local_finder);
 	if (!new_command) return result_fail;
 
-	if (!buffered_stream_input.set_input_mode(input_binary | input_allow_underrun))
+	if (!bBuffer->input_source->set_input_mode(input_binary | input_allow_underrun))
 	{
 	delete new_command;
 	return result_fail;
 	}
 
-	if (!buffered_stream_input.parse_command(new_command) || buffered_stream_input.is_terminated())
+	if (!bBuffer->input_source->parse_command(new_command))
 	{
 	delete new_command;
-	if (buffered_stream_input.is_terminated()) return result_invalid;
+	if (bBuffer->input_source->is_terminated()) return result_invalid;
 	return result_fail;
 	}
 
@@ -713,7 +718,7 @@ receive_short_func rReceive)
 	return result_success;
 	}
 
-	if (!buffered_stream_input.set_input_mode(input_binary)); //NOTE: to turn off underrun
+	if (!bBuffer->input_source->set_input_mode(input_binary)); //NOTE: to turn off underrun
 
 	insert_remote_address(new_command->orig_address, aAddress);
 	insert_remote_client(new_command->orig_address, new_command->orig_entity);
@@ -740,7 +745,8 @@ result buffered_residual_stream_input(external_buffer *bBuffer)
 {
 	if (!bBuffer) return false;
 	return bBuffer->current_data.size() || bBuffer->current_line.size() ||
-	  bBuffer->loaded_data.size();
+	  bBuffer->loaded_data.size() ||
+	  (bBuffer->input_source && !bBuffer->input_source->empty_read());
 }
 
 

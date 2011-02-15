@@ -63,6 +63,7 @@ public:
 	lexer_input(const lexer_input&);
 	lexer_input &operator = (const lexer_input&);
 
+	void clear_parser();
 	bool parse_command(transmit_block*);
 	bool empty_read() const;
 
@@ -120,6 +121,8 @@ public:
 	bool is_terminated() const;
 	//----------------------------------------------------------------------
 
+	virtual void file_swap(int);
+
 	socket_reference   socket;
 	receive_short_func input_receiver;
 
@@ -139,6 +142,8 @@ protected:
 struct buffered_common_input : public buffered_common_input_nolex, public lexer_input
 {
 	buffered_common_input(int, external_buffer*);
+	void file_swap(int);
+	virtual inline ~buffered_common_input() {} //NOTE: for use with 'external_buffer'
 };
 
 
@@ -147,7 +152,6 @@ struct common_input_nolex : public buffered_common_input_nolex, private external
 	common_input_nolex(int = -1);
 	common_input_nolex(const common_input_nolex&);
 
-	void file_swap(int);
 	bool residual_data() const;
 	void close_input_pipe();
 };
@@ -156,6 +160,7 @@ struct common_input_nolex : public buffered_common_input_nolex, private external
 struct common_input : public common_input_nolex, public lexer_input
 {
 	common_input(int = -1);
+	void file_swap(int);
 };
 
 

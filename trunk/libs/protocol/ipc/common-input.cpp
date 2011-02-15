@@ -123,6 +123,20 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	{ return *this; }
 
 
+	void lexer_input::clear_parser()
+	{
+	delete context.command;
+	protocol_pstate_delete(state);
+	protocol_lex_destroy(scanner);
+
+	context.command = NULL;
+	protocol_lex_init(&scanner);
+	protocol_set_out(NULL, scanner);
+	protocol_set_extra(static_cast <YY_EXTRA_TYPE> (&context), scanner);
+	state = protocol_pstate_new();
+	}
+
+
 	bool lexer_input::parse_command(transmit_block *cCommand)
 	{
 	if (!cCommand) return false;
@@ -162,6 +176,32 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	}
 
 //END lexer/parser logic--------------------------------------------------------
+
+
+
+//(from 'remote/external-buffer.hpp')
+
+	external_buffer::external_buffer() : input_source(NULL) {}
+
+	external_buffer::external_buffer(const external_buffer &eEqual) :
+	current_data(eEqual.current_data), current_line(eEqual.current_line),
+	loaded_data(eEqual.loaded_data), input_source(NULL) {}
+
+	external_buffer &external_buffer::operator = (const external_buffer &eEqual)
+	{
+	current_data = eEqual.current_data;
+	current_line = eEqual.current_line;
+	loaded_data  = eEqual.loaded_data;
+	return *this;
+	}
+
+	external_buffer::~external_buffer()
+	{
+	buffered_common_input *old_source = input_source;
+	input_source = NULL;
+	delete old_source;
+	}
+
 
 
 	input_base::input_base(external_buffer *bBuffer) :
@@ -283,6 +323,22 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	//----------------------------------------------------------------------
 
 
+	void buffered_common_input_nolex::file_swap(int fFile)
+	{
+	//NOTE: a negative file descriptor will allow use of what remains in the buffers
+	if (fFile >= 0 && fFile != input_pipe)
+	 {
+	buffer->current_data.clear();
+	buffer->current_line.clear();
+	buffer->loaded_data.clear();
+	read_cancel = -1;
+	eof_reached = false;
+	this->set_input_mode(input_binary);
+	 }
+	input_pipe = fFile;
+	}
+
+
 	bool buffered_common_input_nolex::read_binary_input()
 	{
 	if (eof_reached) return false;
@@ -372,6 +428,12 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	buffered_common_input::buffered_common_input(int fFile, external_buffer *bBuffer) :
 	buffered_common_input_nolex(fFile, bBuffer) { }
 
+	void buffered_common_input::file_swap(int fFile)
+	{
+	if (fFile >= 0 && fFile != input_pipe) this->clear_parser();
+	this->buffered_common_input_nolex::file_swap(fFile);
+	}
+
 
 
 	common_input_nolex::common_input_nolex(int fFile) :
@@ -381,22 +443,6 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	common_input_nolex::common_input_nolex(const common_input_nolex &eEqual) :
 	buffered_common_input_nolex(eEqual.input_pipe, this)
 	{ this->buffered_common_input_nolex::operator = (eEqual); }
-
-
-	void common_input_nolex::file_swap(int fFile)
-	{
-	//NOTE: a negative file descriptor will allow use of what remains in the buffers
-	if (fFile >= 0 && fFile != input_pipe)
-	 {
-	current_data.clear();
-	current_line.clear();
-	loaded_data.clear();
-	read_cancel = -1;
-	eof_reached = false;
-	this->set_input_mode(input_binary);
-	 }
-	input_pipe = fFile;
-	}
 
 
 	bool common_input_nolex::residual_data() const
@@ -412,6 +458,12 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 
 
 	common_input::common_input(int fFile) : common_input_nolex(fFile) { }
+
+	void common_input::file_swap(int fFile)
+	{
+	if (fFile >= 0 && fFile != input_pipe) this->clear_parser();
+	this->buffered_common_input_nolex::file_swap(fFile);
+	}
 
 
 	receive_protected_input::receive_protected_input(protected_input *iInput) :

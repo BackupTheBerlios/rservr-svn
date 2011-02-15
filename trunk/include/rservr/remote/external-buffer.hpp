@@ -47,12 +47,22 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 #include <hparser/classes/string-input.hpp>
 
 
+struct buffered_common_input;
+
 /*! For internal use only.*/
 struct external_buffer
 {
+	external_buffer();
+	external_buffer(const external_buffer&);
+	external_buffer &operator = (const external_buffer&);
+
+	~external_buffer();
+
 	input_section current_data;
 	input_section current_line;
 	input_section loaded_data;
+
+	buffered_common_input *input_source;
 };
 
 #endif //rservr_external_buffer_hpp

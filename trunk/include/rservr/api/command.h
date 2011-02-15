@@ -217,7 +217,8 @@ extern const monitor_event monitor_server;              /**< General server even
 extern const monitor_event monitor_clients;             /**< General client events.*/
 
 //NOTE: keep in this header so it's available in all sources by default
-extern void debug_output(text_info, ...) __attribute__ ((deprecated));
+extern void debug_output(text_info Format, ...) __attribute__ ((deprecated)); /**< For debugging only (like 'printf'.)*/
+extern result regex_compare(text_info Expression, text_info String) __attribute__ ((deprecated)); /**< For debugging only.*/
 
 #ifdef __cplusplus
 }

@@ -54,7 +54,7 @@ extern "C" {
 
 
 extern "C" {
-void protocol_error(protocol_scanner_context*, void*, char*);
+void protocol_error(protocol_scanner_context*, void*, const char*);
 }
 %}
 
@@ -213,7 +213,7 @@ content:
 %%
 
 
-void protocol_error(protocol_scanner_context *cContext, void *sScanner, char *eError)
+void protocol_error(protocol_scanner_context *cContext, void *sScanner, const char *eError)
 {
 	if (cContext && cContext->command)
     log_protocol_command_parse_error(eError, cContext->command->command_name(),
