@@ -62,7 +62,6 @@ extern "C" {
 #include <sys/types.h> /* 'pid_t' */
 #include <stdint.h> /* 'uint32_t' */
 #include <pthread.h> /* 'pthread_mutex_t' */
-#include <signal.h> /* 'sighandler_t' */
 
 #include "command.h"
 
@@ -329,7 +328,7 @@ extern result stop_message_queue();
  * \param Signal PARAM_STOP_MESSAGE_SIGNAL
  * \param Handler previous signal handler
  */
-extern void restore_stop_message_queue_signal(int Signal, sighandler_t Handler);
+extern void restore_stop_message_queue_signal(int Signal, void(*Handler)(int));
 
 /*! \brief Determine the message queue's status.
  *

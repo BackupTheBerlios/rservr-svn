@@ -1214,7 +1214,7 @@ static void message_queue_stop_signal(int sSignal)
 #endif
 
 
-void restore_stop_message_queue_signal(int sSignal, sighandler_t hHandler)
+void restore_stop_message_queue_signal(int sSignal, void(*hHandler)(int))
 {
 #if defined(PARAM_STOP_MESSAGE_SIGNAL) && PARAM_STOP_MESSAGE_SIGNAL != 0
 	signal(sSignal, hHandler);
@@ -1247,12 +1247,13 @@ result stop_message_queue()
 	if (pthread_cancel(temp_thread) == 0)
 	 {
 #if defined(PARAM_STOP_MESSAGE_SIGNAL) && PARAM_STOP_MESSAGE_SIGNAL != 0
-	sighandler_t old_signal = signal(PARAM_STOP_MESSAGE_SIGNAL, &message_queue_stop_signal);
+	void(*old_signal)(int) = signal(PARAM_STOP_MESSAGE_SIGNAL, &message_queue_stop_signal);
 	pthread_kill(temp_thread, PARAM_STOP_MESSAGE_SIGNAL);
-#endif
 	pthread_join(temp_thread, NULL);
-#if defined(PARAM_STOP_MESSAGE_SIGNAL) && PARAM_STOP_MESSAGE_SIGNAL != 0
 	restore_stop_message_queue_signal(PARAM_STOP_MESSAGE_SIGNAL, old_signal);
+#else
+	//NOTE: this can cause minor problems with 'set_async_response' in some cases
+	pthread_detach(temp_thread);
 #endif
 	 }
 	pthread_mutex_unlock(queue_exit_mutex);
