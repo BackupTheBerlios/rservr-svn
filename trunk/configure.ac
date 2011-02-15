@@ -5,7 +5,7 @@ AC_PREREQ(2.61)
 AC_INIT(rservr-core, gamma.7, [Kevin P. Barry (ta0kira@users.berlios.de)])
 AM_INIT_AUTOMAKE([dist-bzip2])
 PACKAGE=rservr-core
-VERSION=gamma.6
+VERSION=gamma.7
 
 AC_CONFIG_FILES([ Makefile
                   include/Makefile
