@@ -963,7 +963,7 @@ static bool remove_server_socket(const char *nName)
 
 //listen thread control---------------------------------------------------------
 
-static pthread_t select_thread = (pthread_t) NULL;
+static pthread_t select_thread = pthread_t();
 
 static auto_mutex     connection_hold_mutex;
 static auto_condition connection_hold_cond;
@@ -981,7 +981,7 @@ void unblock_connection_wait()
 static void *select_thread_loop(void*);
 
 static inline bool select_thread_status()
-{ return select_thread != (pthread_t) NULL; }
+{ return !pthread_equal(select_thread, pthread_t()); }
 
 
 int start_select_thread()
@@ -993,7 +993,7 @@ int start_select_thread()
 	if (outcome < 0)
 	{
 	connection_hold_cond.deactivate();
-	select_thread = (pthread_t) NULL;
+	select_thread = pthread_t();
 	}
 	return true;
 }
@@ -1003,7 +1003,7 @@ int stop_select_thread()
 {
 	pthread_t thread_copy = select_thread;
 	if (!select_thread_status()) return 0;
-	select_thread = (pthread_t) NULL;
+	select_thread = pthread_t();
 	pthread_cancel(thread_copy);
 	connection_hold_cond.deactivate();
 	return pthread_detach(thread_copy);
@@ -1073,14 +1073,14 @@ static void *select_thread_loop(void *iIgnore)
 	if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0)
 	{
 	pthread_detach(pthread_self());
-	select_thread = (pthread_t) NULL;
+	select_thread = pthread_t();
 	return NULL;
 	}
 
 	if (!connection_hold_cond.active())
 	{
 	pthread_detach(pthread_self());
-	select_thread = (pthread_t) NULL;
+	select_thread = pthread_t();
 	return NULL;
 	}
 
@@ -1102,7 +1102,7 @@ static void *select_thread_loop(void *iIgnore)
 	{
 	connection_hold_cond.deactivate();
 	pthread_detach(pthread_self());
-	select_thread = (pthread_t) NULL;
+	select_thread = pthread_t();
 	return NULL;
 	}
 
@@ -1113,7 +1113,7 @@ static void *select_thread_loop(void *iIgnore)
 	 {
 	connection_hold_cond.deactivate();
 	pthread_detach(pthread_self());
-	select_thread = (pthread_t) NULL;
+	select_thread = pthread_t();
 	return NULL;
 	 }
 
@@ -1125,7 +1125,7 @@ static void *select_thread_loop(void *iIgnore)
 	  {
 	connection_hold_cond.deactivate();
 	pthread_detach(pthread_self());
-	select_thread = (pthread_t) NULL;
+	select_thread = pthread_t();
 	return NULL;
 	  }
 
@@ -1147,7 +1147,7 @@ static void *select_thread_loop(void *iIgnore)
 	   {
 	connection_hold_cond.deactivate();
 	pthread_detach(pthread_self());
-	select_thread = (pthread_t) NULL;
+	select_thread = pthread_t();
 	return NULL;
 	   }
 
@@ -1157,7 +1157,7 @@ static void *select_thread_loop(void *iIgnore)
 	    {
 	connection_hold_cond.deactivate();
 	pthread_detach(pthread_self());
-	select_thread = (pthread_t) NULL;
+	select_thread = pthread_t();
 	return NULL;
 	    }
 
@@ -1210,7 +1210,7 @@ static void *select_thread_loop(void *iIgnore)
 	    {
 	connection_hold_cond.deactivate();
 	pthread_detach(pthread_self());
-	select_thread = (pthread_t) NULL;
+	select_thread = pthread_t();
 	return NULL;
 	    }
 
@@ -1228,14 +1228,14 @@ static void *select_thread_loop(void *iIgnore)
 	 {
 	connection_hold_cond.deactivate();
 	pthread_detach(pthread_self());
-	select_thread = (pthread_t) NULL;
+	select_thread = pthread_t();
 	return NULL;
 	 }
 	}
 
 	connection_hold_cond.deactivate();
 	pthread_detach(pthread_self());
-	select_thread = (pthread_t) NULL;
+	select_thread = pthread_t();
 	return NULL;
 }
 

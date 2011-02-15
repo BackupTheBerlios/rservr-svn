@@ -371,7 +371,8 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 
 	int error_copy = errno; //NOTE: copy for thread safety
 
-	if (read_size != (ssize_t) -1 && read_size != 0)
+	if (read_size > 0)
+	//NOTE: must check for < -1 because some 'input_receiver' use that to denote errors
 	  {
 	data_read = true;
 	buffer->loaded_data.resize(read_size + current);

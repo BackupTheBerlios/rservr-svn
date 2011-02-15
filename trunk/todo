@@ -1,9 +1,9 @@
 12feb11
+- NOTE: blocking IPC can cause a hang until after destructors have been called!
 - *****figure out why there's a pure-virtual call in rservr and double-free (fclose) in rservrd
-- *****figure out why plugin thread (rqconfig, in particular) freezes sometimes
 - rservrd needs to exit more quickly (or server needs to exit more quickly) with duplicate server name
 - move command_info to header in plugin-dev? might be useful with command callbacks
-- review all commands to make sure that:
+- *****review all commands to make sure that:
   - all members are initialized when constructed
   - all members are *reset* then set (if necessary) when parsing
   - all members are added when building

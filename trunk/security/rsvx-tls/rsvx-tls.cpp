@@ -370,7 +370,11 @@ remote_connection sSocket, char *dData, ssize_t sSize)
 {
 	gnutls_transport_set_ptr(sessions[rReference],
 	  (gnutls_transport_ptr_t) sSocket);
-	return gnutls_record_recv(sessions[rReference], dData, sSize);
+	ssize_t outcome = gnutls_record_recv(sessions[rReference], dData, sSize);
+	//NOTE: set for 'buffered_common_input_nolex::read_binary_input'
+	if (outcome == GNUTLS_E_AGAIN)       errno = EAGAIN;
+	if (outcome == GNUTLS_E_INTERRUPTED) errno = EINTR;
+	return outcome;
 }
 
 

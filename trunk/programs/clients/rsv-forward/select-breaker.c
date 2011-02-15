@@ -33,15 +33,18 @@
 #include "select-breaker.h"
 
 #include <signal.h> /* signals */
+#include <string.h> /* memset */
 
 #include "socket-table.h"
 
 
 int send_select_break()
 {
+	pthread_t default_thread;
+	memset(&default_thread, 0x00, sizeof default_thread);
 	pthread_t input = input_select_thread();
-	if (input != (pthread_t) NULL) pthread_kill(input, SIGUSR1);
+	if (!pthread_equal(input, default_thread)) pthread_kill(input, SIGUSR1);
 	pthread_t listen = listen_select_thread();
-	if (listen != (pthread_t) NULL) pthread_kill(listen, SIGUSR1);
+	if (!pthread_equal(listen, default_thread)) pthread_kill(listen, SIGUSR1);
 	return 1;
 }

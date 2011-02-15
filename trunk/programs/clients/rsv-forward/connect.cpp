@@ -1085,6 +1085,9 @@ const char *aAddress, const char *pPort, std::string &rRevised)
 	return -1;
 	}
 
+	current_state = fcntl(new_socket, F_GETFL);
+	fcntl(new_socket, F_SETFL, current_state | O_NONBLOCK);
+
 	return new_socket;
 }
 
@@ -1197,7 +1200,6 @@ static int try_connection(socket_reference rReference, const char *nName, std::s
 	shutdown(new_socket, SHUT_RDWR);
 	return -1;
 	}
-
 
 	current_state = fcntl(new_socket, F_GETFL);
 	fcntl(new_socket, F_SETFL, current_state | O_NONBLOCK);
