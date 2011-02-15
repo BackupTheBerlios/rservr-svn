@@ -316,20 +316,6 @@ extern result inline_message_queue();
  */
 extern result stop_message_queue();
 
-/*! \brief Restore old signal handler.
- *
- * Redefine this to manually restore the signal handler for
- * PARAM_STOP_MESSAGE_SIGNAL (see param.h) after stop_message_queue changes it
- * to break blocking system calls in the message queue; otherwise, leave this
- * function alone.
- * \note By default, signal(Signal, Handler); is called.
- * \note Don't call this function.
- *
- * \param Signal PARAM_STOP_MESSAGE_SIGNAL
- * \param Handler previous signal handler
- */
-extern void restore_stop_message_queue_signal(int Signal, void(*Handler)(int));
-
 /*! \brief Determine the message queue's status.
  *
  * Determine if the message queue is currently running.

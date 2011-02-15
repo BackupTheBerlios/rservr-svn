@@ -106,7 +106,7 @@ int nNumber, flag_set &oObjects)
 	command_handle new_command = NULL;
 
 
-	if (nNumber >= 0 && nNumber < oObjects.size())
+	if (nNumber >= 0 && nNumber < (signed) oObjects.size())
 	    {
 	if (strcmp(RSERVR_TO_REQUEST_MESSAGE(mMessage), "check") == 0)
 	new_command = oObjects[nNumber]?

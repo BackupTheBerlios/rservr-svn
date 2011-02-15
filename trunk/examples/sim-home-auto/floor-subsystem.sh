@@ -7,10 +7,12 @@ output="$1"
 server="$2"
 shift 2
 
+echo "start server '$server'..." 1>&2
+
 { echo "execute_critical rservrd -dxr";
   echo "execute rsv-fsrelay $server-connect";
   echo "register_all_wait"; } | \
-rservr "$server" "$output"
+rservr "$server" "$output" || exit 1
 
 for room in $*; do
   name=$( echo "$room" | cut -d: -f1 )
@@ -18,8 +20,10 @@ for room in $*; do
   fans=$( echo "$room" | cut -d: -f3 )
   vents=$( echo "$room" | cut -d: -f4 )
 
-  rservrd "$server" @execute@./separate-room@$name@$lights@$fans@$vents > /dev/null
+  rservrd "$server" @execute@./separate-room@$name@$lights@$fans@$vents > /dev/null || exit 1
 done
 
+echo "connect server '$server'..." 1>&2
+
 #connect the virtual floor's server system to the main system
-rservrd "$server" @local_connect@"$server"-connect@/tmp/system-connect > /dev/null
+rservrd "$server" @local_connect@"$server"-connect@/tmp/system-connect > /dev/null || exit 1

@@ -48,6 +48,8 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 extern "C" {
 #endif
 
+#include "rsvp-ready.h"
+
 #include "../api/command.h"
 
 

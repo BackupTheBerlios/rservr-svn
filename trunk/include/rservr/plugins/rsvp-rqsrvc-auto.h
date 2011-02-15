@@ -53,6 +53,8 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 extern "C" {
 #endif
 
+#include "rsvp-rqsrvc.h"
+
 #include "../api/remote-service.h"
 
 

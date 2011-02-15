@@ -216,10 +216,6 @@ extern "C" {
 #define PARAM_MESSAGE_PAUSE_RESTORE   0.75
 #define PARAM_MESSAGE_PAUSE_TIMEOUT   2.5
 
-/* signal to use for stopping message queue */
-/* SETTING TO 0 OR LEAVING UNDEFINED CAN MAKE CLIENTS BLOCK IN SOME CASES */
-#define PARAM_STOP_MESSAGE_SIGNAL SIGUSR2
-
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~ END CLIENT PARAMETERS ~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 

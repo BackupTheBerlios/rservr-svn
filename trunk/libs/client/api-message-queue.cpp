@@ -1115,6 +1115,8 @@ static bool internal_queue_loop()
 	execute_client_command(internal_command);
 	local_client_interface.current_command_type = command_none;
 	internal_command.set_command(NULL);
+
+	pthread_testcancel();
 	 }
 	}
 
@@ -1208,20 +1210,6 @@ bool calling_from_message_queue()
 { return pthread_equal(pthread_self(), internal_thread); }
 
 
-#if defined(PARAM_STOP_MESSAGE_SIGNAL) && PARAM_STOP_MESSAGE_SIGNAL != 0
-static void message_queue_stop_signal(int sSignal)
-{ }
-#endif
-
-
-void restore_stop_message_queue_signal(int sSignal, void(*hHandler)(int))
-{
-#if defined(PARAM_STOP_MESSAGE_SIGNAL) && PARAM_STOP_MESSAGE_SIGNAL != 0
-	signal(sSignal, hHandler);
-#endif
-}
-
-
 result stop_message_queue()
 {
 	if (inline_queue)
@@ -1244,18 +1232,8 @@ result stop_message_queue()
 
 	if (have_lock)
 	{
-	if (pthread_cancel(temp_thread) == 0)
-	 {
-#if defined(PARAM_STOP_MESSAGE_SIGNAL) && PARAM_STOP_MESSAGE_SIGNAL != 0
-	void(*old_signal)(int) = signal(PARAM_STOP_MESSAGE_SIGNAL, &message_queue_stop_signal);
-	pthread_kill(temp_thread, PARAM_STOP_MESSAGE_SIGNAL);
-	pthread_join(temp_thread, NULL);
-	restore_stop_message_queue_signal(PARAM_STOP_MESSAGE_SIGNAL, old_signal);
-#else
-	//NOTE: this can cause minor problems with 'set_async_response' in some cases
-	pthread_detach(temp_thread);
-#endif
-	 }
+	if (pthread_cancel(temp_thread) == 0) pthread_join(temp_thread, NULL);
+	else                                  pthread_detach(temp_thread);
 	pthread_mutex_unlock(queue_exit_mutex);
 	}
 

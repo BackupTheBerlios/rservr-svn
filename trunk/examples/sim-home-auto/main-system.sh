@@ -15,20 +15,23 @@ if [ -n "$2" ]; then
   output="$2"
 fi
 
+echo "start server 'system'..." 1>&2
+
 { echo "execute_critical rservrd -dxr";
   echo "execute rsv-fsrelay system-connect";
-#  echo "execute ./system-status status";
-  echo "execute rsvf-log '~status' ./system-status status";
+  echo "execute ./system-status status";
   echo "register_all_wait"; } | \
-rservr system "$output"
+rservr system "$output" || exit 1
 
 #set up a local connection point for the other systems to connect to
-rservrd system @local_listen@system-connect@/tmp/system-connect > /dev/null
+rservrd system @local_listen@system-connect@/tmp/system-connect > /dev/null || exit 1
 
 cat "$1" | while read line; do
-  eval ./floor-subsystem.sh "$output" $line
+  eval ./floor-subsystem.sh "$output" $line || exit 1
 done
+
+echo "request configuration from 'status'..." 1>&2
 
 #execute the configuration-initiation client
 #this sends a 'configure' request for system 'rooms' to the 'status' client
-rservrd system @execute@./system-control@control@status@rooms > /dev/null
+rservrd system @execute@./system-control@control@status@rooms > /dev/null || exit 1

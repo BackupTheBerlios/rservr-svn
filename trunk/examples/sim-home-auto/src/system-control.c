@@ -8,6 +8,7 @@
 #include <stdio.h> /* 'fprintf' */
 #include <string.h> /* 'strlen' */
 
+#include <rservr/api/client.h>
 #include <rservr/api/control-client.h>
 #include <rservr/api/message-queue.h>
 #include <rservr/api/command-queue.h>

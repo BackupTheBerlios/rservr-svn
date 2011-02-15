@@ -48,6 +48,8 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 extern "C" {
 #endif
 
+#include "rsvp-dataref.h"
+
 #include <unistd.h> /* 'ssize_t' */
 
 #include "../api/command.h"
