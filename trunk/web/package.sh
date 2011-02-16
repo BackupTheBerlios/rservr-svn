@@ -15,5 +15,5 @@ if [ -x "$(which gtar)" ]; then
   TAR=gtar
 fi
 
-$TAR --owner=root --group=`id -gn 0` -cvvjf "$file" $( find api/ app user -type f | grep -v '/\.' ) \
+$TAR --owner=root --group=`id -gn root` -cvvjf "$file" $( find api/ app user -type f | grep -v '/\.' ) \
   fragment.png index.html rservr-rabbit2.png rservr.css

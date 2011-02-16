@@ -23,6 +23,7 @@
 - set up flex/bison parser for config files, and maybe for rservrd
   - use this to improve flexibility of syntax?
 - update docs
+  - make note that connections between forwarders and selves are very slow!
   - new library structure
   - remove old filter-parser script shown in rsvf-log docs
   - annotate that PARAM_STOP_MESSAGE_SIGNAL is taken over by stop_message_queue
