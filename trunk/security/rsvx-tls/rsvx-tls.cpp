@@ -65,12 +65,16 @@ GCRY_THREAD_OPTION_PTHREAD_IMPL;
 }
 #endif
 
+#include "global/condition-block.hpp"
+
 
 static bool initialized = false;
 static int forwarder_type = 0;
 
 static std::map <socket_reference, gnutls_session_t> sessions;
 static std::map <int, bool> socket_setup;
+
+static auto_mutex session_mutex;
 
 
 //srp authentication------------------------------------------------------------
@@ -313,6 +317,8 @@ const char *aActual)
 {
 	gnutls_srp_client_credentials_t srp_client;
 
+	if (!session_mutex.valid() || pthread_mutex_lock(session_mutex) < 0) return -1;
+
 	sessions[rReference] = initialize_tls_session(sServer, srp_client,
 	  aAddress, lLength, aActual);
 	gnutls_transport_set_ptr(sessions[rReference],
@@ -320,7 +326,15 @@ const char *aActual)
 
 	socket_setup[sSocket] = true;
 
-	int handshake = gnutls_handshake(sessions[rReference]);
+	gnutls_session_t session = sessions[rReference];
+
+	pthread_mutex_unlock(session_mutex);
+
+	//NOTE: must be unlocked here if "from" and "to" are the same forwarder!
+	int handshake = gnutls_handshake(session);
+
+	if (!session_mutex.valid() || pthread_mutex_lock(session_mutex) < 0) return -1;
+
 	if (handshake < 0)
 	{
     client_log_output(logging_normal, "rsvx-tls:connect", gnutls_strerror(handshake));
@@ -329,6 +343,8 @@ const char *aActual)
 	}
 
 	socket_setup[sSocket] = false;
+
+	pthread_mutex_unlock(session_mutex);
 
 	return 0;
 }
@@ -349,8 +365,13 @@ const char *aActual)
 int disconnect_general(load_reference lLoad, socket_reference rReference,
  remote_connection sSocket)
 {
+	//TODO: see if this deadlocks when "from" and "to" are the same forwarder
+	if (!session_mutex.valid() || pthread_mutex_lock(session_mutex) < 0) return -1;
+
 	gnutls_bye(sessions[rReference], GNUTLS_SHUT_RDWR);
 	gnutls_deinit(sessions[rReference]);
+
+	pthread_mutex_unlock(session_mutex);
 
 	return 0;
 }
@@ -359,21 +380,32 @@ int disconnect_general(load_reference lLoad, socket_reference rReference,
 static int send_command(load_reference lLoad, socket_reference rReference,
 remote_connection sSocket, const char *dData, ssize_t sSize)
 {
+	if (!session_mutex.valid() || pthread_mutex_lock(session_mutex) < 0) return -1;
+
 	gnutls_transport_set_ptr(sessions[rReference],
 	  (gnutls_transport_ptr_t) sSocket);
-	return gnutls_record_send(sessions[rReference], dData, sSize);
+	int outcome = gnutls_record_send(sessions[rReference], dData, sSize);
+
+	pthread_mutex_unlock(session_mutex);
+
+	return outcome;
 }
 
 
 static ssize_t receive_command(load_reference lLoad, socket_reference rReference,
 remote_connection sSocket, char *dData, ssize_t sSize)
 {
+	if (!session_mutex.valid() || pthread_mutex_lock(session_mutex) < 0) return -1;
+
 	gnutls_transport_set_ptr(sessions[rReference],
 	  (gnutls_transport_ptr_t) sSocket);
 	ssize_t outcome = gnutls_record_recv(sessions[rReference], dData, sSize);
 	//NOTE: set for 'buffered_common_input_nolex::read_binary_input'
 	if (outcome == GNUTLS_E_AGAIN)       errno = EAGAIN;
 	if (outcome == GNUTLS_E_INTERRUPTED) errno = EINTR;
+
+	pthread_mutex_unlock(session_mutex);
+
 	return outcome;
 }
 

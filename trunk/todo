@@ -1,4 +1,5 @@
 12feb11
+- *****require that socket paths start with /, e.g. fs forwarders, detached clients, etc.
 - implement create_exact, create_target (create_flags) etc.
 - NOTE: blocking IPC can cause a hang until after destructors have been called!
 - *****figure out why there's a pure-virtual call in rservr and double-free (fclose) in rservrd
@@ -13,12 +14,15 @@
     - messages received before "reserve" but processed after "reserve" will fail
     - reserving socket will clear associated services!
     - TODO: make "protected" connection flag, use for config-created connections
+    - implement a get() function for std::map for security plugins instead of [], which might not be reentrant
+      - use only for functions that won't modify the map
 - set up flex/bison parser for config files, and maybe for rservrd
   - use this to improve flexibility of syntax?
 - update docs
   - make note that connections between forwarders and selves are very slow!
   - new library structure
   - remove old filter-parser script shown in rsvf-log docs
+  - add trigger and passthru to plug-in docs
 - update structure
   - merge proto- into a single library
   - rename command.h
