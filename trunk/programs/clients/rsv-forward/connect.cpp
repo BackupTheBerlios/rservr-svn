@@ -191,6 +191,7 @@ struct socket_set
 	inline bool ATTR_INL operator == (const socket_set &eEqual) const
 	{ return socket == eEqual.socket; }
 
+	std::string      reserved; //reserve for pass-thru
 	long             socket;
 	long             listen;
 	socket_reference reference;
@@ -221,7 +222,7 @@ private:
 std::map <std::string, unsigned int> connection_data::duplicates;
 
 
-typedef data::keylist <const socket_set, connection_data> connection_list;
+typedef data::keylist <socket_set, connection_data> connection_list;
 typedef protect::capsule <connection_list> protected_connection_list;
 
 static protect::literal_capsule <connection_list, global_sentry_pthread <> > internal_connection_list;
@@ -484,6 +485,98 @@ private:
 };
 
 
+class reserve_connection : public protected_connection_list::modifier
+{
+public:
+	ATTR_INT reserve_connection() : current_file(-1), current_client(NULL) { }
+
+	bool ATTR_INT operator () (int fFile, text_info cClient)
+	{
+	current_file   = fFile;
+	current_client = cClient;
+	bool outcome = internal_connection_list.access_contents(this);
+	current_file   = -1;
+	current_client = NULL;
+	return !outcome;
+	}
+
+private:
+	protect::entry_result ATTR_INT access_entry(write_object oObject) const
+	{
+	if (!oObject || current_file < 0) return protect::entry_denied;
+
+	write_temp object = NULL;
+
+	if (!(object = oObject)) return protect::exit_forced;
+
+	int position = object->f_find(current_file, &connection_list::find_by_key);
+	if (position == data::not_found) return protect::entry_fail;
+
+	if (object->get_element(position).key().reserved.size()) return protect::entry_fail;
+
+	object->get_element(position).key().reserved = current_client? current_client : "";
+
+    #ifdef RSV_RELAY
+	disconnect_from_address(object->get_element(position).value().socket_address.c_str());
+    #endif
+
+	return protect::entry_success;
+	}
+
+	int       current_file;
+	text_info current_client;
+};
+
+
+class steal_connection : public protected_connection_list::modifier
+{
+public:
+	ATTR_INT steal_connection() : current_file(-1), current_client(NULL),
+	current_reference(NULL) { }
+
+	bool ATTR_INT operator () (int fFile, text_info cClient,
+	socket_reference *rReference)
+	{
+	current_file      = fFile;
+	current_client    = cClient;
+	current_reference = rReference;
+	bool outcome = internal_connection_list.access_contents(this);
+	current_file      = -1;
+	current_client    = NULL;
+	current_reference = NULL;
+	return !outcome;
+	}
+
+private:
+	protect::entry_result ATTR_INT access_entry(write_object oObject) const
+	{
+	if (!oObject || current_file < 0) return protect::entry_denied;
+
+	write_temp object = NULL;
+
+	if (!(object = oObject)) return protect::exit_forced;
+
+	int position = object->f_find(current_file, &connection_list::find_by_key);
+	if (position == data::not_found) return protect::entry_fail;
+
+	if (!current_client || object->get_element(position).key().reserved != current_client)
+	return protect::entry_fail;
+
+	if (current_reference)
+	*current_reference = object->get_element(position).key().reference;
+
+	object->remove_single(position);
+	send_select_break();
+
+	return protect::entry_success;
+	}
+
+	int               current_file;
+	text_info         current_client;
+	socket_reference *current_reference;
+};
+
+
 class remove_all_connections : public protected_connection_list::modifier
 {
 public:
@@ -550,6 +643,10 @@ private:
 };
 
 
+static bool check_not_reserved(connection_list::const_return_type eElement)
+{ return !eElement.key().reserved.size(); }
+
+
 class create_connection_list : public protected_connection_list::viewer
 {
 public:
@@ -572,12 +669,14 @@ private:
 
 	if (!(object = oObject)) return protect::exit_forced;
 
-	*current_list = new char*[ object->size() + 1 ];
+	unsigned int count = object->fe_count(&check_not_reserved), total = 0;
+	*current_list = new char*[count + 1];
 
-	for (unsigned int I = 0; I < object->size(); I++)
-	(*current_list)[I] =
-	  strdup(object->get_element(I).value().socket_address.c_str());
-	(*current_list)[ object->size() ] = NULL;
+	for (unsigned int I = 0; I < object->size() && total < count; I++)
+	if (!object->get_element(I).key().reserved.size())
+	(*current_list)[total++] = strdup(object->get_element(I).value().socket_address.c_str());
+
+	(*current_list)[total] = NULL;
 
 	return protect::entry_success;
 	}
@@ -759,14 +858,17 @@ private:
 class get_file : public protected_connection_list::viewer
 {
 public:
-	ATTR_INT get_file() : current_file(-1), current_address(NULL) { }
+	ATTR_INT get_file() : current_file(-1), current_client(NULL),
+	current_address(NULL) { }
 
-	int ATTR_INT operator () (const char *aAddress)
+	int ATTR_INT operator () (const char *aAddress, text_info cClient)
 	{
 	current_file    = -1;
+	current_client  = cClient;
 	current_address = aAddress;
 	bool outcome = internal_connection_list.view_contents_locked(this);
 	current_address = NULL;
+	current_client  = NULL;
 	return outcome? -1 : current_file;
 	}
 
@@ -785,12 +887,18 @@ private:
 
 	if (position == data::not_found) return protect::entry_fail;
 
+	//don't allow sending to a reserved socket
+	if ( object->get_element(position).key().reserved.size() && (!current_client ||
+	    object->get_element(position).key().reserved != current_client) )
+	return protect::entry_fail;
+
 	current_file = object->get_element(position).key().socket;
 
 	return protect::entry_success;
 	}
 
 	int         current_file;
+	text_info   current_client;
 	const char *current_address;
 };
 
@@ -877,10 +985,10 @@ struct external_buffer *find_socket_buffer(int fFile)
 	return new_buffer(fFile);
 }
 
-int find_socket(const char *aAddress)
+int find_socket(const char *aAddress, const char *cClient)
 {
 	get_file new_file;
-	return new_file(aAddress);
+	return new_file(aAddress, cClient);
 }
 
 socket_reference find_reference(int sSocket)
@@ -931,6 +1039,18 @@ int remove_socket(int fFile)
 {
 	remove_connection new_remove;
 	return new_remove(fFile);
+}
+
+int reserve_socket(int fFile, const char *cClient)
+{
+	reserve_connection new_reserve;
+	return new_reserve(fFile, cClient);
+}
+
+int steal_socket(int fFile, const char *cClient, socket_reference *rReference)
+{
+	steal_connection new_steal;
+	return new_steal(fFile, cClient, rReference);
 }
 
 int store_socket_list(const fd_set *sSet)
@@ -1489,7 +1609,7 @@ command_event __rsvp_netcntl_hook_local_disconnect(const struct netcntl_source_i
     #endif
 
 	int file_number = -1;
-	if ((file_number = find_socket(aAddress)) < 0 || !remove_socket(file_number))
+	if ((file_number = find_socket(aAddress, sSource->sender)) < 0 || !remove_socket(file_number))
 	{
     log_message_disconnect_deny(aAddress);
 	return event_error;

@@ -59,12 +59,14 @@ void finish_socket(int) ATTR_INT;
 
 const char *find_socket_address(int) ATTR_INT;
 struct external_buffer *find_socket_buffer(int) ATTR_INT;
-int find_socket(const char*) ATTR_INT;
+int find_socket(const char*, const char*) ATTR_INT;
 socket_reference find_reference(int) ATTR_INT;
 int add_socket_error(int) ATTR_INT;
 void remove_socket_error(int) ATTR_INT;
 
 int remove_socket(int) ATTR_INT;
+int reserve_socket(int, const char*) ATTR_INT;
+int steal_socket(int, const char*, socket_reference*) ATTR_INT;
 
 int parse_config_file(const char*) ATTR_INT;
 

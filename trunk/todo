@@ -5,17 +5,9 @@
 - rservrd needs to exit more quickly (or server needs to exit more quickly) with duplicate server name
 - move command_info to header in plugin-dev? might be useful with command callbacks
 - do thing with rsv-forward where it reutilizes a socket for data transmission
-  - need two identical connections; one becomes the data connection
-  - rsv-forward will perform pass-through with loaded filters
-  - need both clients to create a local socket
-  - what the forwarders do:
-    - fork; parent closes socket to be used for data, child closes all other descriptors, even log and server IPC
-    - child creates thread; main thread in one direction, other thread in other direction (blocking)
-  - setup process:
-    - clients on either end send request to forwarder to "steal" connection with name of existing local socket
-    - forwarder complies (maybe add restrictions in config file?)
-    - recommended, but not built-in: one client sends message to another to tell it to take over other end of same connection
-  - ***what to do with command buffer between request for conversion and conversion?
+  1> send message from client 1 to client 2 via connection requesting it to steal the connection
+  2> send a response to client 1 from client 2 via connection; if "yes", send reserve message immediately after
+  3> send a "reserve" message from client 1 (after receiving response) to the forwarder for the connection
 - set up flex/bison parser for config files, and maybe for rservrd
   - use this to improve flexibility of syntax?
 - update docs
