@@ -44,7 +44,9 @@ extern "C" {
 
 
 //rsvp_dataref_open_reference command===========================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_open_reference) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_open_reference),
+	location_reference(0), location_type(RSVP_DATAREF_TYPE_NONE),
+	open_mode(RSVP_DATAREF_MODE_NONE) {}
 
 
 	rsvp_dataref_open_reference::rsvp_dataref_open_reference(text_info lLocation,
@@ -120,7 +122,9 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_open_reference, rsvp_dataref_open_re
 
 
 //rsvp_dataref_change_reference command=========================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_change_reference) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_change_reference)
+	location_reference(0), location_type(RSVP_DATAREF_TYPE_NONE),
+	change_mode(RSVP_DATAREF_MODE_NONE) {}
 
 
 	rsvp_dataref_change_reference::rsvp_dataref_change_reference(text_info lLocation,
@@ -196,7 +200,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_change_reference, rsvp_dataref_chang
 
 
 //rsvp_dataref_close_reference command==========================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_close_reference) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_close_reference)
+	location_reference(0) {}
 
 
 	rsvp_dataref_close_reference::rsvp_dataref_close_reference(int rReference) :
@@ -256,7 +261,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_close_reference, rsvp_dataref_close_
 
 
 //rsvp_dataref_read_data command================================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_read_data) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_read_data)
+	location_reference(0), data_offset(0), data_size(0) {}
 
 
 	rsvp_dataref_read_data::rsvp_dataref_read_data(int rReference, ssize_t oOffset,
@@ -290,7 +296,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_close_reference, rsvp_dataref_close_
 	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
 	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
 	RSERVR_COMMAND_PARSE10(location_reference)
 
 	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
@@ -327,7 +333,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_read_data, rsvp_dataref_read_data_ta
 
 
 //rsvp_dataref_write_data command===============================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_write_data) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_write_data)
+	location_reference(0), data_offset(0), data_size(0) {}
 
 
 	rsvp_dataref_write_data::rsvp_dataref_write_data(int rReference, ssize_t oOffset,
@@ -361,7 +368,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_read_data, rsvp_dataref_read_data_ta
 	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
 	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
 	RSERVR_COMMAND_PARSE10(location_reference)
 
 	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
@@ -398,8 +405,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_write_data, rsvp_dataref_write_data_
 
 
 //rsvp_dataref_exchange_data command============================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_exchange_data) { }
-
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_exchange_data)
+	location_reference(0), data_offset(0), data_size(0) {}
 
 	rsvp_dataref_exchange_data::rsvp_dataref_exchange_data(int rReference, ssize_t oOffset,
 	ssize_t sSize) :
@@ -432,7 +439,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_write_data, rsvp_dataref_write_data_
 	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
 	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
 	RSERVR_COMMAND_PARSE10(location_reference)
 
 	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
@@ -469,7 +476,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_exchange_data, rsvp_dataref_exchange
 
 
 //rsvp_dataref_alteration_response command======================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_alteration_response) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_alteration_response)
+	location_reference(0), data_offset(0), data_size(0) {}
 
 
 	rsvp_dataref_alteration_response::rsvp_dataref_alteration_response(int rReference, ssize_t oOffset,
@@ -503,7 +511,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_exchange_data, rsvp_dataref_exchange
 	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
 	RSERVR_COMMAND_COPY_DATA(request_origin)
 
-	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
 	RSERVR_COMMAND_PARSE10(location_reference)
 
 	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
