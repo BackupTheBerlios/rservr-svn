@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 	else log_file = STDERR_FILENO;
 
 	int execute_type = argc > 2;
-	int upstream_process = -1, downstream_process = -1;
+	pid_t upstream_process = -1, downstream_process = -1;
 
 
 	if (create_filters(argv[0], execute_type, upstream, downstream, &upstream_process,
@@ -160,7 +160,7 @@ int __execute_filter_hook(int iInput, int oOutput, int dDirection)
 	ssize_t read_size = 0, write_size = 0;
 
 	while (1)
-	if ((read_size = read(iInput, input_data, PARAM_MAX_INPUT_SECTION)) > 0 && read_size != (ssize_t) -1)
+	if ((read_size = read(iInput, input_data, sizeof input_data)) > 0 && read_size != (ssize_t) -1)
 	{
 	if (!locked && !get_lock()) break;
 	if (set_nonblock(iInput) < 0) break;
