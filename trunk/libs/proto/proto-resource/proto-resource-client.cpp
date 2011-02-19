@@ -52,7 +52,7 @@ extern "C" {
 //proto_register_service command================================================
 RSERVR_AUTO_BUILTIN_TAG(register_service)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_register_service) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_register_service) {}
 
 
 	proto_register_service::proto_register_service(text_info nName, text_info tType) :
@@ -133,7 +133,7 @@ RSERVR_GENERATOR_DEFAULT( proto_register_service, \
 //proto_deregister_own_service command==========================================
 RSERVR_AUTO_BUILTIN_TAG(deregister_own_service)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_deregister_own_service) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_deregister_own_service) {}
 
 
 	proto_deregister_own_service::proto_deregister_own_service(text_info nName) :
@@ -197,7 +197,7 @@ RSERVR_GENERATOR_DEFAULT( proto_deregister_own_service, \
 //proto_deregister_all_own_services command=====================================
 RSERVR_AUTO_BUILTIN_TAG(deregister_all_own_services)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_deregister_all_own_services) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_deregister_all_own_services) {}
 
 
 	proto_deregister_all_own_services::proto_deregister_all_own_services() :
@@ -359,7 +359,7 @@ RSERVR_GENERATOR_DEFAULT( proto_find_resource_clients, \
 RSERVR_AUTO_BUILTIN_TAG(remote_service_action)
 
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_remote_service_action),
-	action(0x00) { }
+	action(0x00) {}
 
 
 	proto_remote_service_action::
@@ -479,6 +479,7 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_action)
 
 	service_name.clear();
 	complete_address.clear();
+	action = 0x00;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -526,7 +527,7 @@ RSERVR_GENERATOR_DEFAULT( proto_remote_service_action, \
 RSERVR_AUTO_BUILTIN_TAG(remote_service_back_action)
 
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_remote_service_back_action),
-	direction(0x00), action(0x00) { }
+	direction(0x00), action(0x00) {}
 
 
 	proto_remote_service_back_action::
@@ -612,6 +613,8 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_back_action)
 	service_name.clear();
 	address_supplement.clear();
 	complete_address.clear();
+	direction = 0x00;
+	action = 0x00;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -754,6 +757,7 @@ RSERVR_AUTO_BUILTIN_TAG(remote_service_disconnect)
 
 	service_name.clear();
 	complete_address.clear();
+	direction = 0x00;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
