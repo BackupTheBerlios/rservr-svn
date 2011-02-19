@@ -53,7 +53,7 @@ DEFAULT_INTERNAL_RESPONSE(send_client_response, proto_short_response, \
 RSERVR_AUTO_BUILTIN_TAG(client_response)
 
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_client_response),
-	event_type(event_none) { }
+	event_type(event_none) {}
 
 
 	proto_client_response::proto_client_response(command_event eEvent, text_info mMessage) :
@@ -101,6 +101,7 @@ RSERVR_AUTO_BUILTIN_TAG(client_response)
 
 	event_origin.clear();
 	event_message.clear();
+	event_type = event_none;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -148,7 +149,7 @@ RSERVR_GENERATOR_DEFAULT( proto_client_response, \
 RSERVR_AUTO_BUILTIN_TAG(client_response_list)
 
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_client_response_list),
-	event_type(event_none) { }
+	event_type(event_none) {}
 
 
 	proto_client_response_list::proto_client_response_list(command_event eEvent,
@@ -209,6 +210,7 @@ RSERVR_AUTO_BUILTIN_TAG(client_response_list)
 
 	event_origin.clear();
 	response_data.clear();
+	event_type = event_none;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -271,7 +273,7 @@ RSERVR_GENERATOR_DEFAULT( proto_client_response_list, \
 RSERVR_AUTO_BUILTIN_TAG(short_response)
 
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_short_response),
-	event_type(event_none) { }
+	event_type(event_none) {}
 
 
 	proto_short_response::proto_short_response(command_event eEvent) :
@@ -306,6 +308,8 @@ RSERVR_AUTO_BUILTIN_TAG(short_response)
 	RSERVR_COMMAND_PARSE_HEAD(proto_short_response)
 	{
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
+
+	event_type = event_none;
 
 	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
 	RSERVR_COMMAND_PARSE16(event_type)
@@ -348,7 +352,7 @@ const text_data proto_register_client_resource   = "resource";
 const text_data proto_register_client_control    = "control";
 
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_register_client),
-	disable(false), register_type(type_none) { }
+	disable(false), register_type(type_none) {}
 
 
 	proto_register_client::proto_register_client(text_info nName, entity_type tType,
@@ -376,6 +380,8 @@ const text_data proto_register_client_control    = "control";
 	RSERVR_COMMAND_PARSE_CHECK(register_client, type_server, type_any_client)
 
 	client_name.clear();
+	disable = false;
+	register_type = type_none;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -419,7 +425,9 @@ const text_data proto_register_client_control    = "control";
 
 	RSERVR_COMMAND_BUILD_START
 
-	if (disable) RSERVR_COMMAND_CONVERT16("disable", disable)
+	if (disable)
+	RSERVR_COMMAND_CONVERT16("disable", true)
+
 	RSERVR_COMMAND_ADD_TEXT("name", client_name)
 
 	if      (register_type == type_admin_client_all)
@@ -455,7 +463,7 @@ RSERVR_GENERATOR_DEFAULT( proto_register_client, \
 //proto_indicate_ready command==================================================
 RSERVR_AUTO_BUILTIN_TAG(indicate_ready)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_indicate_ready) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_indicate_ready) {}
 
 
 	proto_indicate_ready::proto_indicate_ready() :
@@ -501,7 +509,7 @@ RSERVR_GENERATOR_DEFAULT( proto_indicate_ready, \
 RSERVR_AUTO_BUILTIN_TAG(client_register_response)
 
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_client_register_response),
-	client_type(event_none) { }
+	client_type(type_none) {}
 
 
 	proto_client_register_response::proto_client_register_response(permission_mask tType) :
@@ -523,6 +531,8 @@ RSERVR_AUTO_BUILTIN_TAG(client_register_response)
 	RSERVR_COMMAND_PARSE_HEAD(proto_client_register_response)
 	{
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
+
+	client_type = type_none;
 
 	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
 	RSERVR_COMMAND_PARSE16(client_type)
@@ -559,7 +569,7 @@ RSERVR_GENERATOR_DEFAULT( proto_client_register_response, \
 //proto_client_message command==================================================
 RSERVR_AUTO_BUILTIN_TAG(client_message)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_client_message) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_client_message) {}
 
 
 	proto_client_message::proto_client_message(text_info mMessage) :
@@ -621,7 +631,7 @@ RSERVR_GENERATOR_DEFAULT( proto_client_message, \
 //proto_term_request command====================================================
 RSERVR_AUTO_BUILTIN_TAG(term_request)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_term_request) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_term_request) {}
 
 
 	proto_term_request::proto_term_request() :
@@ -663,7 +673,7 @@ RSERVR_GENERATOR_DEFAULT( proto_term_request, \
 //proto_term_return command=====================================================
 RSERVR_AUTO_BUILTIN_TAG(term_return)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_term_return) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_term_return) {}
 
 
 	proto_term_return::proto_term_return() :
@@ -708,7 +718,7 @@ RSERVR_GENERATOR_DEFAULT( proto_term_return, \
 //proto_ping_client command=====================================================
 RSERVR_AUTO_BUILTIN_TAG(ping_client)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_ping_client) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_ping_client) {}
 
 
 	proto_ping_client::proto_ping_client() :
@@ -750,7 +760,7 @@ RSERVR_GENERATOR_DEFAULT( proto_ping_client, \
 //proto_ping_server command=====================================================
 RSERVR_AUTO_BUILTIN_TAG(ping_server)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_ping_server) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_ping_server) {}
 
 
 	proto_ping_server::proto_ping_server() :
