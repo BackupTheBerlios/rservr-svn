@@ -50,7 +50,7 @@ DEFAULT_INTERNAL_RESPONSE(send_server_response, proto_server_response, \
 RSERVR_AUTO_BUILTIN_TAG(server_response)
 
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_server_response),
-	event_type(event_none) { }
+	event_type(event_none) {}
 
 
 	proto_server_response::proto_server_response(command_event eEvent, text_info mMessage) :
@@ -96,6 +96,7 @@ RSERVR_AUTO_BUILTIN_TAG(server_response)
 	{
 	event_origin.clear();
 	event_message.clear();
+	event_type = event_none;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -192,6 +193,7 @@ RSERVR_AUTO_BUILTIN_TAG(server_response_list)
 	{
 	event_origin.clear();
 	response_data.clear();
+	event_type = event_none;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -272,6 +274,8 @@ RSERVR_AUTO_BUILTIN_TAG(server_directive)
 
 	RSERVR_COMMAND_PARSE_HEAD(proto_server_directive)
 	{
+	directive_type = directed_none;
+
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
 	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
@@ -454,7 +458,7 @@ RSERVR_GENERATOR_DEFAULT( proto_update_timing, \
 RSERVR_AUTO_BUILTIN_TAG(monitor_data)
 
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_monitor_data),
-	event_type(event_none) { }
+	event_type(event_none) {}
 
 
 	proto_monitor_data::proto_monitor_data(monitor_event eEvent,
@@ -487,6 +491,7 @@ RSERVR_AUTO_BUILTIN_TAG(monitor_data)
 	RSERVR_COMMAND_PARSE_CHECK(monitor_data, type_monitor_client, type_none)
 
 	monitor_data.clear();
+	event_type = event_none;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
