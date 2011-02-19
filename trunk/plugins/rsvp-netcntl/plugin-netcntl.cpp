@@ -48,7 +48,7 @@ extern "C" {
 
 //rsvp_netcntl_connection_list command==========================================
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_netcntl_connection_list),
-	connect_type(NETCNTL_DEFAULT) { }
+	connect_type(NETCNTL_DEFAULT) {}
 
 
 	rsvp_netcntl_connection_list::rsvp_netcntl_connection_list(int tType) :
@@ -139,7 +139,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connection_list, rsvp_netcntl_connec
 
 //rsvp_netcntl_connect command==================================================
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_netcntl_connect),
-	connect_type(NETCNTL_DEFAULT) { }
+	connect_type(NETCNTL_DEFAULT) {}
 
 
 	rsvp_netcntl_connect::rsvp_netcntl_connect(int tType, text_info aAddress, text_info pPort) :
@@ -245,7 +245,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connect, rsvp_netcntl_connect_tag, t
 
 //rsvp_netcntl_filtered_connect command=========================================
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_netcntl_filtered_connect),
-	connect_type(NETCNTL_DEFAULT) { }
+	connect_type(NETCNTL_DEFAULT) {}
 
 
 	rsvp_netcntl_filtered_connect::rsvp_netcntl_filtered_connect(int tType, text_info aAddress,

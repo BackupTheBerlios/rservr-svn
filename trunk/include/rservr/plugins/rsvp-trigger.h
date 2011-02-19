@@ -69,10 +69,11 @@ struct local_commands;
 extern int rsvp_trigger_load(struct local_commands *Loader);
 
 
-#define RSVP_TRIGGER_ACTION_START    ((uint8_t) 0) /**< Trigger start.*/
-#define RSVP_TRIGGER_ACTION_STOP     ((uint8_t) 1) /**< Trigger stop.*/
-#define RSVP_TRIGGER_ACTION_CANCEL   ((uint8_t) 2) /**< Cancel trigger.*/
-#define RSVP_TRIGGER_ACTION_CONTINUE ((uint8_t) 3) /**< Continue trigger.*/
+#define RSVP_TRIGGER_ACTION_NONE     ((uint8_t) 0) /**< Trigger nothing.*/
+#define RSVP_TRIGGER_ACTION_START    ((uint8_t) 1) /**< Trigger start.*/
+#define RSVP_TRIGGER_ACTION_STOP     ((uint8_t) 2) /**< Trigger stop.*/
+#define RSVP_TRIGGER_ACTION_CANCEL   ((uint8_t) 3) /**< Cancel trigger.*/
+#define RSVP_TRIGGER_ACTION_CONTINUE ((uint8_t) 4) /**< Continue trigger.*/
 
 
 /*! \param Target

@@ -71,6 +71,7 @@ struct local_commands;
 extern int rsvp_dataref_load(struct local_commands *Loader);
 
 
+#define RSVP_DATAREF_MODE_NONE  ((uint8_t) 0)         /**< No mode.*/
 #define RSVP_DATAREF_MODE_READ  ((uint8_t) 0x01 << 0) /**< Read-mode bit.*/
 #define RSVP_DATAREF_MODE_WRITE ((uint8_t) 0x01 << 1) /**< Write-mode bit.*/
 
