@@ -125,6 +125,13 @@ const text_data proto_create_client_exec   = "exec";
 	RSERVR_COMMAND_PARSE_CHECK(create_client, type_server, type_any_client)
 
 	command_text.clear();
+	create_type = 0x00;
+	user_id = 0;
+	group_id = 0;
+	return_pid = false;
+	min_priority = 0;
+	max_permissions = 0;
+	options = 0x00;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -250,6 +257,9 @@ RSERVR_AUTO_BUILTIN_TAG(detached_client)
 	RSERVR_COMMAND_PARSE_CHECK(detached_client, type_server, type_any_client)
 
 	socket_name.clear();
+	min_priority = 0;
+	max_permissions = 0;
+	options = 0x00;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -338,6 +348,7 @@ const text_data proto_remove_client_kill = "kill";
 	RSERVR_COMMAND_PARSE_CHECK(remove_client, type_server, type_any_client)
 
 	client_name.clear();
+	remove_type = 0x00;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -437,6 +448,7 @@ RSERVR_AUTO_BUILTIN_TAG(remove_find_client)
 	RSERVR_COMMAND_PARSE_CHECK(remove_find_client, type_server, type_any_client)
 
 	client_expression.clear();
+	remove_type = 0x00;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -534,6 +546,9 @@ RSERVR_AUTO_BUILTIN_TAG(remove_pid_client)
 	RSERVR_COMMAND_PARSE_HEAD(proto_remove_pid_client)
 	{
 	RSERVR_COMMAND_PARSE_CHECK(remove_pid_client, type_server, type_any_client)
+
+	remove_type = 0x00;
+	client_pid = -1;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -648,7 +663,7 @@ RSERVR_GENERATOR_DEFAULT( proto_terminate_server, \
 RSERVR_AUTO_BUILTIN_TAG(find_clients)
 
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_find_clients),
-	required(0x00), denied(~0x00) { }
+	required(0x00), denied(~(permission_mask) 0x00) { }
 
 
 	proto_find_clients::proto_find_clients(text_info nName,
@@ -669,6 +684,8 @@ RSERVR_AUTO_BUILTIN_TAG(find_clients)
 	RSERVR_COMMAND_PARSE_CHECK(find_clients, type_admin_client, type_none)
 
 	name_expression.clear();
+	required = 0x00;
+	denied = ~(permission_mask) 0x00;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
