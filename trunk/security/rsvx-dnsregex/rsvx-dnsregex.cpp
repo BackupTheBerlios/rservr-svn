@@ -62,9 +62,9 @@ socket_reference rReference, const struct sockaddr *aAddress, socklen_t lLength)
 	char name_buffer[PARAM_DEFAULT_FORMAT_BUFFER];
 
 	if (getnameinfo(aAddress, lLength, name_buffer, sizeof name_buffer, NULL, 0, 0x00))
-	return get_check(lLoad).get_mode()? 0 : -1;
+	return get_check(lLoad).second.get_mode()? 0 : -1;
 
-	return (get_check(lLoad) == name_buffer)? 0 : -1;
+	return (get_check(lLoad).second == name_buffer)? 0 : -1;
 }
 
 

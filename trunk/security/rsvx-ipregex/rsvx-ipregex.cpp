@@ -58,7 +58,7 @@ static int address_filter(load_reference lLoad, socket_reference lListen,
 socket_reference rReference, const struct sockaddr *aAddress, socklen_t lLength)
 {
 	if (!aAddress || lLength != sizeof(struct sockaddr_in)) return -1;
-	return (get_check(lLoad) == inet_ntoa(((const struct sockaddr_in*) aAddress)->sin_addr))? 0 : -1;
+	return (get_check(lLoad).second == inet_ntoa(((const struct sockaddr_in*) aAddress)->sin_addr))? 0 : -1;
 }
 
 

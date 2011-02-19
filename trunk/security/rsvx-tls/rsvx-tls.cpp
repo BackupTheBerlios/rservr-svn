@@ -77,6 +77,14 @@ static std::map <int, bool> socket_setup;
 static auto_mutex session_mutex;
 
 
+static const std::pair <int, bool> &get_setup(int fFile)
+{
+	static const std::pair <int, bool> not_found(-1, false);
+	std::map <int, bool> ::const_iterator position = socket_setup.find(fFile);
+	return (position == socket_setup.end())? not_found : *position;
+}
+
+
 //srp authentication------------------------------------------------------------
 static bool use_srp_auth = false;
 
@@ -233,7 +241,7 @@ static ssize_t write_wrapper(int sSocket, const char *dData, size_t sSize)
 
 static ssize_t read_wrapper(int sSocket, char *dData, size_t sSize)
 {
-	if (socket_setup[sSocket])
+	if (get_setup(sSocket).second)
 	{
 	//protect the forwarder from a dead connection left open; the handshake
 	//requires blocking
