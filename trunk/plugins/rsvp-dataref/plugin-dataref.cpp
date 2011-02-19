@@ -75,6 +75,9 @@ extern "C" {
 
 	request_origin.clear();
 	data_location.clear();
+	location_reference = 0;
+	location_type = RSVP_DATAREF_TYPE_NONE;
+	open_mode = RSVP_DATAREF_MODE_NONE;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -153,6 +156,9 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_open_reference, rsvp_dataref_open_re
 
 	request_origin.clear();
 	data_location.clear();
+	location_reference = 0;
+	location_type = RSVP_DATAREF_TYPE_NONE;
+	change_mode = RSVP_DATAREF_MODE_NONE;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -226,6 +232,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_change_reference, rsvp_dataref_chang
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(close_reference))
 
 	request_origin.clear();
+	location_reference = 0;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -290,6 +297,9 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_close_reference, rsvp_dataref_close_
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(read_data))
 
 	request_origin.clear();
+	location_reference = 0;
+	data_offset = 0;
+	data_size = 0;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -362,6 +372,9 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_read_data, rsvp_dataref_read_data_ta
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(write_data))
 
 	request_origin.clear();
+	location_reference = 0;
+	data_offset = 0;
+	data_size = 0;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -433,6 +446,9 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_write_data, rsvp_dataref_write_data_
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(exchange_data))
 
 	request_origin.clear();
+	location_reference = 0;
+	data_offset = 0;
+	data_size = 0;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -505,6 +521,9 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_exchange_data, rsvp_dataref_exchange
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(alteration_response))
 
 	request_origin.clear();
+	location_reference = 0;
+	data_offset = 0;
+	data_size = 0;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
