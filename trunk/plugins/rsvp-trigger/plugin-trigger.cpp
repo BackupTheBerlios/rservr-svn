@@ -44,7 +44,8 @@ extern "C" {
 
 
 //rsvp_trigger_system_trigger command===========================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_trigger_system_trigger) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_trigger_system_trigger),
+	trigger_action(RSVP_TRIGGER_ACTION_NONE) {}
 
 
 	rsvp_trigger_system_trigger::rsvp_trigger_system_trigger(uint8_t aAction, text_info tType) :
@@ -70,6 +71,7 @@ extern "C" {
 
 	request_origin.clear();
 	trigger_type.clear();
+	trigger_action = RSVP_TRIGGER_ACTION_NONE;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
