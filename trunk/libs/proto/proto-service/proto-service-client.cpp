@@ -42,7 +42,8 @@
 //proto_service_request command=================================================
 RSERVR_AUTO_BUILTIN_TAG(service_request)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_service_request), binary(false) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_service_request),
+	binary(false) {}
 
 
 	proto_service_request::proto_service_request(text_info mMessage) :
@@ -77,6 +78,7 @@ RSERVR_AUTO_BUILTIN_TAG(service_request)
 
 	event_origin.clear();
 	request_message.clear();
+	binary = false;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -124,7 +126,8 @@ RSERVR_GENERATOR_DEFAULT( proto_service_request, \
 //proto_service_response command================================================
 RSERVR_AUTO_BUILTIN_TAG(service_response)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_service_response), binary(false) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_service_response),
+	binary(false) {}
 
 
 	proto_service_response::proto_service_response(text_info mMessage) :
@@ -177,6 +180,7 @@ RSERVR_AUTO_BUILTIN_TAG(service_response)
 
 	event_origin.clear();
 	response_message.clear();
+	binary = false;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -224,7 +228,7 @@ RSERVR_GENERATOR_DEFAULT( proto_service_response, \
 //proto_service_response_list command===========================================
 RSERVR_AUTO_BUILTIN_TAG(service_response_list)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_service_response_list) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_service_response_list) {}
 
 
 	proto_service_response_list::proto_service_response_list(info_list lList) :
@@ -331,7 +335,7 @@ RSERVR_GENERATOR_DEFAULT( proto_service_response_list, \
 RSERVR_AUTO_BUILTIN_TAG(partial_response)
 
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_partial_response),
-	event_type(event_none) { }
+	event_type(response_ignore) {}
 
 
 	proto_partial_response::proto_partial_response(response_type tType,
@@ -376,6 +380,7 @@ RSERVR_AUTO_BUILTIN_TAG(partial_response)
 
 	event_origin.clear();
 	response_message.clear();
+	event_type = response_ignore;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -423,7 +428,7 @@ RSERVR_GENERATOR_DEFAULT( proto_partial_response, \
 RSERVR_AUTO_BUILTIN_TAG(partial_response_list)
 
 	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_partial_response_list),
-	event_type(event_none) { }
+	event_type(response_ignore) {}
 
 
 	proto_partial_response_list::proto_partial_response_list(response_type tType,
@@ -473,6 +478,7 @@ RSERVR_AUTO_BUILTIN_TAG(partial_response_list)
 
 	event_origin.clear();
 	response_data.clear();
+	event_type = response_ignore;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
@@ -534,7 +540,7 @@ RSERVR_GENERATOR_DEFAULT( proto_partial_response_list, \
 //proto_find_services command===================================================
 RSERVR_AUTO_BUILTIN_TAG(find_services)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_find_services) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_find_services) {}
 
 
 	proto_find_services::proto_find_services(text_info nName,
