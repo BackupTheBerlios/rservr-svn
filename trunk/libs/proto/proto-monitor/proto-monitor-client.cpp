@@ -39,7 +39,8 @@
 //proto_set_monitor_types command===============================================
 RSERVR_AUTO_BUILTIN_TAG(set_monitor_types)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_set_monitor_types) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_set_monitor_types),
+	monitor_types(monitor_none) {}
 
 
 	proto_set_monitor_types::proto_set_monitor_types(monitor_event eEvent) :
@@ -57,6 +58,8 @@ RSERVR_AUTO_BUILTIN_TAG(set_monitor_types)
 	RSERVR_COMMAND_PARSE_HEAD(proto_set_monitor_types)
 	{
 	RSERVR_COMMAND_PARSE_CHECK(set_monitor_types, type_server, type_any_client)
+
+	monitor_types = monitor_none;
 
 	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
 
