@@ -31,6 +31,7 @@ AC_CONFIG_FILES([ Makefile
                   plugins/rsvp-ready/Makefile
                   plugins/rsvp-dataref/Makefile
                   plugins/rsvp-trigger/Makefile
+                  plugins/rsvp-passthru/Makefile
                   security/Makefile
                   security/rsvx-localhost/Makefile
                   security/rsvx-ipregex/Makefile

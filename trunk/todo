@@ -12,6 +12,7 @@
   - NOTES:
     - messages received before "reserve" but processed after "reserve" will fail
     - reserving socket will clear associated services!
+    - TODO: make "protected" connection flag, use for config-created connections
 - set up flex/bison parser for config files, and maybe for rservrd
   - use this to improve flexibility of syntax?
 - update docs
