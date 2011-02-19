@@ -64,7 +64,7 @@ public:
 	lexer_input &operator = (const lexer_input&);
 
 	void clear_parser();
-	bool parse_command(transmit_block*);
+	bool parse_command(command_transmit*);
 	bool empty_read() const;
 
 	~lexer_input();
@@ -173,12 +173,12 @@ class receive_protected_input : public protected_input::modifier
 public:
 	receive_protected_input(protected_input*);
 
-	bool operator () (transmit_block*);
+	bool operator () (command_transmit*);
 
 private:
 	protect::entry_result access_entry(write_object) const;
 
-	transmit_block  *      current_input;
+	command_transmit  *      current_input;
 	protected_input *const current_source;
 };
 

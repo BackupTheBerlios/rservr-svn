@@ -64,7 +64,7 @@ extern "C" {
 
 struct server_command_finder : public command_finder
 {
-	bool new_command(transmit_block &bBase, const text_data &cCommand) const
+	bool new_command(command_transmit &bBase, const text_data &cCommand) const
 	{ return empty_server_command(bBase, cCommand); }
 };
 
@@ -191,7 +191,7 @@ static const input_section default_input_section;
 	active = true;
 
 	server_command_finder internal_finder;
-	transmit_block base_command(&internal_finder);
+	command_transmit base_command(&internal_finder);
 
 	monitor_standby local_standby(server_timing_specs->read_normal_retry,
 	                              server_timing_specs->read_standby_retry,

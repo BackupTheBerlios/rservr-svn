@@ -49,14 +49,14 @@ extern "C" {
 }
 
 
-typedef data::clist <transmit_block> command_queue;
+typedef data::clist <command_transmit> command_queue;
 typedef protect::capsule <command_queue> protected_command_queue;
 
 
 DECLARE_RETAINED_LIST_MODIFIER(queue_new_command, protected_command_queue, \
-	const transmit_block *operator () (transmit_block*), \
-	transmit_block       *current_command; \
-	const transmit_block *new_command_handle; )
+	const command_transmit *operator () (command_transmit*), \
+	command_transmit       *current_command; \
+	const command_transmit *new_command_handle; )
 
 
 DECLARE_RETAINED_LIST_MODIFIER(remove_command, protected_command_queue, \
@@ -79,8 +79,8 @@ DECLARE_RETAINED_LIST_MODIFIER(extract_command, protected_command_queue, \
 
 
 DECLARE_RETAINED_LIST_MODIFIER(forward_command, protected_command_queue, \
-	transmit_block *operator () (command_handle), \
-	transmit_block *current_block; \
+	command_transmit *operator () (command_handle), \
+	command_transmit *current_block; \
 	command_handle  current_command; )
 
 

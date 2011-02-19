@@ -182,7 +182,7 @@ monitor_event eEvent, const data_list *dData)
 	if (!get_event_current_clients(mMonitorTable->events, *cClientTable, eEvent, sending_list))
 	return true;
 
-	transmit_block monitor_command;
+	command_transmit monitor_command;
 	if (!monitor_command.set_command(new proto_monitor_data(eEvent, dData)))
 	return false;
 
@@ -211,7 +211,7 @@ entity_handle cClient, text_info nName)
 	if (!get_exit_current_clients(mMonitorTable->exits, *cClientTable, cClient, nName, sending_list))
 	return true;
 
-	transmit_block monitor_command;
+	command_transmit monitor_command;
 
 
 	for (unsigned int I = 0; I < sending_list.size(); I++)

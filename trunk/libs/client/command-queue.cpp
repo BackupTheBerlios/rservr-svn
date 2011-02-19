@@ -52,7 +52,7 @@ extern "C" {
 	RETAINED_MODULE_CONSTRUCTOR(queue_new_command, protected_command_queue),
 	current_command(NULL), new_command_handle(NULL) { }
 
-	const transmit_block *queue_new_command::operator () (transmit_block *cCommand)
+	const command_transmit *queue_new_command::operator () (command_transmit *cCommand)
 	{
 	current_command    = cCommand;
 	new_command_handle = NULL;
@@ -223,7 +223,7 @@ command_handle cCommand)
 	RETAINED_MODULE_CONSTRUCTOR(forward_command, protected_command_queue),
 	current_block(NULL), current_command(NULL) { }
 
-	transmit_block *forward_command::operator () (command_handle cCommand)
+	command_transmit *forward_command::operator () (command_handle cCommand)
 	{
 	current_block   = NULL;
 	current_command = cCommand;

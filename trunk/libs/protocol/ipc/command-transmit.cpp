@@ -87,11 +87,11 @@ inline static bool ATTR_INL local_check_su()
 { return getuid() == 0 || geteuid() == 0 || getgid() == 0 || getegid() == 0; }
 
 
-	transmit_block::transmit_block(const command_finder *fFinder) :
+	command_transmit::command_transmit(const command_finder *fFinder) :
 	wait_start(0), execute_type(0), no_send(false), send_to(NULL), command(NULL),
 	finder(fFinder) {}
 
-	transmit_block::transmit_block(const transmit_block &eEqual) :
+	command_transmit::command_transmit(const command_transmit &eEqual) :
  	command_info(eEqual), structure_base(eEqual),
 	wait_start(eEqual.wait_start), execute_type(eEqual.execute_type),
 	no_send(eEqual.no_send), send_to(eEqual.send_to),
@@ -99,7 +99,7 @@ inline static bool ATTR_INL local_check_su()
 	finder(eEqual.finder), command_label(eEqual.command_label)/*,
 	extracted_command(eEqual.extracted_command)*/ {}
 
-	transmit_block &transmit_block::operator = (const transmit_block &eEqual)
+	command_transmit &command_transmit::operator = (const command_transmit &eEqual)
 	{
 	if (&eEqual == this) return *this;
 
@@ -115,14 +115,14 @@ inline static bool ATTR_INL local_check_su()
 	}
 
 
-	transmit_block::~transmit_block()
+	command_transmit::~command_transmit()
 	{
 	delete command;
 	command = NULL;
 	}
 
 
-	bool transmit_block::find_command()
+	bool command_transmit::find_command()
 	{
 	if (!finder) return false;
 
@@ -136,23 +136,23 @@ inline static bool ATTR_INL local_check_su()
 	return true;
 	}
 
-	bool transmit_block::command_ready() const
+	bool command_transmit::command_ready() const
 	{ return command; }
 
-	bool transmit_block::command_sendable()
+	bool command_transmit::command_sendable()
 	{
 	if (this->get_tree()) return true;
 	return this->assemble_command();
 	}
 
-	text_info transmit_block::extract()
+	text_info command_transmit::extract()
 	{
 	extracted_command.clear();
 	::export_data(this, this);
 	return extracted_command.c_str();
 	}
 
-	void transmit_block::clear_command()
+	void command_transmit::clear_command()
 	{
 	this->clear_info();
 	this->set_command_name("");
@@ -160,16 +160,16 @@ inline static bool ATTR_INL local_check_su()
 	this->set_command(NULL);
 	}
 
-	void transmit_block::set_command_name(const text_data &nName)
+	void command_transmit::set_command_name(const text_data &nName)
 	{ command_label = nName; }
 
-	text_info transmit_block::command_name() const
+	text_info command_transmit::command_name() const
 	{ return command? command->command_name() : command_label.c_str(); }
 
-	void transmit_block::set_command_data(storage_section *sSection)
+	void command_transmit::set_command_data(storage_section *sSection)
 	{ this->set_child(sSection); }
 
-	bool transmit_block::set_command(external_command *cCommand)
+	bool command_transmit::set_command(external_command *cCommand)
 	{
 	if (cCommand && this->get_tree() && !cCommand->compile_command(this->get_tree()))
 	 {
@@ -181,11 +181,11 @@ inline static bool ATTR_INL local_check_su()
 	return true;
 	}
 
-	storage_section *transmit_block::get_tree() const
+	storage_section *command_transmit::get_tree() const
 	{ return this->first_branch(); }
 
 
-	bool transmit_block::string_property(const char *lLabel, const char *vValue)
+	bool command_transmit::string_property(const char *lLabel, const char *vValue)
 	{
 	if (!lLabel || !vValue) return false;
 	     if (orig_entity_label == lLabel)    orig_entity    = vValue;
@@ -197,13 +197,13 @@ inline static bool ATTR_INL local_check_su()
 	return true;
 	}
 
-	bool transmit_block::sinteger_property(const char *lLabel, int vValue)
+	bool command_transmit::sinteger_property(const char *lLabel, int vValue)
 	{
 	if (vValue < 0) return false;
 	return this->uinteger_property(lLabel, vValue);
 	}
 
-	bool transmit_block::uinteger_property(const char *lLabel, unsigned int vValue)
+	bool command_transmit::uinteger_property(const char *lLabel, unsigned int vValue)
 	{
 	if (!lLabel) return false;
 	     if (priority_label == lLabel)         priority             = vValue;
@@ -217,10 +217,10 @@ inline static bool ATTR_INL local_check_su()
 	return true;
 	}
 
-	const transmit_block *transmit_block::show_command() const
+	const command_transmit *command_transmit::show_command() const
 	{ return target_address.size()? this : NULL; }
 
-	bool transmit_block::copy_base(transmit_block &eEqual) const
+	bool command_transmit::copy_base(command_transmit &eEqual) const
 	{
 	eEqual.property_equal(*this);
 	return true;
@@ -228,7 +228,7 @@ inline static bool ATTR_INL local_check_su()
 
 
 	//from 'output_sender'--------------------------------------------------
-	const output_sender *transmit_block::send_data(data_output *oOutput) const
+	const output_sender *command_transmit::send_data(data_output *oOutput) const
 	{
 	if (!strlen(this->command_name()) || !oOutput) return NULL;
 
@@ -306,7 +306,7 @@ inline static bool ATTR_INL local_check_su()
 
 
 	//mirrored to 'element_interface'---------------------------------------
-	bool transmit_block::evaluate_server(server_interface *sServer) const
+	bool command_transmit::evaluate_server(server_interface *sServer) const
 	{
 	if (!strlen(this->command_name()))
 	 {
@@ -348,7 +348,7 @@ inline static bool ATTR_INL local_check_su()
 	return true;
 	}
 
-	bool transmit_block::evaluate_client(client_interface *cClient) const
+	bool command_transmit::evaluate_client(client_interface *cClient) const
 	{
 	if (local_check_su())
 	 {
@@ -401,7 +401,7 @@ inline static bool ATTR_INL local_check_su()
 	return true;
 	}
 
-	command_priority transmit_block::
+	command_priority command_transmit::
 	  override_priority(command_priority pPriority) const
 	{
 	command_priority new_priority = (pPriority < priority)? priority : pPriority;
@@ -409,12 +409,12 @@ inline static bool ATTR_INL local_check_su()
 	return command? command->override_priority(new_priority) : new_priority;
 	}
 
-	permission_mask transmit_block::execute_permissions() const
+	permission_mask command_transmit::execute_permissions() const
 	{ return command? command->execute_permissions() : type_none; }
 	//----------------------------------------------------------------------
 
 
-	void transmit_block::property_equal(const transmit_block &eEqual)
+	void command_transmit::property_equal(const command_transmit &eEqual)
 	{
 	if (&eEqual == this) return;
 
@@ -429,7 +429,7 @@ inline static bool ATTR_INL local_check_su()
 	}
 
 
-	bool transmit_block::assemble_command()
+	bool command_transmit::assemble_command()
 	{
 	if (!command) return false;
 	storage_section *new_tree = command->assemble_command();
@@ -439,7 +439,7 @@ inline static bool ATTR_INL local_check_su()
 	}
 
 
-	void transmit_block::export_tree(const storage_section *sSection,
+	void command_transmit::export_tree(const storage_section *sSection,
 	data_output *oOutput, text_data pPrefix) const
 	{
 	const storage_section *current = sSection;
@@ -495,7 +495,7 @@ inline static bool ATTR_INL local_check_su()
 	}
 
 	//from 'data_output'----------------------------------------------------
-	bool transmit_block::send_output(const output_section &dData)
+	bool command_transmit::send_output(const output_section &dData)
 	{
 	if (extracted_command.size() + dData.size() > PARAM_MAX_COMMAND_DATA)
 	 {
@@ -507,6 +507,6 @@ inline static bool ATTR_INL local_check_su()
 	return true;
 	}
 
-	bool transmit_block::is_closed() const
+	bool command_transmit::is_closed() const
 	{ return false; }
 	//----------------------------------------------------------------------

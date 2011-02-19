@@ -567,7 +567,7 @@ public:
 	ATTR_INT copy_message_response(protected_message_list *lList) :
 	current_info(NULL), current_command(NULL), current_list(lList) { }
 
-	bool ATTR_INT operator () (message_handle mMessage, transmit_block *cCommand)
+	bool ATTR_INT operator () (message_handle mMessage, command_transmit *cCommand)
 	{
 	current_info    = mMessage;
 	current_command = cCommand;
@@ -606,7 +606,7 @@ private:
 	}
 
 	message_handle  current_info;
-	transmit_block *current_command;
+	command_transmit *current_command;
 
 	protected_message_list *const current_list;
 };
@@ -798,8 +798,8 @@ struct external_client_interface : public client_interface
 	if (!iInfo.show_command()) return false;
 	if (requirement_fail(command_remote) || block_remote_status()) return false;
 
-	transmit_block *command_copy = NULL;
-	command_copy = new transmit_block(*iInfo.show_command());
+	command_transmit *command_copy = NULL;
+	command_copy = new command_transmit(*iInfo.show_command());
 	if (!command_copy || !command_copy->command_ready())
 	 {
 	delete command_copy;
@@ -819,7 +819,7 @@ struct external_client_interface : public client_interface
 	if (iInfo.orig_address.size() && !requirement_fail(command_response))
 	command_copy->target_reference = command_copy->remote_reference;
 
-	const transmit_block *registered_command = register_new_command(command_copy);
+	const command_transmit *registered_command = register_new_command(command_copy);
 	if (!registered_command)
 	 {
 	delete command_copy;
@@ -858,8 +858,8 @@ struct external_client_interface : public client_interface
 	return false;
 	 }
 
-	transmit_block *command_copy = NULL;
-	command_copy = new transmit_block;
+	command_transmit *command_copy = NULL;
+	command_copy = new command_transmit;
 	if (!command_copy)
 	 {
 	delete cCommand;
@@ -897,7 +897,7 @@ struct external_client_interface : public client_interface
 	if (iInfo.orig_address.size() && !requirement_fail(command_response))
 	command_copy->target_reference = command_copy->remote_reference;
 
-	const transmit_block *registered_command = register_new_command(command_copy);
+	const command_transmit *registered_command = register_new_command(command_copy);
 	if (!registered_command)
 	 {
 	delete command_copy;
@@ -980,15 +980,15 @@ static external_client_interface local_client_interface;
 
 struct client_command_finder : public command_finder
 {
-	bool ATTR_INT new_command(transmit_block &bBase, const text_data &cCommand) const
+	bool ATTR_INT new_command(command_transmit &bBase, const text_data &cCommand) const
 	{ return empty_client_command(bBase, cCommand); }
 };
 
 static client_command_finder internal_finder;
 
-static const transmit_block *executing_command = NULL;
+static const command_transmit *executing_command = NULL;
 
-static bool execute_client_command(const transmit_block &cCommand)
+static bool execute_client_command(const command_transmit &cCommand)
 {
 	executing_command = &cCommand;
 	bool outcome = cCommand.evaluate_client(&local_client_interface);
@@ -1030,7 +1030,7 @@ static bool internal_queue_loop()
 
 	if (!inline_queue && pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) return false;
 
-	transmit_block internal_command(&internal_finder);
+	command_transmit internal_command(&internal_finder);
 
 	receive_protected_input new_input(pipe_input);
 
@@ -1465,7 +1465,7 @@ result remove_responses(command_reference rReference)
 	return new_remove(rReference);
 }
 
-bool copy_response(message_handle mMessage, transmit_block &cCommand)
+bool copy_response(message_handle mMessage, command_transmit &cCommand)
 {
 	copy_message_response new_response(&local_message_list);
 	return new_response(mMessage, &cCommand);

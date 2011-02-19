@@ -43,11 +43,11 @@
 #include "common-output.hpp"
 
 
-class transmit_block;
+class command_transmit;
 
 struct command_finder
 {
-	virtual bool new_command(transmit_block&, const text_data&) const = 0;
+	virtual bool new_command(command_transmit&, const text_data&) const = 0;
 
 	inline virtual ~command_finder() { }
 };
@@ -61,15 +61,15 @@ struct response_receiver
 };
 
 
-struct transmit_block;
+struct command_transmit;
 
 struct command_info
 {
 	command_info();
 
 	virtual text_info command_name() const = 0;
-	virtual const transmit_block *show_command() const = 0;
-	virtual bool copy_base(transmit_block&) const = 0;
+	virtual const command_transmit *show_command() const = 0;
+	virtual bool copy_base(command_transmit&) const = 0;
 
 	void clear_info();
 
@@ -90,17 +90,17 @@ struct command_info
 };
 
 
-class transmit_block :
+class command_transmit :
 	public command_info,
 	public structure_base,
 	public output_manager,
 	private data_output
 {
 public:
-	transmit_block(const command_finder* = NULL);
-	transmit_block(const transmit_block&);
-	transmit_block &operator = (const transmit_block&);
-	~transmit_block();
+	command_transmit(const command_finder* = NULL);
+	command_transmit(const command_transmit&);
+	command_transmit &operator = (const command_transmit&);
+	~command_transmit();
 
 	bool find_command();
 	bool command_ready() const;
@@ -118,8 +118,8 @@ public:
 	bool sinteger_property(text_info, int);
 	bool uinteger_property(text_info, unsigned int);
 
-	const transmit_block *show_command() const;
-	bool copy_base(transmit_block&) const;
+	const command_transmit *show_command() const;
+	bool copy_base(command_transmit&) const;
 
 	//command parameters----------------------------------------------------
 	//transmitted___________________________________________________________
@@ -144,7 +144,7 @@ public:
 	//----------------------------------------------------------------------
 
 private:
-	void property_equal(const transmit_block&);
+	void property_equal(const command_transmit&);
 	bool assemble_command();
 	void export_tree(const storage_section *sSection, data_output *oOutput,
 	  text_data pPrefix) const;

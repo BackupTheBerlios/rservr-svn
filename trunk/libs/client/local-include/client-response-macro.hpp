@@ -45,9 +45,9 @@ extern "C" {
 
 #define GENERAL_RESPONSE(arg, command) \
 { if (!arg) return NULL; \
-  transmit_block *new_block = NULL; \
-  const transmit_block *queued_block = NULL; \
-  new_block = new transmit_block; \
+  command_transmit *new_block = NULL; \
+  const command_transmit *queued_block = NULL; \
+  new_block = new command_transmit; \
   if (!new_block) return NULL; \
   if (!copy_response(arg, *new_block)) \
   { delete new_block; \

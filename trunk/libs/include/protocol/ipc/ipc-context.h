@@ -38,7 +38,7 @@ extern "C" {
 #endif
 
 
-struct transmit_block;
+struct command_transmit;
 struct lexer_input;
 
 typedef struct lexer_input *lexer_input_type;
@@ -46,7 +46,7 @@ typedef struct lexer_input *lexer_input_type;
 struct protocol_scanner_context
 {
 	int                    complete;
-	struct transmit_block *command;
+	struct command_transmit *command;
 	lexer_input_type       input;
 };
 

@@ -134,7 +134,7 @@ command_reference manual_message_number()
 }
 
 
-const transmit_block *register_new_command(transmit_block *cCommand)
+const command_transmit *register_new_command(command_transmit *cCommand)
 {
 	if (!cCommand) return NULL;
 	queue_new_command new_command(&queued_client_commands);
@@ -542,7 +542,7 @@ socket_reference sSocket, send_short_func sSend)
 	if (!hHandle) return result_fail;
 	forward_command new_forward(&queued_client_commands);
 
-	transmit_block *copied_command = new_forward(hHandle);
+	command_transmit *copied_command = new_forward(hHandle);
 	if (!copied_command) return result_fail;
 
 	common_output new_output(fFile);
@@ -565,7 +565,7 @@ socket_reference sSocket, send_short_func sSend)
 
 struct local_command_finder : public command_finder
 {
-	bool ATTR_INT new_command(transmit_block &bBase, const text_data &cCommand) const
+	bool ATTR_INT new_command(command_transmit &bBase, const text_data &cCommand) const
 	{ return empty_client_command(bBase, cCommand); }
 };
 
@@ -576,10 +576,10 @@ command_handle insert_remote_command(text_info cCommand, text_info nName, text_i
 
 	cstring_input local_input(cCommand);
 	local_command_finder local_finder;
-	transmit_block *new_command          = NULL;
-	const transmit_block *queued_command = NULL;
+	command_transmit *new_command          = NULL;
+	const command_transmit *queued_command = NULL;
 
-	new_command = new transmit_block(&local_finder);
+	new_command = new command_transmit(&local_finder);
 	if (!new_command) return NULL;
 
 	if (!local_input.parse_command(new_command))
@@ -618,10 +618,10 @@ text_info nName, text_info aAddress)
 
 	internal_stream_input.file_swap(fFile);
 	local_command_finder local_finder;
-	transmit_block *new_command          = NULL;
-	const transmit_block *queued_command = NULL;
+	command_transmit *new_command          = NULL;
+	const command_transmit *queued_command = NULL;
 
-	new_command = new transmit_block(&local_finder);
+	new_command = new command_transmit(&local_finder);
 	if (!new_command) return result_fail;
 
 	if (!internal_stream_input.set_input_mode(input_binary | input_allow_underrun))
@@ -692,10 +692,10 @@ receive_short_func rReceive)
 	bBuffer->input_source->socket         = sSocket;
 	bBuffer->input_source->input_receiver = rReceive;
 	local_command_finder local_finder;
-	transmit_block *new_command          = NULL;
-	const transmit_block *queued_command = NULL;
+	command_transmit *new_command          = NULL;
+	const command_transmit *queued_command = NULL;
 
-	new_command = new transmit_block(&local_finder);
+	new_command = new command_transmit(&local_finder);
 	if (!new_command) return result_fail;
 
 	if (!bBuffer->input_source->set_input_mode(input_binary | input_allow_underrun))
@@ -821,9 +821,9 @@ command_handle manual_command(text_info nName, external_command *cCommand)
 	return NULL;
 	}
 
-	transmit_block *new_block            = NULL;
-	const transmit_block *queued_command = NULL;
-	new_block = new transmit_block(NULL);
+	command_transmit *new_block            = NULL;
+	const command_transmit *queued_command = NULL;
+	new_block = new command_transmit(NULL);
 	if (!new_block)
 	{
 	delete cCommand;

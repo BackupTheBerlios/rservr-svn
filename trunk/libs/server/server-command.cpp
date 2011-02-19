@@ -475,7 +475,7 @@ result set_program_name(text_info nName)
 }
 
 
-bool empty_server_command(transmit_block &bBase, const text_data &nName)
+bool empty_server_command(command_transmit &bBase, const text_data &nName)
 {
 	bBase.execute_type = command_null;
 	external_command *new_command = NULL;

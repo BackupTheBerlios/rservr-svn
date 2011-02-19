@@ -216,7 +216,7 @@ extern const monitor_event monitor_terminal_status;     /**< Terminal status eve
 extern const monitor_event monitor_server;              /**< General server events.*/
 extern const monitor_event monitor_clients;             /**< General client events.*/
 
-//NOTE: keep in this header so it's available in all sources by default
+//NOTE: keep in this header so they're available in all sources by default
 extern void debug_output(text_info Format, ...) __attribute__ ((deprecated)); /**< For debugging only (like 'printf'.)*/
 extern result regex_compare(text_info Expression, text_info String) __attribute__ ((deprecated)); /**< For debugging only.*/
 

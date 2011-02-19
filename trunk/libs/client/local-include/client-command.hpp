@@ -74,6 +74,6 @@ bool lookup_command(const text_data&, command_type&) ATTR_INT;
 
 bool load_client_commands() ATTR_INT;
 
-bool empty_client_command(transmit_block&, const text_data&) ATTR_INT;
+bool empty_client_command(command_transmit&, const text_data&) ATTR_INT;
 
 #endif //client_command_hpp

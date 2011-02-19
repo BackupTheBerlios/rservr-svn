@@ -51,7 +51,7 @@ extern "C" {
 template <unsigned int>
 struct execute_queue_multi;
 typedef execute_queue_multi <PARAM_EXECUTE_HEAP_ORDER> execute_queue;
-typedef data::keylist <entity_handle, transmit_block> execute_queue_base;
+typedef data::keylist <entity_handle, command_transmit> execute_queue_base;
 
 
 //this is a partially-standard priority queue implemented in an array
@@ -117,11 +117,11 @@ public:
 
 
 	template <class Function2> inline
-	transmit_block ATTR_INL *insert_command(insert_type eElement, Function2 fFunction)
+	command_transmit ATTR_INL *insert_command(insert_type eElement, Function2 fFunction)
 	{
 	if (!eElement) return NULL;
 	if (!this->transfer_element(eElement)) return NULL;
-	transmit_block *last_added = &this->last_element().value();
+	command_transmit *last_added = &this->last_element().value();
 	this->sift_up(fFunction);
 	return last_added;
 	}

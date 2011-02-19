@@ -137,7 +137,7 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	}
 
 
-	bool lexer_input::parse_command(transmit_block *cCommand)
+	bool lexer_input::parse_command(command_transmit *cCommand)
 	{
 	//NOTE: minimize the operations between here and 'parse_loop'
 	if (!cCommand) return false;
@@ -147,7 +147,7 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	if (!context.command)
 	 {
 	this->set_input_mode(universal_transmission_reset);
-	context.command = new transmit_block;
+	context.command = new command_transmit;
 	 }
 	context.complete = false;
 
@@ -473,7 +473,7 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	receive_protected_input::receive_protected_input(protected_input *iInput) :
 	current_input(NULL), current_source(iInput) { }
 
-	bool receive_protected_input::operator () (transmit_block *iInput)
+	bool receive_protected_input::operator () (command_transmit *iInput)
 	{
 	current_input = iInput;
 	bool outcome = current_source->access_contents(this);

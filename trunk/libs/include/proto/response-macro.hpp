@@ -63,9 +63,9 @@ extern "C" {
 
 #define RESPONSE_ORIGINAL_ARG cCommand
 #define DEFAULT_INTERNAL_RESPONSE(name, command, check) \
-result name(const transmit_block &RESPONSE_ORIGINAL_ARG, command_event rResult) \
+result name(const command_transmit &RESPONSE_ORIGINAL_ARG, command_event rResult) \
 { check \
-  transmit_block response_command; \
+  command_transmit response_command; \
   COPY_TO_RESPONSE(new command(rResult), response_command, RESPONSE_ORIGINAL_ARG) \
   AUTO_SEND_COMMAND(response_command, RESPONSE_ORIGINAL_ARG) }
 

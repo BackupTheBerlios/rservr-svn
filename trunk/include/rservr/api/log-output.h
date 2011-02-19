@@ -122,7 +122,6 @@ extern result set_log_client_name(text_info Name);
 /*! \brief Manually log locally.
  *
  * Add a new line of output to the client's log.
- * @see register_resource_client
  *
  * \param Mode logging mode applicable
  * \param Source short name of the source, such as "local" or "internal"

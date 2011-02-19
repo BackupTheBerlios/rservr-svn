@@ -48,10 +48,10 @@ extern "C" {
 
 
 DECLARE_RETAINED_LIST_MODIFIER(queue_new_execute, protect::capsule <protected_server::execute_access>, \
-	const transmit_block *operator () (execute_queue::insert_type, execute_queue::execute_compare), \
+	const command_transmit *operator () (execute_queue::insert_type, execute_queue::execute_compare), \
 	execute_queue::insert_type      current_element; \
         execute_queue::execute_compare  current_compare; \
-	const transmit_block           *new_command_handle; )
+	const command_transmit           *new_command_handle; )
 
 
 bool remove_handle_commands(execute_queue*, entity_handle);

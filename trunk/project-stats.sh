@@ -11,7 +11,7 @@ if [ "$1" = "all" ];then
   additional=",external"
 fi
 
-if [ "$1" = "all" ];then
+if [ "$2" = "all" ];then
   additional_really="../../hparser/trunk/{include,src}"
   additional_really_specific="echo ../../hparser/trunk/Makefile.am; "
 fi

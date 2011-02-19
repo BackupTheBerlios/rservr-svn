@@ -43,6 +43,6 @@ extern "C" {
 
 void reset_input_standby() ATTR_INT;
 bool calling_from_message_queue() ATTR_INT;
-bool copy_response(message_handle, transmit_block&) ATTR_INT;
+bool copy_response(message_handle, command_transmit&) ATTR_INT;
 
 #endif //api_message_queue_hpp

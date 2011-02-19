@@ -48,7 +48,7 @@ extern "C" {
 
 command_reference manual_message_number() ATTR_INT;
 
-const transmit_block *register_new_command(transmit_block*) ATTR_INT;
+const command_transmit *register_new_command(command_transmit*) ATTR_INT;
 
 class command_status
 {

@@ -39,6 +39,6 @@ extern "C" {
 
 #include "protocol/ipc/command-transmit.hpp"
 
-extern result send_server_response(const transmit_block&, command_event);
+extern result send_server_response(const command_transmit&, command_event);
 
 #endif //server_response_hpp

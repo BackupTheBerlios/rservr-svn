@@ -634,7 +634,7 @@ void free_command_table_info(const command_table_element *iInfo)
 }
 
 
-bool empty_client_command(transmit_block &bBase, const text_data &nName)
+bool empty_client_command(command_transmit &bBase, const text_data &nName)
 {
 	bBase.execute_type = command_null;
 	external_command *new_command = NULL;

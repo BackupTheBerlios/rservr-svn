@@ -1026,7 +1026,7 @@ const client_id *get_client_id_name(const client_list *tTable, text_info nName)
 
 
 bool send_client_command(client_list *cClientTable, const service_list *sServiceTable,
-entity_handle hHandle, transmit_block *cCommand)
+entity_handle hHandle, command_transmit *cCommand)
 {
 	if (!cClientTable || !sServiceTable || !cCommand || !hHandle) return false;
 

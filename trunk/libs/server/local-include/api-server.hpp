@@ -73,10 +73,10 @@ multi_result queue_client_command(execute_queue::insert_type) ATTR_INT;
 bool requeue_server_command(execute_queue::insert_type) ATTR_INT;
 bool waiting_command_available() ATTR_INT;
 
-bool validate_and_execute(protected_server::common_access*, entity_handle, const transmit_block&,
+bool validate_and_execute(protected_server::common_access*, entity_handle, const command_transmit&,
 server_interface&) ATTR_INT;
 
-bool send_server_response_list(const transmit_block&, command_event, const data_list*) ATTR_INT;
+bool send_server_response_list(const command_transmit&, command_event, const data_list*) ATTR_INT;
 
 struct client_id;
 bool remove_local_client(const client_id*) ATTR_INT;

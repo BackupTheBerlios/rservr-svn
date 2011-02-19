@@ -380,7 +380,7 @@ public:
 
 
 	ATTR_INT client_id *set_effective_handle(entity_handle hHandle,
-	  const transmit_block *cCommand)
+	  const command_transmit *cCommand)
 	{
 	//TODO: clean this up!!!
 	client_handle =get_client_id_mutable(unprotected_data->clients(), hHandle);
@@ -399,7 +399,7 @@ private	:
 	protected_server::common_access *unprotected_data;
 	const permission_mask            permissions;
 	client_id                       *client_handle;
-	const transmit_block            *actual_command;
+	const command_transmit            *actual_command;
 
 	friend class execute_single;
 };

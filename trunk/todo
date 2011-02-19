@@ -1,13 +1,9 @@
 12feb11
+- implement create_exact, create_target (create_flags) etc.
 - NOTE: blocking IPC can cause a hang until after destructors have been called!
 - *****figure out why there's a pure-virtual call in rservr and double-free (fclose) in rservrd
 - rservrd needs to exit more quickly (or server needs to exit more quickly) with duplicate server name
 - move command_info to header in plugin-dev? might be useful with command callbacks
-- *****review all commands to make sure that:
-  - all members are initialized when constructed
-  - all members are *reset* then set (if necessary) when parsing
-  - all members are added when building
-  - parsing and building match (either order or labels)
 - do thing with rsv-forward where it reutilizes a socket for data transmission
   - need two identical connections; one becomes the data connection
   - rsv-forward will perform pass-through with loaded filters
@@ -26,10 +22,8 @@
   - make note that connections between forwarders and selves are very slow!
   - new library structure
   - remove old filter-parser script shown in rsvf-log docs
-  - annotate that PARAM_STOP_MESSAGE_SIGNAL is taken over by stop_message_queue
 - update structure
   - merge proto- into a single library
-  - rename transmit_block or command-transmit.hpp
   - rename command.h
   - make a library for rsv-forward and link all forwarders to it
     - make an api so it can be extended to e.g. character devices?
@@ -38,35 +32,21 @@
 clean up and update this todo! actually, this is just for testing a commit
 
 20dec08
-	- remove PARAM_AUTO_BLOCKING et. al. -OR- test it and make it work
 	- same thing with PARAM_CACHE_COMMAND_OUTPUT
 	document:
 	- message-queue pausing
-	- explicitly adress server $PATH vs. rservrd command-line
+	- explicitly address server $PATH vs. rservrd command-line
 		- maybe add 'path' field in execute/system admin commands?
 			- rservrd would extract it from the command-line? (inconsistent at best...)
 	- switch from 'signal' to sigaction
 
 16nov08 - change capsule module pattern to use single-use nested class instance and operator ()
 
-06dec08 - make command transmission and parsing more efficient!
-    - maybe change format, don't check labels every time...
-
 8aug08 - review docs starting with user:connections
 
 22:24 7th September 2008
 check timing-manager.c to make sure all timing fields show up in *4* functions each!
 	- default_timeout was missed and/or changed to default_short_timeout when it was added
-
-14:17 12th October 2008
-make an example with rsvp-dataref! similar in nature to ftp?
-
-
-- BEFORE RELEASE:
-	- redo README
-	- global-sentry (maybe), and hparser
-	- change license to BSD
-
 
 
 - create rsvf-gedit
@@ -86,9 +66,6 @@ make an example with rsvp-dataref! similar in nature to ftp?
 	- add extra plugins
 	- add extra locales
 	- use a different locale by default
-
-- server execute command needs to return a command_event
-	- rservrd command error needs one, too
 
 check macro use in proto-* to make sure tags aren't used with wrong command
 
@@ -123,11 +100,6 @@ change strdup to strings? will that work with strsep?
 
 
 add stat/performance hooks for a debugging library
-
-fix hparser tags to use std::string functions
-	- use std::string::npos in particular when finding?
-
-add to sec pol: parse errors above proto level need to increment input (i.e. rservr open tag parse)
 
 retest all daemon commands
 	- test remote clients
@@ -217,8 +189,6 @@ anything that can send must be able to parse command
 	- server commands which can't be executed by the server but can be passed on should be able to be parsed by it
 	- unknown commands will be parsed as null by server and rejected by clients
 	- scoped commands will be parsed as null except for responses (to prevent auto responses to auto responses)
-
-make all member access this->
 
 check all handle functions' running functionality
 give all headers a header block with description and intended visibility

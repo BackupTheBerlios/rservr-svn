@@ -47,7 +47,7 @@ extern "C" {
 	current_element(NULL), new_command_handle(NULL) { }
 
 
-	const transmit_block *queue_new_execute::
+	const command_transmit *queue_new_execute::
 	  operator () (execute_queue::insert_type eElement, execute_queue::execute_compare cCompare)
 	{
 	current_element    = eElement;

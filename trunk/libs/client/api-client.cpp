@@ -129,7 +129,7 @@ bool master_register_client(text_info nName, permission_mask tType)
 	}
 
 	if (tType != type_none && local_type() != type_none) return false;
-	transmit_block new_block;
+	command_transmit new_block;
 	if (!new_block.set_command(new proto_register_client(nName, tType, disable_ready))) return false;
 	if (!lookup_command(new_block.command_name(), new_block.execute_type)) return false;
 
@@ -200,7 +200,7 @@ result create_manual_response(const command_info &cCommand, external_command *rR
 	delete rResponse;
 	return false;
 	}
-	transmit_block response_command, command_copy;
+	command_transmit response_command, command_copy;
 	if (!cCommand.copy_base(response_command))
 	{
 	delete rResponse;
@@ -224,7 +224,7 @@ result create_auto_response(const command_info &cCommand, command_event rResult,
 text_info mMessage)
 {
 	if (!cCommand.target_entity.size()) return false;
-	transmit_block response_command, command_copy;
+	command_transmit response_command, command_copy;
 	if (!cCommand.copy_base(response_command)) return false;
 	command_copy = response_command;
 
@@ -240,7 +240,7 @@ result create_auto_response_list(const command_info &cCommand, command_event rRe
 info_list lList)
 {
 	if (!cCommand.target_entity.size()) return false;
-	transmit_block response_command, command_copy;
+	command_transmit response_command, command_copy;
 	if (!cCommand.copy_base(response_command)) return false;
 	command_copy = response_command;
 

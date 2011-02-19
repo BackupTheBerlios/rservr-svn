@@ -44,9 +44,9 @@ extern "C" {
 
 #define DEFAULT_QUEUE_CLIENT_COMMAND(target, command) \
 { if (!strlen(nName) || !check_entity_label(nName)) return NULL; \
-  transmit_block *new_block = NULL; \
-  const transmit_block *queued_block = NULL; \
-  new_block = new transmit_block; \
+  command_transmit *new_block = NULL; \
+  const command_transmit *queued_block = NULL; \
+  new_block = new command_transmit; \
   if (!new_block) return NULL; \
   if (!new_block->set_command(command)) \
   { delete new_block; \
@@ -63,9 +63,9 @@ extern "C" {
 
 
 #define DEFAULT_QUEUE_SERVER_COMMAND(command) \
-{ transmit_block *new_block = NULL; \
-  const transmit_block *queued_block = NULL; \
-  new_block = new transmit_block; \
+{ command_transmit *new_block = NULL; \
+  const command_transmit *queued_block = NULL; \
+  new_block = new command_transmit; \
   if (!new_block) return NULL; \
   if (!new_block->set_command(command)) \
   { delete new_block; \
@@ -83,7 +83,7 @@ extern "C" {
 #define SEND_SERVER_COMMAND_OUTCOME send_outcome
 #define DEFAULT_SEND_SERVER_COMMAND(command, wait) \
 command_event SEND_SERVER_COMMAND_OUTCOME; \
-{ transmit_block new_block; \
+{ command_transmit new_block; \
   if (!new_block.set_command(command)) return event_unsent; \
   if (!lookup_command(new_block.command_name(), new_block.execute_type)) return event_unsent; \
   new_block.orig_reference = manual_message_number(); \
@@ -99,7 +99,7 @@ command_event SEND_SERVER_COMMAND_OUTCOME; \
 
 #define SEND_SERVER_COMMAND_NO_EVENT(command, wait) \
 command_event SEND_SERVER_COMMAND_OUTCOME; \
-{ transmit_block new_block; \
+{ command_transmit new_block; \
   if (!new_block.set_command(command)) return false; \
   if (!lookup_command(new_block.command_name(), new_block.execute_type)) return false; \
   new_block.orig_reference = manual_message_number(); \
@@ -114,7 +114,7 @@ command_event SEND_SERVER_COMMAND_OUTCOME; \
 
 
 #define SILENT_SEND_SERVER_COMMAND(command) \
-{ transmit_block new_block; \
+{ command_transmit new_block; \
   if (!new_block.set_command(command)) return false; \
   if (!lookup_command(new_block.command_name(), new_block.execute_type)) return false; \
   new_block.orig_reference = manual_message_number(); \

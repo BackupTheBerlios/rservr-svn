@@ -56,7 +56,7 @@ result remote_service_broken_connection(const struct remote_service_data *dData)
 	     !message_queue_status() || !dData->current_target )
 	return false;
 
-	transmit_block new_block;
+	command_transmit new_block;
 	send_protected_output new_output(pipe_output);
 
 

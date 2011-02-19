@@ -86,7 +86,7 @@ client_id *get_client_id_mutable(client_list*, entity_handle) ATTR_INT;
 const client_id *get_client_id_name(const client_list*, text_info) ATTR_INT;
 
 bool send_client_command(client_list*, const service_list*, entity_handle,
-transmit_block*) ATTR_INT;
+command_transmit*) ATTR_INT;
 
 bool terminate_running_client(client_list*, service_list*, monitor_list*, const client_id*, bool) ATTR_INT;
 
