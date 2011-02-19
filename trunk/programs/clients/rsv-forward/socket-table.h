@@ -66,6 +66,7 @@ void remove_socket_error(int) ATTR_INT;
 
 int remove_socket(int) ATTR_INT;
 int reserve_socket(int, const char*) ATTR_INT;
+int unreserve_socket(int, const char*) ATTR_INT;
 int steal_socket(int, const char*, socket_reference*) ATTR_INT;
 
 int parse_config_file(const char*) ATTR_INT;

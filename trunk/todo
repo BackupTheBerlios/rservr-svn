@@ -5,9 +5,13 @@
 - rservrd needs to exit more quickly (or server needs to exit more quickly) with duplicate server name
 - move command_info to header in plugin-dev? might be useful with command callbacks
 - do thing with rsv-forward where it reutilizes a socket for data transmission
-  1> send message from client 1 to client 2 via connection requesting it to steal the connection
-  2> send a response to client 1 from client 2 via connection; if "yes", send reserve message immediately after
-  3> send a "reserve" message from client 1 (after receiving response) to the forwarder for the connection
+  1> client 1 reserves connection; if successful, sends "steal" request to client 2
+  2> client 2 reserves connection; if successful, responds to client 1, then steals connection
+  3> client 1 steals connection
+  *> if client 1 doesn't receive a "success" response, needs to "unreserve" connection
+  - NOTES:
+    - messages received before "reserve" but processed after "reserve" will fail
+    - reserving socket will clear associated services!
 - set up flex/bison parser for config files, and maybe for rservrd
   - use this to improve flexibility of syntax?
 - update docs

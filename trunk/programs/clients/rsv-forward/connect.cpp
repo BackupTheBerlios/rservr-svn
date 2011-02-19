@@ -488,15 +488,18 @@ private:
 class reserve_connection : public protected_connection_list::modifier
 {
 public:
-	ATTR_INT reserve_connection() : current_file(-1), current_client(NULL) { }
+	ATTR_INT reserve_connection() : current_file(-1), current_state(false),
+	current_client(NULL) { }
 
-	bool ATTR_INT operator () (int fFile, text_info cClient)
+	bool ATTR_INT operator () (int fFile, text_info cClient, bool sState)
 	{
 	current_file   = fFile;
 	current_client = cClient;
+	current_state  = sState;
 	bool outcome = internal_connection_list.access_contents(this);
 	current_file   = -1;
 	current_client = NULL;
+	current_state  = false;
 	return !outcome;
 	}
 
@@ -512,18 +515,28 @@ private:
 	int position = object->f_find(current_file, &connection_list::find_by_key);
 	if (position == data::not_found) return protect::entry_fail;
 
+	if (current_state)
+	 {
 	if (object->get_element(position).key().reserved.size()) return protect::entry_fail;
-
 	object->get_element(position).key().reserved = current_client? current_client : "";
 
     #ifdef RSV_RELAY
 	disconnect_from_address(object->get_element(position).value().socket_address.c_str());
     #endif
+	 }
+
+	else
+	 {
+	if (!current_client || object->get_element(position).key().reserved != current_client)
+	return protect::entry_fail;
+	object->get_element(position).key().reserved.clear();
+	 }
 
 	return protect::entry_success;
 	}
 
 	int       current_file;
+	bool      current_state;
 	text_info current_client;
 };
 
@@ -1044,7 +1057,13 @@ int remove_socket(int fFile)
 int reserve_socket(int fFile, const char *cClient)
 {
 	reserve_connection new_reserve;
-	return new_reserve(fFile, cClient);
+	return new_reserve(fFile, cClient, true);
+}
+
+int unreserve_socket(int fFile, const char *cClient)
+{
+	reserve_connection new_reserve;
+	return new_reserve(fFile, cClient, false);
 }
 
 int steal_socket(int fFile, const char *cClient, socket_reference *rReference)
