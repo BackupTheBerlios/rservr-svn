@@ -39,7 +39,7 @@
 //proto_find_control_clients command============================================
 RSERVR_AUTO_BUILTIN_TAG(find_control_clients)
 
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_find_control_clients) { }
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_find_control_clients) {}
 
 
 	proto_find_control_clients::proto_find_control_clients(text_info nName) :
