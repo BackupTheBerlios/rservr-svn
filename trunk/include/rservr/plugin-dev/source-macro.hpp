@@ -52,8 +52,6 @@ extern "C" {
 }
 
 
-//NOTE: WORKING!!!
-
 #ifndef RSERVR_COMMAND_TEMP
 #define RSERVR_COMMAND_TEMP temp_node
 #endif
@@ -72,7 +70,9 @@ extern "C" {
 
 #define RSERVR_COMMAND_TYPE RSERVR_COMMAND_CURRENT->extract_interface()->data_type()
 
-#define RSERVR_COMMAND_DATA RSERVR_COMMAND_CURRENT->extract_interface()->get_data()
+#define RSERVR_COMMAND_DATA \
+(RSERVR_COMMAND_CURRENT->extract_interface()->get_data()? \
+ RSERVR_COMMAND_CURRENT->extract_interface()->get_data() : "")
 
 #define RSERVR_COMMAND_SIZE RSERVR_COMMAND_CURRENT->extract_interface()->data_size()
 
@@ -132,14 +132,8 @@ command_event name::evaluate_client(const command_info &RSERVR_INFO_ARG, client_
 #define RSERVR_COMMAND_PARSE_HEAD(name) bool name::compile_command(const storage_section *RSERVR_COMMAND_TREE)
 #define RSERVR_COMMAND_BUILD_HEAD(name) storage_section *name::assemble_command() const
 
-#define RSERVR_TEMP_STRING  temp_input
-#define RSERVR_TEMP_UVALUE  temp_uvalue
-#define RSERVR_TEMP_SVALUE  temp_svalue
-
-#define RSERVR_TEMP_STORAGE \
-input_section  ATTR_UNUSED  RSERVR_TEMP_STRING; \
-unsigned int   ATTR_UNUSED  RSERVR_TEMP_UVALUE = 0; \
-int            ATTR_UNUSED  RSERVR_TEMP_SVALUE = 0;
+#define RSERVR_TEMP_UVALUE temp_uvalue
+#define RSERVR_TEMP_SVALUE temp_svalue
 
 #define RSERVR_COMMAND_COPY_DATA(variable) \
 { variable = RSERVR_COMMAND_DATA; }
