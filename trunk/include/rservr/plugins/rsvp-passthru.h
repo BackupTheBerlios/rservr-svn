@@ -11,7 +11,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -43,7 +43,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /*! \file rservr/plugins/rsvp-passthru.h
  *  \author Kevin P. Barry
- *  \brief Remote-service-registration command plug-in.
+ *  \brief Connection-reutilizing command plug-in.
  */
 
 #ifndef rsvp_passthru_h
@@ -70,18 +70,26 @@ extern int rsvp_passthru_load(struct local_commands *Loader);
 
 
 /*! \param Target
- *  \param Type service type to register
+ *  \param Channel name of channel to reserve
  *  \return queued command or error (NULL)
  */
-extern command_handle passthru_register_services(text_info Target,
-  text_info Type);
+extern command_handle passthru_reserve_channel(text_info Target,
+  text_info Channel);
 
 /*! \param Target
- *  \param Type service type to deregister
+ *  \param Channel name of channel to un-reserve
  *  \return queued command or error (NULL)
  */
-extern command_handle passthru_deregister_services(text_info Target,
-  text_info Type);
+extern command_handle passthru_unreserve_channel(text_info Target,
+  text_info Channel);
+
+/*! \param Target
+ *  \param Channel name of channel to un-reserve
+ *  \param Socket name of a local socket being listened to
+ *  \return queued command or error (NULL)
+ */
+extern command_handle passthru_steal_channel(text_info Target,
+  text_info Channel, text_info Socket);
 
 #ifdef __cplusplus
 }

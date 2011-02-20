@@ -38,13 +38,16 @@
 
 PLUGIN_BASIC_DECLARATIONS(passthru)
 
-extern text_info PLUGIN_COMMAND_REQUEST(register_services)   ATTR_INT;
-extern text_info PLUGIN_COMMAND_REQUEST(deregister_services) ATTR_INT;
+extern text_info PLUGIN_COMMAND_REQUEST(reserve_channel)   ATTR_INT;
+extern text_info PLUGIN_COMMAND_REQUEST(unreserve_channel) ATTR_INT;
+extern text_info PLUGIN_COMMAND_REQUEST(steal_channel)     ATTR_INT;
 
-extern text_info PLUGIN_COMMAND_TAG(passthru, register_services)   ATTR_INT;
-extern text_info PLUGIN_COMMAND_TAG(passthru, deregister_services) ATTR_INT;
+extern text_info PLUGIN_COMMAND_TAG(passthru, reserve_channel)   ATTR_INT;
+extern text_info PLUGIN_COMMAND_TAG(passthru, unreserve_channel) ATTR_INT;
+extern text_info PLUGIN_COMMAND_TAG(passthru, steal_channel)     ATTR_INT;
 
-extern text_info PLUGIN_COMMAND_INFO(passthru, register_services)   ATTR_INT;
-extern text_info PLUGIN_COMMAND_INFO(passthru, deregister_services) ATTR_INT;
+extern text_info PLUGIN_COMMAND_INFO(passthru, reserve_channel)   ATTR_INT;
+extern text_info PLUGIN_COMMAND_INFO(passthru, unreserve_channel) ATTR_INT;
+extern text_info PLUGIN_COMMAND_INFO(passthru, steal_channel)     ATTR_INT;
 
 #endif /*api_passthru_h*/

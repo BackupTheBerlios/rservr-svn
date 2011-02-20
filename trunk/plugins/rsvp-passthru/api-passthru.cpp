@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -60,13 +60,17 @@ extern int rsvp_passthru_load(struct local_commands *lLoader)
 {
 	PLUGIN_LOAD_START(passthru, lLoader)
 
-	PLUGIN_LOAD_SINGLE(passthru, register_services, lLoader,
-	  type_service_client, type_service_client,
-	  command_null, &rsvp_passthru_register_services::generate)
+	PLUGIN_LOAD_RESTRICTED(passthru, reserve_channel, lLoader,
+	  type_active_client, type_active_client,
+	  command_null, &rsvp_passthru_reserve_channel::generate)
 
-	PLUGIN_LOAD_SINGLE(passthru, deregister_services, lLoader,
-	  type_service_client, type_service_client,
-	  command_null, &rsvp_passthru_deregister_services::generate)
+	PLUGIN_LOAD_RESTRICTED(passthru, unreserve_channel, lLoader,
+	  type_active_client, type_active_client,
+	  command_null, &rsvp_passthru_unreserve_channel::generate)
+
+	PLUGIN_LOAD_RESTRICTED(passthru, steal_channel, lLoader,
+	  type_active_client, type_active_client,
+	  command_null, &rsvp_passthru_steal_channel::generate)
 
 	  PLUGIN_LOAD_END(passthru)
 }
@@ -74,25 +78,34 @@ extern int rsvp_passthru_load(struct local_commands *lLoader)
 PLUGIN_DEFAULT_LOAD(rsvp_passthru_load)
 
 
-command_event __rsvp_passthru_hook_register_services(const struct passthru_source_info *sSource, text_info)
-{ return default_response(sSource, request_register_services); }
+command_event __rsvp_passthru_hook_reserve_channel(const struct passthru_source_info *sSource, text_info)
+{ return default_response(sSource, request_reserve_channel); }
 
-command_event __rsvp_passthru_hook_deregister_services(const struct passthru_source_info *sSource, text_info)
-{ return default_response(sSource, request_deregister_services); }
+command_event __rsvp_passthru_hook_unreserve_channel(const struct passthru_source_info *sSource, text_info)
+{ return default_response(sSource, request_unreserve_channel); }
 
-
-command_handle passthru_register_services(text_info tTarget, text_info tType)
-{ return manual_command(tTarget, new rsvp_passthru_register_services(tType)); }
-
-command_handle passthru_deregister_services(text_info tTarget, text_info tType)
-{ return manual_command(tTarget, new rsvp_passthru_deregister_services(tType)); }
+command_event __rsvp_passthru_hook_steal_channel(const struct passthru_source_info *sSource, text_info, text_info)
+{ return default_response(sSource, request_steal_channel); }
 
 
-text_info PLUGIN_COMMAND_REQUEST(register_services)   = "register services";
-text_info PLUGIN_COMMAND_REQUEST(deregister_services) = "deregister services";
+command_handle passthru_reserve_channel(text_info tTarget, text_info nName)
+{ return manual_command(tTarget, new rsvp_passthru_reserve_channel(nName)); }
 
-text_info PLUGIN_COMMAND_TAG(passthru, register_services)   = "passthru_register_services";
-text_info PLUGIN_COMMAND_TAG(passthru, deregister_services) = "passthru_deregister_service";
+command_handle passthru_unreserve_channel(text_info tTarget, text_info nName)
+{ return manual_command(tTarget, new rsvp_passthru_unreserve_channel(nName)); }
 
-text_info PLUGIN_COMMAND_INFO(passthru, register_services)   = "request local or remote service registration";
-text_info PLUGIN_COMMAND_INFO(passthru, deregister_services) = "request local or remote service deregistration";
+command_handle passthru_steal_channel(text_info tTarget, text_info nName, text_info sSocket)
+{ return manual_command(tTarget, new rsvp_passthru_steal_channel(nName, sSocket)); }
+
+
+text_info PLUGIN_COMMAND_REQUEST(passthru, reserve_channel)   = "reserve channel";
+text_info PLUGIN_COMMAND_REQUEST(passthru, unreserve_channel) = "unreserve channel";
+text_info PLUGIN_COMMAND_REQUEST(passthru, steal_channel)     = "steal channel";
+
+text_info PLUGIN_COMMAND_TAG(passthru, reserve_channel)   = "passthru_reserve_channel";
+text_info PLUGIN_COMMAND_TAG(passthru, unreserve_channel) = "passthru_unreserve_channel";
+text_info PLUGIN_COMMAND_TAG(passthru, steal_channel)     = "passthru_steal_channel";
+
+text_info PLUGIN_COMMAND_INFO(reserve_channel)   = "reserve IPC channel";
+text_info PLUGIN_COMMAND_INFO(unreserve_channel) = "un-reserve IPC channel";
+text_info PLUGIN_COMMAND_INFO(steal_channel)     = "steal IPC channel for exclusive use";

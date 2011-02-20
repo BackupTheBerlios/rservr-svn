@@ -11,7 +11,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -55,36 +55,6 @@ extern "C" {
 
 #include "rsvp-passthru.h"
 
-#include "../api/remote-service.h"
-
-
-/*! Call this if you redefine __remote_service_action_hook and still want the
- *  automatic action executed.
- * @see remote-service.h
- */
-extern void rsvp_passthru_auto_remote_service_action_hook(const struct remote_service_data*);
-
-/*! Call this if you redefine __resource_exit_hook and still want the automatic
- *  action executed.
- * @see remote-service.h
- */
-extern void rsvp_passthru_auto_resource_exit_hook(text_info);
-
-
-/*! \brief Verify service type.
- *
- * Define this to have control over the types of services the client will
- * automatically register.
- * @see passthru_register_services
- *
- * \param Type requested service type
- * \param Name requested name
- * \param NewType revised type (dynamically allocate if changed)
- * \param NewName revised name (dynamically allocate if changed)
- * \return approved (true) or disapproved (false)
- */
-extern result __rsvp_passthru_auto_hook_type_check(text_info Type, text_info Name,
-  text_info *NewType, text_info *NewName);
 
 #ifdef __cplusplus
 }

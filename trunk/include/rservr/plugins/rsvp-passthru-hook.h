@@ -11,7 +11,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -59,10 +59,13 @@ struct passthru_source_info
 	text_info target;
 	text_info sender;
 	text_info address;
+
+	message_handle respond;
 } __attribute__ ((packed));
 
-extern command_event __rsvp_passthru_hook_register_services(const struct passthru_source_info*, text_info);
-extern command_event __rsvp_passthru_hook_deregister_services(const struct passthru_source_info*, text_info);
+extern command_event __rsvp_passthru_hook_reserve_channel(const struct passthru_source_info*, text_info);
+extern command_event __rsvp_passthru_hook_unreserve_channel(const struct passthru_source_info*, text_info);
+extern command_event __rsvp_passthru_hook_steal_channel(const struct passthru_source_info*, text_info, text_info);
 
 #ifdef __cplusplus
 }

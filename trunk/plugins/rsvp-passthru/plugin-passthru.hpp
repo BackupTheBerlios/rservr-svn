@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -36,19 +36,28 @@
 #include "plugin-dev/header-macro.hpp"
 
 
-RSERVR_COMMAND_CLASS( rsvp_passthru_register_services, \
+RSERVR_COMMAND_CLASS( rsvp_passthru_reserve_channel, \
 	/*constructors*/ \
-	rsvp_passthru_register_services(text_info);, \
+	rsvp_passthru_reserve_channel(text_info);, \
 	/*members*/ \
 	text_data request_origin; \
-	text_data register_type; )
+	text_data channel_name; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_passthru_deregister_services, \
+RSERVR_COMMAND_CLASS( rsvp_passthru_unreserve_channel, \
 	/*constructors*/ \
-	rsvp_passthru_deregister_services(text_info);, \
+	rsvp_passthru_unreserve_channel(text_info);, \
 	/*members*/ \
 	text_data request_origin; \
-	text_data deregister_type; )
+	text_data channel_name; )
+
+
+RSERVR_COMMAND_CLASS( rsvp_passthru_steal_channel, \
+	/*constructors*/ \
+	rsvp_passthru_unreserve_channel(text_info, text_info);, \
+	/*members*/ \
+	text_data request_origin; \
+	text_data channel_name; \
+	text_data local_socket; )
 
 #endif //plugin_passthru_hpp

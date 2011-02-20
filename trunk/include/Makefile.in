@@ -231,6 +231,7 @@ nobase_include_HEADERS = rservr/config-parser.h \
 	rservr/plugins/rsvp-passthru.h \
 	rservr/plugins/rsvp-passthru-hook.h \
 	rservr/plugins/rsvp-passthru-auto.h \
+	rservr/plugins/rsvp-passthru-thread.h \
 	rservr/plugins/thread-macro.h \
 	rservr/remote/external-buffer.hpp rservr/remote/security.h
 EXTRA_DIST = external/clist.hpp external/components/accessors__.hpp external/components/base__.hpp external/components/capsule_lock__.hpp external/components/clist__.hpp external/components/derivative__.hpp external/components/dynamic__.hpp external/components/keylist__.hpp external/components/list_assist__.hpp external/components/list_types__.hpp external/components/literal__.hpp external/components/mutex__.hpp external/components/selfcontained__.hpp external/components/shadow_list__.hpp external/components/storage__.hpp external/components/virt_array__.hpp external/external/FUNCTOR.cpp external/external/FUNCTOR.hpp external/external/MISC.hpp external/global-sentry.hpp external/global-sentry-pthread.hpp external/info global/condition-block.hpp global/regex-check.hpp

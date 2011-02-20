@@ -11,7 +11,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -48,15 +48,13 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 extern "C" {
 #endif
 
-#include <unistd.h> /* 'ssize_t' */
-
 #include "thread-macro.h"
 #include "../api/command.h"
 
-
-extern int rsvp_passthru_thread_read_data(const struct passthru_source_info*, int, ssize_t, ssize_t);
-extern int rsvp_passthru_thread_write_data(const struct passthru_source_info*, int, ssize_t, ssize_t);
-extern int rsvp_passthru_thread_exchange_data(const struct passthru_source_info*, int, ssize_t, ssize_t);
+/* NOTE: use threads for coordination between clients!
+extern int rsvp_passthru_thread_reserve_channel(const struct passthru_source_info*, text_info);
+extern int rsvp_passthru_thread_unreserve_channel(const struct passthru_source_info*, text_info);
+extern int rsvp_passthru_thread_steal_channel(const struct passthru_source_info*, text_info, text_info);*/
 
 #ifdef __cplusplus
 }
