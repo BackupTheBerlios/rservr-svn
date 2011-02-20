@@ -46,11 +46,11 @@ extern "C" {
 static std::map <load_reference, regex_check> loaded_checks;
 
 
-static const std::pair <load_reference, regex_check> &get_check(load_reference lLoad)
+static const regex_check &get_check(load_reference lLoad)
 {
-	static const std::pair <load_reference, regex_check> not_found(NULL, false);
+	regex_check not_found;
 	std::map <load_reference, regex_check> ::const_iterator position = loaded_checks.find(lLoad);
-	return (position == loaded_checks.end())? not_found : *position;
+	return (position == loaded_checks.end())? not_found : position->second;
 }
 
 
@@ -62,9 +62,9 @@ socket_reference rReference, const struct sockaddr *aAddress, socklen_t lLength)
 	char name_buffer[PARAM_DEFAULT_FORMAT_BUFFER];
 
 	if (getnameinfo(aAddress, lLength, name_buffer, sizeof name_buffer, NULL, 0, 0x00))
-	return get_check(lLoad).second.get_mode()? 0 : -1;
+	return get_check(lLoad).get_mode()? 0 : -1;
 
-	return (get_check(lLoad).second == name_buffer)? 0 : -1;
+	return (get_check(lLoad) == name_buffer)? 0 : -1;
 }
 
 
