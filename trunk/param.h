@@ -113,6 +113,10 @@ extern "C" {
 /* NOT MANY GOOD REASONS TO COMMENT THIS OUT */
 #define PARAM_ASYM_REMOTE_SERVICES
 
+/* require that local socket names start with "/" for standard programs */
+/* THIS IMPROVES SECURITY! */
+#define PARAM_ABSOLUTE_LOCAL_SOCKETS
+
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~ END GENERAL PARAMETERS ~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 

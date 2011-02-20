@@ -1023,6 +1023,15 @@ bool block_for_connect()
 
 bool add_listen_socket(const char *lLocation)
 {
+#if defined(PARAM_ABSOLUTE_LOCAL_SOCKETS) && defined(RSV_LOCAL)
+	if (strlen(lLocation) < 1 || lLocation[0] != '/')
+	{
+    log_message_listen_deny(lLocation);
+	fprintf(stderr, "%s: can't create socket '%s': name must start with '/'\n", client_name, lLocation);
+	return false;
+	}
+#endif
+
 	int new_socket = -1;
 	std::string revised_address;
 
@@ -1274,6 +1283,14 @@ command_event __rsvp_netcntl_hook_local_listen(const struct netcntl_source_info 
 {
 	if (!sSource) return event_rejected;
 
+#if defined(PARAM_ABSOLUTE_LOCAL_SOCKETS) && defined(RSV_LOCAL)
+	if (strlen(lLocation) < 1 || lLocation[0] != '/')
+	{
+    log_message_listen_deny(lLocation);
+	return event_rejected;
+	}
+#endif
+
     log_message_incoming_listen(sSource, lLocation);
 	if (!screen_listen(lLocation))
 	{
@@ -1281,13 +1298,13 @@ command_event __rsvp_netcntl_hook_local_listen(const struct netcntl_source_info 
 	return event_rejected;
 	}
 
-    #ifdef PARAM_SELF_TRUSTING_FORWARDER
+#ifdef PARAM_SELF_TRUSTING_FORWARDER
 	if (!trusted_remote_check(sSource))
 	{
     log_message_listen_deny(lLocation);
 	return event_rejected;
 	}
-    #endif
+#endif
 
 	int new_socket = -1;
 	std::string revised_address;
@@ -1336,15 +1353,23 @@ command_event __rsvp_netcntl_hook_local_unlisten(const struct netcntl_source_inf
 {
 	if (!sSource) return event_rejected;
 
+#if defined(PARAM_ABSOLUTE_LOCAL_SOCKETS) && defined(RSV_LOCAL)
+	if (strlen(lLocation) < 1 || lLocation[0] != '/')
+	{
+    log_message_unlisten_deny(lLocation);
+	return event_rejected;
+	}
+#endif
+
     log_message_incoming_unlisten(sSource, lLocation);
 
-    #ifdef PARAM_SELF_TRUSTING_FORWARDER
+#ifdef PARAM_SELF_TRUSTING_FORWARDER
 	if (!trusted_remote_check(sSource))
 	{
     log_message_unlisten_deny(lLocation);
 	return event_rejected;
 	}
-    #endif
+#endif
 
 	return remove_server_socket(lLocation)? event_complete : event_error;
 }

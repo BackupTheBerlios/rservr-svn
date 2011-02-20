@@ -623,6 +623,10 @@ const client_id *rRequestor)
 {
 	//TODO: add logging points here!
 
+#ifdef PARAM_ABSOLUTE_LOCAL_SOCKETS
+	if (strlen(sSocket) < 1 || sSocket[0] != '/') return -1;
+#endif
+
 	struct stat file_status;
 	if (stat(sSocket, &file_status) < 0 || !S_ISSOCK(file_status.st_mode)) return -1;
 

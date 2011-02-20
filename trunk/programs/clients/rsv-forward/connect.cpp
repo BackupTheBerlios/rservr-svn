@@ -1355,6 +1355,15 @@ static int try_connection(socket_reference rReference, const char *nName, std::s
 
 bool add_connection_socket(const char *lLocation)
 {
+#if defined(PARAM_ABSOLUTE_LOCAL_SOCKETS) && defined(RSV_LOCAL)
+	if (strlen(lLocation) < 1 || lLocation[0] != '/')
+	{
+    log_message_connect_deny(lLocation);
+	fprintf(stderr, "%s: can't connect to socket '%s': name must start with '/'\n", client_name, lLocation);
+	return false;
+	}
+#endif
+
 	int new_socket = -1;
 	std::string revised_address;
 
@@ -1383,6 +1392,15 @@ bool add_connection_socket(const char *lLocation)
 
 bool add_filtered_socket(const char *lLocation, const char *fFilter)
 {
+#if defined(PARAM_ABSOLUTE_LOCAL_SOCKETS) && defined(RSV_LOCAL)
+	if (strlen(lLocation) < 1 || lLocation[0] != '/')
+	{
+    log_message_connect_deny(lLocation);
+	fprintf(stderr, "%s: can't connect to socket '%s': name must start with '/'\n", client_name, lLocation);
+	return false;
+	}
+#endif
+
 	int new_socket = -1;
 	std::string revised_address;
 
@@ -1491,6 +1509,14 @@ command_event __rsvp_netcntl_hook_local_connect(const struct netcntl_source_info
 {
 	if (!sSource) return event_rejected;
 
+#if defined(PARAM_ABSOLUTE_LOCAL_SOCKETS) && defined(RSV_LOCAL)
+	if (strlen(aAddress) < 1 || aAddress[0] != '/')
+	{
+    log_message_connect_deny(aAddress);
+	return event_rejected;
+	}
+#endif
+
 #ifdef RSV_NET
     log_message_incoming_connect(sSource, aAddress, pPort);
 	if (!screen_connect(aAddress, pPort))
@@ -1549,6 +1575,14 @@ command_event __rsvp_netcntl_hook_local_filtered_connect(const struct netcntl_so
 #endif
 {
 	if (!sSource) return event_rejected;
+
+#if defined(PARAM_ABSOLUTE_LOCAL_SOCKETS) && defined(RSV_LOCAL)
+	if (strlen(aAddress) < 1 || aAddress[0] != '/')
+	{
+    log_message_connect_deny(aAddress);
+	return event_rejected;
+	}
+#endif
 
 #ifdef RSV_NET
     log_message_incoming_filtered_connect(sSource, aAddress, pPort, fFilter);
@@ -1616,6 +1650,14 @@ command_event __rsvp_netcntl_hook_local_disconnect(const struct netcntl_source_i
 #endif
 {
 	if (!sSource) return event_rejected;
+
+#if defined(PARAM_ABSOLUTE_LOCAL_SOCKETS) && defined(RSV_LOCAL)
+	if (strlen(aAddress) < 1 || aAddress[0] != '/')
+	{
+    log_message_disconnect_deny(aAddress);
+	return event_rejected;
+	}
+#endif
 
     log_message_incoming_disconnect(sSource, aAddress);
 
