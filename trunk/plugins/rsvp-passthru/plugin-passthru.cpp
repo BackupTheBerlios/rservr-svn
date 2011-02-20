@@ -184,7 +184,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_passthru_unreserve_channel, rsvp_passthru_un
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
 
-	return __rsvp_passthru_hook_steal_channel(&source_info, channel_name.c_str());
+	return __rsvp_passthru_hook_steal_channel(&source_info, channel_name.c_str(), local_socket.c_str());
 	}
 
 

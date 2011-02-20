@@ -37,6 +37,7 @@
 #include "api/command.h"
 #include "remote/security.h"
 #include "plugins/rsvp-netcntl-hook.h"
+#include "plugins/rsvp-passthru-hook.h"
 
 #ifdef RSV_RELAY
 #include "api/remote-service.h"
@@ -64,9 +65,9 @@ void log_message_socket_error_final(text_info) ATTR_INT;
 
 void log_message_connect(text_info) ATTR_INT;
 void log_message_connect_deny(text_info) ATTR_INT;
-#ifdef RSV_NET
+    #ifdef RSV_NET
 void log_message_incoming_fail(text_info) ATTR_INT;
-#endif
+    #endif
 void log_message_disconnect(text_info) ATTR_INT;
 void log_message_disconnect_deny(text_info) ATTR_INT;
 void log_message_listen(text_info) ATTR_INT;
@@ -91,6 +92,17 @@ void log_message_incoming_disconnect(const struct netcntl_source_info*, text_inf
 void log_message_incoming_listen_list(const struct netcntl_source_info*) ATTR_INT;
 void log_message_incoming_listen(const struct netcntl_source_info*, text_info) ATTR_INT;
 void log_message_incoming_unlisten(const struct netcntl_source_info*, text_info) ATTR_INT;
+
+void log_message_incoming_reserve_channel(const struct passthru_source_info*, text_info) ATTR_INT;
+void log_message_incoming_unreserve_channel(const struct passthru_source_info*, text_info) ATTR_INT;
+void log_message_incoming_steal_channel(const struct passthru_source_info*, text_info, text_info) ATTR_INT;
+
+void log_message_reserve_channel(text_info, text_info) ATTR_INT;
+void log_message_reserve_channel_deny(text_info, text_info) ATTR_INT;
+void log_message_unreserve_channel(text_info, text_info) ATTR_INT;
+void log_message_unreserve_channel_deny(text_info, text_info) ATTR_INT;
+void log_message_steal_channel(text_info, text_info, text_info) ATTR_INT;
+void log_message_steal_channel_deny(text_info, text_info, text_info) ATTR_INT;
 #endif
 
 #ifdef RSV_RELAY

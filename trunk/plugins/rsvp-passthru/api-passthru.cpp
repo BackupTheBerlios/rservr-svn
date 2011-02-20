@@ -98,14 +98,14 @@ command_handle passthru_steal_channel(text_info tTarget, text_info nName, text_i
 { return manual_command(tTarget, new rsvp_passthru_steal_channel(nName, sSocket)); }
 
 
-text_info PLUGIN_COMMAND_REQUEST(passthru, reserve_channel)   = "reserve channel";
-text_info PLUGIN_COMMAND_REQUEST(passthru, unreserve_channel) = "unreserve channel";
-text_info PLUGIN_COMMAND_REQUEST(passthru, steal_channel)     = "steal channel";
+text_info PLUGIN_COMMAND_REQUEST(reserve_channel)   = "reserve channel";
+text_info PLUGIN_COMMAND_REQUEST(unreserve_channel) = "unreserve channel";
+text_info PLUGIN_COMMAND_REQUEST(steal_channel)     = "steal channel";
 
 text_info PLUGIN_COMMAND_TAG(passthru, reserve_channel)   = "passthru_reserve_channel";
 text_info PLUGIN_COMMAND_TAG(passthru, unreserve_channel) = "passthru_unreserve_channel";
 text_info PLUGIN_COMMAND_TAG(passthru, steal_channel)     = "passthru_steal_channel";
 
-text_info PLUGIN_COMMAND_INFO(reserve_channel)   = "reserve IPC channel";
-text_info PLUGIN_COMMAND_INFO(unreserve_channel) = "un-reserve IPC channel";
-text_info PLUGIN_COMMAND_INFO(steal_channel)     = "steal IPC channel for exclusive use";
+text_info PLUGIN_COMMAND_INFO(passthru, reserve_channel)   = "reserve IPC channel";
+text_info PLUGIN_COMMAND_INFO(passthru, unreserve_channel) = "unreserve IPC channel";
+text_info PLUGIN_COMMAND_INFO(passthru, steal_channel)     = "steal IPC channel for exclusive use";

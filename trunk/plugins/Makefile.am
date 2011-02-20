@@ -1,4 +1,4 @@
-SUBDIRS=rsvp-netcntl rsvp-rqsrvc rsvp-rqconfig rsvp-ready rsvp-dataref rsvp-trigger
+SUBDIRS=rsvp-netcntl rsvp-rqsrvc rsvp-rqconfig rsvp-ready rsvp-dataref rsvp-trigger rsvp-passthru
 EXTRA_DIST=include/api-macro.h include/plugin-macro.hpp
 
 install-exec-hook:

@@ -47,9 +47,11 @@
 #endif
 
 #ifdef RSV_SOCKET
-    #ifdef RSV_RELAY
 #include "plugin-dev/entry-point.h"
 #include "plugins/rsvp-netcntl.h"
+#include "plugins/rsvp-passthru.h"
+
+    #ifdef RSV_RELAY
 #include "plugins/rsvp-rqsrvc.h"
     #endif
 
@@ -556,14 +558,15 @@ static void *input_receive(void *iIgnore)
 
 
 #ifdef RSV_SOCKET
-    #ifdef RSV_RELAY
 int load_all_commands(struct local_commands *lLoader)
 {
-	if (rsvp_netcntl_load(lLoader) < 0) return -1;
-	if (rsvp_rqsrvc_load(lLoader) < 0)  return -1;
+	if (rsvp_netcntl_load(lLoader) < 0)  return -1;
+	if (rsvp_passthru_load(lLoader) < 0) return -1;
+    #ifdef RSV_RELAY
+	if (rsvp_rqsrvc_load(lLoader) < 0)   return -1;
+    #endif
 	return 0;
 }
-    #endif
 #endif
 
 

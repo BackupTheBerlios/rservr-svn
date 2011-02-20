@@ -30,34 +30,8 @@
  | POSSIBILITY OF SUCH DAMAGE.
  +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef plugin_passthru_hpp
-#define plugin_passthru_hpp
-
-#include "plugin-dev/header-macro.hpp"
+#ifndef ipc_passthru_h
+#define ipc_passthru_h
 
 
-RSERVR_COMMAND_CLASS( rsvp_passthru_reserve_channel, \
-	/*constructors*/ \
-	rsvp_passthru_reserve_channel(text_info);, \
-	/*members*/ \
-	text_data request_origin; \
-	text_data channel_name; )
-
-
-RSERVR_COMMAND_CLASS( rsvp_passthru_unreserve_channel, \
-	/*constructors*/ \
-	rsvp_passthru_unreserve_channel(text_info);, \
-	/*members*/ \
-	text_data request_origin; \
-	text_data channel_name; )
-
-
-RSERVR_COMMAND_CLASS( rsvp_passthru_steal_channel, \
-	/*constructors*/ \
-	rsvp_passthru_steal_channel(text_info, text_info);, \
-	/*members*/ \
-	text_data request_origin; \
-	text_data channel_name; \
-	text_data local_socket; )
-
-#endif //plugin_passthru_hpp
+#endif /*ipc_passthru_h*/
