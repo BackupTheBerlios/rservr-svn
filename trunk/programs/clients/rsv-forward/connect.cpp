@@ -698,82 +698,6 @@ private:
 };
 
 
-class get_address : public protected_connection_list::viewer
-{
-public:
-	ATTR_INT get_address() : current_file(-1), current_address(NULL) { }
-
-	const char ATTR_INT *operator () (int fFile)
-	{
-	current_file    = fFile;
-	current_address = NULL;
-	bool outcome = internal_connection_list.view_contents_locked(this);
-	current_file    = -1;
-	return outcome? NULL : current_address;
-	}
-
-private:
-	protect::entry_result ATTR_INT view_entry(read_object oObject)
-	{
-	if (!oObject || current_file < 0) return protect::entry_denied;
-
-	read_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	int position = object->f_find(current_file, &connection_list::find_by_key);
-	if (position == data::not_found) return protect::entry_fail;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	current_address = object->get_element(position).value().socket_address.c_str();
-
-	return protect::entry_success;
-	}
-
-	int         current_file;
-	const char *current_address;
-};
-
-
-class get_buffer : public protected_connection_list::modifier
-{
-public:
-	ATTR_INT get_buffer() : current_file(-1), current_buffer(NULL) { }
-
-	external_buffer ATTR_INT *operator () (int fFile)
-	{
-	current_file    = fFile;
-	current_buffer = NULL;
-	bool outcome = internal_connection_list.access_contents(this);
-	current_file    = -1;
-	return outcome? NULL : current_buffer;
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject)
-	{
-	if (!oObject || current_file < 0) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	int position = object->f_find(current_file, &connection_list::find_by_key);
-	if (position == data::not_found) return protect::entry_fail;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	current_buffer = &object->get_element(position).value().input_buffer;
-
-	return protect::entry_success;
-	}
-
-	int              current_file;
-	external_buffer *current_buffer;
-};
-
-
 class get_reference : public protected_connection_list::viewer
 {
 public:
@@ -865,6 +789,86 @@ private:
 
 	int  current_file;
 	bool current_type;
+};
+
+
+class get_command : public protected_connection_list::modifier
+{
+public:
+	ATTR_INT get_command() : current_name(NULL), current_file(-1), current_command(NULL) { }
+
+	multi_result ATTR_INT operator () (command_handle *cCommand, text_info nName, int fFile)
+	{
+	current_command = cCommand;
+	current_name    = nName;
+	current_file    = fFile;
+	bool outcome = internal_connection_list.access_contents(this);
+	current_command = NULL;
+	current_name    = NULL;
+	current_file    = -1;
+	return outcome? result_invalid : current_status;
+	}
+
+private:
+	protect::entry_result ATTR_INT access_entry(write_object oObject)
+	{
+	if (!oObject || current_file < 0) return protect::entry_denied;
+
+	write_temp object = NULL;
+
+	if (!(object = oObject)) return protect::exit_forced;
+
+	int position = object->f_find(current_file, &connection_list::find_by_key);
+	if (position == data::not_found) return protect::entry_fail;
+
+	if (!(object = oObject)) return protect::exit_forced;
+
+	current_status = filtered_receive_stream_command(current_command, current_file,
+	  current_name, object->get_element(position).value().socket_address.c_str(),
+	  &object->get_element(position).value().input_buffer,
+	  object->get_element(position).key().reference,
+	  receive_command_filter());
+
+	return protect::entry_success;
+	}
+
+	text_info       current_name;
+	int             current_file;
+	command_handle *current_command;
+	multi_result    current_status;
+};
+
+
+class buffer_status : public protected_connection_list::modifier
+{
+public:
+	ATTR_INT buffer_status() : current_file(-1) { }
+
+	bool ATTR_INT operator () (int fFile)
+	{
+	current_file = fFile;
+	bool outcome = internal_connection_list.access_contents(this);
+	current_file = -1;
+	return !outcome;
+	}
+
+private:
+	protect::entry_result ATTR_INT access_entry(write_object oObject)
+	{
+	if (!oObject || current_file < 0) return protect::entry_denied;
+
+	write_temp object = NULL;
+
+	if (!(object = oObject)) return protect::exit_forced;
+
+	int position = object->f_find(current_file, &connection_list::find_by_key);
+	if (position == data::not_found) return protect::entry_fail;
+
+	return buffered_residual_stream_input(&object->get_element(position).value().input_buffer)?
+	  protect::entry_success : protect::entry_fail;
+	}
+
+	int current_file;
 };
 
 
@@ -986,16 +990,10 @@ static bool remove_all_sockets()
 void remove_connection_sockets()
 { remove_all_sockets(); }
 
-const char *find_socket_address(int fFile)
+multi_result receive_command(command_handle *cCommand, const char *nName, int sSocket)
 {
-	get_address new_address;
-	return new_address(fFile);
-}
-
-struct external_buffer *find_socket_buffer(int fFile)
-{
-	get_buffer new_buffer;
-	return new_buffer(fFile);
+	get_command new_command;
+	return new_command(cCommand, nName, sSocket);
 }
 
 int find_socket(const char *aAddress, const char *cClient)
@@ -1008,6 +1006,12 @@ socket_reference find_reference(int sSocket)
 {
 	get_reference new_reference;
 	return new_reference(sSocket);
+}
+
+int check_buffer(int sSocket)
+{
+	buffer_status new_status;
+	return new_status(sSocket);
 }
 
 int add_socket_error(int fFile)

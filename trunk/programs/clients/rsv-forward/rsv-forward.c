@@ -445,9 +445,6 @@ static void *input_receive(void *iIgnore)
 	command_handle new_command = NULL;
 	multi_result outcome = result_fail;
 	int current_file = -1;
-	socket_reference current_reference = (socket_reference) 0x00;
-	const char *current_address = NULL;
-	struct external_buffer *current_buffer = NULL;
 	struct timeval no_wait = { tv_sec: 0, tv_usec: 0 };
 
 	while (message_queue_status())
@@ -479,50 +476,33 @@ static void *input_receive(void *iIgnore)
 	while ((current_file = next_socket()) >= 0)
 	/*this iterates through the sockets once, then returns -1*/
 	  {
-	current_reference = find_reference(current_file);
-	current_address   = find_socket_address(current_file);
-	current_buffer    = find_socket_buffer(current_file);
-	if (!current_reference || !current_address || !current_buffer)
-	/*remove completely if there's some sort of error*/
+    #ifdef RSV_RELAY
+	outcome = receive_command(&new_command, client_name, current_file);
+    #else
+	outcome = receive_command(&new_command, NULL, current_file);
+    #endif
+	if (outcome == result_invalid)
+	/*remove completely if EOF is reached*/
 	   {
 	finish_socket(current_file);
 	remove_socket(current_file);
 	   }
 
-	else
-	   {
-    #ifdef RSV_RELAY
-	outcome = filtered_receive_stream_command(&new_command, current_file,
-	  client_name, current_address, current_buffer, current_reference,
-	  receive_command_filter());
-    #else
-	outcome = filtered_receive_stream_command(&new_command, current_file,
-	  NULL, current_address, current_buffer, current_reference,
-	  receive_command_filter());
-    #endif
-	if (outcome == result_invalid)
-	/*remove completely if EOF is reached*/
-	    {
-	finish_socket(current_file);
-	remove_socket(current_file);
-	    }
-
 	else if (new_command)
-	    {
+	   {
 	remove_socket_error(current_file);
 	/*remove from the list if nothing is left in the buffer*/
-	if (!buffered_residual_stream_input(current_buffer)) finish_socket(current_file);
+	if (!check_buffer(current_file)) finish_socket(current_file);
 	send_command_no_status(new_command);
 	destroy_command(new_command);
-	    }
+	   }
 
 	else if (outcome == result_success && !new_command) finish_socket(current_file);
 
 	else if (outcome != result_success && !add_socket_error(current_file))
-	    {
+	   {
 	finish_socket(current_file);
 	remove_socket(current_file);
-	    }
 	   }
 	  }
 	 }

@@ -57,10 +57,10 @@ int next_socket() ATTR_INT;
 int have_waiting_input() ATTR_INT;
 void finish_socket(int) ATTR_INT;
 
-const char *find_socket_address(int) ATTR_INT;
-struct external_buffer *find_socket_buffer(int) ATTR_INT;
+multi_result receive_command(command_handle*, const char*, int) ATTR_INT;
 int find_socket(const char*, const char*) ATTR_INT;
 socket_reference find_reference(int) ATTR_INT;
+int check_buffer(int) ATTR_INT;
 int add_socket_error(int) ATTR_INT;
 void remove_socket_error(int) ATTR_INT;
 
