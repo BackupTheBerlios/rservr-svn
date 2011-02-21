@@ -340,14 +340,14 @@ const char *aActual)
 	//NOTE: must be unlocked here if "from" and "to" are the same forwarder!
 	int handshake = gnutls_handshake(session);
 
-	if (!session_mutex.valid() || pthread_mutex_lock(session_mutex) < 0) return -1;
-
 	if (handshake < 0)
 	{
     client_log_output(logging_normal, "rsvx-tls:connect", gnutls_strerror(handshake));
-	gnutls_deinit(sessions[rReference]);
+	gnutls_deinit(session);
 	return -1;
 	}
+
+	if (!session_mutex.valid() || pthread_mutex_lock(session_mutex) < 0) return -1;
 
 	socket_setup[sSocket] = false;
 
