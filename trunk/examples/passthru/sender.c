@@ -12,7 +12,7 @@
 #include <rservr/plugin-dev/entry-point.h>
 #include <rservr/plugins/rsvp-dataref.h>
 #include <rservr/plugins/rsvp-netcntl.h>
-#include <rservr/plugins/rsvp-passthru.h>
+#include <rservr/plugins/rsvp-passthru-assist.h>
 
 
 int load_all_commands(struct local_commands *lLoader)
@@ -156,28 +156,12 @@ int main(int argc, char *argv[])
 	clear_command_status(request_status);
 
 
-	//*****TEMP*****
-	command_handle new_steal = passthru_steal_channel(argv[2], connection2_name, "/tmp/sender");
-	if (!new_steal)
-	{
-	command_handle new_unreserve = passthru_unreserve_channel(argv[2], connection2_name);
-	if (new_unreserve) send_command_no_status(new_unreserve);
-	destroy_command(new_unreserve);
+	int dataref_file = -1;
 
-	free((void*) connection1_name);
-	free((void*) connection2_name);
-	stop_message_queue();
-	return 1;
-	}
-
-	command_reference steal_status = send_command(new_steal);
-	destroy_command(new_steal);
-
-
-	if (!(wait_command_event(steal_status, event_complete, local_default_timeout()) & event_complete))
+	if (!( rsvp_passthru_assist_steal_channel( argv[2], connection2_name, "/tmp/sender",
+	    0600, &dataref_file ) & event_complete ))
 	{
 	fprintf(stderr, "%s: couldn't steal connection '%s' via '%s'\n", argv[0], connection2_name, argv[2]);
-	clear_command_status(steal_status);
 
 	command_handle new_unreserve = passthru_unreserve_channel(argv[2], connection2_name);
 	if (new_unreserve) send_command_no_status(new_unreserve);

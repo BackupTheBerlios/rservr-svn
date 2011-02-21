@@ -41,9 +41,9 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
  | POSSIBILITY OF SUCH DAMAGE.
  +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-/*! \file rservr/plugins/rsvp-passthru-auto.h
+/*! \file rservr/plugins/rsvp-passthru-assist.h
  *  \author Kevin P. Barry
- *  \brief Automation of rsvp-passthru.h command plug-in.
+ *  \brief Assistance functions for rsvp-passthru.h command plug-in.
  */
 
 #ifndef rsvp_passthru_auto_h
@@ -55,6 +55,22 @@ extern "C" {
 
 #include "rsvp-passthru.h"
 
+#include <sys/stat.h> /* 'mode_t' */
+
+
+/*! Automate the process of creating a local socket, requesting passthru, and
+ *  waiting for the final status.
+ * @see passthru_steal_channel
+ *
+ * \param Target
+ * \param Channel name of channel to un-reserve
+ * \param Socket name of a local socket being listened to
+ * \param Mode permissions mode to create socket with
+ * \param File pointer to store resulting descriptor in
+ * \return outcome of operation
+ */
+extern command_event rsvp_passthru_assist_steal_channel(text_info Target, text_info Channel,
+  text_info Socket, mode_t Mode, int *File);
 
 #ifdef __cplusplus
 }

@@ -41,11 +41,20 @@ extern "C" {
 }
 
 #include <string.h> //'strlen'
+#include <unistd.h> //'close'
+#include <fcntl.h> //'fcntl', open modes
+#include <errno.h> //'errno'
+#include <stddef.h> //'offsetof'
+#include <sys/stat.h> //'stat'
+#include <sys/socket.h> //sockets
+#include <sys/un.h> //socket macros
 
 extern "C" {
 #include "messages.h"
 #include "socket-table.h"
 }
+
+static int connect_to_socket(text_info);
 
 
 command_event __rsvp_passthru_hook_reserve_channel(const struct passthru_source_info *sSource, text_info nName)
@@ -110,17 +119,69 @@ command_event __rsvp_passthru_hook_steal_channel(const struct passthru_source_in
 	socket_reference reference = NULL;
 	int file_number = find_socket(nName, sSource->sender);
 
-	if (file_number < 0 || !steal_socket(file_number, sSource->sender, &reference))
+	if (file_number < 0)
 	{
     log_message_steal_channel_deny(nName, sSocket, sSource->sender);
 	return event_error;
 	}
 
-	else
+	int passthru_socket = -1;
+
+	if ((passthru_socket = connect_to_socket(sSocket)) < 0 ||
+	  !steal_socket(file_number, sSource->sender, &reference))
 	{
+    log_message_steal_channel_deny(nName, sSocket, sSource->sender);
+	if (passthru_socket >= 0) close(passthru_socket);
+	return event_error;
+	}
+
     log_message_steal_channel(nName, sSocket, sSource->sender);
 
 	//TODO: add passthru threads between 'sSocket' and 'file_number'
+	close(passthru_socket); //TEMP
+
 	return event_complete;
+}
+
+
+static int connect_to_socket(text_info sSocket)
+{
+	struct stat file_status;
+	if (stat(sSocket, &file_status) < 0 || !S_ISSOCK(file_status.st_mode)) return -1;
+
+
+	/*create socket*/
+
+	struct sockaddr_un new_address;
+	size_t new_length = 0;
+
+	int new_socket = socket(PF_LOCAL, SOCK_STREAM, 0);
+
+	if (new_socket < 0) return -1;
+
+	int current_state = fcntl(new_socket, F_GETFL);
+	fcntl(new_socket, F_SETFL, current_state | O_NONBLOCK);
+
+	current_state = fcntl(new_socket, F_GETFD);
+	fcntl(new_socket, F_SETFD, current_state | FD_CLOEXEC);
+
+
+	/*connect socket*/
+
+	new_address.sun_family = AF_LOCAL;
+	strncpy(new_address.sun_path, sSocket, sizeof new_address.sun_path);
+
+	new_length = (offsetof(struct sockaddr_un, sun_path) + SUN_LEN(&new_address) + 1);
+
+	int outcome = 0;
+	while ((outcome = connect(new_socket, (struct sockaddr*) &new_address, new_length)) < 0 && errno == EINTR);
+
+	if (outcome < 0)
+	{
+	close(new_socket);
+	return -1;
 	}
+
+
+	return new_socket;
 }

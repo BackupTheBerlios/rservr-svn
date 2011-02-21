@@ -14,7 +14,7 @@
 #include <rservr/api/load-plugin.h>
 #include <rservr/plugin-dev/entry-point.h>
 #include <rservr/plugins/rsvp-dataref-thread.h>
-#include <rservr/plugins/rsvp-passthru.h>
+#include <rservr/plugins/rsvp-passthru-assist.h>
 
 
 static pthread_mutex_t queue_sync = PTHREAD_MUTEX_INITIALIZER;
@@ -134,26 +134,10 @@ int rReference, uint8_t tType, uint8_t mMode)
 	fast_respond(iInfo->respond, event_complete);
 
 
-	//*****TEMP*****
-	command_handle new_steal = passthru_steal_channel(iInfo->sender, address, "/tmp/receiver");
-	if (!new_steal)
+	if (!( rsvp_passthru_assist_steal_channel( iInfo->sender, address, "/tmp/receiver",
+	    0600, &dataref_file ) & event_complete ))
 	{
 	free(original);
-	command_handle new_unreserve = passthru_unreserve_channel(iInfo->sender, address);
-	if (new_unreserve) send_command_no_status(new_unreserve);
-	destroy_command(new_unreserve);
-	pthread_mutex_unlock(&dataref_mutex);
-	return event_none;
-	}
-
-	free(original);
-
-	command_reference steal_status = send_command(new_steal);
-	destroy_command(new_steal);
-
-
-	if (!(wait_command_event(steal_status, event_complete, local_default_timeout()) & event_complete))
-	{
 	command_handle new_unreserve = passthru_unreserve_channel(iInfo->sender, address);
 	if (new_unreserve) send_command_no_status(new_unreserve);
 	destroy_command(new_unreserve);
