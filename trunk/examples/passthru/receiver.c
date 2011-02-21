@@ -12,15 +12,37 @@
 #include <rservr/api/response.h>
 #include <rservr/api/log-output.h>
 #include <rservr/api/load-plugin.h>
+#include <rservr/plugin-dev/entry-point.h>
+#include <rservr/plugins/rsvp-dataref-thread.h>
 #include <rservr/plugins/rsvp-passthru.h>
 
 
 static pthread_mutex_t queue_sync = PTHREAD_MUTEX_INITIALIZER;
 
+static pthread_mutex_t dataref_mutex = PTHREAD_MUTEX_INITIALIZER;
+static int  dataref_file = -1;
+static int  dataref_ref  = 0;
+static char dataref_forwarder[256];
+static char dataref_sender[256];
 
-static void fast_respond(const struct message_info *mMessage, command_event eEvent)
+
+int load_all_commands(struct local_commands *lLoader)
+/*redefinition of the default because multiple plug-ins are used*/
 {
+	if (rsvp_dataref_load(lLoader) < 0)  return -1;
+	if (rsvp_passthru_load(lLoader) < 0) return -1;
+	return 0;
+}
 
+
+static void fast_respond(message_handle mMessage, command_event eEvent)
+{
+	command_handle response = short_response(mMessage, eEvent);
+	if (response)
+	{
+	send_command_no_status(response);
+	destroy_command(response);
+	}
 }
 
 
@@ -40,6 +62,13 @@ int main(int argc, char *argv[])
 	}
 
 
+	if (pthread_mutex_init(&dataref_mutex, NULL) < 0)
+	{
+	fprintf(stderr, "%s: mutex initialization failure: %s\n", argv[0], strerror(errno));
+	return 1;
+	}
+
+
 	/*standard client initialization sequence*/
 	if (!set_program_name(argv[0])) return 1;
 	if (!initialize_client())       return 1;
@@ -47,60 +76,75 @@ int main(int argc, char *argv[])
 	/*only required because plug-ins are used*/
 	load_internal_plugins();
 
+	/*don't allow *any* messages in the message queue*/
+	block_messages();
 	if (!start_message_queue()) return 1;
 
 	if (!register_control_client(argv[1])) return 1;
 
+	//stop the queue so that it can be subsequently inlined
+	if (!stop_message_queue()) return 1;
 
-	const struct message_info *message = NULL;
+	//merge the message queue with this thread until it exits
+	return inline_message_queue()? 0 : 1;
+}
 
-	while ((message = current_message()) || message_queue_sync(&queue_sync))
+
+command_event __rsvp_dataref_hook_open_reference(const struct dataref_source_info *iInfo, text_info lLocation,
+int rReference, uint8_t tType, uint8_t mMode)
+{
+	//this macro allows the message queue to continue doing what it was
+	//doing and places this function in a thread
+	RSERVR_PLUGIN_THREAD( rsvp_dataref_thread_open_reference(iInfo, lLocation, rReference, tType, mMode) )
+
+	if (pthread_mutex_trylock(&dataref_mutex) < 0) return event_rejected;
+
+	if (dataref_file >= 0)
 	{
-	if (!message) continue;
+	pthread_mutex_unlock(&dataref_mutex);
+	return event_rejected;
+	}
 
-	if (RSERVR_IS_INFO(message) && !RSERVR_IS_BINARY(message) &&
-	    strcmp(RSERVR_TO_INFO_MESSAGE(message), "steal") == 0)
-	 {
-	char *tokens = strdup(message->received_address), *original = tokens, *address = NULL;
-	strsep(&tokens, "?"); /*(discard the first token)*/
+	char *tokens = strdup(iInfo->address), *original = tokens, *address = NULL;
 
-	command_handle new_reserve = passthru_reserve_channel(message->received_from, address = strsep(&tokens, "?"));
+	dataref_ref = rReference;
+	snprintf(dataref_forwarder, sizeof dataref_forwarder, "%s", iInfo->sender);
+	snprintf(dataref_sender, sizeof dataref_sender, "%s", strsep(&tokens, "?"));
+
+	command_handle new_reserve = passthru_reserve_channel(iInfo->sender, address = strsep(&tokens, "?"));
 	if (!new_reserve)
-	  {
+	{
 	free(original);
-	fast_respond(message, event_error);
-	remove_current_message();
-	continue;
-	  }
+	pthread_mutex_unlock(&dataref_mutex);
+	return event_error;
+	}
 
 	command_reference reserve_status = send_command(new_reserve);
 	destroy_command(new_reserve);
 
 	if (!(wait_command_event(reserve_status, event_complete, local_default_timeout()) & event_complete))
-	  {
+	{
 	free(original);
 	clear_command_status(reserve_status);
-	fast_respond(message, event_error);
-	remove_current_message();
-	continue;
-	  }
+	pthread_mutex_unlock(&dataref_mutex);
+	return event_error;
+	}
 
 	clear_command_status(reserve_status);
-	fast_respond(message, event_complete);
+	fast_respond(iInfo->respond, event_complete);
 
 
 	//*****TEMP*****
-	command_handle new_steal = passthru_steal_channel(message->received_from, address, "/tmp/receiver");
+	command_handle new_steal = passthru_steal_channel(iInfo->sender, address, "/tmp/receiver");
 	if (!new_steal)
-	  {
+	{
 	free(original);
-	command_handle new_unreserve = passthru_unreserve_channel(message->received_from, address);
+	command_handle new_unreserve = passthru_unreserve_channel(iInfo->sender, address);
 	if (new_unreserve) send_command_no_status(new_unreserve);
 	destroy_command(new_unreserve);
-	fast_respond(message, event_error);
-	remove_current_message();
-	continue;
-	  }
+	pthread_mutex_unlock(&dataref_mutex);
+	return event_none;
+	}
 
 	free(original);
 
@@ -109,22 +153,15 @@ int main(int argc, char *argv[])
 
 
 	if (!(wait_command_event(steal_status, event_complete, local_default_timeout()) & event_complete))
-	  {
-	command_handle new_unreserve = passthru_unreserve_channel(message->received_from, address);
+	{
+	command_handle new_unreserve = passthru_unreserve_channel(iInfo->sender, address);
 	if (new_unreserve) send_command_no_status(new_unreserve);
 	destroy_command(new_unreserve);
-	fast_respond(message, event_error);
-	remove_current_message();
-	continue;
-	  }
-fprintf(stderr, "receiver success\n");
-	 }
-
-	else fast_respond(message, event_rejected);
-
-	remove_current_message();
+	pthread_mutex_unlock(&dataref_mutex);
+	return event_none;
 	}
+fprintf(stderr, "receiver success\n");
 
-
-	return stop_message_queue()? 0 : 1;
+	pthread_mutex_unlock(&dataref_mutex);
+	return event_none;
 }

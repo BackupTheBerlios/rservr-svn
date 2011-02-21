@@ -48,6 +48,8 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 extern "C" {
 #endif
 
+#include "rsvp-dataref-hook.h"
+
 #include <unistd.h> /* 'ssize_t' */
 
 #include "thread-macro.h"

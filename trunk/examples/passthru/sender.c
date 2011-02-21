@@ -10,6 +10,7 @@
 #include <rservr/api/log-output.h>
 #include <rservr/api/load-plugin.h>
 #include <rservr/plugin-dev/entry-point.h>
+#include <rservr/plugins/rsvp-dataref.h>
 #include <rservr/plugins/rsvp-netcntl.h>
 #include <rservr/plugins/rsvp-passthru.h>
 
@@ -17,6 +18,7 @@
 int load_all_commands(struct local_commands *lLoader)
 /*redefinition of the default because multiple plug-ins are used*/
 {
+	if (rsvp_dataref_load(lLoader) < 0)  return -1;
 	if (rsvp_netcntl_load(lLoader) < 0)  return -1;
 	if (rsvp_passthru_load(lLoader) < 0) return -1;
 	return 0;
@@ -115,8 +117,8 @@ int main(int argc, char *argv[])
 	}
 
 
-	command_handle new_request = client_message(argv[4], "steal");
-	if (!new_reserve)
+	command_handle new_request = dataref_open_reference(argv[4], NULL, 1, RSVP_DATAREF_MODE_NONE, RSVP_DATAREF_TYPE_OTHER);
+	if (!new_request)
 	{
 	command_handle new_unreserve = passthru_unreserve_channel(argv[2], connection2_name);
 	if (new_unreserve) send_command_no_status(new_unreserve);

@@ -1222,8 +1222,6 @@ result stop_message_queue()
 
 	bool have_lock = pthread_mutex_trylock(queue_exit_mutex) == 0;
 
-	pthread_t temp_thread = internal_thread;
-	internal_thread = pthread_t();
 	exit_state = true;
 
 	message_queue_unpause();
@@ -1232,10 +1230,13 @@ result stop_message_queue()
 
 	if (have_lock)
 	{
-	if (pthread_cancel(temp_thread) == 0) pthread_join(temp_thread, NULL);
-	else                                  pthread_detach(temp_thread);
+	if (pthread_cancel(internal_thread) == 0) pthread_join(internal_thread, NULL);
+	else                                      pthread_detach(internal_thread);
+	internal_thread = pthread_t();
 	pthread_mutex_unlock(queue_exit_mutex);
 	}
+
+	else internal_thread = pthread_t();
 
 	message_sync_resume.deactivate();
 
