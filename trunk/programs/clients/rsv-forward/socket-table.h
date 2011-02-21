@@ -34,7 +34,9 @@
 #define socket_table_h
 
 #include "param.h"
+#include "api/command.h"
 #include "api/command-queue.h"
+#include "api/message-queue.h"
 #include "remote/security.h"
 
 #include <pthread.h> /* pthreads */
@@ -58,8 +60,8 @@ int have_waiting_input() ATTR_INT;
 void finish_socket(int) ATTR_INT;
 
 multi_result receive_command(command_handle*, const char*, int) ATTR_INT;
+multi_result forward_command(const struct message_info*, int) ATTR_INT;
 int find_socket(const char*, const char*) ATTR_INT;
-socket_reference find_reference(int) ATTR_INT;
 int check_buffer(int) ATTR_INT;
 int add_socket_error(int) ATTR_INT;
 void remove_socket_error(int) ATTR_INT;

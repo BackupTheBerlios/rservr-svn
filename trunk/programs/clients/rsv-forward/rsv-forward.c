@@ -306,14 +306,12 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef RSV_SOCKET
-	forward_file      = 0;
-	forward_reference = (socket_reference) 0x00;
-	send_status       = 0x00;
+	forward_file = 0;
+	send_status  = 0x00;
 
 	if ( get_next_address(RSERVR_REMOTE_COMMAND(message), next_address, PARAM_DEFAULT_FORMAT_BUFFER) &&
 	     (forward_file = find_socket(next_address, message->received_from)) >= 0 &&
-	     (forward_reference = find_reference(forward_file)) &&
-	     (send_status = filtered_send_stream_command(forward_file, RSERVR_REMOTE_COMMAND(message), forward_reference, send_command_filter())) == result_success ) /*send is complete*/;
+	     (send_status = forward_command(message, forward_file)) == result_success ) /*send is complete*/;
 #endif
 
 	else
