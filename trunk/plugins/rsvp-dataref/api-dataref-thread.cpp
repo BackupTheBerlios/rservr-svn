@@ -49,14 +49,17 @@ extern "C" {
 typedef struct
 {
 	struct dataref_source_info info;
+	text_info                  location;
 	int                        reference;
+	uint8_t                    type;
+	uint8_t                    mode;
 	ssize_t                    offset;
 	ssize_t                    size;
 } copied_info;
 
 
-static copied_info *duplicate_info(const struct dataref_source_info *iInfo, int rReference,
-ssize_t oOffset, ssize_t sSize)
+static copied_info *duplicate_info(const struct dataref_source_info *iInfo, text_info lLocation,
+int rReference, uint8_t tType, uint8_t mMode, ssize_t oOffset, ssize_t sSize)
 {
 	//TODO: create a macro for this
 
@@ -77,7 +80,10 @@ ssize_t oOffset, ssize_t sSize)
 
 	duplicate->info.respond = respond;
 
+	duplicate->location  = lLocation? strdup(lLocation) : NULL;
 	duplicate->reference = rReference;
+	duplicate->type      = tType;
+	duplicate->mode      = mMode;
 	duplicate->offset    = oOffset;
 	duplicate->size      = sSize;
 
@@ -98,13 +104,78 @@ static void destroy_info(copied_info *iInfo)
 
 	remove_message(iInfo->info.respond);
 
+	free((void*) iInfo->location);
+
 	delete iInfo;
 }
 
 
+static void *thread_open_reference(void*);
+static void *thread_change_reference(void*);
+static void *thread_close_reference(void*);
 static void *thread_read_data(void*);
 static void *thread_write_data(void*);
 static void *thread_exchange_data(void*);
+static void *thread_alteration(void*);
+
+
+int rsvp_dataref_thread_open_reference(const struct dataref_source_info *iInfo, text_info lLocation,
+int rReference, uint8_t tType, uint8_t mMode)
+{
+	if (!message_queue_status() || !iInfo) return -1;
+	if (iInfo->respond) return 1;
+
+	pthread_t new_thread = (pthread_t) NULL;
+	copied_info *current_info = NULL;
+
+	if ( pthread_create( &new_thread, NULL, &thread_open_reference,
+	       static_cast <copied_info*> (current_info = duplicate_info(iInfo, lLocation, rReference, tType, mMode, 0, 0)) ) != 0)
+	{
+	destroy_info(current_info);
+	return -1;
+	}
+
+	else return 0;
+}
+
+
+int rsvp_dataref_thread_change_reference(const struct dataref_source_info *iInfo, text_info lLocation,
+int rReference, uint8_t tType, uint8_t mMode)
+{
+	if (!message_queue_status() || !iInfo) return -1;
+	if (iInfo->respond) return 1;
+
+	pthread_t new_thread = (pthread_t) NULL;
+	copied_info *current_info = NULL;
+
+	if ( pthread_create( &new_thread, NULL, &thread_change_reference,
+	       static_cast <copied_info*> (current_info = duplicate_info(iInfo, lLocation, rReference, tType, mMode, 0, 0)) ) != 0)
+	{
+	destroy_info(current_info);
+	return -1;
+	}
+
+	else return 0;
+}
+
+
+int rsvp_dataref_thread_close_reference(const struct dataref_source_info *iInfo, int rReference)
+{
+	if (!message_queue_status() || !iInfo) return -1;
+	if (iInfo->respond) return 1;
+
+	pthread_t new_thread = (pthread_t) NULL;
+	copied_info *current_info = NULL;
+
+	if ( pthread_create( &new_thread, NULL, &thread_close_reference,
+	       static_cast <copied_info*> (current_info = duplicate_info(iInfo, NULL, rReference, 0x00, 0x00, 0, 0)) ) != 0)
+	{
+	destroy_info(current_info);
+	return -1;
+	}
+
+	else return 0;
+}
 
 
 int rsvp_dataref_thread_read_data(const struct dataref_source_info *iInfo, int rReference,
@@ -117,7 +188,7 @@ ssize_t oOffset, ssize_t sSize)
 	copied_info *current_info = NULL;
 
 	if ( pthread_create( &new_thread, NULL, &thread_read_data,
-	       static_cast <copied_info*> (current_info = duplicate_info(iInfo, rReference, oOffset, sSize)) ) != 0)
+	       static_cast <copied_info*> (current_info = duplicate_info(iInfo, NULL, rReference, 0x00, 0x00, oOffset, sSize)) ) != 0)
 	{
 	destroy_info(current_info);
 	return -1;
@@ -125,6 +196,7 @@ ssize_t oOffset, ssize_t sSize)
 
 	else return 0;
 }
+
 
 int rsvp_dataref_thread_write_data(const struct dataref_source_info *iInfo, int rReference,
 ssize_t oOffset, ssize_t sSize)
@@ -136,7 +208,7 @@ ssize_t oOffset, ssize_t sSize)
 	copied_info *current_info = NULL;
 
 	if ( pthread_create( &new_thread, NULL, &thread_write_data,
-	       static_cast <copied_info*> (current_info = duplicate_info(iInfo, rReference, oOffset, sSize)) ) != 0)
+	       static_cast <copied_info*> (current_info = duplicate_info(iInfo, NULL, rReference, 0x00, 0x00, oOffset, sSize)) ) != 0)
 	{
 	destroy_info(current_info);
 	return -1;
@@ -144,6 +216,7 @@ ssize_t oOffset, ssize_t sSize)
 
 	else return 0;
 }
+
 
 int rsvp_dataref_thread_exchange_data(const struct dataref_source_info *iInfo, int rReference,
 ssize_t oOffset, ssize_t sSize)
@@ -155,13 +228,98 @@ ssize_t oOffset, ssize_t sSize)
 	copied_info *current_info = NULL;
 
 	if ( pthread_create( &new_thread, NULL, &thread_exchange_data,
-	       static_cast <copied_info*> (current_info = duplicate_info(iInfo, rReference, oOffset, sSize)) ) != 0)
+	       static_cast <copied_info*> (current_info = duplicate_info(iInfo, NULL, rReference, 0x00, 0x00, oOffset, sSize)) ) != 0)
 	{
 	destroy_info(current_info);
 	return -1;
 	}
 
 	else return 0;
+}
+
+
+int rsvp_dataref_thread_alteration(const struct dataref_source_info *iInfo, int rReference,
+ssize_t oOffset, ssize_t sSize)
+{
+	if (!message_queue_status() || !iInfo) return -1;
+	if (iInfo->respond) return 1;
+
+	pthread_t new_thread = (pthread_t) NULL;
+	copied_info *current_info = NULL;
+
+	if ( pthread_create( &new_thread, NULL, &thread_alteration,
+	       static_cast <copied_info*> (current_info = duplicate_info(iInfo, NULL, rReference, 0x00, 0x00, oOffset, sSize)) ) != 0)
+	{
+	destroy_info(current_info);
+	return -1;
+	}
+
+	else return 0;
+}
+
+
+static void *thread_open_reference(void *cCopy)
+{
+	if (!cCopy) return NULL;
+
+	copied_info *const current_info = static_cast <copied_info*> (cCopy);
+	command_event outcome = __rsvp_dataref_hook_open_reference(&current_info->info,
+	  current_info->location, current_info->reference, current_info->type,
+	  current_info->mode);
+
+	if (current_info->info.respond && outcome != event_none)
+	{
+	command_handle new_response = short_response(current_info->info.respond, outcome);
+	if (new_response) send_command_no_status(new_response);
+	destroy_command(new_response);
+	}
+
+	destroy_info(current_info);
+
+	return NULL;
+}
+
+
+static void *thread_change_reference(void *cCopy)
+{
+	if (!cCopy) return NULL;
+
+	copied_info *const current_info = static_cast <copied_info*> (cCopy);
+	command_event outcome = __rsvp_dataref_hook_change_reference(&current_info->info,
+	  current_info->location, current_info->reference, current_info->type,
+	  current_info->mode);
+
+	if (current_info->info.respond && outcome != event_none)
+	{
+	command_handle new_response = short_response(current_info->info.respond, outcome);
+	if (new_response) send_command_no_status(new_response);
+	destroy_command(new_response);
+	}
+
+	destroy_info(current_info);
+
+	return NULL;
+}
+
+
+static void *thread_close_reference(void *cCopy)
+{
+	if (!cCopy) return NULL;
+
+	copied_info *const current_info = static_cast <copied_info*> (cCopy);
+	command_event outcome = __rsvp_dataref_hook_close_reference(&current_info->info,
+	  current_info->reference);
+
+	if (current_info->info.respond && outcome != event_none)
+	{
+	command_handle new_response = short_response(current_info->info.respond, outcome);
+	if (new_response) send_command_no_status(new_response);
+	destroy_command(new_response);
+	}
+
+	destroy_info(current_info);
+
+	return NULL;
 }
 
 
@@ -213,6 +371,27 @@ static void *thread_exchange_data(void *cCopy)
 
 	copied_info *const current_info = static_cast <copied_info*> (cCopy);
 	command_event outcome = __rsvp_dataref_hook_exchange_data(&current_info->info,
+	  current_info->reference, current_info->offset, current_info->size);
+
+	if (current_info->info.respond && outcome != event_none)
+	{
+	command_handle new_response = short_response(current_info->info.respond, outcome);
+	if (new_response) send_command_no_status(new_response);
+	destroy_command(new_response);
+	}
+
+	destroy_info(current_info);
+
+	return NULL;
+}
+
+
+static void *thread_alteration(void *cCopy)
+{
+	if (!cCopy) return NULL;
+
+	copied_info *const current_info = static_cast <copied_info*> (cCopy);
+	command_event outcome = __rsvp_dataref_hook_alteration(&current_info->info,
 	  current_info->reference, current_info->offset, current_info->size);
 
 	if (current_info->info.respond && outcome != event_none)

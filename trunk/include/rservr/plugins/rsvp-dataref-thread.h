@@ -54,9 +54,13 @@ extern "C" {
 #include "../api/command.h"
 
 
+extern int rsvp_dataref_thread_open_reference(const struct dataref_source_info*, text_info, int, uint8_t, uint8_t);
+extern int rsvp_dataref_thread_change_reference(const struct dataref_source_info*, text_info, int, uint8_t, uint8_t);
+extern int rsvp_dataref_thread_close_reference(const struct dataref_source_info*, int);
 extern int rsvp_dataref_thread_read_data(const struct dataref_source_info*, int, ssize_t, ssize_t);
 extern int rsvp_dataref_thread_write_data(const struct dataref_source_info*, int, ssize_t, ssize_t);
 extern int rsvp_dataref_thread_exchange_data(const struct dataref_source_info*, int, ssize_t, ssize_t);
+extern int rsvp_dataref_thread_alteration(const struct dataref_source_info*, int, ssize_t, ssize_t);
 
 #ifdef __cplusplus
 }
