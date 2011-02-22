@@ -97,13 +97,14 @@ void log_message_incoming_reserve_channel(const struct passthru_source_info*, te
 void log_message_incoming_unreserve_channel(const struct passthru_source_info*, text_info) ATTR_INT;
 void log_message_incoming_steal_channel(const struct passthru_source_info*, text_info, text_info) ATTR_INT;
 
+void log_message_passthru_disabled() ATTR_INT;
 void log_message_reserve_channel(text_info, text_info) ATTR_INT;
 void log_message_reserve_channel_deny(text_info, text_info) ATTR_INT;
 void log_message_unreserve_channel(text_info, text_info) ATTR_INT;
 void log_message_unreserve_channel_deny(text_info, text_info) ATTR_INT;
 void log_message_steal_channel(text_info, text_info, text_info) ATTR_INT;
 void log_message_steal_channel_deny(text_info, text_info, text_info) ATTR_INT;
-void log_message_steal_channel_exit(text_info, text_info, text_info) ATTR_INT;
+void log_message_steal_channel_exit(text_info, text_info) ATTR_INT;
 #endif
 
 #ifdef RSV_RELAY

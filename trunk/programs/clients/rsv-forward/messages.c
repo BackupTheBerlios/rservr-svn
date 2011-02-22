@@ -366,6 +366,8 @@ void log_message_incoming_steal_channel(const struct passthru_source_info *sSour
 	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "incoming steal_channel request: '%s' -> '%s' (%s)", nName, sSocket, show_source_passthru(sSource));
 	client_log_output(logging_normal, local_source, message_string);
 }
+void log_message_passthru_disabled()
+{ client_log_output(logging_normal, local_source, "can't monitor server; disabling passthru"); }
 
 void log_message_reserve_channel(text_info nName, text_info cClient)
 {
@@ -409,10 +411,10 @@ void log_message_steal_channel_deny(text_info nName, text_info sSocket, text_inf
 	client_log_output(logging_normal, local_source, message_string);
 }
 
-void log_message_steal_channel_exit(text_info nName, text_info sSocket, text_info cClient)
+void log_message_steal_channel_exit(text_info nName, text_info cClient)
 {
 	char message_string[PARAM_DEFAULT_FORMAT_BUFFER];
-	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "closing passthru connection '%s' via '%s' for '%s'", nName, sSocket, cClient);
+	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "closing passthru connection '%s' for '%s'", nName, cClient);
 	client_log_output(logging_normal, local_source, message_string);
 }
 #endif

@@ -37,12 +37,15 @@ extern "C" {
 extern "C" {
 #include "param.h"
 #include "attributes.h"
+#include "api/client-timing.h"
+#include "api/monitor-client.h"
+#include "api/command-queue.h"
 #include "plugins/rsvp-passthru-hook.h"
 }
 
 #include <string>
 
-#include <string.h> //'strlen'
+#include <string.h> //'strlen', 'strsep'
 #include <unistd.h> //'close', 'read', 'write'
 #include <fcntl.h> //'fcntl', open modes
 #include <errno.h> //'errno'
@@ -67,6 +70,25 @@ typedef data::clist <passthru_specs> passthru_list;
 static passthru_list thread_list;
 static auto_mutex thread_list_mutex;
 
+static bool accept_passthru = false;
+
+
+void passthru_setup()
+{
+	if (accept_passthru) return;
+
+	command_handle new_monitor = set_monitor_flags(monitor_registered_clients | monitor_registered_services);
+	command_reference monitor_status = send_command(new_monitor);
+	destroy_command(new_monitor);
+
+	accept_passthru = wait_command_event(monitor_status, event_complete, local_default_timeout()) & event_complete;
+
+	if (!accept_passthru)
+    log_message_passthru_disabled();
+
+	clear_command_status(monitor_status);
+}
+
 
 struct passthru_specs
 {
@@ -82,18 +104,24 @@ struct passthru_specs
 	 {
 	send_short_func filter = send_command_filter();
 
+	if (pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) != 0) return;
 	while ((current_size = read(socket, buffer, sizeof buffer)) != 0)
 	  {
+	if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) return;
+	pthread_testcancel();
 	if (current_size < 0 && errno != EINTR) break;
 
+	if (pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) != 0) return;
 	current_size = filter?
 	  (*filter)(reference, connection, buffer, current_size) :
 	  write(connection, buffer, current_size);
+	if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) return;
 
 	if (current_size < 0 && errno != EINTR) break;
 	  }
+	if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) return;
 
-	if (pthread_mutex_lock(thread_list_mutex) == 0)
+	if (thread_list_mutex.valid() && pthread_mutex_lock(thread_list_mutex) == 0)
 	  {
 	incoming = pthread_t();
 	pthread_detach(pthread_self());
@@ -106,18 +134,24 @@ struct passthru_specs
 	 {
 	receive_short_func filter = receive_command_filter();
 
+	if (pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) != 0) return;
 	while ((current_size = filter?
 	    (*filter)(reference, connection, buffer, sizeof buffer) :
 	    read(connection, buffer, sizeof buffer) ) != 0)
 	  {
+	if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) return;
+	pthread_testcancel();
 	if (current_size < 0 && errno != EINTR) break;
 
+	if (pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) != 0) return;
 	current_size = write(socket, buffer, current_size);
+	if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) return;
 
 	if (current_size < 0 && errno != EINTR) break;
 	  }
+	if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) return;
 
-	if (pthread_mutex_lock(thread_list_mutex) == 0)
+	if (thread_list_mutex.valid() && pthread_mutex_lock(thread_list_mutex) == 0)
 	  {
 	outgoing = pthread_t();
 	pthread_detach(pthread_self());
@@ -130,9 +164,16 @@ struct passthru_specs
 
 	~passthru_specs()
 	{
+	if (channel.size() || sender.size())
+    log_message_steal_channel_exit(channel.c_str(), sender.c_str());
 	if (!pthread_equal(incoming, pthread_t())) pthread_cancel(incoming);
 	if (!pthread_equal(outgoing, pthread_t())) pthread_cancel(outgoing);
 	if (socket >= 0) shutdown(socket, SHUT_RDWR);
+	if (connection >= 0)
+	 {
+	disconnect_general(reference, connection);
+	shutdown(connection, SHUT_RDWR);
+	 }
 	}
 
 
@@ -150,7 +191,7 @@ static void *passthru_thread(void*);
 
 void exit_passthru_threads()
 {
-	if (pthread_mutex_lock(thread_list_mutex) == 0)
+	if (thread_list_mutex.valid() && pthread_mutex_lock(thread_list_mutex) == 0)
 	{
 	thread_list.reset_list();
 	pthread_mutex_unlock(thread_list_mutex);
@@ -163,6 +204,9 @@ command_event __rsvp_passthru_hook_reserve_channel(const struct passthru_source_
 	if (!sSource) return event_rejected;
 
     log_message_incoming_reserve_channel(sSource, nName);
+
+	if (!accept_passthru)
+    log_message_reserve_channel_deny(nName, sSource->sender);
 
 	int file_number = find_socket(nName, sSource->sender);
 
@@ -185,6 +229,9 @@ command_event __rsvp_passthru_hook_unreserve_channel(const struct passthru_sourc
 	if (!sSource) return event_rejected;
 
     log_message_incoming_unreserve_channel(sSource, nName);
+
+	if (!accept_passthru)
+    log_message_unreserve_channel_deny(nName, sSource->sender);
 
 	int file_number = find_socket(nName, sSource->sender);
 
@@ -217,6 +264,9 @@ command_event __rsvp_passthru_hook_steal_channel(const struct passthru_source_in
 
     log_message_incoming_steal_channel(sSource, nName, sSocket);
 
+	if (!accept_passthru)
+    log_message_steal_channel_deny(nName, sSocket, sSource->sender);
+
 	socket_reference reference = NULL;
 	int file_number = find_socket(nName, sSource->sender);
 
@@ -243,7 +293,7 @@ command_event __rsvp_passthru_hook_steal_channel(const struct passthru_source_in
 	fcntl(file_number, F_SETFL, current_state & ~O_NONBLOCK);
 
 
-	if (pthread_mutex_lock(thread_list_mutex) != 0) return event_error;
+	if (!thread_list_mutex.valid() || pthread_mutex_lock(thread_list_mutex) != 0) return event_error;
 
 	passthru_specs *new_passthru = &thread_list.add_element();
 	new_passthru->socket      = passthru_socket;
@@ -260,6 +310,8 @@ command_event __rsvp_passthru_hook_steal_channel(const struct passthru_source_in
 
 	success &= pthread_create(&new_passthru->outgoing, NULL, &passthru_thread,
 	    static_cast <passthru_specs*> (new_passthru)) == 0;
+
+	pthread_mutex_unlock(thread_list_mutex);
 
 	return success? event_complete : event_error;
 }
@@ -318,22 +370,48 @@ static bool find_passthru_specs(passthru_list::const_return_type eElement, const
 
 static void *passthru_thread(void *sSpecs)
 {
+	if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) return NULL;
+
 	if (!sSpecs) return NULL;
 
 	passthru_specs *specs = (passthru_specs*) sSpecs;
 
 	specs->run_thread();
 
-	if (pthread_mutex_lock(thread_list_mutex) == 0)
-	{
-	if (pthread_equal(specs->incoming, pthread_t()) || pthread_equal(specs->outgoing, pthread_t()))
-	 {
-    log_message_steal_channel_exit(specs->channel.c_str(), specs->socket_name.c_str(), specs->sender.c_str());
-	thread_list.f_remove_pattern(specs, &find_passthru_specs);
-	 }
-
-	pthread_mutex_unlock(thread_list_mutex);
-	}
-
 	return NULL;
+}
+
+
+static bool find_passthru_name(passthru_list::const_return_type eElement, text_info nName)
+{ return nName && eElement.sender == nName; }
+
+
+void __monitor_update_hook(const struct monitor_update_data *dData)
+{
+	if (!accept_passthru) return;
+
+	if (dData && (dData->event_type & monitor_remove) &&
+	  (dData->event_type & (monitor_registered_clients | monitor_registered_services)))
+	{
+	info_list current_data = dData->event_data;
+
+	if (current_data) while (*current_data)
+	 {
+	char delimiter[] = { standard_delimiter_char, 0x00 };
+	std::string copied_data = *current_data++;
+	char *tokens = &copied_data[0];
+	strsep(&tokens, delimiter); //discard pid
+	text_info deregister_name = strsep(&tokens, delimiter);
+
+	if (!deregister_name || !strlen(deregister_name)) continue;
+
+	unreserve_socket(-1, deregister_name);
+
+	if (thread_list_mutex.valid() && pthread_mutex_lock(thread_list_mutex) == 0)
+	  {
+	thread_list.f_remove_pattern(deregister_name, &find_passthru_name);
+	pthread_mutex_unlock(thread_list_mutex);
+	  }
+	 }
+	}
 }

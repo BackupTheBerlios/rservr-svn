@@ -36,6 +36,7 @@
 #include "attributes.h"
 
 
+void passthru_setup() ATTR_INT;
 void exit_passthru_threads() ATTR_INT;
 
 #endif /*ipc_passthru_h*/

@@ -75,6 +75,7 @@
 #ifdef RSV_SOCKET
 #include "socket-table.h"
 #include "security-filter.h"
+#include "ipc-passthru.h"
 #endif
 
 
@@ -265,6 +266,9 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef RSV_SOCKET
+	/*forwarder still functions if this fails*/
+	passthru_setup();
+
 	int forward_file = -1;
 	socket_reference forward_reference = (socket_reference) 0x00;
 #endif

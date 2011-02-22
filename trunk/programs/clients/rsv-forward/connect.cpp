@@ -512,24 +512,34 @@ private:
 
 	if (!(object = oObject)) return protect::exit_forced;
 
+	if (!current_state && current_file < 0)
+	for (int I = 0; I < (signed) object->size(); I++)
+	 {
+	if (object->get_element(I).value().reserved == current_client)
+	object->get_element(I).value().reserved.clear();
+	 }
+
+	else
+	 {
 	int position = object->f_find(current_file, &connection_list::find_by_key);
 	if (position == data::not_found) return protect::entry_fail;
 
 	if (current_state)
-	 {
+	  {
 	if (object->get_element(position).value().reserved.size()) return protect::entry_fail;
 	object->get_element(position).value().reserved = current_client? current_client : "";
 
     #ifdef RSV_RELAY
 	disconnect_from_address(object->get_element(position).value().socket_address.c_str());
     #endif
-	 }
+	  }
 
 	else
-	 {
+	  {
 	if (!current_client || object->get_element(position).value().reserved != current_client)
 	return protect::entry_fail;
 	object->get_element(position).value().reserved.clear();
+	  }
 	 }
 
 	return protect::entry_success;
