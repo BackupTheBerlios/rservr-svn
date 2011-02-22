@@ -378,6 +378,12 @@ static void *passthru_thread(void *sSpecs)
 
 	specs->run_thread();
 
+	if (thread_list_mutex.valid() && pthread_mutex_lock(thread_list_mutex) == 0)
+	{
+	thread_list.f_remove_pattern(specs, &find_passthru_specs);
+	pthread_mutex_unlock(thread_list_mutex);
+	}
+
 	return NULL;
 }
 
