@@ -119,7 +119,7 @@ int rReference, uint8_t tType, uint8_t mMode)
 	snprintf(dataref_forwarder, sizeof dataref_forwarder, "%s", iInfo->sender);
 	snprintf(dataref_sender, sizeof dataref_sender, "%s", strsep(&tokens, "?"));
 
-	command_handle new_reserve = passthru_reserve_channel(iInfo->sender, address = strsep(&tokens, "?"));
+	command_handle new_reserve = rsvp_passthru_reserve_channel(iInfo->sender, address = strsep(&tokens, "?"));
 	if (!new_reserve)
 	{
 	free(original);
@@ -149,7 +149,7 @@ int rReference, uint8_t tType, uint8_t mMode)
 	    0600, &dataref_file ) & event_complete ))
 	{
 	free(original);
-	command_handle new_unreserve = passthru_unreserve_channel(iInfo->sender, address);
+	command_handle new_unreserve = rsvp_passthru_unreserve_channel(iInfo->sender, address);
 	if (new_unreserve) send_command_no_status(new_unreserve);
 	destroy_command(new_unreserve);
 	pthread_mutex_unlock(&dataref_mutex);
