@@ -61,7 +61,7 @@ extern int rsvp_trigger_load(struct local_commands *lLoader)
 	PLUGIN_LOAD_START(trigger, lLoader)
 
 	PLUGIN_LOAD_SINGLE(trigger, system_trigger, lLoader,
-	  type_resource_client, type_resource_client,
+	  type_active_client, type_active_client,
 	  command_null, &rsvp_trigger_system_trigger::generate)
 
 	  PLUGIN_LOAD_END(trigger)
