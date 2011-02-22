@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
 	/*this command is from 'librsvp-rqconfig.so' which the status-updating*/
 	/*client implements (see 'system-status.cpp')*/
-	command_handle new_configure = rqconfig_request_configure(argv[2], argv[3]);
+	command_handle new_configure = rsvp_rqconfig_request_configure(argv[2], argv[3]);
 	if (!new_configure) return 1;
 
 	command_reference new_send = send_command(new_configure);

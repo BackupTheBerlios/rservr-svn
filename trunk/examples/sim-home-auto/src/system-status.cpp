@@ -116,10 +116,10 @@ text_info sSystem)
 	//command's originator (see 'system-control.c')
 
 	if (outcome >= 0)
-	new_command = ready_system_ready_response(iInfo->respond, sSystem);
+	new_command = rsvp_ready_system_ready_response(iInfo->respond, sSystem);
 
 	else
-	new_command = ready_system_never_ready_response(iInfo->respond, sSystem);
+	new_command = rsvp_ready_system_never_ready_response(iInfo->respond, sSystem);
 
 	if (new_command)
 	{
@@ -197,7 +197,7 @@ static int configure_sub_function(text_info sSystem)
 
 	//this command is from 'librsvp-netcntl.so' and is implemented by the
 	//relay program 'rsv-fsrelay', the standard relay used in this example
-	new_command = netcntl_local_connection_list(local_relays[I].c_str());
+	new_command = rsvp_netcntl_local_connection_list(local_relays[I].c_str());
 	if (!new_command) continue;
 	set_alternate_sender(new_command, service_name);
 
@@ -244,7 +244,7 @@ static int configure_sub_function(text_info sSystem)
 
 	//this command is from 'librsvp-rqsrvc.so' and is implemented by the
 	//targeted clients (see 'separate-room.cpp')
-	new_command = rqsrvc_register_services(service_split = strsep(&service_split, "*"), sSystem);
+	new_command = rsvp_rqsrvc_register_services(service_split = strsep(&service_split, "*"), sSystem);
 	if (!new_command) continue;
 	set_alternate_sender(new_command, service_name);
 
