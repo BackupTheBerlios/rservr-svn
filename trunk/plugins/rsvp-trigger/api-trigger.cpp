@@ -70,7 +70,7 @@ extern int rsvp_trigger_load(struct local_commands *lLoader)
 PLUGIN_DEFAULT_LOAD(rsvp_trigger_load)
 
 
-command_event __rsvp_trigger_hook_system_trigger(const struct trigger_source_info *sSource, text_info)
+command_event __rsvp_trigger_hook_system_trigger(const struct trigger_source_info *sSource, uint8_t, text_info)
 { return default_response(sSource, request_system_trigger); }
 
 
