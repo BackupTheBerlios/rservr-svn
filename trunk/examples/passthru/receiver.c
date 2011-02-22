@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <sys/socket.h>
 
 #include <rservr/api/client.h>
 #include <rservr/api/client-timing.h>
@@ -89,7 +90,11 @@ int main(int argc, char *argv[])
 	if (!stop_message_queue()) return 1;
 
 	//merge the message queue with this thread until it exits
-	return inline_message_queue()? 0 : 1;
+	result outcome = inline_message_queue();
+
+	if (dataref_file >= 0) shutdown(dataref_file, SHUT_RDWR);
+
+	return outcome? 0 : 1;
 }
 
 

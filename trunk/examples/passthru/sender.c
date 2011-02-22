@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/socket.h>
 
 #include <rservr/api/client.h>
 #include <rservr/api/client-timing.h>
@@ -213,6 +214,7 @@ command_reference connection2_status = send_command(new_connect1);
 	send_command_no_status(request_exit);
 	destroy_command(request_exit);
 
+	shutdown(dataref_file, SHUT_RDWR);
 	stop_message_queue();
 	return 1;
 	 }
@@ -233,12 +235,14 @@ command_reference connection2_status = send_command(new_connect1);
 	send_command_no_status(request_exit);
 	destroy_command(request_exit);
 
+	shutdown(dataref_file, SHUT_RDWR);
 	stop_message_queue();
 	return 1;
 	 }
 	}
 
 
+	shutdown(dataref_file, SHUT_RDWR);
 	send_command_no_status(request_exit);
 	destroy_command(request_exit);
 
