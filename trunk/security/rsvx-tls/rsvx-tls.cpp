@@ -77,7 +77,15 @@ static std::map <int, bool> socket_setup;
 static auto_mutex session_mutex;
 
 
-static const bool get_setup(int fFile)
+static const gnutls_session_t &get_session(socket_reference rReference)
+{
+	static const gnutls_session_t not_found = gnutls_session_t();
+	std::map <socket_reference, gnutls_session_t> ::const_iterator position = sessions.find(rReference);
+	return (position == sessions.end())? not_found : position->second;
+}
+
+
+static bool get_setup(int fFile)
 {
 	std::map <int, bool> ::const_iterator position = socket_setup.find(fFile);
 	return (position == socket_setup.end())? false : position->second;
@@ -387,13 +395,9 @@ int disconnect_general(load_reference lLoad, socket_reference rReference,
 static int send_command(load_reference lLoad, socket_reference rReference,
 remote_connection sSocket, const char *dData, ssize_t sSize)
 {
-	if (!session_mutex.valid() || pthread_mutex_lock(session_mutex) < 0) return -1;
-
-	gnutls_transport_set_ptr(sessions[rReference],
+	gnutls_transport_set_ptr(get_session(rReference),
 	  (gnutls_transport_ptr_t) sSocket);
-	int outcome = gnutls_record_send(sessions[rReference], dData, sSize);
-
-	pthread_mutex_unlock(session_mutex);
+	int outcome = gnutls_record_send(get_session(rReference), dData, sSize);
 
 	return outcome;
 }
@@ -402,16 +406,11 @@ remote_connection sSocket, const char *dData, ssize_t sSize)
 static ssize_t receive_command(load_reference lLoad, socket_reference rReference,
 remote_connection sSocket, char *dData, ssize_t sSize)
 {
-	if (!session_mutex.valid() || pthread_mutex_lock(session_mutex) < 0) return -1;
-
-	gnutls_transport_set_ptr(sessions[rReference],
-	  (gnutls_transport_ptr_t) sSocket);
-	ssize_t outcome = gnutls_record_recv(sessions[rReference], dData, sSize);
+	gnutls_transport_set_ptr(get_session(rReference), (gnutls_transport_ptr_t) sSocket);
+	ssize_t outcome = gnutls_record_recv(get_session(rReference), dData, sSize);
 	//NOTE: set for 'buffered_common_input_nolex::read_binary_input'
 	if (outcome == GNUTLS_E_AGAIN)       errno = EAGAIN;
 	if (outcome == GNUTLS_E_INTERRUPTED) errno = EINTR;
-
-	pthread_mutex_unlock(session_mutex);
 
 	return outcome;
 }
