@@ -3174,7 +3174,7 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 
 
 PACKAGE=rservr-core
-VERSION=gamma.7
+VERSION=gamma.8
 
 ac_config_files="$ac_config_files Makefile include/Makefile lang/Makefile lang/us-english/Makefile libs/Makefile libs/protocol/Makefile libs/proto/Makefile libs/proto/proto-server/Makefile libs/proto/proto-common/Makefile libs/proto/proto-admin/Makefile libs/proto/proto-service/Makefile libs/proto/proto-control/Makefile libs/proto/proto-resource/Makefile libs/proto/proto-monitor/Makefile libs/server/Makefile libs/client/Makefile libs/filter/Makefile plugins/Makefile plugins/rsvp-netcntl/Makefile plugins/rsvp-rqsrvc/Makefile plugins/rsvp-rqconfig/Makefile plugins/rsvp-ready/Makefile plugins/rsvp-dataref/Makefile plugins/rsvp-trigger/Makefile plugins/rsvp-passthru/Makefile security/Makefile security/rsvx-localhost/Makefile security/rsvx-ipregex/Makefile security/rsvx-dnsregex/Makefile security/rsvx-penalty/Makefile security/rsvx-tls/Makefile security/rsvx-inert/Makefile programs/Makefile programs/server/Makefile programs/server/rservr/Makefile programs/clients/Makefile programs/clients/rservrd/Makefile programs/clients/rsv-forward/Makefile programs/clients/rsv-echo/Makefile programs/clients/rsv-terminal/Makefile programs/clients/rsv-respawn/Makefile programs/filters/Makefile programs/filters/rsvf-log/Makefile programs/other/Makefile programs/other/safexec/Makefile programs/other/rsvbits/Makefile programs/other/pipexec/Makefile programs/other/unsterm/Makefile"
 
