@@ -406,7 +406,9 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
     log_protocol_input_underrun("buffered_common_input");
 	underrun_logged = true;
 	   }
-	if ((current_mode & input_allow_underrun) && retry_cycle.wait()) input_underrun = false;
+
+	//NOTE: unused with current IPC system
+	//if ((current_mode & input_allow_underrun) && retry_cycle.wait()) input_underrun = false;
 	  }
 	 }
 

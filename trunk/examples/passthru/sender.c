@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <rservr/api/client.h>
 #include <rservr/api/client-timing.h>
@@ -13,6 +14,11 @@
 #include <rservr/plugins/rsvp-dataref.h>
 #include <rservr/plugins/rsvp-netcntl.h>
 #include <rservr/plugins/rsvp-passthru-assist.h>
+#include <rservr/plugins/rsvp-trigger.h>
+
+
+static char message1[] = "hello, this is a message";
+static char message2[] = "this is the final message";
 
 
 int load_all_commands(struct local_commands *lLoader)
@@ -21,6 +27,7 @@ int load_all_commands(struct local_commands *lLoader)
 	if (rsvp_dataref_load(lLoader) < 0)  return -1;
 	if (rsvp_netcntl_load(lLoader) < 0)  return -1;
 	if (rsvp_passthru_load(lLoader) < 0) return -1;
+	if (rsvp_trigger_load(lLoader) < 0)  return -1;
 	return 0;
 }
 
@@ -121,6 +128,11 @@ command_reference connection2_status = send_command(new_connect1);
 	}
 
 
+	command_handle request_exit = trigger_system_trigger(argv[4], RSVP_TRIGGER_ACTION_START, "exit");
+	insert_remote_target(request_exit, argv[2], connection1_name);
+
+
+	//TODO: use 'location' for something here? (3rd argument)
 	command_handle new_request = dataref_open_reference(argv[4], NULL, 1, RSVP_DATAREF_MODE_NONE, RSVP_DATAREF_TYPE_OTHER);
 	if (!new_request)
 	{
@@ -150,6 +162,9 @@ command_reference connection2_status = send_command(new_connect1);
 	if (new_unreserve) send_command_no_status(new_unreserve);
 	destroy_command(new_unreserve);
 
+	send_command_no_status(request_exit);
+	destroy_command(request_exit);
+
 	free((void*) connection1_name);
 	free((void*) connection2_name);
 	stop_message_queue();
@@ -162,7 +177,10 @@ command_reference connection2_status = send_command(new_connect1);
 
 	int dataref_file = -1;
 
-	if (!( rsvp_passthru_assist_steal_channel( argv[2], connection2_name, "/tmp/sender",
+	char current_dir[256], socket_name[256];
+	snprintf(socket_name, sizeof socket_name, "%s/%s-socket", getcwd(current_dir, sizeof current_dir), get_client_name());
+
+	if (!( rsvp_passthru_assist_steal_channel( argv[2], connection2_name, socket_name,
 	    0600, &dataref_file ) & event_complete ))
 	{
 	fprintf(stderr, "%s: couldn't steal connection '%s' via '%s'\n", argv[0], connection2_name, argv[2]);
@@ -171,16 +189,58 @@ command_reference connection2_status = send_command(new_connect1);
 	if (new_unreserve) send_command_no_status(new_unreserve);
 	destroy_command(new_unreserve);
 
+	send_command_no_status(request_exit);
+	destroy_command(request_exit);
+
 	free((void*) connection1_name);
 	free((void*) connection2_name);
 	stop_message_queue();
 	return 1;
 	}
-// fprintf(stderr, "sender success\n");
 
-//TEMP
-char buffer[] = "hello, this is a message";
-write(dataref_file, buffer, sizeof buffer);
+
+	if (write(dataref_file, message1, sizeof message1) == sizeof message1)
+	{
+	command_handle message1_read = dataref_read_data(argv[4], 1, 0, sizeof message1);
+	insert_remote_target(message1_read, argv[2], connection1_name);
+	command_reference message1_status = send_command(message1_read);
+	destroy_command(message1_read);
+
+	if (!(wait_command_event(message1_status, event_complete, local_default_timeout()) & event_complete))
+	 {
+	clear_command_status(message1_status);
+
+	send_command_no_status(request_exit);
+	destroy_command(request_exit);
+
+	stop_message_queue();
+	return 1;
+	 }
+	}
+
+
+	if (write(dataref_file, message2, sizeof message2) == sizeof message2)
+	{
+	command_handle message2_read = dataref_read_data(argv[4], 1, 0, sizeof message2);
+	insert_remote_target(message2_read, argv[2], connection1_name);
+	command_reference message2_status = send_command(message2_read);
+	destroy_command(message2_read);
+
+	if (!(wait_command_event(message2_status, event_complete, local_default_timeout()) & event_complete))
+	 {
+	clear_command_status(message2_status);
+
+	send_command_no_status(request_exit);
+	destroy_command(request_exit);
+
+	stop_message_queue();
+	return 1;
+	 }
+	}
+
+
+	send_command_no_status(request_exit);
+	destroy_command(request_exit);
 
 
 	return stop_message_queue()? 0 : 1;

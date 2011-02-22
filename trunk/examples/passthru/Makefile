@@ -9,10 +9,10 @@ LINK=-L$(BASE)/lib -L$(PLUGINS) -Xlinker -rpath=$(PLUGINS)
 all: sender receiver
 
 sender: sender.c
-	gcc $(INCLUDE) $(COMPILE) $(LINK) sender.c -lrsvp-dataref -lrsvp-netcntl -lrsvp-passthru-assist -lrservr-client -o sender
+	gcc $(INCLUDE) $(COMPILE) $(LINK) sender.c -lrsvp-dataref -lrsvp-netcntl -lrsvp-passthru-assist -lrsvp-trigger -lrservr-client -o sender
 
 receiver: receiver.c
-	gcc $(INCLUDE) $(COMPILE) $(LINK) receiver.c -lrsvp-dataref -lrsvp-passthru-assist -lrservr-client -o receiver
+	gcc $(INCLUDE) $(COMPILE) $(LINK) receiver.c -lrsvp-dataref -lrsvp-passthru-assist -lrsvp-trigger -lrservr-client -o receiver
 
 clean:
 	rm -fv sender receiver *~

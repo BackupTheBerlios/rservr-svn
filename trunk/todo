@@ -23,6 +23,7 @@
   - new library structure
   - remove old filter-parser script shown in rsvf-log docs
   - add trigger and passthru to plug-in docs
+  - new permissions for rsvp-trigger
 - update structure
   - merge proto- into a single library
   - rename command.h

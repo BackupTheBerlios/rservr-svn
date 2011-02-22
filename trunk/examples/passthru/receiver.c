@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #include <rservr/api/client.h>
 #include <rservr/api/client-timing.h>
@@ -15,6 +16,7 @@
 #include <rservr/plugin-dev/entry-point.h>
 #include <rservr/plugins/rsvp-dataref-thread.h>
 #include <rservr/plugins/rsvp-passthru-assist.h>
+#include <rservr/plugins/rsvp-trigger-hook.h>
 
 
 static pthread_mutex_t queue_sync = PTHREAD_MUTEX_INITIALIZER;
@@ -31,6 +33,7 @@ int load_all_commands(struct local_commands *lLoader)
 {
 	if (rsvp_dataref_load(lLoader) < 0)  return -1;
 	if (rsvp_passthru_load(lLoader) < 0) return -1;
+	if (rsvp_trigger_load(lLoader) < 0)  return -1;
 	return 0;
 }
 
@@ -134,7 +137,10 @@ int rReference, uint8_t tType, uint8_t mMode)
 	fast_respond(iInfo->respond, event_complete);
 
 
-	if (!( rsvp_passthru_assist_steal_channel( iInfo->sender, address, "/tmp/receiver",
+	char current_dir[256], socket_name[256];
+	snprintf(socket_name, sizeof socket_name, "%s/%s-socket", getcwd(current_dir, sizeof current_dir), get_client_name());
+
+	if (!( rsvp_passthru_assist_steal_channel( iInfo->sender, address, socket_name,
 	    0600, &dataref_file ) & event_complete ))
 	{
 	free(original);
@@ -144,13 +150,57 @@ int rReference, uint8_t tType, uint8_t mMode)
 	pthread_mutex_unlock(&dataref_mutex);
 	return event_none;
 	}
-// fprintf(stderr, "receiver success\n");
 
-//TEMP
-char buffer[256];
-read(dataref_file, buffer, sizeof buffer);
-fprintf(stdout, "message: '%s'\n", buffer);
 
 	pthread_mutex_unlock(&dataref_mutex);
 	return event_none;
+}
+
+
+command_event __rsvp_dataref_hook_read_data(const struct dataref_source_info *iInfo, int rReference,
+ssize_t oOffset, ssize_t sSize)
+{
+	static unsigned int message_number = 0;
+
+	if (rReference !=  dataref_ref || !iInfo || strcmp(dataref_forwarder, iInfo->sender) != 0) return event_error;
+
+	RSERVR_PLUGIN_THREAD( rsvp_dataref_thread_read_data(iInfo, rReference, oOffset, sSize) )
+
+	if (pthread_mutex_lock(&dataref_mutex) < 0) return event_rejected;
+
+
+	char buffer[256];
+	ssize_t total_read = 0, current_read = 0;
+
+	fprintf(stdout, "message %u from '%s' [%s]:\n", ++message_number, iInfo->sender, iInfo->address);
+
+	while (total_read < sSize)
+	{
+	current_read = read(dataref_file, buffer, sizeof buffer);
+	if (current_read < 0 && errno != EINTR) break;
+	if (current_read > 0)
+	 {
+	total_read += current_read;
+	fprintf(stderr, "%s", buffer);
+	 }
+	}
+
+	if (total_read) fprintf(stderr, "\n");
+
+
+	pthread_mutex_unlock(&dataref_mutex);
+	return event_complete;
+}
+
+
+command_event __rsvp_trigger_hook_system_trigger(const struct trigger_source_info *iInfo, uint8_t aAction,
+text_info sSystem)
+{
+	if (!iInfo || !sSystem) return event_rejected;
+
+	if (aAction != RSVP_TRIGGER_ACTION_START || strcmp(sSystem, "exit") != 0)
+	return event_error;
+
+	stop_message_queue();
+	return event_complete;
 }
