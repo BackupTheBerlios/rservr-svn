@@ -1114,7 +1114,7 @@ static bool internal_queue_loop()
 	send_client_response(internal_command, event_received_client);
 
 	local_client_interface.current_command_type = internal_command.execute_type;
-	execute_client_command(internal_command);
+	execute_client_command(internal_command); //thread cancelation needs to be disabled here!
 	local_client_interface.current_command_type = command_none;
 	internal_command.set_command(NULL);
 
@@ -1228,12 +1228,15 @@ result stop_message_queue()
 
 	message_queue_unpause();
 
-	//NOTE: this is the only way to resume when thread is blocked for input
-
 	if (have_lock)
 	{
-	if (pthread_cancel(internal_thread) == 0) pthread_join(internal_thread, NULL);
-	else                                      pthread_detach(internal_thread);
+	//NOTE: thread cancelation should be disabled here if calling from message queue
+	if (pthread_cancel(internal_thread) == 0 && !calling_from_message_queue())
+	pthread_join(internal_thread, NULL);
+
+	else
+	pthread_detach(internal_thread);
+
 	internal_thread = pthread_t();
 	pthread_mutex_unlock(queue_exit_mutex);
 	}
