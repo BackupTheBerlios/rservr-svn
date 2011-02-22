@@ -202,7 +202,7 @@ command_reference connection2_status = send_command(new_connect1);
 
 	if (write(dataref_file, message1, sizeof message1) == sizeof message1)
 	{
-	command_handle message1_read = dataref_read_data(argv[4], 1, 0, sizeof message1);
+	command_handle message1_read = dataref_transfer_data(argv[4], 1, RSVP_DATAREF_MODE_READ, 0, sizeof message1);
 	insert_remote_target(message1_read, argv[2], connection1_name);
 	command_reference message1_status = send_command(message1_read);
 	destroy_command(message1_read);
@@ -223,7 +223,7 @@ command_reference connection2_status = send_command(new_connect1);
 
 	if (write(dataref_file, message2, sizeof message2) == sizeof message2)
 	{
-	command_handle message2_read = dataref_read_data(argv[4], 1, 0, sizeof message2);
+	command_handle message2_read = dataref_transfer_data(argv[4], 1, RSVP_DATAREF_MODE_READ, 0, sizeof message2);
 	insert_remote_target(message2_read, argv[2], connection1_name);
 	command_reference message2_status = send_command(message2_read);
 	destroy_command(message2_read);

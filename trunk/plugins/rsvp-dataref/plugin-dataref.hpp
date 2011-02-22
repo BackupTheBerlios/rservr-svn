@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -66,32 +66,13 @@ RSERVR_COMMAND_CLASS( rsvp_dataref_close_reference, \
 	int       location_reference; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_dataref_read_data, \
+RSERVR_COMMAND_CLASS( rsvp_dataref_transfer_data, \
 	/*constructors*/ \
-	rsvp_dataref_read_data(int, ssize_t, ssize_t);, \
+	rsvp_dataref_transfer_data(int, uint8_t, ssize_t, ssize_t);, \
 	/*members*/ \
 	text_data request_origin; \
 	int       location_reference; \
-	ssize_t   data_offset; \
-	ssize_t   data_size; )
-
-
-RSERVR_COMMAND_CLASS( rsvp_dataref_write_data, \
-	/*constructors*/ \
-	rsvp_dataref_write_data(int, ssize_t, ssize_t);, \
-	/*members*/ \
-	text_data request_origin; \
-	int       location_reference; \
-	ssize_t   data_offset; \
-	ssize_t   data_size; )
-
-
-RSERVR_COMMAND_CLASS( rsvp_dataref_exchange_data, \
-	/*constructors*/ \
-	rsvp_dataref_exchange_data(int, ssize_t, ssize_t);, \
-	/*members*/ \
-	text_data request_origin; \
-	int       location_reference; \
+	uint8_t   transfer_mode; \
 	ssize_t   data_offset; \
 	ssize_t   data_size; )
 

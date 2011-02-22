@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -54,6 +54,8 @@ extern "C" {
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_ready_system_ready)
 	{
+	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready))
+
 	struct ready_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),
@@ -115,6 +117,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_ready, rsvp_ready_system_ready_
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_ready_system_not_ready)
 	{
+	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready))
+
 	struct ready_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),
@@ -176,6 +180,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_not_ready, rsvp_ready_system_no
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_ready_system_never_ready)
 	{
+	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready))
+
 	struct ready_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),
@@ -237,6 +243,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_never_ready, rsvp_ready_system_
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_ready_system_ready_response)
 	{
+	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready_response))
+
 	struct ready_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),
@@ -305,6 +313,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_ready_response, rsvp_ready_syst
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_ready_system_not_ready_response)
 	{
+	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready_response))
+
 	struct ready_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),
@@ -373,6 +383,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_not_ready_response, rsvp_ready_
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_ready_system_never_ready_response)
 	{
+	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready_response))
+
 	struct ready_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),

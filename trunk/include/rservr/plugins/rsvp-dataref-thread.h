@@ -11,7 +11,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -59,9 +59,7 @@ extern "C" {
 extern int rsvp_dataref_thread_open_reference(const struct dataref_source_info*, text_info, int, uint8_t, uint8_t);
 extern int rsvp_dataref_thread_change_reference(const struct dataref_source_info*, text_info, int, uint8_t, uint8_t);
 extern int rsvp_dataref_thread_close_reference(const struct dataref_source_info*, int);
-extern int rsvp_dataref_thread_read_data(const struct dataref_source_info*, int, ssize_t, ssize_t);
-extern int rsvp_dataref_thread_write_data(const struct dataref_source_info*, int, ssize_t, ssize_t);
-extern int rsvp_dataref_thread_exchange_data(const struct dataref_source_info*, int, ssize_t, ssize_t);
+extern int rsvp_dataref_thread_transfer_data(const struct dataref_source_info*, int, uint8_t, ssize_t, ssize_t);
 extern int rsvp_dataref_thread_alteration(const struct dataref_source_info*, int, ssize_t, ssize_t);
 
 #ifdef __cplusplus

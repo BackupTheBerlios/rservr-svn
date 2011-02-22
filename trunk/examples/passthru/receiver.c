@@ -162,14 +162,16 @@ int rReference, uint8_t tType, uint8_t mMode)
 }
 
 
-command_event __rsvp_dataref_hook_read_data(const struct dataref_source_info *iInfo, int rReference,
-ssize_t oOffset, ssize_t sSize)
+command_event __rsvp_dataref_hook_transfer_data(const struct dataref_source_info *iInfo, int rReference,
+uint8_t mMode, ssize_t oOffset, ssize_t sSize)
 {
 	static unsigned int message_number = 0;
 
-	if (rReference !=  dataref_ref || !iInfo || strcmp(dataref_forwarder, iInfo->sender) != 0) return event_error;
+	if (mMode != RSVP_DATAREF_MODE_READ || rReference != dataref_ref || !iInfo ||
+	  strcmp(dataref_forwarder, iInfo->sender) != 0)
+	return event_error;
 
-	RSERVR_PLUGIN_THREAD( rsvp_dataref_thread_read_data(iInfo, rReference, oOffset, sSize) )
+	RSERVR_PLUGIN_THREAD( rsvp_dataref_thread_transfer_data(iInfo, rReference, mMode, oOffset, sSize) )
 
 	if (pthread_mutex_lock(&dataref_mutex) < 0) return event_rejected;
 

@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -61,6 +61,8 @@ extern "C" {
 	//NOTE: check remoteness first so a call to the hook is an indication of being remote
 	if (RSERVR_CHECK_FROM_REMOTE && !__rsvp_netcntl_hook_allow_remote())
 	return RSERVR_EVAL_REJECTED;
+
+	PLUGIN_SENDER_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(connection_list))
 
 	struct netcntl_source_info source_info = {
 	  origin:  request_origin.c_str(),
@@ -155,6 +157,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connection_list, rsvp_netcntl_connec
 	//NOTE: check remoteness first so a call to the hook is an indication of being remote
 	if (RSERVR_CHECK_FROM_REMOTE && !__rsvp_netcntl_hook_allow_remote())
 	return RSERVR_EVAL_REJECTED;
+
+	PLUGIN_SENDER_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(connect))
 
 	char *response = NULL;
 	command_event outcome = RSERVR_EVAL_NONE;
@@ -262,6 +266,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connect, rsvp_netcntl_connect_tag, t
 	{
 	//NOTE: this cannot be used remotely
 	if (RSERVR_CHECK_FROM_REMOTE) return RSERVR_EVAL_REJECTED;
+
+	PLUGIN_SENDER_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(filtered_connect))
 
 	char *response = NULL;
 	command_event outcome = RSERVR_EVAL_NONE;
@@ -373,6 +379,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_filtered_connect, rsvp_netcntl_filte
 	if (RSERVR_CHECK_FROM_REMOTE && !__rsvp_netcntl_hook_allow_remote())
 	return RSERVR_EVAL_REJECTED;
 
+	PLUGIN_SENDER_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(disconnect))
+
 	struct netcntl_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),
@@ -451,6 +459,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_disconnect, rsvp_netcntl_disconnect_
 	//NOTE: check remoteness first so a call to the hook is an indication of being remote
 	if (RSERVR_CHECK_FROM_REMOTE && !__rsvp_netcntl_hook_allow_remote())
 	return RSERVR_EVAL_REJECTED;
+
+	PLUGIN_SENDER_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(listen_list))
 
 	struct netcntl_source_info source_info = {
 	  origin:  request_origin.c_str(),
@@ -545,6 +555,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_listen_list, rsvp_netcntl_listen_lis
 	if (RSERVR_CHECK_FROM_REMOTE && !__rsvp_netcntl_hook_allow_remote())
 	return RSERVR_EVAL_REJECTED;
 
+	PLUGIN_SENDER_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(listen))
+
 	struct netcntl_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),
@@ -625,6 +637,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_listen, rsvp_netcntl_listen_tag, typ
 	//NOTE: check remoteness first so a call to the hook is an indication of being remote
 	if (RSERVR_CHECK_FROM_REMOTE && !__rsvp_netcntl_hook_allow_remote())
 	return RSERVR_EVAL_REJECTED;
+
+	PLUGIN_SENDER_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(unlisten))
 
 	struct netcntl_source_info source_info = {
 	  origin:  request_origin.c_str(),

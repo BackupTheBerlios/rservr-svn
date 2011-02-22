@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -88,6 +88,12 @@ if (!(get_client_type() & type)) \
 if (condition) \
 { name##_log_create_rejected(label); \
   return NULL; }
+
+
+#define PLUGIN_SENDER_CHECK(name, type, label) \
+if (!(external_command::get_sender_type(RSERVR_INFO_ARG) & type)) \
+{ name##_log_execute_rejected(label, external_command::get_sender_type(RSERVR_INFO_ARG)); \
+  return event_rejected; }
 
 
 #define PLUGIN_PARSE_CHECK(name, type, label) \

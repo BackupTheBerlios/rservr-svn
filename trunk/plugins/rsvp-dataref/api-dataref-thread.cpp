@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -113,9 +113,7 @@ static void destroy_info(copied_info *iInfo)
 static void *thread_open_reference(void*);
 static void *thread_change_reference(void*);
 static void *thread_close_reference(void*);
-static void *thread_read_data(void*);
-static void *thread_write_data(void*);
-static void *thread_exchange_data(void*);
+static void *thread_transfer_data(void*);
 static void *thread_alteration(void*);
 
 
@@ -178,8 +176,8 @@ int rsvp_dataref_thread_close_reference(const struct dataref_source_info *iInfo,
 }
 
 
-int rsvp_dataref_thread_read_data(const struct dataref_source_info *iInfo, int rReference,
-ssize_t oOffset, ssize_t sSize)
+int rsvp_dataref_thread_transfer_data(const struct dataref_source_info *iInfo, int rReference,
+uint8_t mMode, ssize_t oOffset, ssize_t sSize)
 {
 	if (!message_queue_status() || !iInfo) return -1;
 	if (iInfo->respond) return 1;
@@ -187,48 +185,8 @@ ssize_t oOffset, ssize_t sSize)
 	pthread_t new_thread = (pthread_t) NULL;
 	copied_info *current_info = NULL;
 
-	if ( pthread_create( &new_thread, NULL, &thread_read_data,
-	       static_cast <copied_info*> (current_info = duplicate_info(iInfo, NULL, rReference, 0x00, 0x00, oOffset, sSize)) ) != 0)
-	{
-	destroy_info(current_info);
-	return -1;
-	}
-
-	else return 0;
-}
-
-
-int rsvp_dataref_thread_write_data(const struct dataref_source_info *iInfo, int rReference,
-ssize_t oOffset, ssize_t sSize)
-{
-	if (!message_queue_status() || !iInfo) return -1;
-	if (iInfo->respond) return 1;
-
-	pthread_t new_thread = (pthread_t) NULL;
-	copied_info *current_info = NULL;
-
-	if ( pthread_create( &new_thread, NULL, &thread_write_data,
-	       static_cast <copied_info*> (current_info = duplicate_info(iInfo, NULL, rReference, 0x00, 0x00, oOffset, sSize)) ) != 0)
-	{
-	destroy_info(current_info);
-	return -1;
-	}
-
-	else return 0;
-}
-
-
-int rsvp_dataref_thread_exchange_data(const struct dataref_source_info *iInfo, int rReference,
-ssize_t oOffset, ssize_t sSize)
-{
-	if (!message_queue_status() || !iInfo) return -1;
-	if (iInfo->respond) return 1;
-
-	pthread_t new_thread = (pthread_t) NULL;
-	copied_info *current_info = NULL;
-
-	if ( pthread_create( &new_thread, NULL, &thread_exchange_data,
-	       static_cast <copied_info*> (current_info = duplicate_info(iInfo, NULL, rReference, 0x00, 0x00, oOffset, sSize)) ) != 0)
+	if ( pthread_create( &new_thread, NULL, &thread_transfer_data,
+	       static_cast <copied_info*> (current_info = duplicate_info(iInfo, NULL, rReference, 0x00, mMode, oOffset, sSize)) ) != 0)
 	{
 	destroy_info(current_info);
 	return -1;
@@ -323,55 +281,13 @@ static void *thread_close_reference(void *cCopy)
 }
 
 
-static void *thread_read_data(void *cCopy)
+static void *thread_transfer_data(void *cCopy)
 {
 	if (!cCopy) return NULL;
 
 	copied_info *const current_info = static_cast <copied_info*> (cCopy);
-	command_event outcome = __rsvp_dataref_hook_read_data(&current_info->info,
-	  current_info->reference, current_info->offset, current_info->size);
-
-	if (current_info->info.respond && outcome != event_none)
-	{
-	command_handle new_response = short_response(current_info->info.respond, outcome);
-	if (new_response) send_command_no_status(new_response);
-	destroy_command(new_response);
-	}
-
-	destroy_info(current_info);
-
-	return NULL;
-}
-
-
-static void *thread_write_data(void *cCopy)
-{
-	if (!cCopy) return NULL;
-
-	copied_info *const current_info = static_cast <copied_info*> (cCopy);
-	command_event outcome = __rsvp_dataref_hook_write_data(&current_info->info,
-	  current_info->reference, current_info->offset, current_info->size);
-
-	if (current_info->info.respond && outcome != event_none)
-	{
-	command_handle new_response = short_response(current_info->info.respond, outcome);
-	if (new_response) send_command_no_status(new_response);
-	destroy_command(new_response);
-	}
-
-	destroy_info(current_info);
-
-	return NULL;
-}
-
-
-static void *thread_exchange_data(void *cCopy)
-{
-	if (!cCopy) return NULL;
-
-	copied_info *const current_info = static_cast <copied_info*> (cCopy);
-	command_event outcome = __rsvp_dataref_hook_exchange_data(&current_info->info,
-	  current_info->reference, current_info->offset, current_info->size);
+	command_event outcome = __rsvp_dataref_hook_transfer_data(&current_info->info,
+	  current_info->reference, current_info->mode, current_info->offset, current_info->size);
 
 	if (current_info->info.respond && outcome != event_none)
 	{

@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2010, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -55,6 +55,8 @@ extern "C" {
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_trigger_system_trigger)
 	{
+	PLUGIN_SENDER_CHECK(trigger, type_active_client, PLUGIN_COMMAND_REQUEST(system_trigger))
+
 	struct trigger_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),

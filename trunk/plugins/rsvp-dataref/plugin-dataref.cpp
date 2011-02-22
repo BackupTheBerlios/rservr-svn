@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -58,6 +58,8 @@ extern "C" {
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_open_reference)
 	{
+	PLUGIN_SENDER_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(open_reference))
+
 	struct dataref_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),
@@ -139,6 +141,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_open_reference, rsvp_dataref_open_re
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_change_reference)
 	{
+	PLUGIN_SENDER_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(change_reference))
+
 	struct dataref_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),
@@ -217,6 +221,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_change_reference, rsvp_dataref_chang
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_close_reference)
 	{
+	PLUGIN_SENDER_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(close_reference))
+
 	struct dataref_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),
@@ -267,37 +273,41 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_close_reference, rsvp_dataref_close_
 //END rsvp_dataref_close_reference command======================================
 
 
-//rsvp_dataref_read_data command================================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_read_data),
-	location_reference(0), data_offset(0), data_size(0) {}
+//rsvp_dataref_transfer_data command============================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_transfer_data),
+	location_reference(0), transfer_mode(RSVP_DATAREF_MODE_NONE), data_offset(0),
+	data_size(0) {}
 
 
-	rsvp_dataref_read_data::rsvp_dataref_read_data(int rReference, ssize_t oOffset,
-	ssize_t sSize) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_read_data_tag),
-	request_origin(get_client_name()), location_reference(rReference), data_offset(oOffset),
-	data_size(sSize) {}
+	rsvp_dataref_transfer_data::rsvp_dataref_transfer_data(int rReference, uint8_t mMode,
+	ssize_t oOffset, ssize_t sSize) :
+	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_transfer_data_tag),
+	request_origin(get_client_name()), location_reference(rReference), transfer_mode(mMode),
+	data_offset(oOffset), data_size(sSize) {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_read_data)
+	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_transfer_data)
 	{
+	PLUGIN_SENDER_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(transfer_data))
+
 	struct dataref_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
 
-	return __rsvp_dataref_hook_read_data(&source_info, location_reference, data_offset,
-	  data_size);
+	return __rsvp_dataref_hook_transfer_data(&source_info, location_reference, transfer_mode,
+	  data_offset, data_size);
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_read_data)
+	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_transfer_data)
 	{
-	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(read_data))
+	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(transfer_data))
 
 	request_origin.clear();
 	location_reference = 0;
+	transfer_mode = RSVP_DATAREF_MODE_NONE;
 	data_offset = 0;
 	data_size = 0;
 
@@ -310,9 +320,12 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_close_reference, rsvp_dataref_close_
 	RSERVR_COMMAND_PARSE10(location_reference)
 
 	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
-	RSERVR_COMMAND_PARSE10(data_offset)
+	RSERVR_COMMAND_PARSE16(transfer_mode)
 
 	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 3)
+	RSERVR_COMMAND_PARSE10(data_offset)
+
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 4)
 	RSERVR_COMMAND_PARSE10(data_size)
 
 	RSERVR_COMMAND_DEFAULT break;
@@ -323,14 +336,15 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_close_reference, rsvp_dataref_close_
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_read_data)
+	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_transfer_data)
 	{
-	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(read_data))
+	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(transfer_data))
 
 	RSERVR_COMMAND_BUILD_START
 
 	RSERVR_COMMAND_ADD_TEXT("", request_origin)
 	RSERVR_COMMAND_CONVERT10("", location_reference)
+	RSERVR_COMMAND_CONVERT16("", transfer_mode)
 	RSERVR_COMMAND_CONVERT10("", data_offset)
 	RSERVR_COMMAND_CONVERT10("", data_size)
 
@@ -338,157 +352,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_close_reference, rsvp_dataref_close_
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_read_data, rsvp_dataref_read_data_tag, type_service_client)
-//END rsvp_dataref_read_data command============================================
-
-
-//rsvp_dataref_write_data command===============================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_write_data),
-	location_reference(0), data_offset(0), data_size(0) {}
-
-
-	rsvp_dataref_write_data::rsvp_dataref_write_data(int rReference, ssize_t oOffset,
-	ssize_t sSize) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_write_data_tag),
-	request_origin(get_client_name()), location_reference(rReference), data_offset(oOffset),
-	data_size(sSize) {}
-
-
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_write_data)
-	{
-	struct dataref_source_info source_info = {
-	  origin:  request_origin.c_str(),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
-
-	return __rsvp_dataref_hook_write_data(&source_info, location_reference, data_offset,
-	  data_size);
-	}
-
-
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_write_data)
-	{
-	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(write_data))
-
-	request_origin.clear();
-	location_reference = 0;
-	data_offset = 0;
-	data_size = 0;
-
-	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
-
-	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
-	RSERVR_COMMAND_COPY_DATA(request_origin)
-
-	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
-	RSERVR_COMMAND_PARSE10(location_reference)
-
-	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
-	RSERVR_COMMAND_PARSE10(data_offset)
-
-	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 3)
-	RSERVR_COMMAND_PARSE10(data_size)
-
-	RSERVR_COMMAND_DEFAULT break;
-
-	RSERVR_COMMAND_PARSE_END
-
-	return true;
-	}
-
-
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_write_data)
-	{
-	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(write_data))
-
-	RSERVR_COMMAND_BUILD_START
-
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
-	RSERVR_COMMAND_CONVERT10("", location_reference)
-	RSERVR_COMMAND_CONVERT10("", data_offset)
-	RSERVR_COMMAND_CONVERT10("", data_size)
-
-	RSERVR_COMMAND_BUILD_END
-	}
-
-
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_write_data, rsvp_dataref_write_data_tag, type_service_client)
-//END rsvp_dataref_write_data command===========================================
-
-
-//rsvp_dataref_exchange_data command============================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_exchange_data),
-	location_reference(0), data_offset(0), data_size(0) {}
-
-	rsvp_dataref_exchange_data::rsvp_dataref_exchange_data(int rReference, ssize_t oOffset,
-	ssize_t sSize) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_exchange_data_tag),
-	request_origin(get_client_name()), location_reference(rReference), data_offset(oOffset),
-	data_size(sSize) {}
-
-
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_exchange_data)
-	{
-	struct dataref_source_info source_info = {
-	  origin:  request_origin.c_str(),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
-
-	return __rsvp_dataref_hook_exchange_data(&source_info, location_reference, data_offset,
-	  data_size);
-	}
-
-
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_exchange_data)
-	{
-	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(exchange_data))
-
-	request_origin.clear();
-	location_reference = 0;
-	data_offset = 0;
-	data_size = 0;
-
-	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
-
-	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
-	RSERVR_COMMAND_COPY_DATA(request_origin)
-
-	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
-	RSERVR_COMMAND_PARSE10(location_reference)
-
-	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 2)
-	RSERVR_COMMAND_PARSE10(data_offset)
-
-	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 3)
-	RSERVR_COMMAND_PARSE10(data_size)
-
-	RSERVR_COMMAND_DEFAULT break;
-
-	RSERVR_COMMAND_PARSE_END
-
-	return true;
-	}
-
-
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_exchange_data)
-	{
-	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(exchange_data))
-
-	RSERVR_COMMAND_BUILD_START
-
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
-	RSERVR_COMMAND_CONVERT10("", location_reference)
-	RSERVR_COMMAND_CONVERT10("", data_offset)
-	RSERVR_COMMAND_CONVERT10("", data_size)
-
-	RSERVR_COMMAND_BUILD_END
-	}
-
-
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_exchange_data, rsvp_dataref_exchange_data_tag, type_service_client)
-//END rsvp_dataref_exchange_data command========================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_transfer_data, rsvp_dataref_transfer_data_tag, type_service_client)
+//END rsvp_dataref_transfer_data command========================================
 
 
 //rsvp_dataref_alteration_response command======================================
@@ -505,6 +370,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_exchange_data, rsvp_dataref_exchange
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_alteration_response)
 	{
+	PLUGIN_SENDER_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(alteration_response))
+
 	struct dataref_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),

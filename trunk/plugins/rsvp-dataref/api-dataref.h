@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -41,25 +41,19 @@ PLUGIN_BASIC_DECLARATIONS(dataref)
 extern text_info PLUGIN_COMMAND_REQUEST(open_reference)      ATTR_INT;
 extern text_info PLUGIN_COMMAND_REQUEST(change_reference)    ATTR_INT;
 extern text_info PLUGIN_COMMAND_REQUEST(close_reference)     ATTR_INT;
-extern text_info PLUGIN_COMMAND_REQUEST(read_data)           ATTR_INT;
-extern text_info PLUGIN_COMMAND_REQUEST(write_data)          ATTR_INT;
-extern text_info PLUGIN_COMMAND_REQUEST(exchange_data)       ATTR_INT;
+extern text_info PLUGIN_COMMAND_REQUEST(transfer_data)       ATTR_INT;
 extern text_info PLUGIN_COMMAND_REQUEST(alteration_response) ATTR_INT;
 
 extern text_info PLUGIN_COMMAND_TAG(dataref, open_reference)      ATTR_INT;
 extern text_info PLUGIN_COMMAND_TAG(dataref, change_reference)    ATTR_INT;
 extern text_info PLUGIN_COMMAND_TAG(dataref, close_reference)     ATTR_INT;
-extern text_info PLUGIN_COMMAND_TAG(dataref, read_data)           ATTR_INT;
-extern text_info PLUGIN_COMMAND_TAG(dataref, write_data)          ATTR_INT;
-extern text_info PLUGIN_COMMAND_TAG(dataref, exchange_data)       ATTR_INT;
+extern text_info PLUGIN_COMMAND_TAG(dataref, transfer_data)       ATTR_INT;
 extern text_info PLUGIN_COMMAND_TAG(dataref, alteration_response) ATTR_INT;
 
 extern text_info PLUGIN_COMMAND_INFO(dataref, open_reference)      ATTR_INT;
 extern text_info PLUGIN_COMMAND_INFO(dataref, change_reference)    ATTR_INT;
 extern text_info PLUGIN_COMMAND_INFO(dataref, close_reference)     ATTR_INT;
-extern text_info PLUGIN_COMMAND_INFO(dataref, read_data)           ATTR_INT;
-extern text_info PLUGIN_COMMAND_INFO(dataref, write_data)          ATTR_INT;
-extern text_info PLUGIN_COMMAND_INFO(dataref, exchange_data)       ATTR_INT;
+extern text_info PLUGIN_COMMAND_INFO(dataref, transfer_data)       ATTR_INT;
 extern text_info PLUGIN_COMMAND_INFO(dataref, alteration_response) ATTR_INT;
 
 #endif /*api_dataref_h*/

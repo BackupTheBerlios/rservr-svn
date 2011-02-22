@@ -11,7 +11,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -68,9 +68,7 @@ struct dataref_source_info
 extern command_event __rsvp_dataref_hook_open_reference(const struct dataref_source_info*, text_info, int, uint8_t, uint8_t);
 extern command_event __rsvp_dataref_hook_change_reference(const struct dataref_source_info*, text_info, int, uint8_t, uint8_t);
 extern command_event __rsvp_dataref_hook_close_reference(const struct dataref_source_info*, int);
-extern command_event __rsvp_dataref_hook_read_data(const struct dataref_source_info*, int, ssize_t, ssize_t);
-extern command_event __rsvp_dataref_hook_write_data(const struct dataref_source_info*, int, ssize_t, ssize_t);
-extern command_event __rsvp_dataref_hook_exchange_data(const struct dataref_source_info*, int, ssize_t, ssize_t);
+extern command_event __rsvp_dataref_hook_transfer_data(const struct dataref_source_info*, int, uint8_t, ssize_t, ssize_t);
 extern command_event __rsvp_dataref_hook_alteration(const struct dataref_source_info*, int, ssize_t, ssize_t);
 
 #ifdef __cplusplus

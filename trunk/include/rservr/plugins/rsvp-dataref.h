@@ -11,7 +11,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -111,30 +111,13 @@ extern command_handle dataref_close_reference(text_info Target, int Reference);
 
 /*! \param Target
  *  \param Reference Initiator-provided reference value.
+ *  \param Mode Read/write mode flags.
  *  \param Offset
  *  \param Size
  *  \return queued command or error (NULL)
  */
-extern command_handle dataref_read_data(text_info Target, int Reference,
-  ssize_t Offset, ssize_t Size);
-
-/*! \param Target
- *  \param Reference Initiator-provided reference value.
- *  \param Offset
- *  \param Size
- *  \return queued command or error (NULL)
- */
-extern command_handle dataref_write_data(text_info Target, int Reference,
-  ssize_t Offset, ssize_t Size);
-
-/*! \param Target
- *  \param Reference Initiator-provided reference value.
- *  \param Offset
- *  \param Size
- *  \return queued command or error (NULL)
- */
-extern command_handle dataref_exchange_data(text_info Target, int Reference,
-  ssize_t Offset, ssize_t Size);
+extern command_handle dataref_transfer_data(text_info Target, int Reference,
+  uint8_t Mode, ssize_t Offset, ssize_t Size);
 
 /*! \param Message
  *  \param Reference Initiator-provided reference value.

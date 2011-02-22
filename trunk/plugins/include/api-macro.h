@@ -49,6 +49,7 @@ extern void name##_log(text_info) ATTR_INT; \
 extern void name##_log_load_failed(text_info) ATTR_INT; \
 extern void name##_log_create_rejected(text_info) ATTR_INT; \
 extern void name##_log_parse_rejected(text_info) ATTR_INT; \
+extern void name##_log_execute_rejected(text_info, entity_type) ATTR_INT; \
 extern text_info plugin_name ATTR_INT;
 
 #define PLUGIN_DEFAULT_RESPONSE(name, source) \
@@ -83,6 +84,10 @@ void name##_log_load_failed(text_info rRequest) \
 void name##_log_parse_rejected(text_info rRequest) \
 { char message_string[PARAM_DEFAULT_FORMAT_BUFFER]; \
   snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "parsing of '%s' request rejected", rRequest); \
+  name##_log(message_string); } \
+void name##_log_execute_rejected(text_info rRequest, entity_type tType) \
+{ char message_string[PARAM_DEFAULT_FORMAT_BUFFER]; \
+  snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "invalid sender type for '%s' request (0x%.4x)", rRequest, tType); \
   name##_log(message_string); }
 
 #define PLUGIN_COMMAND_REQUEST(label)    request_##label

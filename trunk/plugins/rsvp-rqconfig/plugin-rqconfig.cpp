@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -54,6 +54,8 @@ extern "C" {
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_rqconfig_configure)
 	{
+	PLUGIN_SENDER_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(configure))
+
 	struct rqconfig_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),
@@ -115,6 +117,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqconfig_configure, rsvp_rqconfig_configure_
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_rqconfig_deconfigure)
 	{
+	PLUGIN_SENDER_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(deconfigure))
+
 	struct rqconfig_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),

@@ -54,6 +54,8 @@ extern "C" {
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_passthru_reserve_channel)
 	{
+	PLUGIN_SENDER_CHECK(passthru, type_active_client, PLUGIN_COMMAND_REQUEST(reserve_channel))
+
 	struct passthru_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),
@@ -115,6 +117,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_passthru_reserve_channel, rsvp_passthru_rese
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_passthru_unreserve_channel)
 	{
+	PLUGIN_SENDER_CHECK(passthru, type_active_client, PLUGIN_COMMAND_REQUEST(unreserve_channel))
+
 	struct passthru_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),
@@ -178,6 +182,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_passthru_unreserve_channel, rsvp_passthru_un
 
 	RSERVR_CLIENT_EVAL_HEAD(rsvp_passthru_steal_channel)
 	{
+	PLUGIN_SENDER_CHECK(passthru, type_active_client, PLUGIN_COMMAND_REQUEST(steal_channel))
+
 	struct passthru_source_info source_info = {
 	  origin:  request_origin.c_str(),
 	  target:  external_command::get_target_name(iInfo),
