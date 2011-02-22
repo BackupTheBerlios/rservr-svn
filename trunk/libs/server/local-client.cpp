@@ -250,6 +250,7 @@ static const input_section default_input_section;
 
 	if (this->parse_command(&internal_command->value()))
 	  {
+	internal_command->value().sender_type = identity->client_type;
 	internal_command->value().send_to = identity;
 
 	if (internal_command->value().command_ready())
