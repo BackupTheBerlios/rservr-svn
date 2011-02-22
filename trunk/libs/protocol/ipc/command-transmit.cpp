@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -64,7 +64,7 @@ extern "C" {
 
 	command_info::command_info() : priority(priority_default), penalty(0),
 	orig_reference(0), target_reference(0), remote_reference(0), creator_pid(getpid()),
-	send_time(0x00), silent_auto_response(false) { }
+	send_time(0x00), silent_auto_response(false), sender_type(type_none) { }
 
 	void command_info::clear_info()
 	{
@@ -80,6 +80,7 @@ extern "C" {
 	orig_address.clear();
 	target_entity.clear();
 	target_address.clear();
+	sender_type = type_none;
 	}
 
 
@@ -213,6 +214,7 @@ inline static bool ATTR_INL local_check_su()
 	else if (creator_pid_label == lLabel)      creator_pid          = vValue;
 	else if (time_label == lLabel)             send_time            = vValue;
 	else if (silent_response_label == lLabel)  silent_auto_response = vValue;
+	else if (sender_type_label == lLabel)      sender_type          = vValue;
 	else return false;
 	return true;
 	}
@@ -291,6 +293,12 @@ inline static bool ATTR_INL local_check_su()
 	if (target_address.size())
 	 {
 	snprintf(buffer, sizeof buffer, "    %s = %s\n", target_address_label.c_str(), target_address.c_str());
+	oOutput->send_output(buffer);
+	 }
+
+	if (sender_type != type_none)
+	 {
+	snprintf(buffer, sizeof buffer, "    %s = !x%X\n", sender_type_label.c_str(), (unsigned int) sender_type);
 	oOutput->send_output(buffer);
 	 }
 

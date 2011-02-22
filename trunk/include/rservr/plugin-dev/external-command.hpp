@@ -93,6 +93,7 @@ protected:
 	static text_info get_target_address(const command_info&);
 	static text_info get_sender_name(const command_info&);
 	static text_info get_sender_address(const command_info&);
+	static entity_type get_sender_type(const command_info&);
 
 	static result manual_response(const command_info&, external_command*);
 	static result auto_response(const command_info&, command_event, text_info);

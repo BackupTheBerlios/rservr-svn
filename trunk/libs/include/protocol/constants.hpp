@@ -75,11 +75,10 @@ extern const text_data orig_address_label;
 extern const text_data target_entity_label;
 extern const text_data target_address_label;
 extern const text_data silent_response_label;
+extern const text_data sender_type_label;
 
 extern const text_data client_scope_separator;
 extern const text_data address_scope_separator;
-extern const char client_scope_char;
-extern const char address_scope_char;
 //END main command--------------------------------------------------------------
 
 //command data------------------------------------------------------------------
@@ -87,7 +86,7 @@ typedef uint8_t input_mode;
 
 extern const text_data message_null;
 
-extern const text_data standard_delimiter; //TODO: make this visible in API?
+extern const text_data standard_delimiter;
 
 extern const input_mode input_none;
 extern const input_mode input_binary;

@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -85,6 +85,8 @@ struct command_info
 
 	text_data orig_entity,   orig_address;
 	text_data target_entity, target_address;
+
+	entity_type sender_type;
 
 	inline virtual ~command_info() { }
 };

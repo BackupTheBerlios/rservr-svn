@@ -124,6 +124,9 @@ extern "C" {
 	text_info external_command::get_sender_address(const command_info &iInfo)
 	{ return iInfo.orig_address.c_str(); }
 
+	entity_type external_command::get_sender_type(const command_info &iInfo)
+	{ return iInfo.sender_type & (type_all_clients & ~type_server_control); }
+
 	result external_command::manual_response(const command_info &iInfo,
 	external_command *cCommand)
 	{ return create_manual_response(iInfo, cCommand); }

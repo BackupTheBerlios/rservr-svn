@@ -34,6 +34,7 @@
 
 extern "C" {
 #include "param.h"
+#include "api/command.h"
 }
 
 #include <fcntl.h> //open modes
@@ -73,6 +74,7 @@ const text_data orig_address_label = "_oa";
 const text_data target_entity_label = "_te";
 const text_data target_address_label = "_ta";
 const text_data silent_response_label = "_sr";
+const text_data sender_type_label = "_st";
 
 const text_data client_scope_separator  = "?";
 const text_data address_scope_separator = "|";
@@ -84,6 +86,7 @@ const char address_scope_char = '|';
 const text_data message_null = "";
 
 const text_data standard_delimiter = "*";
+const char standard_delimiter_char = '*';
 
 const input_mode input_none                   = 0x00;
 const input_mode input_binary                 = 0x01 << 0;

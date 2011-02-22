@@ -759,12 +759,14 @@ struct external_client_interface : public client_interface
 	if (check_directive_all(dDirective, directed_terminate))
 	 {
     log_client_terminated(error_server_forced);
+	isolate_client();
 	stop_message_queue();
 	 }
 
 	if (check_directive_all(dDirective, directed_disconnect))
 	 {
     log_client_terminated(error_server_forced);
+	isolate_client();
 	stop_message_queue();
 	 }
 
