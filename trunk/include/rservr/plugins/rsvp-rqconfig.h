@@ -11,7 +11,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -73,14 +73,14 @@ extern int rsvp_rqconfig_load(struct local_commands *Loader);
  *  \param System system to configure
  *  \return queued command or error (NULL)
  */
-extern command_handle rqconfig_request_configure(text_info Target,
+extern command_handle rsvp_rqconfig_request_configure(text_info Target,
   text_info System);
 
 /*! \param Target
  *  \param System system to deconfigure
  *  \return queued command or error (NULL)
  */
-extern command_handle rqconfig_request_deconfigure(text_info Target,
+extern command_handle rsvp_rqconfig_request_deconfigure(text_info Target,
   text_info System);
 
 #ifdef __cplusplus

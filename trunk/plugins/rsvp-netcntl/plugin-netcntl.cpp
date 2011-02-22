@@ -46,17 +46,17 @@ extern "C" {
 }
 
 
-//rsvp_netcntl_connection_list command==========================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_netcntl_connection_list),
+//netcntl_connection_list command===============================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(netcntl_connection_list),
 	connect_type(NETCNTL_DEFAULT) {}
 
 
-	rsvp_netcntl_connection_list::rsvp_netcntl_connection_list(int tType) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_netcntl_connection_list_tag),
+	netcntl_connection_list::netcntl_connection_list(int tType) :
+	RSERVR_COMMAND_INIT_BASE(netcntl_connection_list_tag),
 	request_origin(get_client_name()), connect_type(tType) {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_netcntl_connection_list)
+	RSERVR_CLIENT_EVAL_HEAD(netcntl_connection_list)
 	{
 	//NOTE: check remoteness first so a call to the hook is an indication of being remote
 	if (RSERVR_CHECK_FROM_REMOTE && !__rsvp_netcntl_hook_allow_remote())
@@ -97,7 +97,7 @@ extern "C" {
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_netcntl_connection_list)
+	RSERVR_COMMAND_PARSE_HEAD(netcntl_connection_list)
 	{
 	PLUGIN_PARSE_CHECK(netcntl, type_service_client, PLUGIN_COMMAND_REQUEST(connection_list))
 
@@ -120,7 +120,7 @@ extern "C" {
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_netcntl_connection_list)
+	RSERVR_COMMAND_BUILD_HEAD(netcntl_connection_list)
 	{
 	PLUGIN_BUILD_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(connection_list))
 	PLUGIN_ALT_BUILD_CHECK(netcntl, (connect_type != NETCNTL_NET && connect_type != NETCNTL_LOCAL), \
@@ -135,24 +135,24 @@ extern "C" {
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connection_list, rsvp_netcntl_connection_list_tag, type_service_client)
-//END rsvp_netcntl_connection_list command======================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_connection_list, netcntl_connection_list_tag, type_service_client)
+//END netcntl_connection_list command===========================================
 
 
-//rsvp_netcntl_connect command==================================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_netcntl_connect),
+//netcntl_connect command=======================================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(netcntl_connect),
 	connect_type(NETCNTL_DEFAULT) {}
 
 
-	rsvp_netcntl_connect::rsvp_netcntl_connect(int tType, text_info aAddress, text_info pPort) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_netcntl_connect_tag),
+	netcntl_connect::netcntl_connect(int tType, text_info aAddress, text_info pPort) :
+	RSERVR_COMMAND_INIT_BASE(netcntl_connect_tag),
 	request_origin(get_client_name()),
 	connect_address(aAddress? aAddress : ""),
 	connect_port(pPort? pPort : ""),
 	connect_type(tType) {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_netcntl_connect)
+	RSERVR_CLIENT_EVAL_HEAD(netcntl_connect)
 	{
 	//NOTE: check remoteness first so a call to the hook is an indication of being remote
 	if (RSERVR_CHECK_FROM_REMOTE && !__rsvp_netcntl_hook_allow_remote())
@@ -195,7 +195,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connection_list, rsvp_netcntl_connec
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_netcntl_connect)
+	RSERVR_COMMAND_PARSE_HEAD(netcntl_connect)
 	{
 	PLUGIN_PARSE_CHECK(netcntl, type_service_client, PLUGIN_COMMAND_REQUEST(connect))
 
@@ -226,7 +226,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connection_list, rsvp_netcntl_connec
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_netcntl_connect)
+	RSERVR_COMMAND_BUILD_HEAD(netcntl_connect)
 	{
 	PLUGIN_BUILD_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(connect))
 	PLUGIN_ALT_BUILD_CHECK(netcntl, (connect_type != NETCNTL_NET && connect_type != NETCNTL_LOCAL), \
@@ -243,18 +243,18 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connection_list, rsvp_netcntl_connec
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connect, rsvp_netcntl_connect_tag, type_service_client)
-//END rsvp_netcntl_connect command==============================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_connect, netcntl_connect_tag, type_service_client)
+//END netcntl_connect command===================================================
 
 
-//rsvp_netcntl_filtered_connect command=========================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_netcntl_filtered_connect),
+//netcntl_filtered_connect command==============================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(netcntl_filtered_connect),
 	connect_type(NETCNTL_DEFAULT) {}
 
 
-	rsvp_netcntl_filtered_connect::rsvp_netcntl_filtered_connect(int tType, text_info aAddress,
+	netcntl_filtered_connect::netcntl_filtered_connect(int tType, text_info aAddress,
 	text_info pPort, text_info fFilter) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_netcntl_filtered_connect_tag),
+	RSERVR_COMMAND_INIT_BASE(netcntl_filtered_connect_tag),
 	request_origin(get_client_name()),
 	connect_address(aAddress? aAddress : ""),
 	connect_port(pPort? pPort : ""),
@@ -262,7 +262,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connect, rsvp_netcntl_connect_tag, t
 	connect_type(tType) {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_netcntl_filtered_connect)
+	RSERVR_CLIENT_EVAL_HEAD(netcntl_filtered_connect)
 	{
 	//NOTE: this cannot be used remotely
 	if (RSERVR_CHECK_FROM_REMOTE) return RSERVR_EVAL_REJECTED;
@@ -304,7 +304,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connect, rsvp_netcntl_connect_tag, t
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_netcntl_filtered_connect)
+	RSERVR_COMMAND_PARSE_HEAD(netcntl_filtered_connect)
 	{
 	PLUGIN_PARSE_CHECK(netcntl, type_service_client, PLUGIN_COMMAND_REQUEST(filtered_connect))
 
@@ -339,7 +339,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connect, rsvp_netcntl_connect_tag, t
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_netcntl_filtered_connect)
+	RSERVR_COMMAND_BUILD_HEAD(netcntl_filtered_connect)
 	{
 	PLUGIN_BUILD_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(filtered_connect))
 	PLUGIN_ALT_BUILD_CHECK(netcntl, (connect_type != NETCNTL_NET && connect_type != NETCNTL_LOCAL), \
@@ -357,23 +357,23 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_connect, rsvp_netcntl_connect_tag, t
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_filtered_connect, rsvp_netcntl_filtered_connect_tag, type_service_client)
-//END rsvp_netcntl_filtered_connect command=====================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_filtered_connect, netcntl_filtered_connect_tag, type_service_client)
+//END netcntl_filtered_connect command==========================================
 
 
-//rsvp_netcntl_disconnect command===============================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_netcntl_disconnect),
+//netcntl_disconnect command====================================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(netcntl_disconnect),
 	disconnect_type(NETCNTL_DEFAULT) { }
 
 
-	rsvp_netcntl_disconnect::rsvp_netcntl_disconnect(int tType, text_info aAddress) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_netcntl_disconnect_tag),
+	netcntl_disconnect::netcntl_disconnect(int tType, text_info aAddress) :
+	RSERVR_COMMAND_INIT_BASE(netcntl_disconnect_tag),
 	request_origin(get_client_name()),
 	disconnect_address(aAddress? aAddress : ""),
 	disconnect_type(tType) {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_netcntl_disconnect)
+	RSERVR_CLIENT_EVAL_HEAD(netcntl_disconnect)
 	{
 	//NOTE: check remoteness first so a call to the hook is an indication of being remote
 	if (RSERVR_CHECK_FROM_REMOTE && !__rsvp_netcntl_hook_allow_remote())
@@ -397,7 +397,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_filtered_connect, rsvp_netcntl_filte
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_netcntl_disconnect)
+	RSERVR_COMMAND_PARSE_HEAD(netcntl_disconnect)
 	{
 	PLUGIN_PARSE_CHECK(netcntl, type_service_client, PLUGIN_COMMAND_REQUEST(disconnect))
 
@@ -424,7 +424,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_filtered_connect, rsvp_netcntl_filte
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_netcntl_disconnect)
+	RSERVR_COMMAND_BUILD_HEAD(netcntl_disconnect)
 	{
 	PLUGIN_BUILD_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(disconnect))
 	PLUGIN_ALT_BUILD_CHECK(netcntl, (disconnect_type != NETCNTL_NET && disconnect_type != NETCNTL_LOCAL), \
@@ -440,21 +440,21 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_filtered_connect, rsvp_netcntl_filte
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_disconnect, rsvp_netcntl_disconnect_tag, type_service_client)
-//END rsvp_netcntl_disconnect command===========================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_disconnect, netcntl_disconnect_tag, type_service_client)
+//END netcntl_disconnect command================================================
 
 
-//rsvp_netcntl_listen_list command==============================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_netcntl_listen_list),
+//netcntl_listen_list command===================================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(netcntl_listen_list),
 	listen_type(NETCNTL_DEFAULT) { }
 
 
-	rsvp_netcntl_listen_list::rsvp_netcntl_listen_list(int tType) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_netcntl_listen_list_tag),
+	netcntl_listen_list::netcntl_listen_list(int tType) :
+	RSERVR_COMMAND_INIT_BASE(netcntl_listen_list_tag),
 	request_origin(get_client_name()), listen_type(tType) {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_netcntl_listen_list)
+	RSERVR_CLIENT_EVAL_HEAD(netcntl_listen_list)
 	{
 	//NOTE: check remoteness first so a call to the hook is an indication of being remote
 	if (RSERVR_CHECK_FROM_REMOTE && !__rsvp_netcntl_hook_allow_remote())
@@ -495,7 +495,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_disconnect, rsvp_netcntl_disconnect_
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_netcntl_listen_list)
+	RSERVR_COMMAND_PARSE_HEAD(netcntl_listen_list)
 	{
 	PLUGIN_PARSE_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(listen_list))
 
@@ -518,7 +518,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_disconnect, rsvp_netcntl_disconnect_
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_netcntl_listen_list)
+	RSERVR_COMMAND_BUILD_HEAD(netcntl_listen_list)
 	{
 	PLUGIN_BUILD_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(listen_list))
 	PLUGIN_ALT_BUILD_CHECK(netcntl, (listen_type != NETCNTL_NET && listen_type != NETCNTL_LOCAL), \
@@ -533,23 +533,23 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_disconnect, rsvp_netcntl_disconnect_
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_listen_list, rsvp_netcntl_listen_list_tag, type_service_client)
-//END rsvp_netcntl_listen_list command==========================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_listen_list, netcntl_listen_list_tag, type_service_client)
+//END netcntl_listen_list command===============================================
 
 
-//rsvp_netcntl_listen command===================================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_netcntl_listen),
+//netcntl_listen command========================================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(netcntl_listen),
 	listen_type(NETCNTL_DEFAULT) { }
 
 
-	rsvp_netcntl_listen::rsvp_netcntl_listen(int tType, text_info lLocation) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_netcntl_listen_tag),
+	netcntl_listen::netcntl_listen(int tType, text_info lLocation) :
+	RSERVR_COMMAND_INIT_BASE(netcntl_listen_tag),
 	request_origin(get_client_name()),
 	listen_location(lLocation? lLocation : ""),
 	listen_type(tType) {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_netcntl_listen)
+	RSERVR_CLIENT_EVAL_HEAD(netcntl_listen)
 	{
 	//NOTE: check remoteness first so a call to the hook is an indication of being remote
 	if (RSERVR_CHECK_FROM_REMOTE && !__rsvp_netcntl_hook_allow_remote())
@@ -573,7 +573,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_listen_list, rsvp_netcntl_listen_lis
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_netcntl_listen)
+	RSERVR_COMMAND_PARSE_HEAD(netcntl_listen)
 	{
 	PLUGIN_PARSE_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(listen))
 
@@ -600,7 +600,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_listen_list, rsvp_netcntl_listen_lis
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_netcntl_listen)
+	RSERVR_COMMAND_BUILD_HEAD(netcntl_listen)
 	{
 	PLUGIN_BUILD_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(listen))
 	PLUGIN_ALT_BUILD_CHECK(netcntl, (listen_type != NETCNTL_NET && listen_type != NETCNTL_LOCAL), \
@@ -616,23 +616,23 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_listen_list, rsvp_netcntl_listen_lis
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_listen, rsvp_netcntl_listen_tag, type_service_client)
-//END rsvp_netcntl_listen command===============================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_listen, netcntl_listen_tag, type_service_client)
+//END netcntl_listen command====================================================
 
 
-//rsvp_netcntl_unlisten command=================================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_netcntl_unlisten),
+//netcntl_unlisten command======================================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(netcntl_unlisten),
 	unlisten_type(NETCNTL_DEFAULT) { }
 
 
-	rsvp_netcntl_unlisten::rsvp_netcntl_unlisten(int tType, text_info lLocation) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_netcntl_unlisten_tag),
+	netcntl_unlisten::netcntl_unlisten(int tType, text_info lLocation) :
+	RSERVR_COMMAND_INIT_BASE(netcntl_unlisten_tag),
 	request_origin(get_client_name()),
 	unlisten_location(lLocation? lLocation : ""),
 	unlisten_type(tType) {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_netcntl_unlisten)
+	RSERVR_CLIENT_EVAL_HEAD(netcntl_unlisten)
 	{
 	//NOTE: check remoteness first so a call to the hook is an indication of being remote
 	if (RSERVR_CHECK_FROM_REMOTE && !__rsvp_netcntl_hook_allow_remote())
@@ -656,7 +656,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_listen, rsvp_netcntl_listen_tag, typ
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_netcntl_unlisten)
+	RSERVR_COMMAND_PARSE_HEAD(netcntl_unlisten)
 	{
 	PLUGIN_PARSE_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(unlisten))
 
@@ -683,7 +683,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_listen, rsvp_netcntl_listen_tag, typ
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_netcntl_unlisten)
+	RSERVR_COMMAND_BUILD_HEAD(netcntl_unlisten)
 	{
 	PLUGIN_BUILD_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(unlisten))
 	PLUGIN_ALT_BUILD_CHECK(netcntl, (unlisten_type != NETCNTL_NET && unlisten_type != NETCNTL_LOCAL), \
@@ -699,5 +699,5 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_listen, rsvp_netcntl_listen_tag, typ
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_netcntl_unlisten, rsvp_netcntl_unlisten_tag, type_service_client)
-//END rsvp_netcntl_unlisten command=============================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_unlisten, netcntl_unlisten_tag, type_service_client)
+//END netcntl_unlisten command==================================================

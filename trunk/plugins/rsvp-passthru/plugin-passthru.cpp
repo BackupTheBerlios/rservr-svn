@@ -43,17 +43,19 @@ extern "C" {
 }
 
 
-//rsvp_passthru_reserve_channel command=========================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_passthru_reserve_channel) {}
+//passthru_reserve_channel command==============================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(passthru_reserve_channel) {}
 
 
-	rsvp_passthru_reserve_channel::rsvp_passthru_reserve_channel(text_info nName) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_passthru_reserve_channel_tag),
+	passthru_reserve_channel::passthru_reserve_channel(text_info nName) :
+	RSERVR_COMMAND_INIT_BASE(passthru_reserve_channel_tag),
 	request_origin(get_client_name()), channel_name(nName? nName : "") {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_passthru_reserve_channel)
+	RSERVR_CLIENT_EVAL_HEAD(passthru_reserve_channel)
 	{
+	if (RSERVR_CHECK_FROM_REMOTE) return RSERVR_EVAL_REJECTED;
+
 	PLUGIN_SENDER_CHECK(passthru, type_active_client, PLUGIN_COMMAND_REQUEST(reserve_channel))
 
 	struct passthru_source_info source_info = {
@@ -66,7 +68,7 @@ extern "C" {
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_passthru_reserve_channel)
+	RSERVR_COMMAND_PARSE_HEAD(passthru_reserve_channel)
 	{
 	PLUGIN_PARSE_CHECK(passthru, type_active_client, PLUGIN_COMMAND_REQUEST(reserve_channel))
 
@@ -89,7 +91,7 @@ extern "C" {
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_passthru_reserve_channel)
+	RSERVR_COMMAND_BUILD_HEAD(passthru_reserve_channel)
 	{
 	PLUGIN_BUILD_CHECK(passthru, type_active_client, PLUGIN_COMMAND_REQUEST(reserve_channel))
 
@@ -102,21 +104,23 @@ extern "C" {
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_passthru_reserve_channel, rsvp_passthru_reserve_channel_tag, type_active_client)
-//END rsvp_passthru_reserve_channel command=====================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(passthru_reserve_channel, passthru_reserve_channel_tag, type_active_client)
+//END passthru_reserve_channel command==========================================
 
 
-//rsvp_passthru_unreserve_channel command=======================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_passthru_unreserve_channel) {}
+//passthru_unreserve_channel command============================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(passthru_unreserve_channel) {}
 
 
-	rsvp_passthru_unreserve_channel::rsvp_passthru_unreserve_channel(text_info nName) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_passthru_unreserve_channel_tag),
+	passthru_unreserve_channel::passthru_unreserve_channel(text_info nName) :
+	RSERVR_COMMAND_INIT_BASE(passthru_unreserve_channel_tag),
 	request_origin(get_client_name()), channel_name(nName? nName : "") {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_passthru_unreserve_channel)
+	RSERVR_CLIENT_EVAL_HEAD(passthru_unreserve_channel)
 	{
+	if (RSERVR_CHECK_FROM_REMOTE) return RSERVR_EVAL_REJECTED;
+
 	PLUGIN_SENDER_CHECK(passthru, type_active_client, PLUGIN_COMMAND_REQUEST(unreserve_channel))
 
 	struct passthru_source_info source_info = {
@@ -129,7 +133,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_passthru_reserve_channel, rsvp_passthru_rese
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_passthru_unreserve_channel)
+	RSERVR_COMMAND_PARSE_HEAD(passthru_unreserve_channel)
 	{
 	PLUGIN_PARSE_CHECK(passthru, type_active_client, PLUGIN_COMMAND_REQUEST(unreserve_channel))
 
@@ -152,7 +156,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_passthru_reserve_channel, rsvp_passthru_rese
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_passthru_unreserve_channel)
+	RSERVR_COMMAND_BUILD_HEAD(passthru_unreserve_channel)
 	{
 	PLUGIN_BUILD_CHECK(passthru, type_active_client, PLUGIN_COMMAND_REQUEST(unreserve_channel))
 
@@ -165,23 +169,25 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_passthru_reserve_channel, rsvp_passthru_rese
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_passthru_unreserve_channel, rsvp_passthru_unreserve_channel_tag, type_active_client)
-//END rsvp_passthru_unreserve_channel command===================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(passthru_unreserve_channel, passthru_unreserve_channel_tag, type_active_client)
+//END passthru_unreserve_channel command========================================
 
 
-//rsvp_passthru_steal_channel command===========================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_passthru_steal_channel) {}
+//passthru_steal_channel command================================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(passthru_steal_channel) {}
 
 
-	rsvp_passthru_steal_channel::rsvp_passthru_steal_channel(text_info nName,
+	passthru_steal_channel::passthru_steal_channel(text_info nName,
 	text_info sSocket) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_passthru_steal_channel_tag),
+	RSERVR_COMMAND_INIT_BASE(passthru_steal_channel_tag),
 	request_origin(get_client_name()), channel_name(nName? nName : ""),
 	local_socket(sSocket? sSocket : "") {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_passthru_steal_channel)
+	RSERVR_CLIENT_EVAL_HEAD(passthru_steal_channel)
 	{
+	if (RSERVR_CHECK_FROM_REMOTE) return RSERVR_EVAL_REJECTED;
+
 	PLUGIN_SENDER_CHECK(passthru, type_active_client, PLUGIN_COMMAND_REQUEST(steal_channel))
 
 	struct passthru_source_info source_info = {
@@ -194,7 +200,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_passthru_unreserve_channel, rsvp_passthru_un
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_passthru_steal_channel)
+	RSERVR_COMMAND_PARSE_HEAD(passthru_steal_channel)
 	{
 	PLUGIN_PARSE_CHECK(passthru, type_active_client, PLUGIN_COMMAND_REQUEST(steal_channel))
 
@@ -221,7 +227,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_passthru_unreserve_channel, rsvp_passthru_un
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_passthru_steal_channel)
+	RSERVR_COMMAND_BUILD_HEAD(passthru_steal_channel)
 	{
 	PLUGIN_BUILD_CHECK(passthru, type_active_client, PLUGIN_COMMAND_REQUEST(steal_channel))
 
@@ -235,5 +241,5 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_passthru_unreserve_channel, rsvp_passthru_un
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_passthru_steal_channel, rsvp_passthru_steal_channel_tag, type_active_client)
-//END rsvp_passthru_steal_channel command=======================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(passthru_steal_channel, passthru_steal_channel_tag, type_active_client)
+//END passthru_steal_channel command============================================

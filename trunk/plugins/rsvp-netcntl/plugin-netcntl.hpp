@@ -41,17 +41,17 @@
 #define NETCNTL_LOCAL   0x02
 
 
-RSERVR_COMMAND_CLASS( rsvp_netcntl_connection_list, \
+RSERVR_COMMAND_CLASS( netcntl_connection_list, \
 	/*constructors*/ \
-	rsvp_netcntl_connection_list(int);, \
+	netcntl_connection_list(int);, \
 	/*members*/ \
 	text_data request_origin; \
 	int       connect_type; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_netcntl_connect, \
+RSERVR_COMMAND_CLASS( netcntl_connect, \
 	/*constructors*/ \
-	rsvp_netcntl_connect(int, text_info, text_info);, \
+	netcntl_connect(int, text_info, text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data connect_address; \
@@ -59,9 +59,9 @@ RSERVR_COMMAND_CLASS( rsvp_netcntl_connect, \
 	int       connect_type; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_netcntl_filtered_connect, \
+RSERVR_COMMAND_CLASS( netcntl_filtered_connect, \
 	/*constructors*/ \
-	rsvp_netcntl_filtered_connect(int, text_info, text_info, text_info);, \
+	netcntl_filtered_connect(int, text_info, text_info, text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data connect_address; \
@@ -70,35 +70,35 @@ RSERVR_COMMAND_CLASS( rsvp_netcntl_filtered_connect, \
 	int       connect_type; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_netcntl_disconnect, \
+RSERVR_COMMAND_CLASS( netcntl_disconnect, \
 	/*constructors*/ \
-	rsvp_netcntl_disconnect(int, text_info);, \
+	netcntl_disconnect(int, text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data disconnect_address; \
 	int       disconnect_type; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_netcntl_listen_list, \
+RSERVR_COMMAND_CLASS( netcntl_listen_list, \
 	/*constructors*/ \
-	rsvp_netcntl_listen_list(int);, \
+	netcntl_listen_list(int);, \
 	/*members*/ \
 	text_data request_origin; \
 	int       listen_type; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_netcntl_listen, \
+RSERVR_COMMAND_CLASS( netcntl_listen, \
 	/*constructors*/ \
-	rsvp_netcntl_listen(int, text_info);, \
+	netcntl_listen(int, text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data listen_location; \
 	int       listen_type; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_netcntl_unlisten, \
+RSERVR_COMMAND_CLASS( netcntl_unlisten, \
 	/*constructors*/ \
-	rsvp_netcntl_unlisten(int, text_info);, \
+	netcntl_unlisten(int, text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data unlisten_location; \

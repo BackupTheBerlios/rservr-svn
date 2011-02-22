@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -63,31 +63,31 @@ extern int rsvp_netcntl_load(struct local_commands *lLoader)
 
 	PLUGIN_LOAD_SINGLE(netcntl, connection_list, lLoader,
 	  type_active_client, type_service_client,
-	  command_null, &rsvp_netcntl_connection_list::generate)
+	  command_null, &netcntl_connection_list::generate)
 
 	PLUGIN_LOAD_SINGLE(netcntl, connect, lLoader,
 	  type_active_client, type_service_client,
-	  command_null, &rsvp_netcntl_connect::generate)
+	  command_null, &netcntl_connect::generate)
 
 	PLUGIN_LOAD_RESTRICTED(netcntl, filtered_connect, lLoader,
 	  type_active_client, type_service_client,
-	  command_null, &rsvp_netcntl_filtered_connect::generate)
+	  command_null, &netcntl_filtered_connect::generate)
 
 	PLUGIN_LOAD_SINGLE(netcntl, disconnect, lLoader,
 	  type_active_client, type_service_client,
-	  command_null, &rsvp_netcntl_disconnect::generate)
+	  command_null, &netcntl_disconnect::generate)
 
 	PLUGIN_LOAD_SINGLE(netcntl, listen_list, lLoader,
 	  type_admin_client, type_active_client,
-	  command_null, &rsvp_netcntl_listen_list::generate)
+	  command_null, &netcntl_listen_list::generate)
 
 	PLUGIN_LOAD_RESTRICTED(netcntl, listen, lLoader,
 	  type_admin_client, type_active_client,
-	  command_null, &rsvp_netcntl_listen::generate)
+	  command_null, &netcntl_listen::generate)
 
 	PLUGIN_LOAD_RESTRICTED(netcntl, unlisten, lLoader,
 	  type_admin_client, type_active_client,
-	  command_null, &rsvp_netcntl_unlisten::generate)
+	  command_null, &netcntl_unlisten::generate)
 
 	  PLUGIN_LOAD_END(netcntl)
 }
@@ -101,7 +101,7 @@ result ATTR_WEAK __rsvp_netcntl_hook_allow_remote()
 	return false;
 }
 
-command_event __rsvp_netcntl_hook_net_connection_list(const struct netcntl_source_info *sSource, char***)
+command_event ATTR_WEAK __rsvp_netcntl_hook_net_connection_list(const struct netcntl_source_info *sSource, char***)
 { PLUGIN_RESPOND(sSource, request_connection_list) }
 
 command_event ATTR_WEAK __rsvp_netcntl_hook_net_connect(const struct netcntl_source_info *sSource, text_info, text_info, char**)
@@ -113,7 +113,7 @@ command_event ATTR_WEAK __rsvp_netcntl_hook_net_filtered_connect(const struct ne
 command_event ATTR_WEAK __rsvp_netcntl_hook_net_disconnect(const struct netcntl_source_info *sSource, text_info)
 { PLUGIN_RESPOND(sSource, request_disconnect) }
 
-command_event __rsvp_netcntl_hook_net_listen_list(const struct netcntl_source_info *sSource, char***)
+command_event ATTR_WEAK __rsvp_netcntl_hook_net_listen_list(const struct netcntl_source_info *sSource, char***)
 { PLUGIN_RESPOND(sSource, request_listen_list) }
 
 command_event ATTR_WEAK __rsvp_netcntl_hook_net_listen(const struct netcntl_source_info *sSource, text_info)
@@ -123,7 +123,7 @@ command_event ATTR_WEAK __rsvp_netcntl_hook_net_unlisten(const struct netcntl_so
 { PLUGIN_RESPOND(sSource, request_unlisten) }
 
 
-command_event __rsvp_netcntl_hook_local_connection_list(const struct netcntl_source_info *sSource, char***)
+command_event ATTR_WEAK __rsvp_netcntl_hook_local_connection_list(const struct netcntl_source_info *sSource, char***)
 { PLUGIN_RESPOND(sSource, request_connection_list) }
 
 command_event ATTR_WEAK __rsvp_netcntl_hook_local_connect(const struct netcntl_source_info *sSource, text_info, char**)
@@ -135,7 +135,7 @@ command_event ATTR_WEAK __rsvp_netcntl_hook_local_filtered_connect(const struct 
 command_event ATTR_WEAK __rsvp_netcntl_hook_local_disconnect(const struct netcntl_source_info *sSource, text_info)
 { PLUGIN_RESPOND(sSource, request_disconnect) }
 
-command_event __rsvp_netcntl_hook_local_listen_list(const struct netcntl_source_info *sSource, char***)
+command_event ATTR_WEAK __rsvp_netcntl_hook_local_listen_list(const struct netcntl_source_info *sSource, char***)
 { PLUGIN_RESPOND(sSource, request_listen_list) }
 
 command_event ATTR_WEAK __rsvp_netcntl_hook_local_listen(const struct netcntl_source_info *sSource, text_info)
@@ -145,13 +145,13 @@ command_event ATTR_WEAK __rsvp_netcntl_hook_local_unlisten(const struct netcntl_
 { PLUGIN_RESPOND(sSource, request_unlisten) }
 
 
-command_handle netcntl_net_connection_list(text_info tTarget)
-{ return manual_command(tTarget, new rsvp_netcntl_connection_list(NETCNTL_NET)); }
+command_handle rsvp_netcntl_net_connection_list(text_info tTarget)
+{ return manual_command(tTarget, new netcntl_connection_list(NETCNTL_NET)); }
 
-command_handle netcntl_net_connect(text_info tTarget, text_info aAddress, text_info pPort)
-{ return manual_command(tTarget, new rsvp_netcntl_connect(NETCNTL_NET, aAddress, pPort)); }
+command_handle rsvp_netcntl_net_connect(text_info tTarget, text_info aAddress, text_info pPort)
+{ return manual_command(tTarget, new netcntl_connect(NETCNTL_NET, aAddress, pPort)); }
 
-command_handle netcntl_net_connect_cut(text_info tTarget, text_info aAddress, text_info dDelimiter)
+command_handle rsvp_netcntl_net_connect_cut(text_info tTarget, text_info aAddress, text_info dDelimiter)
 {
 	if (!aAddress || !strlen(aAddress)) return NULL;
 	std::string address_copy = aAddress;
@@ -160,13 +160,13 @@ command_handle netcntl_net_connect_cut(text_info tTarget, text_info aAddress, te
 	std::string cut_address = working;
 	if (!(working = strsep(&current, dDelimiter)) || current) return NULL;
 	std::string cut_port = working;
-	return manual_command(tTarget, new rsvp_netcntl_connect(NETCNTL_NET, cut_address.c_str(), cut_port.c_str()));
+	return manual_command(tTarget, new netcntl_connect(NETCNTL_NET, cut_address.c_str(), cut_port.c_str()));
 }
 
-command_handle netcntl_net_filtered_connect(text_info tTarget, text_info aAddress, text_info pPort, text_info fFilter)
-{ return manual_command(tTarget, new rsvp_netcntl_filtered_connect(NETCNTL_NET, aAddress, pPort, fFilter)); }
+command_handle rsvp_netcntl_net_filtered_connect(text_info tTarget, text_info aAddress, text_info pPort, text_info fFilter)
+{ return manual_command(tTarget, new netcntl_filtered_connect(NETCNTL_NET, aAddress, pPort, fFilter)); }
 
-command_handle netcntl_net_filtered_connect_cut(text_info tTarget, text_info aAddress, text_info dDelimiter, text_info fFilter)
+command_handle rsvp_netcntl_net_filtered_connect_cut(text_info tTarget, text_info aAddress, text_info dDelimiter, text_info fFilter)
 {
 	if (!aAddress || !strlen(aAddress)) return NULL;
 	std::string address_copy = aAddress;
@@ -175,42 +175,42 @@ command_handle netcntl_net_filtered_connect_cut(text_info tTarget, text_info aAd
 	std::string cut_address = working;
 	if (!(working = strsep(&current, dDelimiter)) || current) return NULL;
 	std::string cut_port = working;
-	return manual_command(tTarget, new rsvp_netcntl_filtered_connect(NETCNTL_NET, cut_address.c_str(), cut_port.c_str(), fFilter));
+	return manual_command(tTarget, new netcntl_filtered_connect(NETCNTL_NET, cut_address.c_str(), cut_port.c_str(), fFilter));
 }
 
-command_handle netcntl_net_disconnect(text_info tTarget, text_info aAddress)
-{ return manual_command(tTarget, new rsvp_netcntl_disconnect(NETCNTL_NET, aAddress)); }
+command_handle rsvp_netcntl_net_disconnect(text_info tTarget, text_info aAddress)
+{ return manual_command(tTarget, new netcntl_disconnect(NETCNTL_NET, aAddress)); }
 
-command_handle netcntl_net_listen_list(text_info tTarget)
-{ return manual_command(tTarget, new rsvp_netcntl_listen_list(NETCNTL_NET)); }
+command_handle rsvp_netcntl_net_listen_list(text_info tTarget)
+{ return manual_command(tTarget, new netcntl_listen_list(NETCNTL_NET)); }
 
-command_handle netcntl_net_listen(text_info tTarget, text_info pPort)
-{ return manual_command(tTarget, new rsvp_netcntl_listen(NETCNTL_NET, pPort)); }
+command_handle rsvp_netcntl_net_listen(text_info tTarget, text_info pPort)
+{ return manual_command(tTarget, new netcntl_listen(NETCNTL_NET, pPort)); }
 
-command_handle netcntl_net_unlisten(text_info tTarget, text_info pPort)
-{ return manual_command(tTarget, new rsvp_netcntl_unlisten(NETCNTL_NET, pPort)); }
+command_handle rsvp_netcntl_net_unlisten(text_info tTarget, text_info pPort)
+{ return manual_command(tTarget, new netcntl_unlisten(NETCNTL_NET, pPort)); }
 
 
-command_handle netcntl_local_connection_list(text_info tTarget)
-{ return manual_command(tTarget, new rsvp_netcntl_connection_list(NETCNTL_LOCAL)); }
+command_handle rsvp_netcntl_local_connection_list(text_info tTarget)
+{ return manual_command(tTarget, new netcntl_connection_list(NETCNTL_LOCAL)); }
 
-command_handle netcntl_local_connect(text_info tTarget, text_info aAddress)
-{ return manual_command(tTarget, new rsvp_netcntl_connect(NETCNTL_LOCAL, aAddress, NULL)); }
+command_handle rsvp_netcntl_local_connect(text_info tTarget, text_info aAddress)
+{ return manual_command(tTarget, new netcntl_connect(NETCNTL_LOCAL, aAddress, NULL)); }
 
-command_handle netcntl_local_filtered_connect(text_info tTarget, text_info aAddress, text_info fFilter)
-{ return manual_command(tTarget, new rsvp_netcntl_filtered_connect(NETCNTL_LOCAL, aAddress, NULL, fFilter)); }
+command_handle rsvp_netcntl_local_filtered_connect(text_info tTarget, text_info aAddress, text_info fFilter)
+{ return manual_command(tTarget, new netcntl_filtered_connect(NETCNTL_LOCAL, aAddress, NULL, fFilter)); }
 
-command_handle netcntl_local_disconnect(text_info tTarget, text_info aAddress)
-{ return manual_command(tTarget, new rsvp_netcntl_disconnect(NETCNTL_LOCAL, aAddress)); }
+command_handle rsvp_netcntl_local_disconnect(text_info tTarget, text_info aAddress)
+{ return manual_command(tTarget, new netcntl_disconnect(NETCNTL_LOCAL, aAddress)); }
 
-command_handle netcntl_local_listen_list(text_info tTarget)
-{ return manual_command(tTarget, new rsvp_netcntl_listen_list(NETCNTL_LOCAL)); }
+command_handle rsvp_netcntl_local_listen_list(text_info tTarget)
+{ return manual_command(tTarget, new netcntl_listen_list(NETCNTL_LOCAL)); }
 
-command_handle netcntl_local_listen(text_info tTarget, text_info pPort)
-{ return manual_command(tTarget, new rsvp_netcntl_listen(NETCNTL_LOCAL, pPort)); }
+command_handle rsvp_netcntl_local_listen(text_info tTarget, text_info pPort)
+{ return manual_command(tTarget, new netcntl_listen(NETCNTL_LOCAL, pPort)); }
 
-command_handle netcntl_local_unlisten(text_info tTarget, text_info pPort)
-{ return manual_command(tTarget, new rsvp_netcntl_unlisten(NETCNTL_LOCAL, pPort)); }
+command_handle rsvp_netcntl_local_unlisten(text_info tTarget, text_info pPort)
+{ return manual_command(tTarget, new netcntl_unlisten(NETCNTL_LOCAL, pPort)); }
 
 
 text_info PLUGIN_COMMAND_REQUEST(connection_list)  = "connection list";

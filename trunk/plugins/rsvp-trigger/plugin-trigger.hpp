@@ -36,9 +36,9 @@
 #include "plugin-dev/header-macro.hpp"
 
 
-RSERVR_COMMAND_CLASS( rsvp_trigger_system_trigger, \
+RSERVR_COMMAND_CLASS( trigger_system_trigger, \
 	/*constructors*/ \
-	rsvp_trigger_system_trigger(uint8_t, text_info);, \
+	trigger_system_trigger(uint8_t, text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	uint8_t   trigger_action; \

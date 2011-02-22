@@ -36,25 +36,25 @@
 #include "plugin-dev/header-macro.hpp"
 
 
-RSERVR_COMMAND_CLASS( rsvp_passthru_reserve_channel, \
+RSERVR_COMMAND_CLASS( passthru_reserve_channel, \
 	/*constructors*/ \
-	rsvp_passthru_reserve_channel(text_info);, \
+	passthru_reserve_channel(text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data channel_name; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_passthru_unreserve_channel, \
+RSERVR_COMMAND_CLASS( passthru_unreserve_channel, \
 	/*constructors*/ \
-	rsvp_passthru_unreserve_channel(text_info);, \
+	passthru_unreserve_channel(text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data channel_name; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_passthru_steal_channel, \
+RSERVR_COMMAND_CLASS( passthru_steal_channel, \
 	/*constructors*/ \
-	rsvp_passthru_steal_channel(text_info, text_info);, \
+	passthru_steal_channel(text_info, text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data channel_name; \

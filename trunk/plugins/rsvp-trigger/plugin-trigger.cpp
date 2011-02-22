@@ -43,17 +43,17 @@ extern "C" {
 }
 
 
-//rsvp_trigger_system_trigger command===========================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_trigger_system_trigger),
+//trigger_system_trigger command================================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(trigger_system_trigger),
 	trigger_action(RSVP_TRIGGER_ACTION_NONE) {}
 
 
-	rsvp_trigger_system_trigger::rsvp_trigger_system_trigger(uint8_t aAction, text_info tType) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_trigger_system_trigger_tag),
+	trigger_system_trigger::trigger_system_trigger(uint8_t aAction, text_info tType) :
+	RSERVR_COMMAND_INIT_BASE(trigger_system_trigger_tag),
 	request_origin(get_client_name()), trigger_action(aAction), trigger_type(tType? tType : "") {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_trigger_system_trigger)
+	RSERVR_CLIENT_EVAL_HEAD(trigger_system_trigger)
 	{
 	PLUGIN_SENDER_CHECK(trigger, type_active_client, PLUGIN_COMMAND_REQUEST(system_trigger))
 
@@ -67,7 +67,7 @@ extern "C" {
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_trigger_system_trigger)
+	RSERVR_COMMAND_PARSE_HEAD(trigger_system_trigger)
 	{
 	PLUGIN_PARSE_CHECK(trigger, type_active_client, PLUGIN_COMMAND_REQUEST(system_trigger))
 
@@ -94,7 +94,7 @@ extern "C" {
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_trigger_system_trigger)
+	RSERVR_COMMAND_BUILD_HEAD(trigger_system_trigger)
 	{
 	PLUGIN_BUILD_CHECK(trigger, type_active_client, PLUGIN_COMMAND_REQUEST(system_trigger))
 
@@ -108,5 +108,5 @@ extern "C" {
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_trigger_system_trigger, rsvp_trigger_system_trigger_tag, type_active_client)
-//END rsvp_trigger_system_trigger command=======================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(trigger_system_trigger, trigger_system_trigger_tag, type_active_client)
+//END trigger_system_trigger command============================================

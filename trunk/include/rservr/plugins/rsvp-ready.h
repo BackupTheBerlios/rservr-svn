@@ -11,7 +11,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -73,42 +73,42 @@ extern int rsvp_ready_load(struct local_commands *Loader);
  *  \param System system being reported on
  *  \return queued command or error (NULL)
  */
-extern command_handle ready_system_ready(text_info Target, text_info System);
+extern command_handle rsvp_ready_system_ready(text_info Target, text_info System);
 
 
 /*! \param Message
  *  \param System system being reported on
  *  \return queued command or error (NULL)
  */
-extern command_handle ready_system_ready_response(message_handle Message,
+extern command_handle rsvp_ready_system_ready_response(message_handle Message,
   text_info System);
 
 /*! \param Target
  *  \param System system being reported on
  *  \return queued command or error (NULL)
  */
-extern command_handle ready_system_not_ready(text_info Target,
+extern command_handle rsvp_ready_system_not_ready(text_info Target,
   text_info System);
 
 /*! \param Message
  *  \param System system being reported on
  *  \return queued command or error (NULL)
  */
-extern command_handle ready_system_not_ready_response(message_handle Message,
+extern command_handle rsvp_ready_system_not_ready_response(message_handle Message,
   text_info System);
 
 /*! \param Target
  *  \param System system being reported on
  *  \return queued command or error (NULL)
  */
-extern command_handle ready_system_never_ready(text_info Target,
+extern command_handle rsvp_ready_system_never_ready(text_info Target,
   text_info System);
 
 /*! \param Message
  *  \param System system being reported on
  *  \return queued command or error (NULL)
  */
-extern command_handle ready_system_never_ready_response(message_handle Message,
+extern command_handle rsvp_ready_system_never_ready_response(message_handle Message,
   text_info System);
 
 #ifdef __cplusplus

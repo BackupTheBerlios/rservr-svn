@@ -36,17 +36,17 @@
 #include "plugin-dev/header-macro.hpp"
 
 
-RSERVR_COMMAND_CLASS( rsvp_rqsrvc_register_services, \
+RSERVR_COMMAND_CLASS( rqsrvc_register_services, \
 	/*constructors*/ \
-	rsvp_rqsrvc_register_services(text_info);, \
+	rqsrvc_register_services(text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data register_type; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_rqsrvc_deregister_services, \
+RSERVR_COMMAND_CLASS( rqsrvc_deregister_services, \
 	/*constructors*/ \
-	rsvp_rqsrvc_deregister_services(text_info);, \
+	rqsrvc_deregister_services(text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data deregister_type; )

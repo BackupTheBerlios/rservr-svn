@@ -11,7 +11,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -72,14 +72,14 @@ extern int rsvp_netcntl_load(struct local_commands *Loader);
 /*! \param Target
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_net_connection_list(text_info Target);
+extern command_handle rsvp_netcntl_net_connection_list(text_info Target);
 
 /*! \param Target
  *  \param Address
  *  \param Port
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_net_connect(text_info Target, text_info Address,
+extern command_handle rsvp_netcntl_net_connect(text_info Target, text_info Address,
   text_info Port);
 
 /*! \param Target
@@ -87,7 +87,7 @@ extern command_handle netcntl_net_connect(text_info Target, text_info Address,
  *  \param Delimiter delimiter separating address and port
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_net_connect_cut(text_info Target,
+extern command_handle rsvp_netcntl_net_connect_cut(text_info Target,
   text_info Address, text_info Delimiter);
 
 /*! \param Target
@@ -96,7 +96,7 @@ extern command_handle netcntl_net_connect_cut(text_info Target,
  *  \param Filter
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_net_filtered_connect(text_info Target,
+extern command_handle rsvp_netcntl_net_filtered_connect(text_info Target,
   text_info Address, text_info Port, text_info Filter);
 
 /*! \param Target
@@ -105,76 +105,76 @@ extern command_handle netcntl_net_filtered_connect(text_info Target,
  *  \param Filter
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_net_filtered_connect_cut(text_info Target,
+extern command_handle rsvp_netcntl_net_filtered_connect_cut(text_info Target,
   text_info Address, text_info Delimiter, text_info Filter);
 
 /*! \param Target
  *  \param Address does not include port
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_net_disconnect(text_info Target,
+extern command_handle rsvp_netcntl_net_disconnect(text_info Target,
   text_info Address);
 
 /*! \param Target
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_net_listen_list(text_info Target);
+extern command_handle rsvp_netcntl_net_listen_list(text_info Target);
 
 /*! \param Target
  *  \param Port
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_net_listen(text_info Target, text_info Port);
+extern command_handle rsvp_netcntl_net_listen(text_info Target, text_info Port);
 
 /*! \param Target
  *  \param Port
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_net_unlisten(text_info Target, text_info Port);
+extern command_handle rsvp_netcntl_net_unlisten(text_info Target, text_info Port);
 
 
 /*! \param Target
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_local_connection_list(text_info Target);
+extern command_handle rsvp_netcntl_local_connection_list(text_info Target);
 
 /*! \param Target
  *  \param Socket
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_local_connect(text_info Target, text_info Socket);
+extern command_handle rsvp_netcntl_local_connect(text_info Target, text_info Socket);
 
 /*! \param Target
  *  \param Socket
  *  \param Filter
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_local_filtered_connect(text_info Target,
+extern command_handle rsvp_netcntl_local_filtered_connect(text_info Target,
   text_info Socket, text_info Filter);
 
 /*! \param Target
  *  \param Socket
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_local_disconnect(text_info Target,
+extern command_handle rsvp_netcntl_local_disconnect(text_info Target,
   text_info Socket);
 
 /*! \param Target
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_local_listen_list(text_info Target);
+extern command_handle rsvp_netcntl_local_listen_list(text_info Target);
 
 /*! \param Target
  *  \param Socket
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_local_listen(text_info Target, text_info Socket);
+extern command_handle rsvp_netcntl_local_listen(text_info Target, text_info Socket);
 
 /*! \param Target
  *  \param Socket
  *  \return queued command or error (NULL)
  */
-extern command_handle netcntl_local_unlisten(text_info Target,
+extern command_handle rsvp_netcntl_local_unlisten(text_info Target,
   text_info Socket);
 
 #ifdef __cplusplus

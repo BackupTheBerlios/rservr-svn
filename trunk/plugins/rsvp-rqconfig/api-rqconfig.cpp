@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -62,11 +62,11 @@ extern int rsvp_rqconfig_load(struct local_commands *lLoader)
 
 	PLUGIN_LOAD_SINGLE(rqconfig, configure, lLoader,
 	  type_admin_client | type_control_client, type_active_client,
-	  command_null, &rsvp_rqconfig_configure::generate)
+	  command_null, &rqconfig_configure::generate)
 
 	PLUGIN_LOAD_SINGLE(rqconfig, deconfigure, lLoader,
 	  type_admin_client | type_control_client, type_active_client,
-	  command_null, &rsvp_rqconfig_deconfigure::generate)
+	  command_null, &rqconfig_deconfigure::generate)
 
 	  PLUGIN_LOAD_END(rqconfig)
 }
@@ -81,11 +81,11 @@ command_event __rsvp_rqconfig_hook_request_deconfigure(const struct rqconfig_sou
 { return default_response(sSource, request_deconfigure); }
 
 
-command_handle rqconfig_request_configure(text_info tTarget, text_info tType)
-{ return manual_command(tTarget, new rsvp_rqconfig_configure(tType)); }
+command_handle rsvp_rqconfig_request_configure(text_info tTarget, text_info tType)
+{ return manual_command(tTarget, new rqconfig_configure(tType)); }
 
-command_handle rqconfig_request_deconfigure(text_info tTarget, text_info tType)
-{ return manual_command(tTarget, new rsvp_rqconfig_deconfigure(tType)); }
+command_handle rsvp_rqconfig_request_deconfigure(text_info tTarget, text_info tType)
+{ return manual_command(tTarget, new rqconfig_deconfigure(tType)); }
 
 
 text_info PLUGIN_COMMAND_REQUEST(configure)   = "request configure";

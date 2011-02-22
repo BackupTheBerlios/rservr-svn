@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -62,11 +62,11 @@ extern int rsvp_rqsrvc_load(struct local_commands *lLoader)
 
 	PLUGIN_LOAD_SINGLE(rqsrvc, register_services, lLoader,
 	  type_service_client, type_service_client,
-	  command_null, &rsvp_rqsrvc_register_services::generate)
+	  command_null, &rqsrvc_register_services::generate)
 
 	PLUGIN_LOAD_SINGLE(rqsrvc, deregister_services, lLoader,
 	  type_service_client, type_service_client,
-	  command_null, &rsvp_rqsrvc_deregister_services::generate)
+	  command_null, &rqsrvc_deregister_services::generate)
 
 	  PLUGIN_LOAD_END(rqsrvc)
 }
@@ -81,11 +81,11 @@ command_event __rsvp_rqsrvc_hook_deregister_services(const struct rqsrvc_source_
 { return default_response(sSource, request_deregister_services); }
 
 
-command_handle rqsrvc_register_services(text_info tTarget, text_info tType)
-{ return manual_command(tTarget, new rsvp_rqsrvc_register_services(tType)); }
+command_handle rsvp_rqsrvc_register_services(text_info tTarget, text_info tType)
+{ return manual_command(tTarget, new rqsrvc_register_services(tType)); }
 
-command_handle rqsrvc_deregister_services(text_info tTarget, text_info tType)
-{ return manual_command(tTarget, new rsvp_rqsrvc_deregister_services(tType)); }
+command_handle rsvp_rqsrvc_deregister_services(text_info tTarget, text_info tType)
+{ return manual_command(tTarget, new rqsrvc_deregister_services(tType)); }
 
 
 text_info PLUGIN_COMMAND_REQUEST(register_services)   = "register services";

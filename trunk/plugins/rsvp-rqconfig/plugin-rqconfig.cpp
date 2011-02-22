@@ -43,16 +43,16 @@ extern "C" {
 }
 
 
-//rsvp_rqconfig_configure command===============================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_rqconfig_configure) { }
+//rqconfig_configure command====================================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rqconfig_configure) { }
 
 
-	rsvp_rqconfig_configure::rsvp_rqconfig_configure(text_info tType) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_rqconfig_configure_tag),
+	rqconfig_configure::rqconfig_configure(text_info tType) :
+	RSERVR_COMMAND_INIT_BASE(rqconfig_configure_tag),
 	request_origin(get_client_name()), configure_type(tType? tType : "") {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_rqconfig_configure)
+	RSERVR_CLIENT_EVAL_HEAD(rqconfig_configure)
 	{
 	PLUGIN_SENDER_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(configure))
 
@@ -66,7 +66,7 @@ extern "C" {
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_rqconfig_configure)
+	RSERVR_COMMAND_PARSE_HEAD(rqconfig_configure)
 	{
 	PLUGIN_PARSE_CHECK(rqconfig, type_active_client, PLUGIN_COMMAND_REQUEST(configure))
 
@@ -89,7 +89,7 @@ extern "C" {
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_rqconfig_configure)
+	RSERVR_COMMAND_BUILD_HEAD(rqconfig_configure)
 	{
 	PLUGIN_BUILD_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(configure))
 
@@ -102,20 +102,20 @@ extern "C" {
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqconfig_configure, rsvp_rqconfig_configure_tag, type_active_client)
-//END rsvp_rqconfig_configure command===========================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(rqconfig_configure, rqconfig_configure_tag, type_active_client)
+//END rqconfig_configure command================================================
 
 
-//rsvp_rqconfig_deconfigure command=============================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_rqconfig_deconfigure) { }
+//rqconfig_deconfigure command==================================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rqconfig_deconfigure) { }
 
 
-	rsvp_rqconfig_deconfigure::rsvp_rqconfig_deconfigure(text_info tType) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_rqconfig_deconfigure_tag),
+	rqconfig_deconfigure::rqconfig_deconfigure(text_info tType) :
+	RSERVR_COMMAND_INIT_BASE(rqconfig_deconfigure_tag),
 	request_origin(get_client_name()), deconfigure_type(tType? tType : "") {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_rqconfig_deconfigure)
+	RSERVR_CLIENT_EVAL_HEAD(rqconfig_deconfigure)
 	{
 	PLUGIN_SENDER_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(deconfigure))
 
@@ -129,7 +129,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqconfig_configure, rsvp_rqconfig_configure_
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_rqconfig_deconfigure)
+	RSERVR_COMMAND_PARSE_HEAD(rqconfig_deconfigure)
 	{
 	PLUGIN_PARSE_CHECK(rqconfig, type_active_client, PLUGIN_COMMAND_REQUEST(deconfigure))
 
@@ -152,7 +152,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqconfig_configure, rsvp_rqconfig_configure_
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_rqconfig_deconfigure)
+	RSERVR_COMMAND_BUILD_HEAD(rqconfig_deconfigure)
 	{
 	PLUGIN_BUILD_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(deconfigure))
 
@@ -165,5 +165,5 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqconfig_configure, rsvp_rqconfig_configure_
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqconfig_deconfigure, rsvp_rqconfig_deconfigure_tag, type_active_client)
-//END rsvp_rqconfig_deconfigure command=========================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(rqconfig_deconfigure, rqconfig_deconfigure_tag, type_active_client)
+//END rqconfig_deconfigure command==============================================

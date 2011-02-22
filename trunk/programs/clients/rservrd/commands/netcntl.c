@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -74,22 +74,22 @@ NETCNTL_FULL_RESPONSE(name, command(copy_target, CURRENT_DATA))
 
 INTEGRATED_DEFINE(net_connection_list, "list network connections",
                                        "(@[client]...)")
-{ NETCNTL_SIMPLE_LIST(net_connection_list, netcntl_net_connection_list) }
+{ NETCNTL_SIMPLE_LIST(net_connection_list, rsvp_netcntl_net_connection_list) }
 
 
 INTEGRATED_DEFINE(local_connection_list, "list local connections",
                                          "(@[client]...)")
-{ NETCNTL_SIMPLE_LIST(local_connection_list, netcntl_local_connection_list) }
+{ NETCNTL_SIMPLE_LIST(local_connection_list, rsvp_netcntl_local_connection_list) }
 
 
 INTEGRATED_DEFINE(net_connect, "connect to a network address",
                                "@[client](@[address]:[port number]...)")
-{ NETCNTL_FULL_RESPONSE(net_connect, netcntl_net_connect_cut(copy_target, CURRENT_DATA, ":")) }
+{ NETCNTL_FULL_RESPONSE(net_connect, rsvp_netcntl_net_connect_cut(copy_target, CURRENT_DATA, ":")) }
 
 
 INTEGRATED_DEFINE(local_connect, "connect to a local socket",
                                  "@[client](@[socket name]...)")
-{ NETCNTL_SIMPLE_RESPONSE(local_connect, netcntl_local_connect) }
+{ NETCNTL_SIMPLE_RESPONSE(local_connect, rsvp_netcntl_local_connect) }
 
 
 INTEGRATED_DEFINE(net_filtered_connect, "connect to a network address (filtered)",
@@ -103,7 +103,7 @@ INTEGRATED_DEFINE(net_filtered_connect, "connect to a network address (filtered)
 	if (!NEXT_INPUT) ABORT_MISSING(net_filtered_connect, "filter")
 	char *copy_filter = CURRENT_DATA;
 
-	RESPONSE_SEND_LOOP(net_filtered_connect, netcntl_net_filtered_connect_cut(copy_target, \
+	RESPONSE_SEND_LOOP(net_filtered_connect, rsvp_netcntl_net_filtered_connect_cut(copy_target, \
 	    CURRENT_DATA, ":", copy_filter))
 
 	PROCESS_COMPLETE(net_filtered_connect)
@@ -121,7 +121,7 @@ INTEGRATED_DEFINE(local_filtered_connect, "connect to a local socket (filtered)"
 	if (!NEXT_INPUT) ABORT_MISSING(local_filtered_connect, "filter")
 	char *copy_filter = CURRENT_DATA;
 
-	RESPONSE_SEND_LOOP(local_filtered_connect, netcntl_local_filtered_connect(copy_target, \
+	RESPONSE_SEND_LOOP(local_filtered_connect, rsvp_netcntl_local_filtered_connect(copy_target, \
 	    CURRENT_DATA, copy_filter))
 
 	PROCESS_COMPLETE(local_filtered_connect)
@@ -130,39 +130,39 @@ INTEGRATED_DEFINE(local_filtered_connect, "connect to a local socket (filtered)"
 
 INTEGRATED_DEFINE(net_disconnect, "disconnect from a network address",
                                   "@[client](@[address]...)")
-{ NETCNTL_SIMPLE_TARGET(net_disconnect, netcntl_net_disconnect) }
+{ NETCNTL_SIMPLE_TARGET(net_disconnect, rsvp_netcntl_net_disconnect) }
 
 
 INTEGRATED_DEFINE(local_disconnect, "disconnect from a local socket",
                                     "@[client](@[socket name]...)")
-{ NETCNTL_SIMPLE_TARGET(local_disconnect, netcntl_local_disconnect) }
+{ NETCNTL_SIMPLE_TARGET(local_disconnect, rsvp_netcntl_local_disconnect) }
 
 
 INTEGRATED_DEFINE(net_listen_list, "list listening network ports",
                                    "(@[client]...)")
-{ NETCNTL_SIMPLE_LIST(net_listen_list, netcntl_net_listen_list) }
+{ NETCNTL_SIMPLE_LIST(net_listen_list, rsvp_netcntl_net_listen_list) }
 
 
 INTEGRATED_DEFINE(local_listen_list, "list listening local sockets",
                                      "(@[client]...)")
-{ NETCNTL_SIMPLE_LIST(local_listen_list, netcntl_local_listen_list) }
+{ NETCNTL_SIMPLE_LIST(local_listen_list, rsvp_netcntl_local_listen_list) }
 
 
 INTEGRATED_DEFINE(net_listen, "listen to network port",
                                "@[client](@[port number]...)")
-{ NETCNTL_SIMPLE_TARGET(net_listen, netcntl_net_listen) }
+{ NETCNTL_SIMPLE_TARGET(net_listen, rsvp_netcntl_net_listen) }
 
 
 INTEGRATED_DEFINE(local_listen, "listen to local socket",
                                 "@[client](@[socket name]...)")
-{ NETCNTL_SIMPLE_TARGET(local_listen, netcntl_local_listen) }
+{ NETCNTL_SIMPLE_TARGET(local_listen, rsvp_netcntl_local_listen) }
 
 
 INTEGRATED_DEFINE(net_unlisten, "stop listening to network port",
                                 "@[client](@[port number]...)")
-{ NETCNTL_SIMPLE_TARGET(net_unlisten, netcntl_net_unlisten) }
+{ NETCNTL_SIMPLE_TARGET(net_unlisten, rsvp_netcntl_net_unlisten) }
 
 
 INTEGRATED_DEFINE(local_unlisten, "stop listening to local socket",
                                   "@[client](@[socket name]...)")
-{ NETCNTL_SIMPLE_TARGET(local_unlisten, netcntl_local_unlisten) }
+{ NETCNTL_SIMPLE_TARGET(local_unlisten, rsvp_netcntl_local_unlisten) }

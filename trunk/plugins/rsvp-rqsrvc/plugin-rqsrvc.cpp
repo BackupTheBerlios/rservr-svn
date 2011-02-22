@@ -43,16 +43,16 @@ extern "C" {
 }
 
 
-//rsvp_rqsrvc_register_services command=========================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_rqsrvc_register_services) { }
+//rqsrvc_register_services command==============================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rqsrvc_register_services) { }
 
 
-	rsvp_rqsrvc_register_services::rsvp_rqsrvc_register_services(text_info aAddress) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_rqsrvc_register_services_tag),
+	rqsrvc_register_services::rqsrvc_register_services(text_info aAddress) :
+	RSERVR_COMMAND_INIT_BASE(rqsrvc_register_services_tag),
 	request_origin(get_client_name()), register_type(aAddress? aAddress : "") {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_rqsrvc_register_services)
+	RSERVR_CLIENT_EVAL_HEAD(rqsrvc_register_services)
 	{
 	PLUGIN_SENDER_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(register_services))
 
@@ -66,7 +66,7 @@ extern "C" {
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_rqsrvc_register_services)
+	RSERVR_COMMAND_PARSE_HEAD(rqsrvc_register_services)
 	{
 	PLUGIN_PARSE_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(register_services))
 
@@ -89,7 +89,7 @@ extern "C" {
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_rqsrvc_register_services)
+	RSERVR_COMMAND_BUILD_HEAD(rqsrvc_register_services)
 	{
 	PLUGIN_BUILD_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(register_services))
 
@@ -102,20 +102,20 @@ extern "C" {
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqsrvc_register_services, rsvp_rqsrvc_register_services_tag, type_resource_client)
-//END rsvp_rqsrvc_register_services command=====================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(rqsrvc_register_services, rqsrvc_register_services_tag, type_resource_client)
+//END rqsrvc_register_services command==========================================
 
 
-//rsvp_rqsrvc_deregister_services command=======================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_rqsrvc_deregister_services) { }
+//rqsrvc_deregister_services command============================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rqsrvc_deregister_services) { }
 
 
-	rsvp_rqsrvc_deregister_services::rsvp_rqsrvc_deregister_services(text_info aAddress) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_rqsrvc_deregister_services_tag),
+	rqsrvc_deregister_services::rqsrvc_deregister_services(text_info aAddress) :
+	RSERVR_COMMAND_INIT_BASE(rqsrvc_deregister_services_tag),
 	request_origin(get_client_name()), deregister_type(aAddress? aAddress : "") {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_rqsrvc_deregister_services)
+	RSERVR_CLIENT_EVAL_HEAD(rqsrvc_deregister_services)
 	{
 	PLUGIN_SENDER_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(deregister_services))
 
@@ -129,7 +129,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqsrvc_register_services, rsvp_rqsrvc_regist
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_rqsrvc_deregister_services)
+	RSERVR_COMMAND_PARSE_HEAD(rqsrvc_deregister_services)
 	{
 	PLUGIN_PARSE_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(deregister_services))
 
@@ -152,7 +152,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqsrvc_register_services, rsvp_rqsrvc_regist
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_rqsrvc_deregister_services)
+	RSERVR_COMMAND_BUILD_HEAD(rqsrvc_deregister_services)
 	{
 	PLUGIN_BUILD_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(deregister_services))
 
@@ -165,5 +165,5 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqsrvc_register_services, rsvp_rqsrvc_regist
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_rqsrvc_deregister_services, rsvp_rqsrvc_deregister_services_tag, type_resource_client)
-//END rsvp_rqsrvc_deregister_services command===================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(rqsrvc_deregister_services, rqsrvc_deregister_services_tag, type_resource_client)
+//END rqsrvc_deregister_services command========================================

@@ -73,14 +73,14 @@ extern int rsvp_passthru_load(struct local_commands *Loader);
  *  \param Channel name of channel to reserve
  *  \return queued command or error (NULL)
  */
-extern command_handle passthru_reserve_channel(text_info Target,
+extern command_handle rsvp_passthru_reserve_channel(text_info Target,
   text_info Channel);
 
 /*! \param Target
  *  \param Channel name of channel to un-reserve
  *  \return queued command or error (NULL)
  */
-extern command_handle passthru_unreserve_channel(text_info Target,
+extern command_handle rsvp_passthru_unreserve_channel(text_info Target,
   text_info Channel);
 
 /*! \param Target
@@ -88,7 +88,7 @@ extern command_handle passthru_unreserve_channel(text_info Target,
  *  \param Socket name of a local socket being listened to
  *  \return queued command or error (NULL)
  */
-extern command_handle passthru_steal_channel(text_info Target,
+extern command_handle rsvp_passthru_steal_channel(text_info Target,
   text_info Channel, text_info Socket);
 
 #ifdef __cplusplus

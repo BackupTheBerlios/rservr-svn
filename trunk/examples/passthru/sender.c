@@ -56,14 +56,14 @@ int main(int argc, char *argv[])
 	if (!register_control_client(argv[1])) return 1;
 
 
-	command_handle new_connect = netcntl_local_connect(argv[2], argv[3]);
+	command_handle new_connect = rsvp_netcntl_local_connect(argv[2], argv[3]);
 	if (!new_connect) return 1;
 
 	allow_responses();
 	command_reference connection1_status = send_command(new_connect);
 
 //TEMP
-command_handle new_connect1 = netcntl_local_filtered_connect(argv[2], argv[3], "@rsvf-log@~intercept.log");
+command_handle new_connect1 = rsvp_netcntl_local_filtered_connect(argv[2], argv[3], "@rsvf-log@~intercept.log");
 command_reference connection2_status = send_command(new_connect1);
 // 	command_reference connection2_status = send_command(new_connect);
 	destroy_command(new_connect);
@@ -105,7 +105,7 @@ command_reference connection2_status = send_command(new_connect1);
 	block_messages();
 
 
-	command_handle new_reserve = passthru_reserve_channel(argv[2], connection2_name);
+	command_handle new_reserve = rsvp_passthru_reserve_channel(argv[2], connection2_name);
 	if (!new_reserve)
 	{
 	free((void*) connection1_name);
@@ -129,15 +129,15 @@ command_reference connection2_status = send_command(new_connect1);
 	}
 
 
-	command_handle request_exit = trigger_system_trigger(argv[4], RSVP_TRIGGER_ACTION_START, "exit");
+	command_handle request_exit = rsvp_trigger_system_trigger(argv[4], RSVP_TRIGGER_ACTION_START, "exit");
 	insert_remote_target(request_exit, argv[2], connection1_name);
 
 
 	//TODO: use 'location' for something here? (3rd argument)
-	command_handle new_request = dataref_open_reference(argv[4], NULL, 1, RSVP_DATAREF_MODE_NONE, RSVP_DATAREF_TYPE_OTHER);
+	command_handle new_request = rsvp_dataref_open_reference(argv[4], NULL, 1, RSVP_DATAREF_MODE_NONE, RSVP_DATAREF_TYPE_OTHER);
 	if (!new_request)
 	{
-	command_handle new_unreserve = passthru_unreserve_channel(argv[2], connection2_name);
+	command_handle new_unreserve = rsvp_passthru_unreserve_channel(argv[2], connection2_name);
 	if (new_unreserve) send_command_no_status(new_unreserve);
 	destroy_command(new_unreserve);
 
@@ -159,7 +159,7 @@ command_reference connection2_status = send_command(new_connect1);
 	fprintf(stderr, "%s: couldn't send message to '%s' (%x)\n", argv[0], argv[4], request_outcome);
 	clear_command_status(request_status);
 
-	command_handle new_unreserve = passthru_unreserve_channel(argv[2], connection2_name);
+	command_handle new_unreserve = rsvp_passthru_unreserve_channel(argv[2], connection2_name);
 	if (new_unreserve) send_command_no_status(new_unreserve);
 	destroy_command(new_unreserve);
 
@@ -186,7 +186,7 @@ command_reference connection2_status = send_command(new_connect1);
 	{
 	fprintf(stderr, "%s: couldn't steal connection '%s' via '%s'\n", argv[0], connection2_name, argv[2]);
 
-	command_handle new_unreserve = passthru_unreserve_channel(argv[2], connection2_name);
+	command_handle new_unreserve = rsvp_passthru_unreserve_channel(argv[2], connection2_name);
 	if (new_unreserve) send_command_no_status(new_unreserve);
 	destroy_command(new_unreserve);
 
@@ -202,7 +202,7 @@ command_reference connection2_status = send_command(new_connect1);
 
 	if (write(dataref_file, message1, sizeof message1) == sizeof message1)
 	{
-	command_handle message1_read = dataref_transfer_data(argv[4], 1, RSVP_DATAREF_MODE_READ, 0, sizeof message1);
+	command_handle message1_read = rsvp_dataref_transfer_data(argv[4], 1, RSVP_DATAREF_MODE_READ, 0, sizeof message1);
 	insert_remote_target(message1_read, argv[2], connection1_name);
 	command_reference message1_status = send_command(message1_read);
 	destroy_command(message1_read);
@@ -223,7 +223,7 @@ command_reference connection2_status = send_command(new_connect1);
 
 	if (write(dataref_file, message2, sizeof message2) == sizeof message2)
 	{
-	command_handle message2_read = dataref_transfer_data(argv[4], 1, RSVP_DATAREF_MODE_READ, 0, sizeof message2);
+	command_handle message2_read = rsvp_dataref_transfer_data(argv[4], 1, RSVP_DATAREF_MODE_READ, 0, sizeof message2);
 	insert_remote_target(message2_read, argv[2], connection1_name);
 	command_reference message2_status = send_command(message2_read);
 	destroy_command(message2_read);

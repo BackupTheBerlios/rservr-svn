@@ -90,7 +90,7 @@ extern int rsvp_dataref_load(struct local_commands *Loader);
  *  \param Mode Open mode flags.
  *  \return queued command or error (NULL)
  */
-extern command_handle dataref_open_reference(text_info Target,
+extern command_handle rsvp_dataref_open_reference(text_info Target,
   text_info Location, int Reference, uint8_t Type, uint8_t Mode);
 
 /*! \param Target
@@ -100,14 +100,14 @@ extern command_handle dataref_open_reference(text_info Target,
  *  \param Mode Open mode flags.
  *  \return queued command or error (NULL)
  */
-extern command_handle dataref_change_reference(text_info Target,
+extern command_handle rsvp_dataref_change_reference(text_info Target,
   text_info Location, int Reference, uint8_t Type, uint8_t Mode);
 
 /*! \param Target
  *  \param Reference Initiator-provided reference value.
  *  \return queued command or error (NULL)
  */
-extern command_handle dataref_close_reference(text_info Target, int Reference);
+extern command_handle rsvp_dataref_close_reference(text_info Target, int Reference);
 
 /*! \param Target
  *  \param Reference Initiator-provided reference value.
@@ -116,7 +116,7 @@ extern command_handle dataref_close_reference(text_info Target, int Reference);
  *  \param Size
  *  \return queued command or error (NULL)
  */
-extern command_handle dataref_transfer_data(text_info Target, int Reference,
+extern command_handle rsvp_dataref_transfer_data(text_info Target, int Reference,
   uint8_t Mode, ssize_t Offset, ssize_t Size);
 
 /*! \param Message
@@ -125,7 +125,7 @@ extern command_handle dataref_transfer_data(text_info Target, int Reference,
  *  \param Size
  *  \return queued command or error (NULL)
  */
-extern command_handle dataref_alteration_response(message_handle Message,
+extern command_handle rsvp_dataref_alteration_response(message_handle Message,
   int Reference, ssize_t Offset, ssize_t Size);
 
 #ifdef __cplusplus

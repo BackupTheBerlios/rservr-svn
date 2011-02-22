@@ -43,20 +43,20 @@ extern "C" {
 }
 
 
-//rsvp_dataref_open_reference command===========================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_open_reference),
+//dataref_open_reference command================================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(dataref_open_reference),
 	location_reference(0), location_type(RSVP_DATAREF_TYPE_NONE),
 	open_mode(RSVP_DATAREF_MODE_NONE) {}
 
 
-	rsvp_dataref_open_reference::rsvp_dataref_open_reference(text_info lLocation,
+	dataref_open_reference::dataref_open_reference(text_info lLocation,
 	int rReference, uint8_t tType, uint8_t mMode) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_open_reference_tag),
+	RSERVR_COMMAND_INIT_BASE(dataref_open_reference_tag),
 	request_origin(get_client_name()), data_location(lLocation? lLocation : ""),
 	location_reference(rReference), location_type(tType), open_mode(mMode) {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_open_reference)
+	RSERVR_CLIENT_EVAL_HEAD(dataref_open_reference)
 	{
 	PLUGIN_SENDER_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(open_reference))
 
@@ -71,7 +71,7 @@ extern "C" {
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_open_reference)
+	RSERVR_COMMAND_PARSE_HEAD(dataref_open_reference)
 	{
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(open_reference))
 
@@ -106,7 +106,7 @@ extern "C" {
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_open_reference)
+	RSERVR_COMMAND_BUILD_HEAD(dataref_open_reference)
 	{
 	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(open_reference))
 
@@ -122,24 +122,24 @@ extern "C" {
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_open_reference, rsvp_dataref_open_reference_tag, type_service_client)
-//END rsvp_dataref_open_reference command=======================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(dataref_open_reference, dataref_open_reference_tag, type_service_client)
+//END dataref_open_reference command============================================
 
 
-//rsvp_dataref_change_reference command=========================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_change_reference),
+//dataref_change_reference command==============================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(dataref_change_reference),
 	location_reference(0), location_type(RSVP_DATAREF_TYPE_NONE),
 	change_mode(RSVP_DATAREF_MODE_NONE) {}
 
 
-	rsvp_dataref_change_reference::rsvp_dataref_change_reference(text_info lLocation,
+	dataref_change_reference::dataref_change_reference(text_info lLocation,
 	int rReference, uint8_t tType, uint8_t mMode) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_change_reference_tag),
+	RSERVR_COMMAND_INIT_BASE(dataref_change_reference_tag),
 	request_origin(get_client_name()), data_location(lLocation? lLocation : ""),
 	location_reference(rReference), location_type(tType), change_mode(mMode) {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_change_reference)
+	RSERVR_CLIENT_EVAL_HEAD(dataref_change_reference)
 	{
 	PLUGIN_SENDER_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(change_reference))
 
@@ -154,7 +154,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_open_reference, rsvp_dataref_open_re
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_change_reference)
+	RSERVR_COMMAND_PARSE_HEAD(dataref_change_reference)
 	{
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(change_reference))
 
@@ -189,7 +189,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_open_reference, rsvp_dataref_open_re
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_change_reference)
+	RSERVR_COMMAND_BUILD_HEAD(dataref_change_reference)
 	{
 	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(change_reference))
 
@@ -205,21 +205,21 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_open_reference, rsvp_dataref_open_re
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_change_reference, rsvp_dataref_change_reference_tag, type_service_client)
-//END rsvp_dataref_change_reference command=====================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(dataref_change_reference, dataref_change_reference_tag, type_service_client)
+//END dataref_change_reference command==========================================
 
 
-//rsvp_dataref_close_reference command==========================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_close_reference),
+//dataref_close_reference command===============================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(dataref_close_reference),
 	location_reference(0) {}
 
 
-	rsvp_dataref_close_reference::rsvp_dataref_close_reference(int rReference) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_close_reference_tag),
+	dataref_close_reference::dataref_close_reference(int rReference) :
+	RSERVR_COMMAND_INIT_BASE(dataref_close_reference_tag),
 	request_origin(get_client_name()), location_reference(rReference) {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_close_reference)
+	RSERVR_CLIENT_EVAL_HEAD(dataref_close_reference)
 	{
 	PLUGIN_SENDER_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(close_reference))
 
@@ -233,7 +233,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_change_reference, rsvp_dataref_chang
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_close_reference)
+	RSERVR_COMMAND_PARSE_HEAD(dataref_close_reference)
 	{
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(close_reference))
 
@@ -256,7 +256,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_change_reference, rsvp_dataref_chang
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_close_reference)
+	RSERVR_COMMAND_BUILD_HEAD(dataref_close_reference)
 	{
 	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(close_reference))
 
@@ -269,24 +269,24 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_change_reference, rsvp_dataref_chang
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_close_reference, rsvp_dataref_close_reference_tag, type_service_client)
-//END rsvp_dataref_close_reference command======================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(dataref_close_reference, dataref_close_reference_tag, type_service_client)
+//END dataref_close_reference command===========================================
 
 
-//rsvp_dataref_transfer_data command============================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_transfer_data),
+//dataref_transfer_data command=================================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(dataref_transfer_data),
 	location_reference(0), transfer_mode(RSVP_DATAREF_MODE_NONE), data_offset(0),
 	data_size(0) {}
 
 
-	rsvp_dataref_transfer_data::rsvp_dataref_transfer_data(int rReference, uint8_t mMode,
+	dataref_transfer_data::dataref_transfer_data(int rReference, uint8_t mMode,
 	ssize_t oOffset, ssize_t sSize) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_transfer_data_tag),
+	RSERVR_COMMAND_INIT_BASE(dataref_transfer_data_tag),
 	request_origin(get_client_name()), location_reference(rReference), transfer_mode(mMode),
 	data_offset(oOffset), data_size(sSize) {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_transfer_data)
+	RSERVR_CLIENT_EVAL_HEAD(dataref_transfer_data)
 	{
 	PLUGIN_SENDER_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(transfer_data))
 
@@ -301,7 +301,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_close_reference, rsvp_dataref_close_
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_transfer_data)
+	RSERVR_COMMAND_PARSE_HEAD(dataref_transfer_data)
 	{
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(transfer_data))
 
@@ -336,7 +336,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_close_reference, rsvp_dataref_close_
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_transfer_data)
+	RSERVR_COMMAND_BUILD_HEAD(dataref_transfer_data)
 	{
 	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(transfer_data))
 
@@ -352,23 +352,23 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_close_reference, rsvp_dataref_close_
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_transfer_data, rsvp_dataref_transfer_data_tag, type_service_client)
-//END rsvp_dataref_transfer_data command========================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(dataref_transfer_data, dataref_transfer_data_tag, type_service_client)
+//END dataref_transfer_data command=============================================
 
 
-//rsvp_dataref_alteration_response command======================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_dataref_alteration_response),
+//dataref_alteration_response command===========================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(dataref_alteration_response),
 	location_reference(0), data_offset(0), data_size(0) {}
 
 
-	rsvp_dataref_alteration_response::rsvp_dataref_alteration_response(int rReference, ssize_t oOffset,
+	dataref_alteration_response::dataref_alteration_response(int rReference, ssize_t oOffset,
 	ssize_t sSize) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_dataref_alteration_response_tag),
+	RSERVR_COMMAND_INIT_BASE(dataref_alteration_response_tag),
 	request_origin(get_client_name()), location_reference(rReference), data_offset(oOffset),
 	data_size(sSize) {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_dataref_alteration_response)
+	RSERVR_CLIENT_EVAL_HEAD(dataref_alteration_response)
 	{
 	PLUGIN_SENDER_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(alteration_response))
 
@@ -383,7 +383,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_transfer_data, rsvp_dataref_transfer
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_dataref_alteration_response)
+	RSERVR_COMMAND_PARSE_HEAD(dataref_alteration_response)
 	{
 	PLUGIN_PARSE_CHECK(dataref, type_active_client, PLUGIN_COMMAND_REQUEST(alteration_response))
 
@@ -414,7 +414,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_transfer_data, rsvp_dataref_transfer
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_dataref_alteration_response)
+	RSERVR_COMMAND_BUILD_HEAD(dataref_alteration_response)
 	{
 	PLUGIN_BUILD_CHECK(dataref, type_service_client, PLUGIN_COMMAND_REQUEST(alteration_response))
 
@@ -429,5 +429,5 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_transfer_data, rsvp_dataref_transfer
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_dataref_alteration_response, rsvp_dataref_alteration_response_tag, type_service_client)
-//END rsvp_dataref_alteration_response command==================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(dataref_alteration_response, dataref_alteration_response_tag, type_service_client)
+//END dataref_alteration_response command=======================================

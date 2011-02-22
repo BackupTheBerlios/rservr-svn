@@ -62,23 +62,23 @@ extern int rsvp_dataref_load(struct local_commands *lLoader)
 
 	PLUGIN_LOAD_SINGLE(dataref, open_reference, lLoader,
 	  type_service_client, type_service_client,
-	  command_null, &rsvp_dataref_open_reference::generate)
+	  command_null, &dataref_open_reference::generate)
 
 	PLUGIN_LOAD_SINGLE(dataref, change_reference, lLoader,
 	  type_service_client, type_service_client,
-	  command_null, &rsvp_dataref_change_reference::generate)
+	  command_null, &dataref_change_reference::generate)
 
 	PLUGIN_LOAD_SINGLE(dataref, close_reference, lLoader,
 	  type_service_client, type_service_client,
-	  command_null, &rsvp_dataref_close_reference::generate)
+	  command_null, &dataref_close_reference::generate)
 
 	PLUGIN_LOAD_SINGLE(dataref, transfer_data, lLoader,
 	  type_service_client, type_service_client,
-	  command_null, &rsvp_dataref_transfer_data::generate)
+	  command_null, &dataref_transfer_data::generate)
 
 	PLUGIN_LOAD_SINGLE(dataref, alteration_response, lLoader,
 	  type_service_client, type_service_client,
-	  command_response, &rsvp_dataref_alteration_response::generate)
+	  command_response, &dataref_alteration_response::generate)
 
 	  PLUGIN_LOAD_END(dataref)
 }
@@ -102,21 +102,21 @@ command_event __rsvp_dataref_hook_alteration(const struct dataref_source_info *s
 { return default_response(sSource, request_alteration_response); }
 
 
-command_handle dataref_open_reference(text_info tTarget, text_info lLocation, int rReference, uint8_t tType, uint8_t mMode)
-{ return manual_command(tTarget, new rsvp_dataref_open_reference(lLocation, rReference, tType, mMode)); }
+command_handle rsvp_dataref_open_reference(text_info tTarget, text_info lLocation, int rReference, uint8_t tType, uint8_t mMode)
+{ return manual_command(tTarget, new dataref_open_reference(lLocation, rReference, tType, mMode)); }
 
-command_handle dataref_change_reference(text_info tTarget, text_info lLocation, int rReference, uint8_t tType, uint8_t mMode)
-{ return manual_command(tTarget, new rsvp_dataref_change_reference(lLocation, rReference, tType, mMode)); }
+command_handle rsvp_dataref_change_reference(text_info tTarget, text_info lLocation, int rReference, uint8_t tType, uint8_t mMode)
+{ return manual_command(tTarget, new dataref_change_reference(lLocation, rReference, tType, mMode)); }
 
-command_handle dataref_close_reference(text_info tTarget, int rReference)
-{ return manual_command(tTarget, new rsvp_dataref_close_reference(rReference)); }
+command_handle rsvp_dataref_close_reference(text_info tTarget, int rReference)
+{ return manual_command(tTarget, new dataref_close_reference(rReference)); }
 
-command_handle dataref_transfer_data(text_info tTarget, int rReference, uint8_t mMode, ssize_t oOffset, ssize_t sSize)
-{ return manual_command(tTarget, new rsvp_dataref_transfer_data(rReference, mMode, oOffset, sSize)); }
+command_handle rsvp_dataref_transfer_data(text_info tTarget, int rReference, uint8_t mMode, ssize_t oOffset, ssize_t sSize)
+{ return manual_command(tTarget, new dataref_transfer_data(rReference, mMode, oOffset, sSize)); }
 
 
-command_handle dataref_alteration_response(message_handle mMessage, int rReference, ssize_t oOffset, ssize_t sSize)
-{ return manual_response(mMessage, new rsvp_dataref_alteration_response(rReference, oOffset, sSize)); }
+command_handle rsvp_dataref_alteration_response(message_handle mMessage, int rReference, ssize_t oOffset, ssize_t sSize)
+{ return manual_response(mMessage, new dataref_alteration_response(rReference, oOffset, sSize)); }
 
 
 text_info PLUGIN_COMMAND_REQUEST(open_reference)      = "open reference";

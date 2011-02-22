@@ -36,49 +36,49 @@
 #include "plugin-dev/header-macro.hpp"
 
 
-RSERVR_COMMAND_CLASS( rsvp_ready_system_ready, \
+RSERVR_COMMAND_CLASS( ready_system_ready, \
 	/*constructors*/ \
-	rsvp_ready_system_ready(text_info);, \
+	ready_system_ready(text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data ready_type; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_ready_system_not_ready, \
+RSERVR_COMMAND_CLASS( ready_system_not_ready, \
 	/*constructors*/ \
-	rsvp_ready_system_not_ready(text_info);, \
+	ready_system_not_ready(text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data not_ready_type; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_ready_system_never_ready, \
+RSERVR_COMMAND_CLASS( ready_system_never_ready, \
 	/*constructors*/ \
-	rsvp_ready_system_never_ready(text_info);, \
+	ready_system_never_ready(text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data never_ready_type; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_ready_system_ready_response, \
+RSERVR_COMMAND_CLASS( ready_system_ready_response, \
 	/*constructors*/ \
-	rsvp_ready_system_ready_response(text_info);, \
+	ready_system_ready_response(text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data ready_type; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_ready_system_not_ready_response, \
+RSERVR_COMMAND_CLASS( ready_system_not_ready_response, \
 	/*constructors*/ \
-	rsvp_ready_system_not_ready_response(text_info);, \
+	ready_system_not_ready_response(text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data not_ready_type; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_ready_system_never_ready_response, \
+RSERVR_COMMAND_CLASS( ready_system_never_ready_response, \
 	/*constructors*/ \
-	rsvp_ready_system_never_ready_response(text_info);, \
+	ready_system_never_ready_response(text_info);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data never_ready_type; )

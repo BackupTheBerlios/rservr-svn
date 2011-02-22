@@ -11,7 +11,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2010, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -81,7 +81,7 @@ extern int rsvp_trigger_load(struct local_commands *Loader);
  *  \param System system to be triggered
  *  \return queued command or error (NULL)
  */
-extern command_handle trigger_system_trigger(text_info Target, uint8_t Action,
+extern command_handle rsvp_trigger_system_trigger(text_info Target, uint8_t Action,
   text_info System);
 
 #ifdef __cplusplus

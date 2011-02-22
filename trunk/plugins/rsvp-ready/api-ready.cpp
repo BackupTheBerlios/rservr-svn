@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -62,27 +62,27 @@ extern int rsvp_ready_load(struct local_commands *lLoader)
 
 	PLUGIN_LOAD_SINGLE(ready, system_ready, lLoader,
 	  type_active_client, type_active_client,
-	  command_null, &rsvp_ready_system_ready::generate)
+	  command_null, &ready_system_ready::generate)
 
 	PLUGIN_LOAD_SINGLE(ready, system_not_ready, lLoader,
 	  type_active_client, type_active_client,
-	  command_null, &rsvp_ready_system_not_ready::generate)
+	  command_null, &ready_system_not_ready::generate)
 
 	PLUGIN_LOAD_SINGLE(ready, system_never_ready, lLoader,
 	  type_active_client, type_active_client,
-	  command_null, &rsvp_ready_system_never_ready::generate)
+	  command_null, &ready_system_never_ready::generate)
 
 	PLUGIN_LOAD_SINGLE(ready, system_ready_response, lLoader,
 	  type_active_client, type_active_client,
-	  command_response, &rsvp_ready_system_ready_response::generate)
+	  command_response, &ready_system_ready_response::generate)
 
 	PLUGIN_LOAD_SINGLE(ready, system_not_ready_response, lLoader,
 	  type_active_client, type_active_client,
-	  command_response, &rsvp_ready_system_not_ready_response::generate)
+	  command_response, &ready_system_not_ready_response::generate)
 
 	PLUGIN_LOAD_SINGLE(ready, system_never_ready_response, lLoader,
 	  type_active_client, type_active_client,
-	  command_response, &rsvp_ready_system_never_ready_response::generate)
+	  command_response, &ready_system_never_ready_response::generate)
 
 	  PLUGIN_LOAD_END(ready)
 }
@@ -100,24 +100,24 @@ command_event __rsvp_ready_hook_system_never_ready(const struct ready_source_inf
 { return default_response(sSource, request_system_never_ready); }
 
 
-command_handle ready_system_ready(text_info tTarget, text_info tType)
-{ return manual_command(tTarget, new rsvp_ready_system_ready(tType)); }
+command_handle rsvp_ready_system_ready(text_info tTarget, text_info tType)
+{ return manual_command(tTarget, new ready_system_ready(tType)); }
 
-command_handle ready_system_not_ready(text_info tTarget, text_info tType)
-{ return manual_command(tTarget, new rsvp_ready_system_not_ready(tType)); }
+command_handle rsvp_ready_system_not_ready(text_info tTarget, text_info tType)
+{ return manual_command(tTarget, new ready_system_not_ready(tType)); }
 
-command_handle ready_system_never_ready(text_info tTarget, text_info tType)
-{ return manual_command(tTarget, new rsvp_ready_system_never_ready(tType)); }
+command_handle rsvp_ready_system_never_ready(text_info tTarget, text_info tType)
+{ return manual_command(tTarget, new ready_system_never_ready(tType)); }
 
 
-command_handle ready_system_ready_response(message_handle mMessage, text_info tType)
-{ return manual_response(mMessage, new rsvp_ready_system_ready_response(tType)); }
+command_handle rsvp_ready_system_ready_response(message_handle mMessage, text_info tType)
+{ return manual_response(mMessage, new ready_system_ready_response(tType)); }
 
-command_handle ready_system_not_ready_response(message_handle mMessage, text_info tType)
-{ return manual_response(mMessage, new rsvp_ready_system_not_ready_response(tType)); }
+command_handle rsvp_ready_system_not_ready_response(message_handle mMessage, text_info tType)
+{ return manual_response(mMessage, new ready_system_not_ready_response(tType)); }
 
-command_handle ready_system_never_ready_response(message_handle mMessage, text_info tType)
-{ return manual_response(mMessage, new rsvp_ready_system_never_ready_response(tType)); }
+command_handle rsvp_ready_system_never_ready_response(message_handle mMessage, text_info tType)
+{ return manual_response(mMessage, new ready_system_never_ready_response(tType)); }
 
 
 text_info PLUGIN_COMMAND_REQUEST(system_ready)       = "system ready";

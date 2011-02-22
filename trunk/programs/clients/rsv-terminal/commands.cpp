@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -287,8 +287,8 @@ static int list_connections_common(FILE *fFile, bool lLocal)
 
 	command_handle new_command = NULL;
 
-	if (lLocal) new_command = netcntl_local_connection_list(name_full.c_str());
-	else        new_command = netcntl_net_connection_list(name_full.c_str());
+	if (lLocal) new_command = rsvp_netcntl_local_connection_list(name_full.c_str());
+	else        new_command = rsvp_netcntl_net_connection_list(name_full.c_str());
 	if (!new_command) return -1;
 	if (address.size() && !insert_remote_address(new_command, address.c_str())) return -1;
 
@@ -388,7 +388,7 @@ static int request_service_func(FILE *fFile, text_info cCommand)
 	if (next_argument(&next_element) >= 0) return -1;
 
 
-	command_handle new_command = rqsrvc_register_services(name_full.c_str(), type_full.c_str());
+	command_handle new_command = rsvp_rqsrvc_register_services(name_full.c_str(), type_full.c_str());
 	if (!new_command) return -1;
 	if (!insert_remote_address(new_command, address.c_str())) return -1;
 

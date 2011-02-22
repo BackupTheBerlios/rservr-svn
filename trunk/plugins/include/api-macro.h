@@ -91,7 +91,7 @@ void name##_log_execute_rejected(text_info rRequest, entity_type tType) \
   name##_log(message_string); }
 
 #define PLUGIN_COMMAND_REQUEST(label)    request_##label
-#define PLUGIN_COMMAND_TAG(name, label)  rsvp_##name##_##label##_tag
-#define PLUGIN_COMMAND_INFO(name, label) rsvp_##name##_##label##_info
+#define PLUGIN_COMMAND_TAG(name, label)  name##_##label##_tag
+#define PLUGIN_COMMAND_INFO(name, label) name##_##label##_info
 
 #endif /*api_macro_h*/

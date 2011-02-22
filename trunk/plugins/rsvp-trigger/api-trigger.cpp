@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2010, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -62,7 +62,7 @@ extern int rsvp_trigger_load(struct local_commands *lLoader)
 
 	PLUGIN_LOAD_SINGLE(trigger, system_trigger, lLoader,
 	  type_active_client, type_active_client,
-	  command_null, &rsvp_trigger_system_trigger::generate)
+	  command_null, &trigger_system_trigger::generate)
 
 	  PLUGIN_LOAD_END(trigger)
 }
@@ -74,8 +74,8 @@ command_event __rsvp_trigger_hook_system_trigger(const struct trigger_source_inf
 { return default_response(sSource, request_system_trigger); }
 
 
-command_handle trigger_system_trigger(text_info tTarget, uint8_t aAction, text_info tType)
-{ return manual_command(tTarget, new rsvp_trigger_system_trigger(aAction, tType)); }
+command_handle rsvp_trigger_system_trigger(text_info tTarget, uint8_t aAction, text_info tType)
+{ return manual_command(tTarget, new trigger_system_trigger(aAction, tType)); }
 
 
 text_info PLUGIN_COMMAND_REQUEST(system_trigger) = "system trigger";

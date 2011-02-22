@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -232,7 +232,7 @@ INTEGRATED_DEFINE(configure, "request client configure system(s)", \
 	if (!NEXT_INPUT) ABORT_MISSING(configure, "target")
 	char *copy_target = CURRENT_DATA;
 
-	SEND_LOOP(configure, rqconfig_request_configure(copy_target, CURRENT_DATA))
+	SEND_LOOP(configure, rsvp_rqconfig_request_configure(copy_target, CURRENT_DATA))
 
 	PROCESS_COMPLETE(configure)
 }
@@ -246,7 +246,7 @@ INTEGRATED_DEFINE(deconfigure, "request client deconfigure system(s)", \
 	if (!NEXT_INPUT) ABORT_MISSING(deconfigure, "target")
 	char *copy_target = CURRENT_DATA;
 
-	SEND_LOOP(deconfigure, rqconfig_request_deconfigure(copy_target, CURRENT_DATA))
+	SEND_LOOP(deconfigure, rsvp_rqconfig_request_deconfigure(copy_target, CURRENT_DATA))
 
 	PROCESS_COMPLETE(deconfigure)
 }

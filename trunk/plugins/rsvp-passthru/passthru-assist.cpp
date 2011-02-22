@@ -84,7 +84,7 @@ text_info sSocket, mode_t mMode, int *fFile)
 	return event_unsent;
 	}
 
-	command_handle new_steal = passthru_steal_channel(tTarget, cChannel, sSocket);
+	command_handle new_steal = rsvp_passthru_steal_channel(tTarget, cChannel, sSocket);
 	if (!new_steal)
 	{
 	pthread_cancel(current_thread);

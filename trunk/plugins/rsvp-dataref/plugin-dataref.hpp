@@ -36,9 +36,9 @@
 #include "plugin-dev/header-macro.hpp"
 
 
-RSERVR_COMMAND_CLASS( rsvp_dataref_open_reference, \
+RSERVR_COMMAND_CLASS( dataref_open_reference, \
 	/*constructors*/ \
-	rsvp_dataref_open_reference(text_info, int, uint8_t, uint8_t);, \
+	dataref_open_reference(text_info, int, uint8_t, uint8_t);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data data_location; \
@@ -47,9 +47,9 @@ RSERVR_COMMAND_CLASS( rsvp_dataref_open_reference, \
 	uint8_t   open_mode; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_dataref_change_reference, \
+RSERVR_COMMAND_CLASS( dataref_change_reference, \
 	/*constructors*/ \
-	rsvp_dataref_change_reference(text_info, int, uint8_t, uint8_t);, \
+	dataref_change_reference(text_info, int, uint8_t, uint8_t);, \
 	/*members*/ \
 	text_data request_origin; \
 	text_data data_location; \
@@ -58,17 +58,17 @@ RSERVR_COMMAND_CLASS( rsvp_dataref_change_reference, \
 	uint8_t   change_mode; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_dataref_close_reference, \
+RSERVR_COMMAND_CLASS( dataref_close_reference, \
 	/*constructors*/ \
-	rsvp_dataref_close_reference(int);, \
+	dataref_close_reference(int);, \
 	/*members*/ \
 	text_data request_origin; \
 	int       location_reference; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_dataref_transfer_data, \
+RSERVR_COMMAND_CLASS( dataref_transfer_data, \
 	/*constructors*/ \
-	rsvp_dataref_transfer_data(int, uint8_t, ssize_t, ssize_t);, \
+	dataref_transfer_data(int, uint8_t, ssize_t, ssize_t);, \
 	/*members*/ \
 	text_data request_origin; \
 	int       location_reference; \
@@ -77,9 +77,9 @@ RSERVR_COMMAND_CLASS( rsvp_dataref_transfer_data, \
 	ssize_t   data_size; )
 
 
-RSERVR_COMMAND_CLASS( rsvp_dataref_alteration_response, \
+RSERVR_COMMAND_CLASS( dataref_alteration_response, \
 	/*constructors*/ \
-	rsvp_dataref_alteration_response(int, ssize_t, ssize_t);, \
+	dataref_alteration_response(int, ssize_t, ssize_t);, \
 	/*members*/ \
 	text_data request_origin; \
 	int       location_reference; \

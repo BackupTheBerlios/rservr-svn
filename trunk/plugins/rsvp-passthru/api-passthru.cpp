@@ -62,15 +62,15 @@ extern int rsvp_passthru_load(struct local_commands *lLoader)
 
 	PLUGIN_LOAD_RESTRICTED(passthru, reserve_channel, lLoader,
 	  type_active_client, type_active_client,
-	  command_null, &rsvp_passthru_reserve_channel::generate)
+	  command_null, &passthru_reserve_channel::generate)
 
 	PLUGIN_LOAD_RESTRICTED(passthru, unreserve_channel, lLoader,
 	  type_active_client, type_active_client,
-	  command_null, &rsvp_passthru_unreserve_channel::generate)
+	  command_null, &passthru_unreserve_channel::generate)
 
 	PLUGIN_LOAD_RESTRICTED(passthru, steal_channel, lLoader,
 	  type_active_client, type_active_client,
-	  command_null, &rsvp_passthru_steal_channel::generate)
+	  command_null, &passthru_steal_channel::generate)
 
 	  PLUGIN_LOAD_END(passthru)
 }
@@ -88,14 +88,14 @@ command_event __rsvp_passthru_hook_steal_channel(const struct passthru_source_in
 { return default_response(sSource, request_steal_channel); }
 
 
-command_handle passthru_reserve_channel(text_info tTarget, text_info nName)
-{ return manual_command(tTarget, new rsvp_passthru_reserve_channel(nName)); }
+command_handle rsvp_passthru_reserve_channel(text_info tTarget, text_info nName)
+{ return manual_command(tTarget, new passthru_reserve_channel(nName)); }
 
-command_handle passthru_unreserve_channel(text_info tTarget, text_info nName)
-{ return manual_command(tTarget, new rsvp_passthru_unreserve_channel(nName)); }
+command_handle rsvp_passthru_unreserve_channel(text_info tTarget, text_info nName)
+{ return manual_command(tTarget, new passthru_unreserve_channel(nName)); }
 
-command_handle passthru_steal_channel(text_info tTarget, text_info nName, text_info sSocket)
-{ return manual_command(tTarget, new rsvp_passthru_steal_channel(nName, sSocket)); }
+command_handle rsvp_passthru_steal_channel(text_info tTarget, text_info nName, text_info sSocket)
+{ return manual_command(tTarget, new passthru_steal_channel(nName, sSocket)); }
 
 
 text_info PLUGIN_COMMAND_REQUEST(reserve_channel)   = "reserve channel";

@@ -43,16 +43,16 @@ extern "C" {
 }
 
 
-//rsvp_ready_system_ready command===============================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_ready_system_ready) { }
+//ready_system_ready command====================================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(ready_system_ready) { }
 
 
-	rsvp_ready_system_ready::rsvp_ready_system_ready(text_info tType) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_ready_system_ready_tag),
+	ready_system_ready::ready_system_ready(text_info tType) :
+	RSERVR_COMMAND_INIT_BASE(ready_system_ready_tag),
 	request_origin(get_client_name()), ready_type(tType? tType : "") {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_ready_system_ready)
+	RSERVR_CLIENT_EVAL_HEAD(ready_system_ready)
 	{
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready))
 
@@ -66,7 +66,7 @@ extern "C" {
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_ready_system_ready)
+	RSERVR_COMMAND_PARSE_HEAD(ready_system_ready)
 	{
 	PLUGIN_PARSE_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready))
 
@@ -89,7 +89,7 @@ extern "C" {
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_ready_system_ready)
+	RSERVR_COMMAND_BUILD_HEAD(ready_system_ready)
 	{
 	PLUGIN_BUILD_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready))
 
@@ -102,20 +102,20 @@ extern "C" {
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_ready, rsvp_ready_system_ready_tag, type_active_client)
-//END rsvp_ready_system_ready command===========================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_ready, ready_system_ready_tag, type_active_client)
+//END ready_system_ready command================================================
 
 
-//rsvp_ready_system_not_ready command===========================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_ready_system_not_ready) { }
+//ready_system_not_ready command================================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(ready_system_not_ready) { }
 
 
-	rsvp_ready_system_not_ready::rsvp_ready_system_not_ready(text_info tType) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_ready_system_not_ready_tag),
+	ready_system_not_ready::ready_system_not_ready(text_info tType) :
+	RSERVR_COMMAND_INIT_BASE(ready_system_not_ready_tag),
 	request_origin(get_client_name()), not_ready_type(tType? tType : "") {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_ready_system_not_ready)
+	RSERVR_CLIENT_EVAL_HEAD(ready_system_not_ready)
 	{
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready))
 
@@ -129,7 +129,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_ready, rsvp_ready_system_ready_
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_ready_system_not_ready)
+	RSERVR_COMMAND_PARSE_HEAD(ready_system_not_ready)
 	{
 	PLUGIN_PARSE_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready))
 
@@ -152,7 +152,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_ready, rsvp_ready_system_ready_
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_ready_system_not_ready)
+	RSERVR_COMMAND_BUILD_HEAD(ready_system_not_ready)
 	{
 	PLUGIN_BUILD_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready))
 
@@ -165,20 +165,20 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_ready, rsvp_ready_system_ready_
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_not_ready, rsvp_ready_system_not_ready_tag, type_active_client)
-//END rsvp_ready_system_not_ready command=======================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_not_ready, ready_system_not_ready_tag, type_active_client)
+//END ready_system_not_ready command============================================
 
 
-//rsvp_ready_system_never_ready command=========================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_ready_system_never_ready) { }
+//ready_system_never_ready command==============================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(ready_system_never_ready) { }
 
 
-	rsvp_ready_system_never_ready::rsvp_ready_system_never_ready(text_info tType) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_ready_system_never_ready_tag),
+	ready_system_never_ready::ready_system_never_ready(text_info tType) :
+	RSERVR_COMMAND_INIT_BASE(ready_system_never_ready_tag),
 	request_origin(get_client_name()), never_ready_type(tType? tType : "") {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_ready_system_never_ready)
+	RSERVR_CLIENT_EVAL_HEAD(ready_system_never_ready)
 	{
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready))
 
@@ -192,7 +192,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_not_ready, rsvp_ready_system_no
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_ready_system_never_ready)
+	RSERVR_COMMAND_PARSE_HEAD(ready_system_never_ready)
 	{
 	PLUGIN_PARSE_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready))
 
@@ -215,7 +215,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_not_ready, rsvp_ready_system_no
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_ready_system_never_ready)
+	RSERVR_COMMAND_BUILD_HEAD(ready_system_never_ready)
 	{
 	PLUGIN_BUILD_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready))
 
@@ -228,20 +228,20 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_not_ready, rsvp_ready_system_no
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_never_ready, rsvp_ready_system_never_ready_tag, type_active_client)
-//END rsvp_ready_system_never_ready command=====================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_never_ready, ready_system_never_ready_tag, type_active_client)
+//END ready_system_never_ready command==========================================
 
 
-//rsvp_ready_system_ready_response command======================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_ready_system_ready_response) { }
+//ready_system_ready_response command===========================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(ready_system_ready_response) { }
 
 
-	rsvp_ready_system_ready_response::rsvp_ready_system_ready_response(text_info tType) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_ready_system_ready_response_tag),
+	ready_system_ready_response::ready_system_ready_response(text_info tType) :
+	RSERVR_COMMAND_INIT_BASE(ready_system_ready_response_tag),
 	request_origin(get_client_name()), ready_type(tType? tType : "") {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_ready_system_ready_response)
+	RSERVR_CLIENT_EVAL_HEAD(ready_system_ready_response)
 	{
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready_response))
 
@@ -262,7 +262,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_never_ready, rsvp_ready_system_
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_ready_system_ready_response)
+	RSERVR_COMMAND_PARSE_HEAD(ready_system_ready_response)
 	{
 	PLUGIN_PARSE_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready_response))
 
@@ -285,7 +285,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_never_ready, rsvp_ready_system_
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_ready_system_ready_response)
+	RSERVR_COMMAND_BUILD_HEAD(ready_system_ready_response)
 	{
 	PLUGIN_BUILD_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready_response))
 
@@ -298,20 +298,20 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_never_ready, rsvp_ready_system_
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_ready_response, rsvp_ready_system_ready_response_tag, type_active_client)
-//END rsvp_ready_system_ready_response command==================================
+RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_ready_response, ready_system_ready_response_tag, type_active_client)
+//END ready_system_ready_response command=======================================
 
 
-//rsvp_ready_system_not_ready_response command==================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_ready_system_not_ready_response) { }
+//ready_system_not_ready_response command=======================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(ready_system_not_ready_response) { }
 
 
-	rsvp_ready_system_not_ready_response::rsvp_ready_system_not_ready_response(text_info tType) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_ready_system_not_ready_response_tag),
+	ready_system_not_ready_response::ready_system_not_ready_response(text_info tType) :
+	RSERVR_COMMAND_INIT_BASE(ready_system_not_ready_response_tag),
 	request_origin(get_client_name()), not_ready_type(tType? tType : "") {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_ready_system_not_ready_response)
+	RSERVR_CLIENT_EVAL_HEAD(ready_system_not_ready_response)
 	{
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready_response))
 
@@ -332,7 +332,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_ready_response, rsvp_ready_syst
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_ready_system_not_ready_response)
+	RSERVR_COMMAND_PARSE_HEAD(ready_system_not_ready_response)
 	{
 	PLUGIN_PARSE_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready_response))
 
@@ -355,7 +355,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_ready_response, rsvp_ready_syst
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_ready_system_not_ready_response)
+	RSERVR_COMMAND_BUILD_HEAD(ready_system_not_ready_response)
 	{
 	PLUGIN_BUILD_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready_response))
 
@@ -368,20 +368,20 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_ready_response, rsvp_ready_syst
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_not_ready_response, rsvp_ready_system_not_ready_response_tag, type_active_client)
-//END rsvp_ready_system_not_ready_response command==============================
+RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_not_ready_response, ready_system_not_ready_response_tag, type_active_client)
+//END ready_system_not_ready_response command===================================
 
 
-//rsvp_ready_system_never_ready_response command================================
-	RSERVR_COMMAND_DEFAULT_CONSTRUCT(rsvp_ready_system_never_ready_response) { }
+//ready_system_never_ready_response command=====================================
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(ready_system_never_ready_response) { }
 
 
-	rsvp_ready_system_never_ready_response::rsvp_ready_system_never_ready_response(text_info tType) :
-	RSERVR_COMMAND_INIT_BASE(rsvp_ready_system_never_ready_response_tag),
+	ready_system_never_ready_response::ready_system_never_ready_response(text_info tType) :
+	RSERVR_COMMAND_INIT_BASE(ready_system_never_ready_response_tag),
 	request_origin(get_client_name()), never_ready_type(tType? tType : "") {}
 
 
-	RSERVR_CLIENT_EVAL_HEAD(rsvp_ready_system_never_ready_response)
+	RSERVR_CLIENT_EVAL_HEAD(ready_system_never_ready_response)
 	{
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready_response))
 
@@ -402,7 +402,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_not_ready_response, rsvp_ready_
 	}
 
 
-	RSERVR_COMMAND_PARSE_HEAD(rsvp_ready_system_never_ready_response)
+	RSERVR_COMMAND_PARSE_HEAD(ready_system_never_ready_response)
 	{
 	PLUGIN_PARSE_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready_response))
 
@@ -425,7 +425,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_not_ready_response, rsvp_ready_
 	}
 
 
-	RSERVR_COMMAND_BUILD_HEAD(rsvp_ready_system_never_ready_response)
+	RSERVR_COMMAND_BUILD_HEAD(ready_system_never_ready_response)
 	{
 	PLUGIN_BUILD_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready_response))
 
@@ -438,5 +438,5 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_not_ready_response, rsvp_ready_
 	}
 
 
-RSERVR_CLIENT_COMMAND_DEFAULTS(rsvp_ready_system_never_ready_response, rsvp_ready_system_never_ready_response_tag, type_active_client)
-//END rsvp_ready_system_never_ready_response command============================
+RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_never_ready_response, ready_system_never_ready_response_tag, type_active_client)
+//END ready_system_never_ready_response command=================================
