@@ -176,13 +176,13 @@ void kill_corrupt()
 	if (local_type() != internal_type)
 	{
     log_client_abort(error_client_type);
-	exit(1);
+	isolate_client();
 	}
 
 	if (is_server())
 	{
     log_client_abort(error_client_server);
-	exit(1);
+	isolate_client();
 	}
 }
 
