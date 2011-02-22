@@ -41,7 +41,7 @@ extern "C" {
 }
 
 #include <string.h> //'strlen'
-#include <unistd.h> //'close'
+#include <unistd.h> //'close', 'read', 'write'
 #include <fcntl.h> //'fcntl', open modes
 #include <errno.h> //'errno'
 #include <stddef.h> //'offsetof'
@@ -49,12 +49,83 @@ extern "C" {
 #include <sys/socket.h> //sockets
 #include <sys/un.h> //socket macros
 
+#include "external/clist.hpp"
+#include "global/condition-block.hpp"
+
 extern "C" {
 #include "messages.h"
 #include "socket-table.h"
+#include "security-filter.h"
 }
 
+
+#include <stdio.h>
+struct passthru_specs
+{
+	passthru_specs() : incoming(), outgoing(), socket(-1), connection(-1), reference(NULL) {}
+
+
+	void run_thread()
+	{
+	char buffer[PARAM_MAX_INPUT_SECTION];
+	ssize_t current_size;
+
+	     if (pthread_equal(incoming, pthread_self()))
+	 {
+	send_short_func filter = send_command_filter();
+
+	while ((current_size = read(socket, buffer, sizeof buffer)) != 0)
+	  {
+	if (current_size < 0 && errno != EINTR) break;
+
+	current_size = filter?
+	  (*filter)(reference, connection, buffer, current_size) :
+	  write(connection, buffer, current_size);
+
+	if (current_size < 0 && errno != EINTR) break;
+	  }
+
+	incoming = pthread_t();
+	pthread_detach(pthread_self());
+	 }
+
+	else if (pthread_equal(outgoing, pthread_self()))
+	 {
+	receive_short_func filter = receive_command_filter();
+
+	while ((current_size = filter?
+	    (*filter)(reference, connection, buffer, sizeof buffer) :
+	    read(connection, buffer, sizeof buffer) ) != 0)
+	  {
+	if (current_size < 0 && errno != EINTR) break;
+
+	current_size = write(socket, buffer, current_size);
+
+	if (current_size < 0 && errno != EINTR) break;
+	  }
+
+	outgoing = pthread_t();
+	pthread_detach(pthread_self());
+	 }
+	}
+
+
+	~passthru_specs()
+	{
+	if (!pthread_equal(incoming, pthread_t())) pthread_cancel(incoming);
+	if (!pthread_equal(outgoing, pthread_t())) pthread_cancel(outgoing);
+	if (socket >= 0) close(socket);
+	}
+
+
+	pthread_t        incoming, outgoing;
+	int              socket, connection;
+	socket_reference reference;
+};
+
+
 static int connect_to_socket(text_info);
+static void *passthru_thread(void*);
 
 
 command_event __rsvp_passthru_hook_reserve_channel(const struct passthru_source_info *sSource, text_info nName)
@@ -137,8 +208,27 @@ command_event __rsvp_passthru_hook_steal_channel(const struct passthru_source_in
 
     log_message_steal_channel(nName, sSocket, sSource->sender);
 
-	//TODO: add passthru threads between 'sSocket' and 'file_number'
-	close(passthru_socket); //TEMP
+
+	int current_state = fcntl(file_number, F_GETFL);
+	fcntl(file_number, F_SETFL, current_state & ~O_NONBLOCK);
+
+
+        //TEMP-->
+	passthru_specs *new_passthru = new passthru_specs;
+	new_passthru->socket     = passthru_socket;
+	new_passthru->connection = file_number;
+	new_passthru->reference  = reference;
+
+	bool success = false;
+
+	success |= pthread_create(&new_passthru->incoming, NULL, &passthru_thread,
+	    static_cast <passthru_specs*> (new_passthru)) == 0;
+
+	success |= pthread_create(&new_passthru->outgoing, NULL, &passthru_thread,
+	    static_cast <passthru_specs*> (new_passthru)) == 0;
+
+	if (!success) delete new_passthru;
+        //<--TEMP
 
 	return event_complete;
 }
@@ -183,5 +273,21 @@ static int connect_to_socket(text_info sSocket)
 	}
 
 
+	current_state = fcntl(new_socket, F_GETFL);
+	fcntl(new_socket, F_SETFL, current_state & ~O_NONBLOCK);
+
+
 	return new_socket;
+}
+
+
+static void *passthru_thread(void *sSpecs)
+{
+	if (!sSpecs) return NULL;
+
+	passthru_specs *specs = (passthru_specs*) sSpecs;
+
+	specs->run_thread();
+
+	return NULL;
 }

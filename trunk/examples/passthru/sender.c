@@ -53,7 +53,11 @@ int main(int argc, char *argv[])
 
 	allow_responses();
 	command_reference connection1_status = send_command(new_connect);
-	command_reference connection2_status = send_command(new_connect);
+
+//TEMP
+command_handle new_connect1 = netcntl_local_filtered_connect(argv[2], argv[3], "@rsvf-log@~intercept.log");
+command_reference connection2_status = send_command(new_connect1);
+// 	command_reference connection2_status = send_command(new_connect);
 	destroy_command(new_connect);
 
 
@@ -172,7 +176,11 @@ int main(int argc, char *argv[])
 	stop_message_queue();
 	return 1;
 	}
-fprintf(stderr, "sender success\n");
+// fprintf(stderr, "sender success\n");
+
+//TEMP
+char buffer[] = "hello, this is a message";
+write(dataref_file, buffer, sizeof buffer);
 
 
 	return stop_message_queue()? 0 : 1;

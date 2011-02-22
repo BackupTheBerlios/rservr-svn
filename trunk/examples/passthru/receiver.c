@@ -144,7 +144,12 @@ int rReference, uint8_t tType, uint8_t mMode)
 	pthread_mutex_unlock(&dataref_mutex);
 	return event_none;
 	}
-fprintf(stderr, "receiver success\n");
+// fprintf(stderr, "receiver success\n");
+
+//TEMP
+char buffer[256];
+read(dataref_file, buffer, sizeof buffer);
+fprintf(stdout, "message: '%s'\n", buffer);
 
 	pthread_mutex_unlock(&dataref_mutex);
 	return event_none;
