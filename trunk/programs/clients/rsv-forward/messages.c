@@ -408,6 +408,13 @@ void log_message_steal_channel_deny(text_info nName, text_info sSocket, text_inf
 	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "connection-passing '%s' via '%s' denied for '%s'", nName, sSocket, cClient);
 	client_log_output(logging_normal, local_source, message_string);
 }
+
+void log_message_steal_channel_exit(text_info nName, text_info sSocket, text_info cClient)
+{
+	char message_string[PARAM_DEFAULT_FORMAT_BUFFER];
+	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "closing passthru connection '%s' via '%s' for '%s'", nName, sSocket, cClient);
+	client_log_output(logging_normal, local_source, message_string);
+}
 #endif
 
 

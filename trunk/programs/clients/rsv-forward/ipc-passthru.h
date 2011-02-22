@@ -33,5 +33,9 @@
 #ifndef ipc_passthru_h
 #define ipc_passthru_h
 
+#include "attributes.h"
+
+
+void exit_passthru_threads() ATTR_INT;
 
 #endif /*ipc_passthru_h*/

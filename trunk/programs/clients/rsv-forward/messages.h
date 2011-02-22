@@ -103,6 +103,7 @@ void log_message_unreserve_channel(text_info, text_info) ATTR_INT;
 void log_message_unreserve_channel_deny(text_info, text_info) ATTR_INT;
 void log_message_steal_channel(text_info, text_info, text_info) ATTR_INT;
 void log_message_steal_channel_deny(text_info, text_info, text_info) ATTR_INT;
+void log_message_steal_channel_exit(text_info, text_info, text_info) ATTR_INT;
 #endif
 
 #ifdef RSV_RELAY

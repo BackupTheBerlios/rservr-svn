@@ -40,6 +40,8 @@ extern "C" {
 #include "plugins/rsvp-passthru-hook.h"
 }
 
+#include <string>
+
 #include <string.h> //'strlen'
 #include <unistd.h> //'close', 'read', 'write'
 #include <fcntl.h> //'fcntl', open modes
@@ -59,7 +61,13 @@ extern "C" {
 }
 
 
-#include <stdio.h>
+struct passthru_specs;
+
+typedef data::clist <passthru_specs> passthru_list;
+static passthru_list thread_list;
+static auto_mutex thread_list_mutex;
+
+
 struct passthru_specs
 {
 	passthru_specs() : incoming(), outgoing(), socket(-1), connection(-1), reference(NULL) {}
@@ -85,8 +93,13 @@ struct passthru_specs
 	if (current_size < 0 && errno != EINTR) break;
 	  }
 
+	if (pthread_mutex_lock(thread_list_mutex) == 0)
+	  {
 	incoming = pthread_t();
 	pthread_detach(pthread_self());
+
+	pthread_mutex_unlock(thread_list_mutex);
+	  }
 	 }
 
 	else if (pthread_equal(outgoing, pthread_self()))
@@ -104,8 +117,13 @@ struct passthru_specs
 	if (current_size < 0 && errno != EINTR) break;
 	  }
 
+	if (pthread_mutex_lock(thread_list_mutex) == 0)
+	  {
 	outgoing = pthread_t();
 	pthread_detach(pthread_self());
+
+	pthread_mutex_unlock(thread_list_mutex);
+	  }
 	 }
 	}
 
@@ -114,18 +132,30 @@ struct passthru_specs
 	{
 	if (!pthread_equal(incoming, pthread_t())) pthread_cancel(incoming);
 	if (!pthread_equal(outgoing, pthread_t())) pthread_cancel(outgoing);
-	if (socket >= 0) close(socket);
+	if (socket >= 0) shutdown(socket, SHUT_RDWR);
 	}
 
 
 	pthread_t        incoming, outgoing;
 	int              socket, connection;
 	socket_reference reference;
+
+	std::string channel, socket_name, sender;
 };
 
 
 static int connect_to_socket(text_info);
 static void *passthru_thread(void*);
+
+
+void exit_passthru_threads()
+{
+	if (pthread_mutex_lock(thread_list_mutex) == 0)
+	{
+	thread_list.reset_list();
+	pthread_mutex_unlock(thread_list_mutex);
+	}
+}
 
 
 command_event __rsvp_passthru_hook_reserve_channel(const struct passthru_source_info *sSource, text_info nName)
@@ -213,24 +243,25 @@ command_event __rsvp_passthru_hook_steal_channel(const struct passthru_source_in
 	fcntl(file_number, F_SETFL, current_state & ~O_NONBLOCK);
 
 
-        //TEMP-->
-	passthru_specs *new_passthru = new passthru_specs;
-	new_passthru->socket     = passthru_socket;
-	new_passthru->connection = file_number;
-	new_passthru->reference  = reference;
+	if (pthread_mutex_lock(thread_list_mutex) != 0) return event_error;
 
-	bool success = false;
+	passthru_specs *new_passthru = &thread_list.add_element();
+	new_passthru->socket      = passthru_socket;
+	new_passthru->connection  = file_number;
+	new_passthru->reference   = reference;
+	new_passthru->channel     = nName;
+	new_passthru->socket_name = sSocket;
+	new_passthru->sender      = sSource->sender;
 
-	success |= pthread_create(&new_passthru->incoming, NULL, &passthru_thread,
+	bool success = true;
+
+	success &= pthread_create(&new_passthru->incoming, NULL, &passthru_thread,
 	    static_cast <passthru_specs*> (new_passthru)) == 0;
 
-	success |= pthread_create(&new_passthru->outgoing, NULL, &passthru_thread,
+	success &= pthread_create(&new_passthru->outgoing, NULL, &passthru_thread,
 	    static_cast <passthru_specs*> (new_passthru)) == 0;
 
-	if (!success) delete new_passthru;
-        //<--TEMP
-
-	return event_complete;
+	return success? event_complete : event_error;
 }
 
 
@@ -281,6 +312,10 @@ static int connect_to_socket(text_info sSocket)
 }
 
 
+static bool find_passthru_specs(passthru_list::const_return_type eElement, const passthru_specs *sSpecs)
+{ return &eElement == sSpecs; }
+
+
 static void *passthru_thread(void *sSpecs)
 {
 	if (!sSpecs) return NULL;
@@ -288,6 +323,17 @@ static void *passthru_thread(void *sSpecs)
 	passthru_specs *specs = (passthru_specs*) sSpecs;
 
 	specs->run_thread();
+
+	if (pthread_mutex_lock(thread_list_mutex) == 0)
+	{
+	if (pthread_equal(specs->incoming, pthread_t()) || pthread_equal(specs->outgoing, pthread_t()))
+	 {
+    log_message_steal_channel_exit(specs->channel.c_str(), specs->socket_name.c_str(), specs->sender.c_str());
+	thread_list.f_remove_pattern(specs, &find_passthru_specs);
+	 }
+
+	pthread_mutex_unlock(thread_list_mutex);
+	}
 
 	return NULL;
 }

@@ -50,6 +50,7 @@ extern "C" {
 
 extern "C" {
 #include "messages.h"
+#include "ipc-passthru.h"
 #include "socket-check.h"
 }
 
@@ -119,6 +120,8 @@ static void load_filter(const struct remote_security_filter *fFilter)
 
 void cleanup_filters()
 {
+	exit_passthru_threads();
+
 	filter_structs::const_iterator
 	  current = filter_table.filters.begin(),
 	  last    = filter_table.filters.end();
