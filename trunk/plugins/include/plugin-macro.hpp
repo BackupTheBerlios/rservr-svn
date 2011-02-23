@@ -96,6 +96,30 @@ if (!(external_command::get_sender_type(RSERVR_INFO_ARG) & type)) \
   return event_rejected; }
 
 
+#define PLUGIN_RANKING_CHECK(name, label) \
+{ entity_type sender = get_client_type() & \
+    (type_admin_client | type_control_client | type_resource_client); \
+  switch (sender) \
+  {      if (sender == type_admin_client) \
+    { if (!(external_command::get_sender_type(RSERVR_INFO_ARG) & \
+        type_admin_client)) \
+      { name##_log_execute_rejected(label, external_command::get_sender_type(RSERVR_INFO_ARG)); \
+        return event_rejected; } } \
+    else if (sender == type_control_client) \
+    { if (!(external_command::get_sender_type(RSERVR_INFO_ARG) & \
+        (type_admin_client | type_control_client))) \
+      { name##_log_execute_rejected(label, external_command::get_sender_type(RSERVR_INFO_ARG)); \
+        return event_rejected; } } \
+    else if (sender == type_resource_client) \
+    { if (!(external_command::get_sender_type(RSERVR_INFO_ARG) & \
+        (type_admin_client | type_control_client | type_resource_client))) \
+      { name##_log_execute_rejected(label, external_command::get_sender_type(RSERVR_INFO_ARG)); \
+        return event_rejected; } } \
+    else \
+    { name##_log_execute_rejected(label, external_command::get_sender_type(RSERVR_INFO_ARG)); \
+      return event_rejected; } } }
+
+
 #define PLUGIN_PARSE_CHECK(name, type, label) \
 if (!(get_client_type() & type)) \
 { name##_log_parse_rejected(label); \

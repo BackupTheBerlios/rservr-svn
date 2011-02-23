@@ -57,6 +57,7 @@ extern "C" {
 	if (RSERVR_CHECK_FROM_REMOTE) return RSERVR_EVAL_REJECTED;
 
 	PLUGIN_SENDER_CHECK(passthru, type_active_client, PLUGIN_COMMAND_REQUEST(reserve_channel))
+	PLUGIN_RANKING_CHECK(passthru, PLUGIN_COMMAND_REQUEST(reserve_channel))
 
 	struct passthru_source_info source_info = {
 	  origin:  request_origin.c_str(),
@@ -122,6 +123,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(passthru_reserve_channel, passthru_reserve_channe
 	if (RSERVR_CHECK_FROM_REMOTE) return RSERVR_EVAL_REJECTED;
 
 	PLUGIN_SENDER_CHECK(passthru, type_active_client, PLUGIN_COMMAND_REQUEST(unreserve_channel))
+	PLUGIN_RANKING_CHECK(passthru, PLUGIN_COMMAND_REQUEST(unreserve_channel))
 
 	struct passthru_source_info source_info = {
 	  origin:  request_origin.c_str(),
@@ -189,6 +191,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(passthru_unreserve_channel, passthru_unreserve_ch
 	if (RSERVR_CHECK_FROM_REMOTE) return RSERVR_EVAL_REJECTED;
 
 	PLUGIN_SENDER_CHECK(passthru, type_active_client, PLUGIN_COMMAND_REQUEST(steal_channel))
+	PLUGIN_RANKING_CHECK(passthru, PLUGIN_COMMAND_REQUEST(steal_channel))
 
 	struct passthru_source_info source_info = {
 	  origin:  request_origin.c_str(),

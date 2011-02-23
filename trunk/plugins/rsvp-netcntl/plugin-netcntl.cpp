@@ -159,6 +159,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_connection_list, netcntl_connection_list_
 	return RSERVR_EVAL_REJECTED;
 
 	PLUGIN_SENDER_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(connect))
+	PLUGIN_RANKING_CHECK(netcntl, PLUGIN_COMMAND_REQUEST(connect))
 
 	char *response = NULL;
 	command_event outcome = RSERVR_EVAL_NONE;
@@ -268,6 +269,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_connect, netcntl_connect_tag, type_servic
 	if (RSERVR_CHECK_FROM_REMOTE) return RSERVR_EVAL_REJECTED;
 
 	PLUGIN_SENDER_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(filtered_connect))
+	PLUGIN_RANKING_CHECK(netcntl, PLUGIN_COMMAND_REQUEST(filtered_connect))
 
 	char *response = NULL;
 	command_event outcome = RSERVR_EVAL_NONE;
@@ -380,6 +382,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_filtered_connect, netcntl_filtered_connec
 	return RSERVR_EVAL_REJECTED;
 
 	PLUGIN_SENDER_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(disconnect))
+	PLUGIN_RANKING_CHECK(netcntl, PLUGIN_COMMAND_REQUEST(disconnect))
 
 	struct netcntl_source_info source_info = {
 	  origin:  request_origin.c_str(),
