@@ -38,5 +38,7 @@
 
 void passthru_setup() ATTR_INT;
 void exit_passthru_threads() ATTR_INT;
+int add_passthru_allow(const char*) ATTR_INT;
+int add_passthru_require(const char*) ATTR_INT;
 
 #endif /*ipc_passthru_h*/

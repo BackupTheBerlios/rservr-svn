@@ -166,12 +166,15 @@ void set_total_connection_max(unsigned int mMax)
 struct listen_info
 {
 	inline ATTR_INL listen_info() :
-	limit(individual_connection_max), connections(0) { }
+	allow_passthru(passthru_status()), limit(individual_connection_max),
+	connections(0) { }
 
 	inline ATTR_INL listen_info(const std::string &lLocation) :
-	location(lLocation), limit(individual_connection_max), connections(0) { }
+	location(lLocation), allow_passthru(passthru_status()),
+	limit(individual_connection_max), connections(0) { }
 
 	std::string location;
+	bool         allow_passthru;
 	unsigned int limit;
 	unsigned int connections;
 };
@@ -510,6 +513,39 @@ private:
 	}
 
 	fd_set *current_list;
+};
+
+
+class get_passthru_flag : public protected_listen_data::viewer
+{
+public:
+	ATTR_INT get_passthru_flag() : current_socket(-1) { }
+
+	bool ATTR_INT operator () (int sSocket)
+	{
+	current_socket = sSocket;
+	bool outcome = internal_listen_data.view_contents_locked(this);
+	current_socket = -1;
+	return !outcome;
+	}
+
+private:
+	protect::entry_result ATTR_INT view_entry(read_object oObject) const
+	{
+	if (!oObject) return protect::entry_denied;
+
+	read_temp object = NULL;
+
+	if (!(object = oObject)) return protect::exit_forced;
+
+	listen_list::const_iterator position = object->sockets.find(current_socket);
+	if (position == object->sockets.end() || !position->second.allow_passthru)
+	return protect::entry_fail;
+
+	return protect::entry_success;
+	}
+
+	int current_socket;
 };
 
 
@@ -1093,6 +1129,7 @@ static void *select_thread_loop(void *iIgnore)
 	return NULL;
 	}
 
+	get_passthru_flag passthru_flag;
 	fd_set current_sockets;
 	data::clist <const int> set_sockets;
 	socklen_t new_length = 0;
@@ -1201,12 +1238,12 @@ static void *select_thread_loop(void *iIgnore)
 
 #ifdef RSV_NET
 	if ( !add_listen_connection(new_connection, new_reference, set_sockets[I],
-	         inet_ntoa(new_address.sin_addr)) )
+	         inet_ntoa(new_address.sin_addr), passthru_flag(set_sockets[I])) )
 	shutdown(new_connection, SHUT_RDWR);
 #endif
 #ifdef RSV_LOCAL
 	if ( !add_listen_connection(new_connection, new_reference, set_sockets[I],
-	         new_address.sun_path) )
+	         new_address.sun_path, passthru_flag(set_sockets[I])) )
 	shutdown(new_connection, SHUT_RDWR);
 #endif
 	   }

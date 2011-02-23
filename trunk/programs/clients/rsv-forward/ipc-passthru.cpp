@@ -55,13 +55,65 @@ extern "C" {
 #include <sys/un.h> //socket macros
 
 #include "external/clist.hpp"
+
+#include "global/regex-check.hpp"
 #include "global/condition-block.hpp"
+
+#include "connect.hpp"
 
 extern "C" {
 #include "messages.h"
 #include "socket-table.h"
 #include "security-filter.h"
 }
+
+
+//regex filtering---------------------------------------------------------------
+
+//TODO: add logging points for screening failure
+
+static data::clist <regex_check> passthru_allow, passthru_require;
+
+int add_passthru_allow(const char *rRegex)
+{
+	if (!rRegex) return false;
+	regex_check new_regex;
+	if (!(new_regex = rRegex)) return false;
+	if (passthru_allow.add_element(new_regex))
+	{
+	passthru_enable();
+	return true;
+	}
+	else return false;
+}
+
+int add_passthru_require(const char *rRegex)
+{
+	if (!rRegex) return false;
+	regex_check new_regex;
+	if (!(new_regex = rRegex)) return false;
+	//NOTE: don't call 'passthru_enable' here
+	return passthru_require.add_element(new_regex);
+}
+
+
+static bool invert_result(const regex_check &lLeft, const char *rRight)
+{ return !(lLeft == rRight); }
+
+
+static bool screen_passthru(const char *aAddress)
+{
+	if (!aAddress) return false;
+
+	if (!passthru_allow.size()) return false;
+
+	bool allow = passthru_allow.find(aAddress) != data::not_found;
+	if (passthru_require.f_find(aAddress, &invert_result) != data::not_found) return false;
+
+	return allow;
+}
+
+//END regex filtering-----------------------------------------------------------
 
 
 struct passthru_specs;
@@ -205,8 +257,11 @@ command_event __rsvp_passthru_hook_reserve_channel(const struct passthru_source_
 
     log_message_incoming_reserve_channel(sSource, nName);
 
-	if (!accept_passthru)
+	if (!accept_passthru || !screen_passthru(sSource->sender))
+	{
     log_message_reserve_channel_deny(nName, sSource->sender);
+	return event_rejected;
+	}
 
 	int file_number = find_socket(nName, sSource->sender);
 
@@ -230,8 +285,11 @@ command_event __rsvp_passthru_hook_unreserve_channel(const struct passthru_sourc
 
     log_message_incoming_unreserve_channel(sSource, nName);
 
-	if (!accept_passthru)
+	if (!accept_passthru || !screen_passthru(sSource->sender))
+	{
     log_message_unreserve_channel_deny(nName, sSource->sender);
+	return event_rejected;
+	}
 
 	int file_number = find_socket(nName, sSource->sender);
 
@@ -264,8 +322,11 @@ command_event __rsvp_passthru_hook_steal_channel(const struct passthru_source_in
 
     log_message_incoming_steal_channel(sSource, nName, sSocket);
 
-	if (!accept_passthru)
+	if (!accept_passthru || !screen_passthru(sSource->sender))
+	{
     log_message_steal_channel_deny(nName, sSocket, sSource->sender);
+	return event_rejected;
+	}
 
 	socket_reference reference = NULL;
 	int file_number = find_socket(nName, sSource->sender);

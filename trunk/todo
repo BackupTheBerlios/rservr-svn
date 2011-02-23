@@ -23,6 +23,9 @@
   - new library structure
   - remove old filter-parser script shown in rsvf-log docs
   - add trigger and passthru to plug-in docs
+  - add passthru documentation to forwarder docs
+    - passthru_allow, passthru_require
+    - passthru_enable/disable (enabled by passthru_allow)
   - new permissions for rsvp-trigger
 - update structure
   - merge proto- into a single library

@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -62,6 +62,7 @@ extern "C" {
 extern "C" {
 #include "messages.h"
 #include "security-filter.h"
+#include "ipc-passthru.h"
 }
 
 
@@ -259,6 +260,34 @@ static int parse_config_line(const char *lLine, const char *pPath)
 	{
 	if (remaining_line(&config_segment) < 0 || !config_segment) return allow_fail;
 	if (!add_connect_require(config_segment)) return allow_fail;
+	}
+
+
+	else if (strcmp(config_segment, "passthru_allow") == 0)
+	{
+	if (remaining_line(&config_segment) < 0 || !config_segment) return allow_fail;
+	if (!add_passthru_allow(config_segment)) return allow_fail;
+	}
+
+
+	else if (strcmp(config_segment, "passthru_require") == 0)
+	{
+	if (remaining_line(&config_segment) < 0 || !config_segment) return allow_fail;
+	if (!add_passthru_require(config_segment)) return allow_fail;
+	}
+
+
+	else if (strcmp(config_segment, "passthru_enable") == 0)
+	{
+	if (next_argument(&config_segment) >= 0) return allow_fail;
+	passthru_enable();
+	}
+
+
+	else if (strcmp(config_segment, "passthru_disable") == 0)
+	{
+	if (next_argument(&config_segment) >= 0) return allow_fail;
+	passthru_disable();
 	}
 
 

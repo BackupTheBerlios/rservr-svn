@@ -40,6 +40,10 @@
     <div class="overview_box">
       <h3 class="overview_title"> Recent Project News. </h3>
       <p class="overview_content">
+     <span class="news_date">February 22<sup>nd</sup>, 2011:</span> I added a "passthru" feature to the command forwarders that allow an existing forwarder connection to be reappropriated for raw data transfer. The primary purpose of this is to allow a connection to be made using the forwarder's security plug-ins (e.g. authentication and encryption,) and to retain that security for raw data transfer. By default, reappropriation of connections is disabled; it must be enabled in the forwarder's configuration. Clients requesting passthru can be screened by regular expressions, and it can be disabled entirely for individual "listen" connections. <br />
+        <br />
+      </p>
+      <p class="overview_content">
      <span class="news_date">February 15<sup>th</sup>, 2011:</span> I converted the entire IPC parsing system to a GNU <a class="general_link" href="http://www.gnu.org/software/flex/">Flex</a>/<a class="general_link" href="http://www.gnu.org/software/bison/">Bison</a>-generated parser, with internal tree structures still managed by <a class="general_link" href="http://hparser.berlios.de/">hparser</a>. All previous functionality is still present and client development isn't affected (command plug-in development is significantly different, however.) Flex and Bison <i>don't</i> need to be installed. Additionally, I merged two of the built-in libraries. <br />
         <br />
       </p>

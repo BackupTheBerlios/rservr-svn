@@ -176,16 +176,32 @@ static bool screen_connect(const char *aAddress)
 
 //connection data and control---------------------------------------------------
 
+static bool passthru_allowed = false;
+
+void passthru_enable()
+{ passthru_allowed = true; }
+
+void passthru_disable()
+{ passthru_allowed = false; }
+
+bool passthru_status()
+{ return passthru_allowed; }
+
+
 struct socket_set
 {
 	inline ATTR_INL socket_set() :
-	socket(-1), listen(-1), reference((socket_reference) 0x00) { }
+	socket(-1), listen(-1), allow_passthru(passthru_status()),
+	reference((socket_reference) 0x00) { }
 
 	inline ATTR_INL socket_set(int fFile) :
-	socket(fFile), listen(-1), reference((socket_reference) 0x00) { }
+	socket(fFile), listen(-1), allow_passthru(passthru_status()),
+	reference((socket_reference) 0x00) { }
 
-	inline ATTR_INL socket_set(int fFile, int lListen, socket_reference rReference) :
-	socket(fFile), listen(lListen), reference(rReference) { }
+	inline ATTR_INL socket_set(int fFile, int lListen, socket_reference rReference,
+	bool pPass = true) :
+	socket(fFile), listen(lListen), allow_passthru(pPass? passthru_status() : false),
+	reference(rReference) { }
 
 
 	inline bool ATTR_INL operator == (const socket_set &eEqual) const
@@ -193,6 +209,7 @@ struct socket_set
 
 	long             socket;
 	long             listen;
+	bool             allow_passthru;
 	socket_reference reference;
 };
 
@@ -204,7 +221,7 @@ public:
 	socket_address(aAddress), errors(0) { }
 
 	std::string     socket_address;
-	std::string     reserved; //reserve for pass-thru
+	std::string     reserved; //reserve for passthru
 	external_buffer input_buffer;
 	unsigned int    errors;
 
@@ -349,21 +366,23 @@ class add_new_connection : public protected_connection_list::modifier
 public:
 	ATTR_INT add_new_connection() : current_socket(-1),
 	current_reference((socket_reference) 0x00), current_address(NULL),
-	current_listen(-1), current_modified(NULL) { }
+	current_listen(-1), current_passthru(false), current_modified(NULL) { }
 
 	bool ATTR_INT operator () (int sSocket, socket_reference rReference,
-	const char *aAddress, int lListen = -1, char **mModified = NULL)
+	const char *aAddress, int lListen = -1, bool pPass = true, char **mModified = NULL)
 	{
 	current_socket    = sSocket;
 	current_reference = rReference;
 	current_address   = aAddress;
 	current_listen    = lListen;
+	current_passthru  = pPass;
 	current_modified  = mModified;
 	bool outcome = internal_connection_list.access_contents(this);
 	current_socket    = -1;
 	current_reference = (socket_reference) 0x00;
 	current_address   = NULL;
 	current_listen    = -1;
+	current_passthru  = false;
 	current_modified  = NULL;
 
 	if (!outcome) unblock_connection_wait();
@@ -408,7 +427,7 @@ private:
 #endif
 
 	if ( !object->add_element( connection_list::new_element(socket_set(current_socket,
-	       current_listen, current_reference), serialized_address) ))
+	       current_listen, current_reference, current_passthru), serialized_address) ))
 	return protect::entry_fail;
 
 	if (!add_listen_connection(current_listen))
@@ -428,6 +447,7 @@ private:
 	socket_reference   current_reference;
 	const char        *current_address;
 	int                current_listen;
+	bool               current_passthru;
 	char             **current_modified;
 };
 
@@ -526,6 +546,7 @@ private:
 
 	if (current_state)
 	  {
+	if (!object->get_element(position).key().allow_passthru) return protect::entry_fail;
 	if (object->get_element(position).value().reserved.size()) return protect::entry_fail;
 	object->get_element(position).value().reserved = current_client? current_client : "";
 
@@ -582,6 +603,7 @@ private:
 	int position = object->f_find(current_file, &connection_list::find_by_key);
 	if (position == data::not_found) return protect::entry_fail;
 
+	if (!object->get_element(position).key().allow_passthru) return protect::entry_fail;
 	if (!current_client || object->get_element(position).value().reserved != current_client)
 	return protect::entry_fail;
 
@@ -1040,17 +1062,17 @@ void remove_socket_error(int fFile)
 }
 
 bool add_listen_connection(int fFile, socket_reference rReference, int lListen,
-const char *aAddress)
+const char *aAddress, bool pPass)
 {
 	add_new_connection new_connection;
-	return new_connection(fFile, rReference, aAddress, lListen);
+	return new_connection(fFile, rReference, aAddress, lListen, pPass);
 }
 
 static bool add_initiated_connection(int fFile, socket_reference rReference,
 const char *aAddress, char **mModified = NULL)
 {
 	add_new_connection new_connection;
-	return new_connection(fFile, rReference, aAddress, -1, mModified);
+	return new_connection(fFile, rReference, aAddress, -1, true, mModified);
 }
 
 static bool fill_connection_select(fd_set *lList)
