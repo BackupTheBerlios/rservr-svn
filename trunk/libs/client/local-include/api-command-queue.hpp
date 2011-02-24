@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -38,6 +38,8 @@
 #include "external/clist.hpp"
 #include "external/global-sentry.hpp"
 
+#include "api/event-functor.hpp"
+
 extern "C" {
 #include "attributes.h"
 #include "api/command-queue.h"
@@ -57,10 +59,10 @@ public:
 
 	bool update_status(command_reference, command_event, const command_info*) ATTR_INT;
 	inline command_event get_status() const { return local_status; }
-	bool register_callback(event_callback) ATTR_INT;
+	bool register_functors(const event_functor_list&) ATTR_INT;
 
 private:
-	std::vector <event_callback> local_callbacks;
+	event_functor_list local_callbacks;
 	command_event local_status;
 };
 

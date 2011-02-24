@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -155,12 +155,7 @@ static void update_status_mask(command_event &sStatus, command_event eEvent)
 
 	for (unsigned int I = 0; I < local_callbacks.size();)
 	{
-	bool remove_callback = true;
-
-	if (local_callbacks[I])
-	remove_callback = (*local_callbacks[I])(rReference, eEvent, local_status, iInfo);
-
-	if (remove_callback)
+	if (local_callbacks[I](rReference, eEvent, local_status, iInfo))
 	 {
 	local_callbacks.erase(local_callbacks.begin() + I);
 	if (!local_callbacks.size()) remove_status = true;
@@ -172,9 +167,10 @@ static void update_status_mask(command_event &sStatus, command_event eEvent)
 	return remove_status;
 	}
 
-	bool command_status::register_callback(event_callback cCallback)
+	bool command_status::register_functors(const event_functor_list &fFunctors)
 	{
-	if (cCallback) local_callbacks.push_back(cCallback);
+	for (int I = 0; I < (signed) fFunctors.size(); I++)
+	local_callbacks.push_back(fFunctors[I]);
 	return true;
 	}
 
@@ -247,19 +243,19 @@ private:
 };
 
 
-class register_callback : public protected_command_status_list::modifier
+class register_functor : public protected_command_status_list::modifier
 {
 public:
-	ATTR_INT register_callback(protected_command_status_list *lList) : current_list(lList),
-	current_reference(0), current_callback(NULL) { }
+	ATTR_INT register_functor(protected_command_status_list *lList) : current_list(lList),
+	current_reference(0), current_functors(NULL) { }
 
-	bool ATTR_INT operator () (command_reference rReference, event_callback cCallback)
+	bool ATTR_INT operator () (command_reference rReference, const event_functor_list *fFunctors)
 	{
 	current_reference = rReference;
-	current_callback  = cCallback;
+	current_functors  = fFunctors;
 	bool outcome = current_list->access_contents(this);
 	current_reference = 0;
-	current_callback  = NULL;
+	current_functors  = NULL;
 	return !outcome;
 	}
 
@@ -267,6 +263,8 @@ private:
 	protect::entry_result ATTR_INT access_entry(write_object oObject)
 	{
 	if (!oObject) return protect::entry_denied;
+
+	if (!current_functors) return protect::entry_fail;
 
 	write_temp object = NULL;
 
@@ -278,15 +276,15 @@ private:
 
 	if (!(object = oObject)) return protect::exit_forced;
 
-	if (!object->get_element(position).value().register_callback(current_callback))
+	if (!object->get_element(position).value().register_functors(*current_functors))
 	return protect::entry_fail;
 
 	return protect::entry_success;
 	}
 
 	protected_command_status_list *current_list;
-	command_reference               current_reference;
-	event_callback                 current_callback;
+	command_reference              current_reference;
+	const event_functor_list      *current_functors;
 };
 
 
@@ -377,15 +375,16 @@ command_reference send_command_no_status(command_handle cCommand)
 }
 
 
-command_reference send_command_callback(command_handle cCommand, event_callback cCallback)
+command_reference send_command_functor(command_handle cCommand, event_functor *fFunctor)
 {
-	event_callback single_callback[] = {cCallback, NULL };
-	return send_command_callbacks(cCommand, single_callback);
+	event_functor_list functors;
+	if (fFunctor) functors.push_back(fFunctor);
+	return send_command_functors(cCommand, functors);
 }
 
 
-command_reference send_command_callbacks(command_handle cCommand,
-const event_callback *cCallback)
+command_reference send_command_functors(command_handle cCommand,
+  const event_functor_list &fFunctors)
 {
 	if (!cCommand) return 0;
 
@@ -408,11 +407,10 @@ const event_callback *cCallback)
 	register_reference new_register(client_command_status);
 	new_register(next_reference);
 
-	if (cCallback)
+	if (fFunctors.size())
 	{
-	register_callback new_callback(client_command_status);
-	const event_callback *current = cCallback;
-	while (*current) new_callback(next_reference, *current++);
+	register_functor new_functor(client_command_status);
+	new_functor(next_reference, &fFunctors);
 	}
 
 	reset_input_standby();
@@ -429,6 +427,47 @@ const event_callback *cCallback)
 }
 
 
+
+command_reference send_command_callback(command_handle cCommand, event_callback cCallback)
+{
+	event_callback single_callback[] = {cCallback, NULL };
+	return send_command_callbacks(cCommand, single_callback);
+}
+
+
+command_reference send_command_callbacks(command_handle cCommand,
+const event_callback *cCallback)
+{
+	event_functor_list functors;
+	const event_callback *current = cCallback;
+	if (current) while (*current) functors.push_back( encapsulate_callback(*current++) );
+	return send_command_functors(cCommand, functors);
+}
+
+
+result new_status_functor(command_reference rReference, event_functor *fFunctor)
+{
+	event_functor_list functors;
+	if (fFunctor) functors.push_back(fFunctor);
+	return new_status_functors(rReference, functors);
+}
+
+
+result new_status_functors(command_reference rReference,
+  const event_functor_list &fFunctors)
+{
+	if (fFunctors.size())
+	{
+	register_functor new_functor(client_command_status);
+	if (!new_functor(rReference, &fFunctors)) return false;
+	}
+
+	else return false;
+
+	return true;
+}
+
+
 result new_status_callback(command_reference rReference, event_callback cCallback)
 {
 	event_callback single_callback[] = {cCallback, NULL };
@@ -439,16 +478,10 @@ result new_status_callback(command_reference rReference, event_callback cCallbac
 result new_status_callbacks(command_reference rReference,
 const event_callback *cCallback)
 {
-	if (cCallback)
-	{
-	register_callback new_callback(client_command_status);
+	event_functor_list functors;
 	const event_callback *current = cCallback;
-	while (*current) if (!new_callback(rReference, *current++)) return false;
-	}
-
-	else return false;
-
-	return true;
+	if (current) while (*current) functors.push_back( encapsulate_callback(*current++) );
+	return new_status_functors(rReference, functors);
 }
 
 

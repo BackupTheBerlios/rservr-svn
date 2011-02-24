@@ -201,15 +201,15 @@ nobase_include_HEADERS = rservr/config-parser.h \
 	rservr/config-parser.hpp rservr/filter.h \
 	rservr/api/admin-client.h rservr/api/client-timing.h \
 	rservr/api/client.h rservr/api/command-queue.h \
-	rservr/api/command-table.h rservr/api/command.h \
-	rservr/api/control-client.h rservr/api/label-check.h \
-	rservr/api/load-plugin.h rservr/api/log-output.h \
-	rservr/api/monitor-client.h rservr/api/detached-client.h \
-	rservr/api/message-queue.h rservr/api/request.h \
-	rservr/api/remote-service.h rservr/api/resource-client.h \
-	rservr/api/response.h rservr/api/service-client.h \
-	rservr/api/timing.h rservr/api/tools.h \
-	rservr/plugin-dev/client-interface.hpp \
+	rservr/api/command-table.h rservr/api/event-functor.hpp \
+	rservr/api/command.h rservr/api/control-client.h \
+	rservr/api/label-check.h rservr/api/load-plugin.h \
+	rservr/api/log-output.h rservr/api/monitor-client.h \
+	rservr/api/detached-client.h rservr/api/message-queue.h \
+	rservr/api/request.h rservr/api/remote-service.h \
+	rservr/api/resource-client.h rservr/api/response.h \
+	rservr/api/service-client.h rservr/api/timing.h \
+	rservr/api/tools.h rservr/plugin-dev/client-interface.hpp \
 	rservr/plugin-dev/entry-point.h \
 	rservr/plugin-dev/external-command.hpp \
 	rservr/plugin-dev/manual-command.hpp \
