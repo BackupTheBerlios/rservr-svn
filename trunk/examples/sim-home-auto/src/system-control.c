@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 
 command_event __rsvp_ready_hook_system_ready(const struct ready_source_info *iInfo,
 text_info sSystem)
-/*hook function called by 'librsvp-ready.so' in response to 'ready_system_ready'*/
+/*hook function called by 'librsvp-ready.so' in response to 'rsvp_ready_system_ready'*/
 {
 	fprintf(stderr, "%s: system '%s' is ready\n", iInfo->sender, sSystem);
 	return event_none;
@@ -84,7 +84,7 @@ text_info sSystem)
 
 command_event __rsvp_ready_hook_system_not_ready(const struct ready_source_info *iInfo,
 text_info sSystem)
-/*hook function called by 'librsvp-ready.so' in response to 'ready_system_not_ready'*/
+/*hook function called by 'librsvp-ready.so' in response to 'rsvp_ready_system_not_ready'*/
 {
 	fprintf(stderr, "%s: system '%s' is not ready\n", iInfo->sender, sSystem);
 	return event_none;

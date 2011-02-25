@@ -1,0 +1,64 @@
+This example demonstrates using a passthru connection to transfer encrypted raw
+data between two remotely-connected clients. Two 'rservr' systems are set up
+with socket forwarders. An additional client is also started on each 'rservr'
+system. One of the clients initiates two identical connections between the
+forwarders, connecting the two 'rservr' systems remotely. It then initiates the
+process of converting one of those connections to a passthru connection in
+coordination with the additional client on the other 'rservr' system. Lastly,
+encrypted data is sent between the two clients via the passthru connection.
+
+To run this example, make sure Resourcerver is installed and is of the same
+version as this example's package. You'll need to have GNU TLS installed prior
+to building and installing Resourcerver so that the 'librsvx-tls.so' security
+plugin is available. The example will work without it; however, the connections
+won't be encrypted, which will make the example slightly less effective. Run
+'gmake' to build the binaries. The Makefile will guess what --prefix you
+installed Resourcerver in, but if that fails (e.g. it's unable to find a
+library,) set PREFIX to that path, e.g. 'gmake PREFIX=/usr'. If everything
+builds successfully, start the example system with the following:
+
+	./execute.sh
+
+This is a non-interactive example; therefore, there should be a pause for a
+second or so while the servers and clients initialize, then you should see a few
+lines print to standard output. Although these few lines are far from
+impressive, a lot of setup goes into transfering the data from one place to
+another so it can be printed.
+
+The procedure carried out between the two clients (see 'sender.c' and
+'receiver.c') is that described in
+
+	http://rservr.berlios.de/app/plugin-table.html#lpsalpas
+
+Most of the important information regarding the passthru setup and the data
+transfer is contained in the two C sources 'sender.c' and 'receiver.c'.
+
+If for some reason you don't see any output after several seconds, press
+[Ctrl]+C (just in case,) then enter the following in the terminal to end the
+'rservr' processes, if they're still running:
+
+	rservrd '^server[12]$' @server_term
+
+If the example is successful, you should have the following log files to
+examine:
+
+	server1.log
+	server2.log
+	intercepted.log
+
+The first two are log files for the servers and their respective clients. They
+log the sequence of actions taken to set up the passthru connection.
+
+The third file is created when 'sender' initiates a filtered connection between
+the two forwarders. The filter logs all IPC sent between the forwarders to this
+file. Because 'librsvx-tls.so' encrypts the connection, this log file should
+contain nothing but binary data. The connection being filtered is that which is
+converted to a passthru connection. Additionally, the filter is a separate
+process; therefore, the change from a normal connection to a passthru connection
+is entirely transparent to the filter. That means if the data transfered after
+the passthru conversion wasn't encrypted, it would show up in plain text at the
+end of the log file, which shouldn't be the case.
+
+Please write to me at ta0kira@users.berlios.de if you have questions, comments,
+or suggestions.
+Kevin P. Barry

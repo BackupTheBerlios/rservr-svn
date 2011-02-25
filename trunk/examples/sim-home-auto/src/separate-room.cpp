@@ -215,7 +215,7 @@ static bool register_room_services(const struct rqsrvc_source_info*, text_info, 
 
 command_event __rsvp_rqsrvc_hook_register_services(const struct rqsrvc_source_info *iInfo,
 text_info sService)
-//hook function called by 'librsvp-rqsrvc.so' in response to 'rqsrvc_register_services'
+//hook function called by 'librsvp-rqsrvc.so' in response to 'rsvp_rqsrvc_register_services'
 {
 	//this function results in a service being registered for every item in the room
 

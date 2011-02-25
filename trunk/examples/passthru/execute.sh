@@ -1,10 +1,19 @@
 #!/bin/sh
 
 
-rm -f server1.log server2.log
+cleanup()
+{
+  rservrd '^server[12]$' @server_term
+}
 
-rservr server1 server1.log server1.conf
-rservr server2 server2.log server2.conf
 
-rservrd server1 @execute@./receiver@receiver
-rservrd server2 @execute@./sender@sender@forward2@`pwd`/controller-socket@receiver
+rm -f server1.log server2.log intercept.log
+
+#stop a currently-running instance if necessary
+if rservrd '^server[12]$' 2> /dev/null; then
+  cleanup
+fi
+
+#start the two servers ('server1' must be started first)
+rservr server1 server1.log server1.conf || { cleanup; exit 1; }
+rservr server2 server2.log server2.conf || { cleanup; exit 1; }
