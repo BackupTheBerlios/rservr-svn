@@ -160,6 +160,15 @@ int &iInput, int &oOutput)
 	int input_pipes[2];
 	int output_pipes[2];
 
+
+	int null_file = open(null_device, O_RDWR);
+	dup2(null_file, execute_input);
+	dup2(null_file, execute_output);
+
+	if (null_file != execute_input && null_file != execute_output)
+	close(null_file);
+
+
 	if (pipe(input_pipes))
 	{
     log_server_new_client_error(strerror(errno));
@@ -169,8 +178,6 @@ int &iInput, int &oOutput)
 	if (pipe(output_pipes))
 	{
     log_server_new_client_error(strerror(errno));
-	close(execute_input);
-	close(execute_output);
 	close(input_pipes[0]);
 	close(input_pipes[1]);
 	return -1;
@@ -224,6 +231,8 @@ int &iInput, int &oOutput)
 	 {
     log_server_set_process_group_error(new_process, getpid());
 	kill(new_process, SIGKILL);
+	close(output_pipes[0]);
+	close(input_pipes[1]);
 	return -1;
 	 }
 
