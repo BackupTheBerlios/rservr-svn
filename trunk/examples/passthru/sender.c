@@ -45,9 +45,6 @@ int load_all_commands(struct local_commands *lLoader)
 }
 
 
-
-
-
 int main(int argc, char *argv[])
 {
 	if (argc < 5 || !strlen(argv[1]))
@@ -97,7 +94,12 @@ int main(int argc, char *argv[])
 	  connection, however.*/
 	command_handle new_connect2 = rsvp_netcntl_local_filtered_connect(argv[2], argv[3], "@rsvf-log@~intercept.log");
 
-	if (!new_connect1 || !new_connect2) return 1;
+	if (!new_connect1 || !new_connect2)
+	{
+	destroy_command(new_connect1);
+	destroy_command(new_connect2);
+	return 1;
+	}
 
 	/*allow responses to the "connect" requests to obtain the connection names*/
 	allow_responses();
@@ -197,6 +199,7 @@ int main(int argc, char *argv[])
 	  RSVP_DATAREF_MODE_NONE, RSVP_DATAREF_TYPE_OTHER);
 	if (!new_request)
 	{
+	/*upon failure, unreserve the connection*/
 	command_handle new_unreserve = rsvp_passthru_unreserve_channel(argv[2], connection2_name);
 	if (new_unreserve) send_command_no_status(new_unreserve);
 	destroy_command(new_unreserve);
@@ -243,11 +246,11 @@ int main(int argc, char *argv[])
 
 	/*step 3: steal the second connection via a local socket*/
 	/*NOTE: 'rsvp_passthru_assist_steal_channel' saves some hassle by:
-	    1) creating the socket and listening to it in a separate thread,
+	    1) creating the socket and listening to it in a separate thread
 	    2) sending the "steal" request to the forwarder
 	    3) making the connection or canceling the listen thread and
-	       cleaning up the socket,
-	    4) returning a descriptor for the passthru connection.*/
+	       cleaning up the socket
+	    4) returning a descriptor for the passthru connection*/
 
 	int dataref_file = -1;
 

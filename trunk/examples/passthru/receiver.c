@@ -19,7 +19,6 @@
 #include <rservr/api/control-client.h>
 #include <rservr/api/command-queue.h>
 #include <rservr/api/message-queue.h>
-#include <rservr/api/response.h>
 #include <rservr/api/log-output.h>
 #include <rservr/api/load-plugin.h>
 #include <rservr/plugin-dev/entry-point.h>
@@ -172,11 +171,11 @@ int rReference, uint8_t tType, uint8_t mMode)
 
 	/*step 3: steal the connection via a local socket*/
 	/*NOTE: 'rsvp_passthru_assist_steal_channel' saves some hassle by:
-	    1) creating the socket and listening to it in a separate thread,
+	    1) creating the socket and listening to it in a separate thread
 	    2) sending the "steal" request to the forwarder
 	    3) making the connection or canceling the listen thread and
-	       cleaning up the socket,
-	    4) returning a descriptor for the passthru connection.*/
+	       cleaning up the socket
+	    4) returning a descriptor for the passthru connection*/
 
 	char current_dir[256], socket_name[256];
 	snprintf(socket_name, sizeof socket_name, "%s/%s-socket", getcwd(current_dir, sizeof current_dir), get_client_name());
@@ -208,6 +207,12 @@ uint8_t mMode, ssize_t oOffset, ssize_t sSize)
 	static unsigned int message_number = 0;
 
 
+	if (iInfo && !iInfo->respond)
+	{
+	/*a non-NULL 'respond' indicates this is happening in the thread and
+	  not in the message queue; this way, the check is only performed prior
+	  to creating a thread.*/
+
 	if (pthread_mutex_lock(&dataref_mutex) < 0) return event_rejected;
 
 	/*verify that the mode is correct and the request came from the sender
@@ -223,6 +228,7 @@ uint8_t mMode, ssize_t oOffset, ssize_t sSize)
 	return event_error;
 
 	pthread_mutex_unlock(&dataref_mutex);
+	}
 
 
 	/*this should be used because the passthru socket is in blocking mode;

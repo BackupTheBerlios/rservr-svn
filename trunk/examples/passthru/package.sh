@@ -3,7 +3,7 @@
 cd "$( dirname "$0" )/../.."
 
 tar -cvvjf examples/"$1"-example-passthru.tar.bz2 --owner root --group root -T - <<END
-examples/passthru/examples/passthru/bsd-license
+examples/passthru/bsd-license
 examples/passthru/controller1.conf
 examples/passthru/controller2.conf
 examples/passthru/execute.sh
