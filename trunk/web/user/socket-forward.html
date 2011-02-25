@@ -204,6 +204,38 @@
         </tr>
       </table>
       <p class="overview_content style_definition_long"> This limits the total number of current connections made by each individual socket being listened to.  This value is applied to all new listen requests following it.  A value of zero allows unlimited connections (within the limitations of <span class="style_command_line">total_limit</span>.) This is persistent after the configuration stage. </p>
+      <div align="center">
+        <div border="0" class="attention_box info_box">
+          <p>
+            <span class="info_box_title">Info:</span> A "passthru" connection is one that transfers raw data, as opposed to the structured command data used by Resourcerver. Passthru connections start as normal connections between two forwarders. One client connected to each forwarder requests that their respective ends of an existing connection be converted to a passthru connection. If successful, the two clients may transfer raw data back and forth using the security (e.g. authentication and encryption) that the converted connection already utilized. This is handled via the <a class="general_link" href="../api/index.html">C API</a> (also see <a class="general_link" href="../app/plugin-table.html#lpsalpas"><span class="style_file_name">librsvp-passthru.so</span></a>;) however, management of approval and denial is done from the configuration. </p>
+        </div>
+      </div>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> passthru_enable
+          </td>
+          <td class="style_definition_short"> enable requests for passthru </td>
+        </tr>
+        <tr>
+          <td width="400" align="left" class="style_term"> passthru_disable
+          </td>
+          <td class="style_definition_short"> disable requests for passthru </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> These options control the persistent state of how passthru requests are dealt with. By default, passthru is disabled. If a connection is made when passthru is disabled, the connection cannot be converted to a passthru connection. If a "listen" socket is created when passthru is disabled, no connections made to that socket can be converted to passthru connections. The enabled/disabled state persists after configuration is complete. </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> passthru_allow <i>&lt;regex&gt;</i>
+          </td>
+          <td class="style_definition_short"> allow a pattern of names of senders requesting passthru </td>
+        </tr>
+        <tr>
+          <td width="400" align="left" class="style_term"> passthru_require <i>&lt;regex&gt;</i>
+          </td>
+          <td class="style_definition_short"> require a pattern of names of senders requesting passthru </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> These options are used to register regular expressions to filter incoming requests for passthru. For passthru to be allowed, at least one pattern must be registered using <span class="style_command_line">passthru_allow</span>. Additionally, <span class="style_command_line">passthru_allow</span> automatically enables passthru for subsequent sockets and connections (see <span class="style_command_line">passthru_enable</span>.) When a request for passthru is received, the sender's name must match at least one "allow" pattern and <b>all</b> "require" patterns. Note that the sender's name might be the name of a service and not the client's registered name. If the sender's name passes, the state of passthru acceptance is checked for the connection to be converted (see <span class="style_command_line">passthru_enable</span> and <span class="style_command_line">passthru_disable</span>.) <u>If at any point the sender's name is deregistered (i.e. client or service name,) all passthru connections made using that name are dropped.</u> </p>
       <table summary="definition" class="overview_content">
         <tr>
           <td width="400" align="left" class="style_term"> log_mode <i>&lt;spec&gt;</i>

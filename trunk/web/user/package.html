@@ -381,30 +381,7 @@ rsvf-log -<b><i>&lt;log1&gt;</i></b> rsvf-log +<b><i>&lt;log2&gt; &lt;program&gt
 rsvf-log -<b><i>&lt;log1&gt;</i></b> rsvf-log +<b><i>&lt;log2&gt;</i></b>
 </pre>
       </div>
-      <p class="overview_content style_definition_long"> You can log several IPC streams to the same log file. Command integrity should be retained by the filters, so even high-intensity IPC from several sources should provide a log of intact commands. For debugging purposes, you can check the integrity of a filter log using the following script: </p>
-      <div align="center">
-        <pre class="example_box code_box script_box">
-<b>#!/bin/sh</b>
-
-<i>#specify the log file with a single argument</i>
-if [ $# -ne 1 ]; then
-  echo $0: "[log file]"
-  exit 1
-fi
-
-<i>#check the integrity of command close tags</i>
-cat $1 | grep -n . | tr "\n" "%" | sed "s@&lt;/rservr&gt;%@&lt;/rservr&gt;@g" | tr "%" "\n" | \
-  egrep "^[0-9]+:&lt;/rservr&gt;" | egrep -v "^[0-9]+:&lt;/rservr&gt;($|[0-9]+:&lt;rservr [^&lt;]+&gt;)" | \
-  sed -r "s@^[0-9]+:&lt;/rservr&gt;@@" | sed -r "s@([^0-9])([0-9]+:)@\1\n\2@g" | grep .
-
-<i>#check the integrity of command open tags</i>
-cat $1 | grep -n . | tr "\n" "%" | sed -r "s@%([0-9]+:&lt;rservr [^&lt;]+&gt;)@\1@g" | \
-  tr "%" "\n" | egrep "[0-9]+:&lt;rservr [^&lt;]+&gt;$" | \
-  egrep -v "^([0-9]+:&lt;/rservr&gt;|)[0-9]+:&lt;rservr [^&lt;]+&gt;$" | \
-  sed -r "s@^[0-9]+:&lt;/rservr&gt;@@" | sed -r "s@[0-9]+:&lt;rservr [^&lt;]+&gt;\$@@" | grep .
-</pre>
-      </div>
-      <p class="overview_content style_definition_long"> The above script, though very cryptic, reveals commands interrupted by other commands and commands closing while another is open. The script reveals the lines where the errors occur. If you'd like, email me with the general context of the file (such as number of connections logged and IPC intensity) if you encounter logging errors revealed by the script. </p>
+      <p class="overview_content style_definition_long"> You can log several IPC streams to the same log file. Command integrity should be retained by the filters, so even high-intensity IPC from several sources should provide a log of intact commands. </p>
       <div align="center">
         <div border="0" class="attention_box info_box">
           <p>
@@ -429,17 +406,11 @@ cat $1 | grep -n . | tr "\n" "%" | sed -r "s@%([0-9]+:&lt;rservr [^&lt;]+&gt;)@\
       <table summary="definition" class="overview_content">
         <tr>
           <td width="350" align="left" class="style_term"> librservr-protocol.so </td>
-          <td class="style_definition_short"> core communication protocol library </td>
+          <td class="style_definition_short"> core command and communication protocol library </td>
         </tr>
       </table>
       <p>
       </p>
-      <table summary="definition" class="overview_content">
-        <tr>
-          <td width="350" align="left" class="style_term"> librservr-command.so </td>
-          <td class="style_definition_short"> core command operations library </td>
-        </tr>
-      </table>
       <div align="center">
         <div border="0" class="attention_box info_box">
           <p>
@@ -542,7 +513,31 @@ cat $1 | grep -n . | tr "\n" "%" | sed -r "s@%([0-9]+:&lt;rservr [^&lt;]+&gt;)@\
       <table summary="definition" class="overview_content">
         <tr>
           <td width="350" align="left" class="style_term"> librsvp-dataref.so </td>
-          <td class="style_definition_short"> provide control of a parallel data source </td>
+          <td class="style_definition_short"> provide control of a data source </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librsvp-trigger.so </td>
+          <td class="style_definition_short"> send an action trigger between clients </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librsvp-passthru.so </td>
+          <td class="style_definition_short"> facilitate creation of raw-data passthru channels </td>
+        </tr>
+      </table>
+      <p>
+      </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="350" align="left" class="style_term"> librsvp-passthru-assist.so </td>
+          <td class="style_definition_short"> functions to automate common tasks needed for <span class="style_file_name">librsvp-passthru.so</span> </td>
         </tr>
       </table>
       <p>

@@ -50,6 +50,12 @@
         <li>
           <a href="#lds" class="overview_link"><span class="style_file_name">librsvp-dataref.so</span>.</a>
         </li>
+        <li>
+          <a href="#lts" class="overview_link"><span class="style_file_name">librsvp-trigger.so</span>.</a>
+        </li>
+        <li>
+          <a href="#lpsalpas" class="overview_link"><span class="style_file_name">librsvp-passthru.so</span> and <span class="style_file_name">librsvp-passthru-assist.so</span>.</a>
+        </li>
       </ul>
     </div>
     <div class="overview_box">
@@ -78,10 +84,10 @@
           </tr>
 		    <tr>
 		      <td class="command_table_element">
-		        <span class="style_inline_code">netcntl_net_connection_list</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_net_connection_list</span><br />
 		        <span class="style_inline_code">__rsvp_netcntl_hook_net_connection_list</span>
 		        <div><hr /></div>
-		        <span class="style_inline_code">netcntl_local_connection_list</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_local_connection_list</span><br />
 		        <span class="style_inline_code">__rsvp_netcntl_hook_local_connection_list</span></td>
 		      <td>active</td>
 		      <td>service</td>
@@ -90,11 +96,11 @@
           </tr>
 		    <tr>
 		      <td class="command_table_element">
-		        <span class="style_inline_code">netcntl_net_connect</span><br />
-		        <span class="style_inline_code">netcntl_net_connect_cut</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_net_connect</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_net_connect_cut</span><br />
 		        <span class="style_inline_code">__rsvp_netcntl_hook_net_connect</span>
 		        <div><hr /></div>
-		        <span class="style_inline_code">netcntl_local_connect</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_local_connect</span><br />
 		        <span class="style_inline_code">__rsvp_netcntl_hook_local_connect</span></td>
 		      <td>active</td>
 		      <td>service</td>
@@ -103,11 +109,11 @@
           </tr>
 		    <tr class="command_table_row">
 		      <td class="command_table_element">
-		        <span class="style_inline_code">netcntl_net_filtered_connect</span><br />
-		        <span class="style_inline_code">netcntl_net_filtered_connect_cut</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_net_filtered_connect</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_net_filtered_connect_cut</span><br />
 		        <span class="style_inline_code">__rsvp_netcntl_hook_net_filtered_connect</span>
 		        <div><hr /></div>
-		        <span class="style_inline_code">netcntl_local_filtered_connect</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_local_filtered_connect</span><br />
 		        <span class="style_inline_code">__rsvp_netcntl_hook_local_filtered_connect</span></td>
 		      <td>active</td>
 		      <td>service</td>
@@ -116,10 +122,10 @@
           </tr>
 		    <tr class="command_table_row">
 		      <td class="command_table_element">
-		        <span class="style_inline_code">netcntl_net_disconnect</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_net_disconnect</span><br />
 		        <span class="style_inline_code">__rsvp_netcntl_hook_net_disconnect</span>
 		        <div><hr /></div>
-		        <span class="style_inline_code">netcntl_local_disconnect</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_local_disconnect</span><br />
 		        <span class="style_inline_code">__rsvp_netcntl_hook_local_disconnect</span></td>
 		      <td>active</td>
 		      <td>service</td>
@@ -128,10 +134,10 @@
           </tr>
 		    <tr class="command_table_row">
 		      <td class="command_table_element">
-		        <span class="style_inline_code">netcntl_net_listen_list</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_net_listen_list</span><br />
 		        <span class="style_inline_code">__rsvp_netcntl_hook_net_listen_list</span>
 		        <div><hr /></div>
-		        <span class="style_inline_code">netcntl_local_listen_list</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_local_listen_list</span><br />
 		        <span class="style_inline_code">__rsvp_netcntl_hook_local_listen_list</span></td>
 		      <td>admin</td>
 		      <td>active</td>
@@ -140,10 +146,10 @@
           </tr>
 		    <tr class="command_table_row">
 		      <td class="command_table_element">
-		        <span class="style_inline_code">netcntl_net_listen</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_net_listen</span><br />
 		        <span class="style_inline_code">__rsvp_netcntl_hook_net_listen</span>
 		        <div><hr /></div>
-		        <span class="style_inline_code">netcntl_local_listen</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_local_listen</span><br />
 		        <span class="style_inline_code">__rsvp_netcntl_hook_local_listen</span></td>
 		      <td>admin</td>
 		      <td>active</td>
@@ -152,10 +158,10 @@
           </tr>
 		    <tr class="command_table_row">
 		      <td class="command_table_element">
-		        <span class="style_inline_code">netcntl_net_unlisten</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_net_unlisten</span><br />
 		        <span class="style_inline_code">__rsvp_netcntl_hook_net_unlisten</span>
 		        <div><hr /></div>
-		        <span class="style_inline_code">netcntl_local_unlisten</span><br />
+		        <span class="style_inline_code">rsvp_netcntl_local_unlisten</span><br />
 		        <span class="style_inline_code">__rsvp_netcntl_hook_local_unlisten</span></td>
 		      <td>admin</td>
 		      <td>active</td>
@@ -185,7 +191,7 @@
           </tr>
 		    <tr>
 		      <td class="command_table_element">
-		        <span class="style_inline_code">rqconfig_request_configure</span><br />
+		        <span class="style_inline_code">rsvp_rqconfig_request_configure</span><br />
 		        <span class="style_inline_code">__rsvp_rqconfig_hook_request_configure</span></td>
 		      <td>admin<br />control</td>
 		      <td>active</td>
@@ -194,7 +200,7 @@
           </tr>
 		    <tr>
 		      <td class="command_table_element">
-		        <span class="style_inline_code">rqconfig_request_deconfigure</span><br />
+		        <span class="style_inline_code">rsvp_rqconfig_request_deconfigure</span><br />
 		        <span class="style_inline_code">__rsvp_rqconfig_hook_request_deconfigure</span></td>
 		      <td>admin<br />control</td>
 		      <td>active</td>
@@ -226,7 +232,7 @@
           </tr>
 		    <tr>
 		      <td class="command_table_element">
-		        <span class="style_inline_code">rqsrvc_register_services</span><br />
+		        <span class="style_inline_code">rsvp_rqsrvc_register_services</span><br />
 		        <span class="style_inline_code">__rsvp_rqsrvc_hook_register_services</span></td>
 		      <td>service</td>
 		      <td>service</td>
@@ -235,7 +241,7 @@
           </tr>
 		    <tr>
 		      <td class="command_table_element">
-		        <span class="style_inline_code">rqsrvc_deregister_services</span><br />
+		        <span class="style_inline_code">rsvp_rqsrvc_deregister_services</span><br />
 		        <span class="style_inline_code">__rsvp_rqsrvc_hook_deregister_services</span></td>
 		      <td>service</td>
 		      <td>service</td>
@@ -265,8 +271,8 @@
           </tr>
 		    <tr>
 		      <td class="command_table_element">
-		        <span class="style_inline_code">ready_system_ready</span><br />
-		        <span class="style_inline_code">ready_system_ready_response</span><br />
+		        <span class="style_inline_code">rsvp_ready_system_ready</span><br />
+		        <span class="style_inline_code">rsvp_ready_system_ready_response</span><br />
 		        <span class="style_inline_code">__rsvp_ready_hook_system_ready</span></td>
 		      <td>active</td>
 		      <td>active</td>
@@ -275,8 +281,8 @@
           </tr>
 		    <tr>
 		      <td class="command_table_element">
-		        <span class="style_inline_code">ready_system_not_ready</span><br />
-		        <span class="style_inline_code">ready_system_not_ready_response</span><br />
+		        <span class="style_inline_code">rsvp_ready_system_not_ready</span><br />
+		        <span class="style_inline_code">rsvp_ready_system_not_ready_response</span><br />
 		        <span class="style_inline_code">__rsvp_ready_hook_system_not_ready</span></td>
 		      <td>active</td>
 		      <td>active</td>
@@ -285,8 +291,8 @@
           </tr>
 		    <tr>
 		      <td class="command_table_element">
-		        <span class="style_inline_code">ready_system_never_ready</span><br />
-		        <span class="style_inline_code">ready_system_never_ready_response</span><br />
+		        <span class="style_inline_code">rsvp_ready_system_never_ready</span><br />
+		        <span class="style_inline_code">rsvp_ready_system_never_ready_response</span><br />
 		        <span class="style_inline_code">__rsvp_ready_hook_system_never_ready</span></td>
 		      <td>active</td>
 		      <td>active</td>
@@ -318,7 +324,7 @@
           </tr>
 		    <tr>
 		      <td class="command_table_element">
-		        <span class="style_inline_code">dataref_open_reference</span><br />
+		        <span class="style_inline_code">rsvp_dataref_open_reference</span><br />
 		        <span class="style_inline_code">__rsvp_dataref_hook_open_reference</span></td>
 		      <td>service</td>
 		      <td>service</td>
@@ -327,7 +333,7 @@
           </tr>
 		    <tr>
 		      <td class="command_table_element">
-		        <span class="style_inline_code">dataref_change_reference</span><br />
+		        <span class="style_inline_code">rsvp_dataref_change_reference</span><br />
 		        <span class="style_inline_code">__rsvp_dataref_hook_change_reference</span></td>
 		      <td>service</td>
 		      <td>service</td>
@@ -336,7 +342,7 @@
           </tr>
 		    <tr>
 		      <td class="command_table_element">
-		        <span class="style_inline_code">dataref_close_reference</span><br />
+		        <span class="style_inline_code">rsvp_dataref_close_reference</span><br />
 		        <span class="style_inline_code">__rsvp_dataref_hook_close_reference</span></td>
 		      <td>service</td>
 		      <td>service</td>
@@ -345,34 +351,16 @@
           </tr>
 		    <tr>
 		      <td class="command_table_element">
-		        <span class="style_inline_code">dataref_read_data</span><br />
-		        <span class="style_inline_code">__rsvp_dataref_hook_read_data</span></td>
+		        <span class="style_inline_code">rsvp_dataref_transfer_data</span><br />
+		        <span class="style_inline_code">__rsvp_dataref_hook_transfer_data</span></td>
 		      <td>service</td>
 		      <td>service</td>
 		      <td>service</td>
-		      <td class="command_table_comment">request a client read data to a reference</td>
+		      <td class="command_table_comment">request a client transfer data to/from a reference</td>
           </tr>
 		    <tr>
 		      <td class="command_table_element">
-		        <span class="style_inline_code">dataref_write_data</span><br />
-		        <span class="style_inline_code">__rsvp_dataref_hook_write_data</span></td>
-		      <td>service</td>
-		      <td>service</td>
-		      <td>service</td>
-		      <td class="command_table_comment">request a client write data from a reference</td>
-          </tr>
-		    <tr>
-		      <td class="command_table_element">
-		        <span class="style_inline_code">dataref_exchange_data</span><br />
-		        <span class="style_inline_code">__rsvp_dataref_hook_exchange_data</span></td>
-		      <td>service</td>
-		      <td>service</td>
-		      <td>service</td>
-		      <td class="command_table_comment">request a client read, then write data from a reference</td>
-          </tr>
-		    <tr>
-		      <td class="command_table_element">
-		        <span class="style_inline_code">dataref_alteration_response</span><br />
+		        <span class="style_inline_code">rsvp_dataref_alteration_response</span><br />
 		        <span class="style_inline_code">__rsvp_dataref_hook_alteration</span></td>
 		      <td>service</td>
 		      <td>service</td>
@@ -382,6 +370,98 @@
         </table>
       </div>
       <p></p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="lts"><span class="style_file_name">librsvp-trigger.so</span>.</a>
+      </h3>
+      <p class="overview_content"> This library provides a command that requests a client trigger an action. This is intended for one client to "detect" the state of something and trigger a resulting action in another client. For example, the sender might take input from a motion sensor, and send a trigger when motion is detected to the receiver, which might control a light or a camera. </p>
+      <div align="center">
+        <table width="900" class="command_table">
+		    <tr style="font-size: larger;">
+		      <td width="300" class="command_table_element"><b>command / hook</b></td>
+		      <td width="75"><b>create</b></td>
+		      <td width="75"><b>parse</b></td>
+		      <td width="75"><b>execute</b></td>
+		      <td><b>purpose</b></td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">rsvp_trigger_system_trigger</span><br />
+		        <span class="style_inline_code">__rsvp_trigger_hook_system_trigger</span></td>
+		      <td>active</td>
+		      <td>active</td>
+		      <td>active</td>
+		      <td class="command_table_comment">request triggering of an action</td>
+          </tr>
+        </table>
+      </div>
+      <p></p>
+      <p>
+        <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
+      </p>
+    </div>
+    <div class="overview_box">
+      <h3 class="overview_title">
+        <a name="lpsalpas"><span class="style_file_name">librsvp-passthru.so</span> and <span class="style_file_name">librsvp-passthru-assist.so</span>.</a>
+      </h3>
+      <p class="overview_content"> <span class="style_file_name">librsvp-passthru.so</span> provides basic commands for a client to request that another client (almost certainly a <a class="general_link" href="../user/socket-forward.html"> socket forwarder</a>) reappropriate a connection for raw data transfer. This is intended for use with the standard <a class="general_link" href="../user/socket-forward.html"> socket forwarders</a>. </p>
+      <p class="overview_content"> <span class="style_file_name">librsvp-passthru-assist.so</span> provides the function <span class="style_inline_code">rsvp_passthru_assist_steal_channel</span>, which automates the process of creating a local socket and requesting a forwarder connect to it for the creation of a passthru connection. </p>
+      <p class="overview_content"> If you override <span class="style_inline_code">load_all_commands</span> in your client and you also link to <span class="style_file_name">librsvp-passthru-assist.so</span>, you'll also need to make a call to <span class="style_inline_code">rsvp_passthru_load</span> in <span class="style_inline_code">load_all_commands</span> to make sure it gets loaded (see <a class="general_link" href="command-plugin.html#PiLR">plug-in loading requirements</a> for more information.) </p>
+      <div align="center">
+        <table width="900" class="command_table">
+		    <tr style="font-size: larger;">
+		      <td width="300" class="command_table_element"><b>command / hook</b></td>
+		      <td width="75"><b>create</b></td>
+		      <td width="75"><b>parse</b></td>
+		      <td width="75"><b>execute</b></td>
+		      <td><b>purpose</b></td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">rsvp_passthru_reserve_channel</span><br />
+		        <span class="style_inline_code">__rsvp_rqsrvc_hook_reserve_channel</span></td>
+		      <td>active</td>
+		      <td>active</td>
+		      <td>active*</td>
+		      <td class="command_table_comment">request a client reserve a channel for the sender</td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">rsvp_passthru_unreserve_channel</span><br />
+		        <span class="style_inline_code">__rsvp_rqsrvc_hook_unreserve_channel</span></td>
+		      <td>active</td>
+		      <td>active</td>
+		      <td>active*</td>
+		      <td class="command_table_comment">request a client unreserve a channel for the sender</td>
+          </tr>
+		    <tr>
+		      <td class="command_table_element">
+		        <span class="style_inline_code">rsvp_passthru_steal_channel</span><br />
+		        <span class="style_inline_code">__rsvp_rqsrvc_hook_steal_channel</span></td>
+		      <td>active</td>
+		      <td>active</td>
+		      <td>active*</td>
+		      <td class="command_table_comment">request to steal a channel for the sender for passthru</td>
+          </tr>
+        </table>
+      </div>
+      <div align="center"> <p><i>*The command will only be executed if the sender has greater-or-equal status (i.e. "admin" > "control" > "resource") compared to the receiver.</i></p> </div>
+      <p class="overview_content"> Generally what should happen is this: </p>
+      <ol>
+        <li>Assume that "client 1" is connected to the same server as "forwarder 1", "client 2" is connected to the same server as "forwarder 2", and "forwarder 1" has a remote connection to "forwarder 2".<br /><br /></li>
+        <li>The initiating client, "client 1", requests "forwarder 1" reserve an existing connection. If successful, only "client 1" can send commands via this connection. This prevents other clients from using it during the conversion process, which could otherwise cause the passthru connection to be cluttered with command data initially.<br /><br /></li>
+        <li>"client 1" sends a request to "client 2" via the connection it just reserved. This could be any command, so long as "client 2" initiates the appropriate course of action, given below. This will generally require that the actions taken by "client 2" are performed outside of the command queue, e.g. with a "thread" version of a hook function like <span class="style_inline_code">rsvp_dataref_thread_open_reference</span>.<br /><br /></li>
+        <li>"client 2" requests "forwarder 2" reserve the connection it just received the request from "client 1" via. If successful, it responds to "client 1" with success.<br /><br /></li>
+        <li>Upon successful notification from "client 2", "client 1" creates a local socket for "forwarder 1" to pass data to, then requests to "steal" the connection from "forwarder 1". This entire step can be handled automatically with <span class="style_inline_code">rsvp_passthru_assist_steal_channel</span> from <span class="style_file_name">librsvp-passthru-assist.so</span>.<br /><br /></li>
+        <li>"client 2" performs the same local-socket and "steal" step "client 1" performed above.<br /><br /></li>
+        <li>"client 1" and "client 2" can now freely pass raw data via the file descriptors provided by <span class="style_inline_code">rsvp_passthru_assist_steal_channel</span> as long as both clients and both forwarders are running. This will normally require coordination via a non-passthru connection; therefore, a duplicate connection should be made before starting this process.<br /><br /></li>
+      </ol>
+      <p class="overview_content"> If any of the above steps fails prior to a client stealing the connection, the client should send <span class="style_inline_code">rsvp_passthru_unreserve_channel</span> to unreserve the connection. </p>
+      <p class="overview_content"> <b>See the "passthru" example for a full implementation of the steps above.</b> </p>
       <p>
         <a class="general_link goto_top_tag" href="#TOP">[Back to Top]</a>
       </p>

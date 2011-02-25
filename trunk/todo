@@ -20,13 +20,7 @@
   - use this to improve flexibility of syntax?
 - update docs
   - make note that connections between forwarders and selves are very slow!
-  - new library structure
-  - remove old filter-parser script shown in rsvf-log docs
-  - add trigger and passthru to plug-in docs
-  - add passthru documentation to forwarder docs
-    - passthru_allow, passthru_require
-    - passthru_enable/disable (enabled by passthru_allow)
-  - new permissions for rsvp-trigger
+  - document passthru example
 - update structure
   - merge proto- into a single library
   - rename command.h
