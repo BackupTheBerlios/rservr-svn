@@ -203,6 +203,13 @@ public:
 	inline event_functor *copy() const
 	{ return functor? functor->copy() : NULL; }
 
+	~auto_event_functor()
+	{
+	event_functor *old_functor = functor;
+	functor = NULL;
+	delete old_functor;
+	}
+
 private:
 	event_functor *functor;
 };
