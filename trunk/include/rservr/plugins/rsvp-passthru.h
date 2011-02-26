@@ -84,7 +84,7 @@ extern command_handle rsvp_passthru_unreserve_channel(text_info Target,
   text_info Channel);
 
 /*! \param Target
- *  \param Channel name of channel to un-reserve
+ *  \param Channel name of channel to steal for passthru
  *  \param Socket name of a local socket being listened to
  *  \return queued command or error (NULL)
  */

@@ -54,9 +54,6 @@ extern "C" {
 }
 
 
-//NOTE: WORKING!!!
-
-
 //TODO: move 'text_data' typedef somewhere else?
 typedef std::string text_data;
 typedef std::vector <text_data> data_list; //TODO: is this needed anywhere?
