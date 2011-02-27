@@ -62,11 +62,11 @@ int protocol_lex_destroy(void*);
 void protocol_set_extra(YY_EXTRA_TYPE, void*);
 int protocol_lex(void*, YYSTYPE*);
 void protocol_set_out(FILE*, void*);
-ssize_t get_input(struct lexer_input*, char*, ssize_t);
+ssize_t parser_get_input(struct lexer_input*, char*, ssize_t);
 }
 
 
-ssize_t get_input(lexer_input *iInput, char *bBuffer, ssize_t mMax)
+ssize_t parser_get_input(lexer_input *iInput, char *bBuffer, ssize_t mMax)
 {
 	if (!iInput) return 0;
 

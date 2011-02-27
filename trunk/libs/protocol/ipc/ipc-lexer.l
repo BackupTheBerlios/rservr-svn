@@ -56,10 +56,10 @@ int parse_u_integer16(const char *dData, unsigned int *vValue)
 }
 
 
-ssize_t get_input(struct data_input*, char*, ssize_t);
+ssize_t parser_get_input(struct data_input*, char*, ssize_t);
 
 #define YY_INPUT(buffer,result,max_size) \
-{ result = get_input(yyextra->input, buffer, max_size); }
+{ result = parser_get_input(yyextra->input, buffer, max_size); }
 
 #define ECHO /*prevent printing of discarded data*/
 %}
