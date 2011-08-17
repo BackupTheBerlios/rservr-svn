@@ -74,11 +74,11 @@ public:
 	{
 	if (!mMutex || !this->active()) return false;
 	bool outcome = false;
-	while (!(outcome = pthread_mutex_trylock(mMutex) == 0) && errno == EINTR);
+	while (!(outcome = pthread_mutex_lock(mMutex) == 0) && errno == EINTR);
 	if (!outcome) return false;
 	while (!(outcome = pthread_cond_wait(&condition, mMutex) == 0) && errno == EINTR);
-	if (!outcome) return false;
 	while (pthread_mutex_unlock(mMutex) != 0 && errno == EINTR);
+	if (!outcome) return false;
 	return this->active() && outcome;
 	}
 
