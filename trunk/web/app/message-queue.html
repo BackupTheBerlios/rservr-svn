@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+﻿<?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
@@ -153,7 +153,7 @@
 
 <i>//hook the function below with <b>set_queue_event_hook</b> to exit when the queue does</i>
 static void message_queue_hook(int eEvent)
-{ if (eEvent == <b>RSERVR_QUEUE_STOP</b>) exit(0); } 
+{ if (eEvent == <b>RSERVR_QUEUE_STOP</b>) exit(0); }
 </pre>
       </div>
       <p>
@@ -319,8 +319,7 @@ struct message_info
 <b><u>#include &lt;rservr/api/message-queue.h&gt;</u></b>
 
 <i>//block the current thread until the queue receives message</i>
-<b>result message_queue_sync(pthread_mutex_t*);</b>
-<i>//provide an unlocked mutex</i>
+<b>result message_queue_sync();</b>
 
 <i>//manually release all threads blocked to wait for messages</i>
 <b>void queue_sync_continue();</b>
@@ -336,12 +335,9 @@ struct message_info
 
 result await_messages()
 {
-	pthread_mutex_t wait_mutex = PTHREAD_MUTEX_INITIALIZER;
-	if (pthread_mutex_init(&wait_mutex, NULL) &lt; 0) return 0;
-
 	const struct <b>message_info</b> *message = NULL;
 
-	while (<b>message_queue_sync</b>(&wait_mutex))
+	while (<b>message_queue_sync</b>())
 	{
 
 	while ((message = <b>current_message</b>()))
@@ -462,7 +458,7 @@ result await_messages()
 
 <i>//enable automatic message-queue pausing</i>
 <b>result message_queue_auto_pause(double, double, long_time);</b>
-<i>/* the first argument indicates the threshold limit and the second argument indicates 
+<i>/* the first argument indicates the threshold limit and the second argument indicates
    the restore mark, both by percentage of queue fullness, (0,1] and [0,1), respectively.
    the third argument indicates the timeout value once the queue is paused, in seconds.
    once the message queue reaches the threshold it pauses for the time given, or until

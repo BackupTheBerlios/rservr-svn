@@ -1,4 +1,4 @@
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
+﻿/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
 
 ______]|]]]]|]__]|]]]]|]__]|]]]]]|]__]|]]]]|]__]|]__]|]__]|]]]]|]_______,_______
 _____]|]__]|]__]|]_______]|]___]|]__]|]__]|]___]|]_]|]__]|]__]|]_______, ,______
@@ -462,10 +462,9 @@ extern queue_event_hook set_queue_event_hook(queue_event_hook Callback);
  * Cause the current function to block and wait for a message to be added to the
  * message queue.
  *
- * \param Mutex pointer to an initialized, unlocked mutex
  * \return success (true) or failure (false)
  */
-extern result message_queue_sync(pthread_mutex_t *Mutex);
+extern result message_queue_sync();
 
 /*! \brief Continue blocked synchronizations.
  *

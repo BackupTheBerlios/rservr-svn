@@ -1,4 +1,4 @@
-/* This software is released under the BSD License.
+﻿/* This software is released under the BSD License.
  |
  | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
@@ -69,8 +69,6 @@
 #include <signal.h> /* 'signal'*/
 #include <stdlib.h> /* 'exit' */
 #include <errno.h> /* 'errno' */
-
-#include "static-auto-mutex.h"
 
 #ifdef RSV_SOCKET
 #include "socket-table.h"
@@ -290,7 +288,7 @@ int main(int argc, char *argv[])
 	/*message forwarding to selected pipe*/
 #endif
 	{
-	if ( (message_queue_pause_state() || message_queue_sync(auto_mutex_get())) &&
+	if ( (message_queue_pause_state() || message_queue_sync()) &&
 	     (message = current_message()) )
 	 {
 	if (RSERVR_IS_REMOTE(message) && RSERVR_REMOTE_COMMAND(message))

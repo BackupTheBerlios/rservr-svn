@@ -1,4 +1,4 @@
-/* This software is released under the BSD License.
+﻿/* This software is released under the BSD License.
  |
  | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
@@ -708,17 +708,19 @@ private:
 };
 
 
-result message_queue_sync(pthread_mutex_t *mMutex)
+result message_queue_sync()
 {
+	static auto_mutex sync_mutex;
+
 	if (calling_from_message_queue()) return false;
 
 	if (message_queue_size()) return true;
 	if (!message_queue_status()) return message_queue_size()? true : false;
 
-	if (!mMutex || !message_sync_resume.active()) return false;
+	if (!message_sync_resume.active()) return false;
 
 	message_queue_unpause();
-	if (!message_sync_resume.block(mMutex)) return false;
+	if (!message_sync_resume.block(sync_mutex)) return false;
 
 	return message_queue_status() || message_queue_size();
 }

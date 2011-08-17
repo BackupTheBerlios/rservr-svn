@@ -48,8 +48,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_rsv_controller_OBJECTS = rsv_controller-rsv-forward.$(OBJEXT) \
-	rsv_controller-static-auto-mutex.$(OBJEXT)
+am_rsv_controller_OBJECTS = rsv_controller-rsv-forward.$(OBJEXT)
 rsv_controller_OBJECTS = $(am_rsv_controller_OBJECTS)
 am__DEPENDENCIES_1 =
 rsv_controller_DEPENDENCIES = $(am__DEPENDENCIES_1) \
@@ -63,7 +62,6 @@ am_rsv_fscontroller_OBJECTS = rsv_fscontroller-rsv-forward.$(OBJEXT) \
 	rsv_fscontroller-select-breaker.$(OBJEXT) \
 	rsv_fscontroller-listen.$(OBJEXT) \
 	rsv_fscontroller-connect.$(OBJEXT) \
-	rsv_fscontroller-static-auto-mutex.$(OBJEXT) \
 	rsv_fscontroller-ipc-passthru.$(OBJEXT)
 rsv_fscontroller_OBJECTS = $(am_rsv_fscontroller_OBJECTS)
 rsv_fscontroller_DEPENDENCIES = $(am__DEPENDENCIES_1) \
@@ -79,7 +77,6 @@ am_rsv_fsrelay_OBJECTS = rsv_fsrelay-rsv-forward.$(OBJEXT) \
 	rsv_fsrelay-remote-filter.$(OBJEXT) \
 	rsv_fsrelay-select-breaker.$(OBJEXT) \
 	rsv_fsrelay-listen.$(OBJEXT) rsv_fsrelay-connect.$(OBJEXT) \
-	rsv_fsrelay-static-auto-mutex.$(OBJEXT) \
 	rsv_fsrelay-ipc-passthru.$(OBJEXT)
 rsv_fsrelay_OBJECTS = $(am_rsv_fsrelay_OBJECTS)
 rsv_fsrelay_DEPENDENCIES = $(am__DEPENDENCIES_1) \
@@ -97,7 +94,6 @@ am_rsv_netcontroller_OBJECTS =  \
 	rsv_netcontroller-select-breaker.$(OBJEXT) \
 	rsv_netcontroller-listen.$(OBJEXT) \
 	rsv_netcontroller-connect.$(OBJEXT) \
-	rsv_netcontroller-static-auto-mutex.$(OBJEXT) \
 	rsv_netcontroller-ipc-passthru.$(OBJEXT)
 rsv_netcontroller_OBJECTS = $(am_rsv_netcontroller_OBJECTS)
 rsv_netcontroller_DEPENDENCIES = $(am__DEPENDENCIES_1) \
@@ -113,7 +109,6 @@ am_rsv_netrelay_OBJECTS = rsv_netrelay-rsv-forward.$(OBJEXT) \
 	rsv_netrelay-remote-filter.$(OBJEXT) \
 	rsv_netrelay-select-breaker.$(OBJEXT) \
 	rsv_netrelay-listen.$(OBJEXT) rsv_netrelay-connect.$(OBJEXT) \
-	rsv_netrelay-static-auto-mutex.$(OBJEXT) \
 	rsv_netrelay-ipc-passthru.$(OBJEXT)
 rsv_netrelay_OBJECTS = $(am_rsv_netrelay_OBJECTS)
 rsv_netrelay_DEPENDENCIES = $(am__DEPENDENCIES_1) \
@@ -123,8 +118,7 @@ rsv_netrelay_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	../../../libs/client/librservr-client.la
 am_rsv_relay_OBJECTS = rsv_relay-rsv-forward.$(OBJEXT) \
 	rsv_relay-messages.$(OBJEXT) \
-	rsv_relay-monitor-services.$(OBJEXT) \
-	rsv_relay-static-auto-mutex.$(OBJEXT)
+	rsv_relay-monitor-services.$(OBJEXT)
 rsv_relay_OBJECTS = $(am_rsv_relay_OBJECTS)
 rsv_relay_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	../../../plugins/rsvp-rqsrvc/librsvp-rqsrvc-auto.la \
@@ -179,6 +173,7 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DLLTOOL = @DLLTOOL@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
@@ -202,6 +197,7 @@ LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
 NM = @NM@
 NMEDIT = @NMEDIT@
@@ -234,6 +230,7 @@ abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
+ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
@@ -267,7 +264,6 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
-lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
@@ -287,22 +283,22 @@ top_srcdir = @top_srcdir@
 ALL_INCLUDES = $(STANDARD_INCLUDES) -I$(srcdir)/../../.. -I$(srcdir)/../../../include/rservr -I$(srcdir)/../../../include
 AM_CPPFLAGS = -DENABLE_VIRT_ARRAY_ALL -DPLUGIN_PATH=\"$(PLUGIN_PATH)\" $(ALL_INCLUDES)
 rsv_relay_CPPFLAGS = $(AM_CPPFLAGS) -DRSV_RELAY -DRSV_PIPE
-rsv_relay_SOURCES = rsv-forward.c messages.c monitor-services.cpp static-auto-mutex.cpp messages.h monitor-services.h static-auto-mutex.h
+rsv_relay_SOURCES = rsv-forward.c messages.c monitor-services.cpp messages.h monitor-services.h
 rsv_relay_LDADD = $(STANDARD_LIBRARIES) $(USE_LIBPTHREAD) ../../../plugins/rsvp-rqsrvc/librsvp-rqsrvc-auto.la ../../../libs/client/librservr-client.la
 rsv_controller_CPPFLAGS = $(AM_CPPFLAGS) -DRSV_CONTROLLER -DRSV_PIPE
-rsv_controller_SOURCES = rsv-forward.c static-auto-mutex.cpp static-auto-mutex.h
+rsv_controller_SOURCES = rsv-forward.c
 rsv_controller_LDADD = $(STANDARD_LIBRARIES) $(USE_LIBPTHREAD) ../../../libs/client/librservr-client.la
 rsv_netrelay_CPPFLAGS = $(AM_CPPFLAGS) -DRSV_RELAY -DRSV_NET -DRSV_SOCKET
-rsv_netrelay_SOURCES = rsv-forward.c socket-table.cpp socket-check.c messages.c monitor-services.cpp security-filter.cpp remote-filter.c select-breaker.c listen.cpp connect.cpp static-auto-mutex.cpp socket-table.h socket-check.h messages.h monitor-services.h security-filter.h remote-filter.h listen.hpp connect.hpp select-breaker.h static-auto-mutex.h ipc-passthru.h ipc-passthru.cpp
+rsv_netrelay_SOURCES = rsv-forward.c socket-table.cpp socket-check.c messages.c monitor-services.cpp security-filter.cpp remote-filter.c select-breaker.c listen.cpp connect.cpp socket-table.h socket-check.h messages.h monitor-services.h security-filter.h remote-filter.h listen.hpp connect.hpp select-breaker.h ipc-passthru.h ipc-passthru.cpp
 rsv_netrelay_LDADD = $(STANDARD_LIBRARIES) $(USE_LIBPTHREAD) ../../../plugins/rsvp-rqsrvc/librsvp-rqsrvc-auto.la ../../../plugins/rsvp-netcntl/librsvp-netcntl.la ../../../plugins/rsvp-passthru/librsvp-passthru.la ../../../libs/client/librservr-client.la
 rsv_netcontroller_CPPFLAGS = $(AM_CPPFLAGS) -DRSV_CONTROLLER -DRSV_NET -DRSV_SOCKET
-rsv_netcontroller_SOURCES = rsv-forward.c socket-table.cpp messages.c security-filter.cpp socket-check.c remote-filter.c select-breaker.c listen.cpp connect.cpp static-auto-mutex.cpp socket-table.h socket-check.h messages.h security-filter.h remote-filter.h listen.hpp connect.hpp select-breaker.h static-auto-mutex.h ipc-passthru.h ipc-passthru.cpp
+rsv_netcontroller_SOURCES = rsv-forward.c socket-table.cpp messages.c security-filter.cpp socket-check.c remote-filter.c select-breaker.c listen.cpp connect.cpp socket-table.h socket-check.h messages.h security-filter.h remote-filter.h listen.hpp connect.hpp select-breaker.h ipc-passthru.h ipc-passthru.cpp
 rsv_netcontroller_LDADD = $(STANDARD_LIBRARIES) $(USE_LIBPTHREAD) ../../../plugins/rsvp-netcntl/librsvp-netcntl.la ../../../plugins/rsvp-passthru/librsvp-passthru.la ../../../libs/client/librservr-client.la
 rsv_fsrelay_CPPFLAGS = $(AM_CPPFLAGS) -DRSV_RELAY -DRSV_LOCAL -DRSV_SOCKET
-rsv_fsrelay_SOURCES = rsv-forward.c socket-table.cpp socket-check.c messages.c monitor-services.cpp security-filter.cpp remote-filter.c select-breaker.c listen.cpp connect.cpp static-auto-mutex.cpp socket-table.h socket-check.h messages.h monitor-services.h security-filter.h remote-filter.h listen.hpp connect.hpp select-breaker.h static-auto-mutex.h ipc-passthru.h ipc-passthru.cpp
+rsv_fsrelay_SOURCES = rsv-forward.c socket-table.cpp socket-check.c messages.c monitor-services.cpp security-filter.cpp remote-filter.c select-breaker.c listen.cpp connect.cpp socket-table.h socket-check.h messages.h monitor-services.h security-filter.h remote-filter.h listen.hpp connect.hpp select-breaker.h ipc-passthru.h ipc-passthru.cpp
 rsv_fsrelay_LDADD = $(STANDARD_LIBRARIES) $(USE_LIBPTHREAD) ../../../plugins/rsvp-rqsrvc/librsvp-rqsrvc-auto.la ../../../plugins/rsvp-netcntl/librsvp-netcntl.la ../../../plugins/rsvp-passthru/librsvp-passthru.la ../../../libs/client/librservr-client.la
 rsv_fscontroller_CPPFLAGS = $(AM_CPPFLAGS) -DRSV_CONTROLLER -DRSV_LOCAL -DRSV_SOCKET
-rsv_fscontroller_SOURCES = rsv-forward.c socket-table.cpp socket-check.c messages.c security-filter.cpp remote-filter.c select-breaker.c listen.cpp connect.cpp static-auto-mutex.cpp socket-table.h socket-check.h messages.h security-filter.h remote-filter.h listen.hpp connect.hpp select-breaker.h static-auto-mutex.h ipc-passthru.h ipc-passthru.cpp
+rsv_fscontroller_SOURCES = rsv-forward.c socket-table.cpp socket-check.c messages.c security-filter.cpp remote-filter.c select-breaker.c listen.cpp connect.cpp socket-table.h socket-check.h messages.h security-filter.h remote-filter.h listen.hpp connect.hpp select-breaker.h ipc-passthru.h ipc-passthru.cpp
 rsv_fscontroller_LDADD = $(STANDARD_LIBRARIES) $(USE_LIBPTHREAD) ../../../plugins/rsvp-netcntl/librsvp-netcntl.la ../../../plugins/rsvp-passthru/librsvp-passthru.la ../../../libs/client/librservr-client.la
 all: all-am
 
@@ -383,7 +379,7 @@ clean-binPROGRAMS:
 	rm -f $$list
 rsv-controller$(EXEEXT): $(rsv_controller_OBJECTS) $(rsv_controller_DEPENDENCIES) 
 	@rm -f rsv-controller$(EXEEXT)
-	$(CXXLINK) $(rsv_controller_OBJECTS) $(rsv_controller_LDADD) $(LIBS)
+	$(LINK) $(rsv_controller_OBJECTS) $(rsv_controller_LDADD) $(LIBS)
 rsv-fscontroller$(EXEEXT): $(rsv_fscontroller_OBJECTS) $(rsv_fscontroller_DEPENDENCIES) 
 	@rm -f rsv-fscontroller$(EXEEXT)
 	$(CXXLINK) $(rsv_fscontroller_OBJECTS) $(rsv_fscontroller_LDADD) $(LIBS)
@@ -407,7 +403,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_controller-rsv-forward.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_controller-static-auto-mutex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_fscontroller-connect.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_fscontroller-ipc-passthru.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_fscontroller-listen.Po@am__quote@
@@ -418,7 +413,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_fscontroller-select-breaker.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_fscontroller-socket-check.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_fscontroller-socket-table.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_fscontroller-static-auto-mutex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_fsrelay-connect.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_fsrelay-ipc-passthru.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_fsrelay-listen.Po@am__quote@
@@ -430,7 +424,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_fsrelay-select-breaker.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_fsrelay-socket-check.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_fsrelay-socket-table.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_fsrelay-static-auto-mutex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_netcontroller-connect.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_netcontroller-ipc-passthru.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_netcontroller-listen.Po@am__quote@
@@ -441,7 +434,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_netcontroller-select-breaker.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_netcontroller-socket-check.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_netcontroller-socket-table.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_netcontroller-static-auto-mutex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_netrelay-connect.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_netrelay-ipc-passthru.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_netrelay-listen.Po@am__quote@
@@ -453,11 +445,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_netrelay-select-breaker.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_netrelay-socket-check.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_netrelay-socket-table.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_netrelay-static-auto-mutex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_relay-messages.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_relay-monitor-services.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_relay-rsv-forward.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_relay-static-auto-mutex.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -823,20 +813,6 @@ rsv_relay-messages.obj: messages.c
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
-rsv_controller-static-auto-mutex.o: static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_controller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_controller-static-auto-mutex.o -MD -MP -MF $(DEPDIR)/rsv_controller-static-auto-mutex.Tpo -c -o rsv_controller-static-auto-mutex.o `test -f 'static-auto-mutex.cpp' || echo '$(srcdir)/'`static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_controller-static-auto-mutex.Tpo $(DEPDIR)/rsv_controller-static-auto-mutex.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='static-auto-mutex.cpp' object='rsv_controller-static-auto-mutex.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_controller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_controller-static-auto-mutex.o `test -f 'static-auto-mutex.cpp' || echo '$(srcdir)/'`static-auto-mutex.cpp
-
-rsv_controller-static-auto-mutex.obj: static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_controller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_controller-static-auto-mutex.obj -MD -MP -MF $(DEPDIR)/rsv_controller-static-auto-mutex.Tpo -c -o rsv_controller-static-auto-mutex.obj `if test -f 'static-auto-mutex.cpp'; then $(CYGPATH_W) 'static-auto-mutex.cpp'; else $(CYGPATH_W) '$(srcdir)/static-auto-mutex.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_controller-static-auto-mutex.Tpo $(DEPDIR)/rsv_controller-static-auto-mutex.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='static-auto-mutex.cpp' object='rsv_controller-static-auto-mutex.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_controller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_controller-static-auto-mutex.obj `if test -f 'static-auto-mutex.cpp'; then $(CYGPATH_W) 'static-auto-mutex.cpp'; else $(CYGPATH_W) '$(srcdir)/static-auto-mutex.cpp'; fi`
-
 rsv_fscontroller-socket-table.o: socket-table.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_fscontroller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_fscontroller-socket-table.o -MD -MP -MF $(DEPDIR)/rsv_fscontroller-socket-table.Tpo -c -o rsv_fscontroller-socket-table.o `test -f 'socket-table.cpp' || echo '$(srcdir)/'`socket-table.cpp
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_fscontroller-socket-table.Tpo $(DEPDIR)/rsv_fscontroller-socket-table.Po
@@ -892,20 +868,6 @@ rsv_fscontroller-connect.obj: connect.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='connect.cpp' object='rsv_fscontroller-connect.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_fscontroller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_fscontroller-connect.obj `if test -f 'connect.cpp'; then $(CYGPATH_W) 'connect.cpp'; else $(CYGPATH_W) '$(srcdir)/connect.cpp'; fi`
-
-rsv_fscontroller-static-auto-mutex.o: static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_fscontroller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_fscontroller-static-auto-mutex.o -MD -MP -MF $(DEPDIR)/rsv_fscontroller-static-auto-mutex.Tpo -c -o rsv_fscontroller-static-auto-mutex.o `test -f 'static-auto-mutex.cpp' || echo '$(srcdir)/'`static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_fscontroller-static-auto-mutex.Tpo $(DEPDIR)/rsv_fscontroller-static-auto-mutex.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='static-auto-mutex.cpp' object='rsv_fscontroller-static-auto-mutex.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_fscontroller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_fscontroller-static-auto-mutex.o `test -f 'static-auto-mutex.cpp' || echo '$(srcdir)/'`static-auto-mutex.cpp
-
-rsv_fscontroller-static-auto-mutex.obj: static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_fscontroller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_fscontroller-static-auto-mutex.obj -MD -MP -MF $(DEPDIR)/rsv_fscontroller-static-auto-mutex.Tpo -c -o rsv_fscontroller-static-auto-mutex.obj `if test -f 'static-auto-mutex.cpp'; then $(CYGPATH_W) 'static-auto-mutex.cpp'; else $(CYGPATH_W) '$(srcdir)/static-auto-mutex.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_fscontroller-static-auto-mutex.Tpo $(DEPDIR)/rsv_fscontroller-static-auto-mutex.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='static-auto-mutex.cpp' object='rsv_fscontroller-static-auto-mutex.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_fscontroller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_fscontroller-static-auto-mutex.obj `if test -f 'static-auto-mutex.cpp'; then $(CYGPATH_W) 'static-auto-mutex.cpp'; else $(CYGPATH_W) '$(srcdir)/static-auto-mutex.cpp'; fi`
 
 rsv_fscontroller-ipc-passthru.o: ipc-passthru.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_fscontroller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_fscontroller-ipc-passthru.o -MD -MP -MF $(DEPDIR)/rsv_fscontroller-ipc-passthru.Tpo -c -o rsv_fscontroller-ipc-passthru.o `test -f 'ipc-passthru.cpp' || echo '$(srcdir)/'`ipc-passthru.cpp
@@ -991,20 +953,6 @@ rsv_fsrelay-connect.obj: connect.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_fsrelay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_fsrelay-connect.obj `if test -f 'connect.cpp'; then $(CYGPATH_W) 'connect.cpp'; else $(CYGPATH_W) '$(srcdir)/connect.cpp'; fi`
 
-rsv_fsrelay-static-auto-mutex.o: static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_fsrelay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_fsrelay-static-auto-mutex.o -MD -MP -MF $(DEPDIR)/rsv_fsrelay-static-auto-mutex.Tpo -c -o rsv_fsrelay-static-auto-mutex.o `test -f 'static-auto-mutex.cpp' || echo '$(srcdir)/'`static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_fsrelay-static-auto-mutex.Tpo $(DEPDIR)/rsv_fsrelay-static-auto-mutex.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='static-auto-mutex.cpp' object='rsv_fsrelay-static-auto-mutex.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_fsrelay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_fsrelay-static-auto-mutex.o `test -f 'static-auto-mutex.cpp' || echo '$(srcdir)/'`static-auto-mutex.cpp
-
-rsv_fsrelay-static-auto-mutex.obj: static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_fsrelay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_fsrelay-static-auto-mutex.obj -MD -MP -MF $(DEPDIR)/rsv_fsrelay-static-auto-mutex.Tpo -c -o rsv_fsrelay-static-auto-mutex.obj `if test -f 'static-auto-mutex.cpp'; then $(CYGPATH_W) 'static-auto-mutex.cpp'; else $(CYGPATH_W) '$(srcdir)/static-auto-mutex.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_fsrelay-static-auto-mutex.Tpo $(DEPDIR)/rsv_fsrelay-static-auto-mutex.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='static-auto-mutex.cpp' object='rsv_fsrelay-static-auto-mutex.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_fsrelay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_fsrelay-static-auto-mutex.obj `if test -f 'static-auto-mutex.cpp'; then $(CYGPATH_W) 'static-auto-mutex.cpp'; else $(CYGPATH_W) '$(srcdir)/static-auto-mutex.cpp'; fi`
-
 rsv_fsrelay-ipc-passthru.o: ipc-passthru.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_fsrelay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_fsrelay-ipc-passthru.o -MD -MP -MF $(DEPDIR)/rsv_fsrelay-ipc-passthru.Tpo -c -o rsv_fsrelay-ipc-passthru.o `test -f 'ipc-passthru.cpp' || echo '$(srcdir)/'`ipc-passthru.cpp
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_fsrelay-ipc-passthru.Tpo $(DEPDIR)/rsv_fsrelay-ipc-passthru.Po
@@ -1074,20 +1022,6 @@ rsv_netcontroller-connect.obj: connect.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='connect.cpp' object='rsv_netcontroller-connect.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_netcontroller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_netcontroller-connect.obj `if test -f 'connect.cpp'; then $(CYGPATH_W) 'connect.cpp'; else $(CYGPATH_W) '$(srcdir)/connect.cpp'; fi`
-
-rsv_netcontroller-static-auto-mutex.o: static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_netcontroller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_netcontroller-static-auto-mutex.o -MD -MP -MF $(DEPDIR)/rsv_netcontroller-static-auto-mutex.Tpo -c -o rsv_netcontroller-static-auto-mutex.o `test -f 'static-auto-mutex.cpp' || echo '$(srcdir)/'`static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_netcontroller-static-auto-mutex.Tpo $(DEPDIR)/rsv_netcontroller-static-auto-mutex.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='static-auto-mutex.cpp' object='rsv_netcontroller-static-auto-mutex.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_netcontroller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_netcontroller-static-auto-mutex.o `test -f 'static-auto-mutex.cpp' || echo '$(srcdir)/'`static-auto-mutex.cpp
-
-rsv_netcontroller-static-auto-mutex.obj: static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_netcontroller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_netcontroller-static-auto-mutex.obj -MD -MP -MF $(DEPDIR)/rsv_netcontroller-static-auto-mutex.Tpo -c -o rsv_netcontroller-static-auto-mutex.obj `if test -f 'static-auto-mutex.cpp'; then $(CYGPATH_W) 'static-auto-mutex.cpp'; else $(CYGPATH_W) '$(srcdir)/static-auto-mutex.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_netcontroller-static-auto-mutex.Tpo $(DEPDIR)/rsv_netcontroller-static-auto-mutex.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='static-auto-mutex.cpp' object='rsv_netcontroller-static-auto-mutex.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_netcontroller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_netcontroller-static-auto-mutex.obj `if test -f 'static-auto-mutex.cpp'; then $(CYGPATH_W) 'static-auto-mutex.cpp'; else $(CYGPATH_W) '$(srcdir)/static-auto-mutex.cpp'; fi`
 
 rsv_netcontroller-ipc-passthru.o: ipc-passthru.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_netcontroller_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_netcontroller-ipc-passthru.o -MD -MP -MF $(DEPDIR)/rsv_netcontroller-ipc-passthru.Tpo -c -o rsv_netcontroller-ipc-passthru.o `test -f 'ipc-passthru.cpp' || echo '$(srcdir)/'`ipc-passthru.cpp
@@ -1173,20 +1107,6 @@ rsv_netrelay-connect.obj: connect.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_netrelay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_netrelay-connect.obj `if test -f 'connect.cpp'; then $(CYGPATH_W) 'connect.cpp'; else $(CYGPATH_W) '$(srcdir)/connect.cpp'; fi`
 
-rsv_netrelay-static-auto-mutex.o: static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_netrelay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_netrelay-static-auto-mutex.o -MD -MP -MF $(DEPDIR)/rsv_netrelay-static-auto-mutex.Tpo -c -o rsv_netrelay-static-auto-mutex.o `test -f 'static-auto-mutex.cpp' || echo '$(srcdir)/'`static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_netrelay-static-auto-mutex.Tpo $(DEPDIR)/rsv_netrelay-static-auto-mutex.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='static-auto-mutex.cpp' object='rsv_netrelay-static-auto-mutex.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_netrelay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_netrelay-static-auto-mutex.o `test -f 'static-auto-mutex.cpp' || echo '$(srcdir)/'`static-auto-mutex.cpp
-
-rsv_netrelay-static-auto-mutex.obj: static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_netrelay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_netrelay-static-auto-mutex.obj -MD -MP -MF $(DEPDIR)/rsv_netrelay-static-auto-mutex.Tpo -c -o rsv_netrelay-static-auto-mutex.obj `if test -f 'static-auto-mutex.cpp'; then $(CYGPATH_W) 'static-auto-mutex.cpp'; else $(CYGPATH_W) '$(srcdir)/static-auto-mutex.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_netrelay-static-auto-mutex.Tpo $(DEPDIR)/rsv_netrelay-static-auto-mutex.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='static-auto-mutex.cpp' object='rsv_netrelay-static-auto-mutex.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_netrelay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_netrelay-static-auto-mutex.obj `if test -f 'static-auto-mutex.cpp'; then $(CYGPATH_W) 'static-auto-mutex.cpp'; else $(CYGPATH_W) '$(srcdir)/static-auto-mutex.cpp'; fi`
-
 rsv_netrelay-ipc-passthru.o: ipc-passthru.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_netrelay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_netrelay-ipc-passthru.o -MD -MP -MF $(DEPDIR)/rsv_netrelay-ipc-passthru.Tpo -c -o rsv_netrelay-ipc-passthru.o `test -f 'ipc-passthru.cpp' || echo '$(srcdir)/'`ipc-passthru.cpp
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_netrelay-ipc-passthru.Tpo $(DEPDIR)/rsv_netrelay-ipc-passthru.Po
@@ -1214,20 +1134,6 @@ rsv_relay-monitor-services.obj: monitor-services.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='monitor-services.cpp' object='rsv_relay-monitor-services.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_relay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_relay-monitor-services.obj `if test -f 'monitor-services.cpp'; then $(CYGPATH_W) 'monitor-services.cpp'; else $(CYGPATH_W) '$(srcdir)/monitor-services.cpp'; fi`
-
-rsv_relay-static-auto-mutex.o: static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_relay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_relay-static-auto-mutex.o -MD -MP -MF $(DEPDIR)/rsv_relay-static-auto-mutex.Tpo -c -o rsv_relay-static-auto-mutex.o `test -f 'static-auto-mutex.cpp' || echo '$(srcdir)/'`static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_relay-static-auto-mutex.Tpo $(DEPDIR)/rsv_relay-static-auto-mutex.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='static-auto-mutex.cpp' object='rsv_relay-static-auto-mutex.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_relay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_relay-static-auto-mutex.o `test -f 'static-auto-mutex.cpp' || echo '$(srcdir)/'`static-auto-mutex.cpp
-
-rsv_relay-static-auto-mutex.obj: static-auto-mutex.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_relay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_relay-static-auto-mutex.obj -MD -MP -MF $(DEPDIR)/rsv_relay-static-auto-mutex.Tpo -c -o rsv_relay-static-auto-mutex.obj `if test -f 'static-auto-mutex.cpp'; then $(CYGPATH_W) 'static-auto-mutex.cpp'; else $(CYGPATH_W) '$(srcdir)/static-auto-mutex.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_relay-static-auto-mutex.Tpo $(DEPDIR)/rsv_relay-static-auto-mutex.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='static-auto-mutex.cpp' object='rsv_relay-static-auto-mutex.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_relay_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_relay-static-auto-mutex.obj `if test -f 'static-auto-mutex.cpp'; then $(CYGPATH_W) 'static-auto-mutex.cpp'; else $(CYGPATH_W) '$(srcdir)/static-auto-mutex.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
