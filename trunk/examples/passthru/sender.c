@@ -8,7 +8,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/socket.h>
 
 #include <rservr/api/client.h>
 #include <rservr/api/client-timing.h>

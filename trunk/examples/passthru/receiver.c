@@ -1,4 +1,4 @@
-/* This client acts passively and waits for direction from 'sender' (sender.c).
+﻿/* This client acts passively and waits for direction from 'sender' (sender.c).
  * 'sender' sends a request via a remote connection for this client to steal
  * the connection the request was sent via for passthru. Once this happens,
  * this client waits for direction from 'sender' to read data from the passthru
@@ -12,7 +12,6 @@
 #include <errno.h>
 #include <pthread.h>
 #include <unistd.h>
-#include <sys/socket.h>
 
 #include <rservr/api/client.h>
 #include <rservr/api/client-timing.h>
@@ -26,8 +25,6 @@
 #include <rservr/plugins/rsvp-passthru-assist.h>
 #include <rservr/plugins/rsvp-trigger-hook.h>
 
-
-static pthread_mutex_t queue_sync = PTHREAD_MUTEX_INITIALIZER;
 
 /*data describing the passthru connection*/
 static pthread_mutex_t dataref_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -65,13 +62,6 @@ int main(int argc, char *argv[])
 	if (argc < 2 || !strlen(argv[1]))
 	{
 	fprintf(stderr, "%s [client name]\n", argv[0]);
-	return 1;
-	}
-
-
-	if (pthread_mutex_init(&queue_sync, NULL) < 0)
-	{
-	fprintf(stderr, "%s: mutex initialization failure: %s\n", argv[0], strerror(errno));
 	return 1;
 	}
 
@@ -222,8 +212,8 @@ uint8_t mMode, ssize_t oOffset, ssize_t sSize)
 	  so the sender's address shouldn't be checked. given that the
 	  name of the forwarder matches, there can only be one client with the
 	  name we previously recorded.*/
-	if (mMode != RSVP_DATAREF_MODE_READ || rReference != dataref_ref || !iInfo ||
-	  strcmp(dataref_forwarder, iInfo->sender) != 0||
+	if (mMode != RSVP_DATAREF_MODE_READ || rReference != dataref_ref ||
+	  strcmp(dataref_forwarder, iInfo->sender) != 0 ||
 	  strcmp(dataref_sender, iInfo->origin) != 0)
 	return event_error;
 
@@ -247,12 +237,13 @@ uint8_t mMode, ssize_t oOffset, ssize_t sSize)
 
 	while (total_read < sSize)
 	{
-	current_read = read(dataref_file, buffer, sizeof buffer);
+	current_read = (sizeof buffer < sSize - total_read)? sizeof buffer : (sSize - total_read);
+	current_read = read(dataref_file, buffer, current_read);
 	if (current_read < 0 && errno != EINTR) break;
 	if (current_read > 0)
 	 {
 	total_read += current_read;
-	fprintf(stderr, "%s", buffer);
+	write(STDERR_FILENO, buffer, current_read);
 	 }
 	}
 
