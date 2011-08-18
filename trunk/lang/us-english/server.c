@@ -220,6 +220,33 @@ int log_server_new_client_niceness_error(int pProcess, int nNice, text_string mM
 	return local_log(logging_minimal, message_string);
 }
 
+
+int log_server_change_limit(text_string nName, int lLimit, int nNew)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/m/ change server limit '%s': %i -> %i",
+	  nName, lLimit, nNew);
+	return local_log(logging_minimal, message_string);
+}
+
+
+int log_server_change_limit_name_error(text_string nName)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/m/ unknown server limit '%s'", nName);
+	return local_log(logging_minimal, message_string);
+}
+
+
+int log_server_change_limit_value_error(text_string nName, int lLimit)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/m/ invalid value %i for server limit '%s'",
+	  lLimit, nName);
+	return local_log(logging_minimal, message_string);
+}
+
+
 int log_server_manual_log(text_string mMessage)
 {
 	char message_string[max_message];

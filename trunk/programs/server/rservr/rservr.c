@@ -615,6 +615,33 @@ static int parse_option(const char *dData, char *fFile)
 	}
 
 
+	else if (strcmp(config_segment, "set_limit") == 0)
+	{
+	if (next_argument(&config_segment) < 0 || !config_segment) return allow_fail;
+	char *limit_name = strdup(config_segment);
+	int value = 0;
+	if (remaining_line(&config_segment) < 0 || !config_segment)
+	 {
+	free(limit_name);
+	return allow_fail;
+	 }
+
+	if (!parse_integer10(config_segment, &value))
+	 {
+	free(limit_name);
+	return allow_fail;
+	 }
+
+	if (!set_limit(limit_name, value))
+	 {
+	free(limit_name);
+	return allow_fail;
+	 }
+
+	free(limit_name);
+	}
+
+
 	else if (strcmp(config_segment, "timing") == 0)
 	{
 	if (next_argument(&config_segment) < 0 || !config_segment) return allow_fail;

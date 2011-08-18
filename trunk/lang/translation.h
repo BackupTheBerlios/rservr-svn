@@ -115,6 +115,10 @@ extern int log_server_config_line_ignore_error(text_string, unsigned int);
 extern int log_server_new_client_niceness(int, int, int);
 extern int log_server_new_client_niceness_error(int, int, text_string);
 
+extern int log_server_change_limit(text_string, int, int);
+extern int log_server_change_limit_name_error(text_string);
+extern int log_server_change_limit_value_error(text_string, int);
+
 extern int log_server_manual_log(text_string);
 
 /*normal______________________________________________________________________*/

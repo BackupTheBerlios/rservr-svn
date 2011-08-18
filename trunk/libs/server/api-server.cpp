@@ -220,10 +220,6 @@ class internal_protected_data :
 	typedef protect::common_mutex <global_sentry_pthread <PARAM_SERVER_MULTI_LOCK> > mutex_type;
 
 public:
-	ATTR_INT internal_protected_data(unsigned int cCommands) :
-	combined_data_sets(cCommands) { }
-
-
 	protect::capsule <protected_server::client_access> ATTR_INT *get_clients()
 	{ return &combined_data_sets.set_one; }
 
@@ -303,10 +299,7 @@ private:
 	    private mutex_type
     {
     public:
-	    data_set_two(unsigned int cCommands) :
-	    command_table(cCommands) { }
-
-	    unsigned int commands_waiting() const
+	    unsigned int ATTR_INT commands_waiting() const
 	    { return command_table.number_waiting(); }
 
 
@@ -328,10 +321,6 @@ private:
 	    public protect::selfcontained_capsule <protected_server::transfer_access, data_set_three>
     {
     public:
-	    data_set_three(unsigned int cCommands) :
-	    set_two(cCommands) { }
-
-
 	    data_set_one set_one;
 	    data_set_two set_two;
 
@@ -437,7 +426,7 @@ private:
 };
 
 
-static internal_protected_data local_server_data(PARAM_MAX_COMMANDS);
+static internal_protected_data local_server_data;
 
 static exposed_server internal_server = {    protected_data: &local_server_data,
                                           server_parameters: {
@@ -774,8 +763,29 @@ static bool initialize_timing_table()
 
 //server execution--------------------------------------------------------------
 
+static void server_update_limits(protected_server::transfer_access *sServer)
+{
+	sServer->commands()->set_queue_limit(server_settings->max_commands + PARAM_ALLOW_SERVER_REQUEUE);
+}
+
+class server_update_with_params : public protect::capsule <protected_server::transfer_access> ::modifier
+{
+	protect::entry_result access_entry(write_object oObject) const
+	{
+	write_temp object;
+	if (!(object = oObject)) return protect::exit_forced;
+	server_update_limits(object);
+	return protect::entry_success;
+	}
+};
+
+
 int enter_server_loop()
-{ return execute_server_thread(&internal_server); }
+{
+	server_update_with_params new_update;
+	internal_server.protected_data->get_transfer()->access_contents(&new_update);
+	return execute_server_thread(&internal_server);
+}
 
 result start_server()
 {
@@ -928,6 +938,100 @@ result set_new_client_niceness(int nNice)
 
 int get_new_client_niceness()
 { return internal_server.new_niceness; }
+
+
+result set_limit(text_info nName, int lLimit)
+{
+	if (!nName || !strlen(nName))
+	{
+    log_server_change_limit_name_error(nName);
+	return false;
+	}
+
+	else if (lLimit < 0)
+	{
+    log_server_change_limit_value_error(nName, lLimit);
+	return false;
+	}
+
+	else if (strcmp(nName, "max_error") == 0)
+	{
+    log_server_change_limit(nName, server_settings->max_client_error, lLimit);
+	internal_server.server_parameters.max_client_error = lLimit;
+	auto_env10("RSERVR_MAX_ERROR", server_settings->max_client_error);
+	}
+
+	else if (strcmp(nName, "max_invalid") == 0)
+	{
+    log_server_change_limit(nName, server_settings->max_client_invalid, lLimit);
+	internal_server.server_parameters.max_client_invalid = lLimit;
+	auto_env10("RSERVR_MAX_INVALID", server_settings->max_client_invalid);
+	}
+
+	else if (strcmp(nName, "max_commands") == 0)
+	{
+    log_server_change_limit(nName, server_settings->max_client_commands, lLimit);
+	internal_server.server_parameters.max_client_commands = lLimit;
+	auto_env10("RSERVR_MAX_COMMANDS", server_settings->max_client_commands);
+	}
+
+	else if (strcmp(nName, "max_queued") == 0)
+	{
+	//TODO: add error message for having limit too low here
+	if (lLimit < PARAM_ALLOW_SERVER_REQUEUE) lLimit = PARAM_ALLOW_SERVER_REQUEUE;
+    log_server_change_limit(nName, server_settings->max_commands, lLimit - PARAM_ALLOW_SERVER_REQUEUE);
+	internal_server.server_parameters.max_commands = lLimit - PARAM_ALLOW_SERVER_REQUEUE;
+	auto_env10("RSERVR_MAX_QUEUED", server_settings->max_commands);
+	}
+
+	else if (strcmp(nName, "max_clients") == 0)
+	{
+    log_server_change_limit(nName, server_settings->max_clients, lLimit);
+	internal_server.server_parameters.max_clients = lLimit;
+	auto_env10("RSERVR_MAX_CLIENTS", server_settings->max_clients);
+	}
+
+	else if (strcmp(nName, "max_services") == 0)
+	{
+    log_server_change_limit(nName, server_settings->max_services, lLimit);
+	internal_server.server_parameters.max_services = lLimit;
+	auto_env10("RSERVR_MAX_SERVICES", server_settings->max_services);
+	}
+
+	else
+	{
+    log_server_change_limit_name_error(nName);
+	return false;
+	}
+
+	return true;
+}
+
+
+int get_limit(text_info nName)
+{
+	if (!nName || !strlen(nName)) return -1;
+
+	else if (strcmp(nName, "max_error") == 0)
+	return server_settings->max_client_error;
+
+	else if (strcmp(nName, "max_invalid") == 0)
+	return server_settings->max_client_invalid;
+
+	else if (strcmp(nName, "max_commands") == 0)
+	return server_settings->max_client_commands;
+
+	else if (strcmp(nName, "max_queued") == 0)
+	return server_settings->max_commands;
+
+	else if (strcmp(nName, "max_clients") == 0)
+	return server_settings->max_clients;
+
+	else if (strcmp(nName, "max_services") == 0)
+	return server_settings->max_services;
+
+	else return -1;
+}
 
 
 result set_environment(text_info sString)

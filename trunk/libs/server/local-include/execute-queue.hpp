@@ -72,6 +72,9 @@ public:
 
 	inline ATTR_INL execute_queue_multi(unsigned int sSize) : max_size(sSize) { }
 
+	inline void ATTR_INL set_queue_limit(unsigned int sSize)
+	{ max_size = sSize; }
+
 
 	unsigned int ATTR_INL number_waiting() const
 	{ return this->size(); }

@@ -99,6 +99,9 @@ extern command_priority get_min_priority();
 extern result set_new_client_niceness(int);
 extern int    get_new_client_niceness();
 
+extern result set_limit(text_info, int);
+extern int    get_limit(text_info);
+
 extern result set_environment(text_info);
 extern result unset_environment(text_info);
 extern result clear_environment();
