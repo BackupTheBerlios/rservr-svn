@@ -41,6 +41,7 @@ extern "C" {
 #include "api/tools.h"
 #include "api/log-output.h"
 #include "api/command-table.h"
+#include "api/command-queue.h"
 #include "plugin-dev/entry-point.h"
 }
 
@@ -470,6 +471,29 @@ result set_program_name(text_info nName)
 	if (nName && program_name.size()) return false;
 	program_name = nName;
 	return true;
+}
+
+
+void nonblocking_send() //(from 'command-queue.h')
+{
+	//TODO: add logging point
+	int current_state = fcntl(execute_output, F_GETFL);
+	fcntl(execute_output, F_SETFL, current_state | O_NONBLOCK);
+}
+
+
+void blocking_send() //(from 'command-queue.h')
+{
+	//TODO: add logging point
+	int current_state = fcntl(execute_output, F_GETFL);
+	fcntl(execute_output, F_SETFL, current_state & ~O_NONBLOCK);
+}
+
+
+result blocking_send_status() //(from 'command-queue.h')
+{
+	int current_state = fcntl(execute_output, F_GETFL);
+	return (current_state & O_NONBLOCK) == 0;
 }
 
 

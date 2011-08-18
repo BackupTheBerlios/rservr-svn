@@ -272,6 +272,12 @@ extern result set_target_to_server_of(command_handle Command, text_info Client,
   text_info Address);
 
 
+
+extern void nonblocking_send();       /**< Enable non-blocking command sending (default).*/
+extern void blocking_send();          /**< Enable blocking command sending.*/
+extern result blocking_send_status(); /**< Check status of command-send blocking.*/
+
+
 extern text_info extract_remote_command(command_handle);
 extern multi_result send_stream_command(int, command_handle);
 extern multi_result filtered_send_stream_command(int, command_handle,
