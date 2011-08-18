@@ -127,7 +127,7 @@ int main(int argc, char *const argv[])
 	else if (argc > 2 && strcmp(argv[1], "e") == 0)
 	{
 	result = execvp(argv[2], argv + 2);
-	fprintf(stderr, "%s: execution error: %s\n", argv[0], strerror(errno));
+	fprintf(stderr, "%s: '%s' execution error: %s\n", argv[0], argv[2], strerror(errno));
 	return result;
 	}
 
