@@ -61,6 +61,7 @@ extern "C" {
 /* allow certain loopholes for the purposes of debugging */
 /* NOT A SECURITY RISK, BUT COMMENT OUT FOR RELEASE VERSIONS! */
 /*#define PARAM_ALLOW_DEBUG_LOOPHOLES*/
+#define PARAM_ALLOW_DEBUG_LOOPHOLES
 
 /* set logging level for GNU TLS in 'librsvx-tls.so' */
 /* SET TO 0 OR 1 FOR RELEASE VERSIONS! */

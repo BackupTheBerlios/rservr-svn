@@ -184,9 +184,13 @@ class auto_event_functor :
 public:
 	inline auto_event_functor(event_functor *fFunctor = NULL) : functor(fFunctor) {}
 
-	inline auto_event_functor(event_functor &eEqual) : functor(eEqual.copy()) {}
+	inline auto_event_functor(const auto_event_functor &eEqual) : functor(eEqual.copy()) {}
+	inline auto_event_functor(const event_functor &eEqual) : functor(eEqual.copy()) {}
 
-	inline auto_event_functor &operator = (event_functor &eEqual)
+	inline auto_event_functor &operator = (const auto_event_functor &eEqual)
+	{ return this->operator = ((const event_functor&) eEqual); }
+
+	inline auto_event_functor &operator = (const event_functor &eEqual)
 	{
 	if (&eEqual == this) return *this;
 	event_functor *old_functor = functor;

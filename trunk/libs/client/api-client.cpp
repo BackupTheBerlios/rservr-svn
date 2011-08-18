@@ -112,8 +112,6 @@ result manual_indicate_ready()
 
 bool master_register_client(text_info nName, permission_mask tType)
 {
-	//NOTE: this must use a callback to retain the registration name
-
 	if (!check_entity_label(nName)) return false;
 
 	if (check_su())
