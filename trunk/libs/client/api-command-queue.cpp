@@ -352,7 +352,7 @@ long_time wWait, int(*cCallback)(command_reference, command_event))
 {
 	//TODO: make this block if the timeout is zero and no callback is used?
 
-	if (!rReference) return event_unavailable;
+	if (!rReference) return event_unsent;
 
 	if (calling_from_message_queue())
 	{

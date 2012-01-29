@@ -174,7 +174,7 @@ static void auto_unpause_check(unsigned int, unsigned int);
 const message_info ATTR_INT *add_new_message(protected_message_list *lList,
 const command_info *oOriginal, command_type tType, const void *mMessage)
 {
-	if (!lList || !oOriginal || !mMessage) return NULL;
+	if (!lList || !oOriginal) return NULL; //NOTE: 'mMessage==NULL' is used for async responses
 	protected_message_list::write_object object = lList->writable();
 	if (!object) return NULL;
 
@@ -183,84 +183,85 @@ const command_info *oOriginal, command_type tType, const void *mMessage)
 	object->index = 0;
 	if ( !object->add_element(message_list::base_type()) ) return NULL;
 	object->index = current_index;
+	message_mirror *const new_mirror  = &object->last_element().key();
+	message_info   *const new_message = &object->last_element().value();
 
-	object->last_element().key().command_name     = oOriginal->command_name();
-	object->last_element().key().received_from    = oOriginal->orig_entity;
-	object->last_element().key().received_address = oOriginal->orig_address;
-	object->last_element().key().sent_to          = oOriginal->target_entity;
-	object->last_element().key().sent_address     = oOriginal->target_address;
+	new_mirror->command_name     = oOriginal->command_name();
+	new_mirror->received_from    = oOriginal->orig_entity;
+	new_mirror->received_address = oOriginal->orig_address;
+	new_mirror->sent_to          = oOriginal->target_entity;
+	new_mirror->sent_address     = oOriginal->target_address;
 
-	object->last_element().value().last_reference   = oOriginal->orig_reference;
-	object->last_element().value().creator_pid      = oOriginal->creator_pid;
-	object->last_element().value().__type           = tType;
-	object->last_element().value().time_received    = clock();
-	object->last_element().value().priority         = oOriginal->priority;
-	object->last_element().value().command_name     = object->last_element().key().command_name.c_str();
-	object->last_element().value().received_from    = object->last_element().key().received_from.c_str();
-	object->last_element().value().received_address = object->last_element().key().received_address.c_str();
-	object->last_element().value().sent_to          = object->last_element().key().sent_to.c_str();
-	object->last_element().value().sent_address     = object->last_element().key().sent_address.c_str();
-	object->last_element().value().message_reference = oOriginal->remote_reference?
+	new_message->last_reference   = oOriginal->orig_reference;
+	new_message->creator_pid      = oOriginal->creator_pid;
+	new_message->__type           = tType;
+	new_message->time_received    = clock();
+	new_message->priority         = oOriginal->priority;
+	new_message->command_name     = new_mirror->command_name.c_str();
+	new_message->received_from    = new_mirror->received_from.c_str();
+	new_message->received_address = new_mirror->received_address.c_str();
+	new_message->sent_to          = new_mirror->sent_to.c_str();
+	new_message->sent_address     = new_mirror->sent_address.c_str();
+	new_message->message_reference = oOriginal->remote_reference?
 		oOriginal->remote_reference : oOriginal->target_reference;
 
 
 	if (tType == command_request)
 	 {
-	const struct incoming_request_data *message_data = (const struct incoming_request_data*) current_message;
+	const struct incoming_request_data *message_data = (const struct incoming_request_data*) mMessage;
 
-	object->last_element().value().__request.__size = message_data->__size;
-	if (!message_data->__size) object->last_element().key().message = message_data->__n1.__message;
+	new_message->__request.__size = message_data->__size;
+	if (!message_data->__size) new_mirror->message = message_data->__n1.__message;
 	else
 	  {
-	object->last_element().key().message.resize(message_data->__size);
+	new_mirror->message.resize(message_data->__size);
 	for (unsigned int I = 0; I < message_data->__size; I++)
-	object->last_element().key().message[I] = (char) message_data->__n1.__binary[I];
+	new_mirror->message[I] = (char) message_data->__n1.__binary[I];
 	  }
-	object->last_element().value().__request.__n1.__message = object->last_element().key().message.c_str();
+	new_message->__request.__n1.__message = new_mirror->message.c_str();
 	 }
 
 
 	else if (tType == command_response)
 	 {
 	const struct incoming_response_data *message_data =
-	  (const struct incoming_response_data*) current_message;
+	  (const struct incoming_response_data*) mMessage;
 
-	object->last_element().value().__response.__dimension = no_message;
-	object->last_element().value().__response.__type      = message_data->__type;
+	new_message->__response.__dimension = no_message;
+	new_message->__response.__type      = message_data->__type;
 
 	if (message_data->__dimension == single_message)
 	  {
-	object->last_element().value().__response.__dimension = single_message;
-	object->last_element().value().__response.__n1.__n2.__size = message_data->__n1.__n2.__size;
-	if (!message_data->__n1.__n2.__size) object->last_element().key().message =
+	new_message->__response.__dimension = single_message;
+	new_message->__response.__n1.__n2.__size = message_data->__n1.__n2.__size;
+	if (!message_data->__n1.__n2.__size) new_mirror->message =
 	  message_data->__n1.__n2.__n3.__message;
 	else
 	   {
-	object->last_element().key().message.resize(message_data->__n1.__n2.__size);
+	new_mirror->message.resize(message_data->__n1.__n2.__size);
 	for (unsigned int I = 0; I < message_data->__n1.__n2.__size; I++)
-	object->last_element().key().message[I] = (char) message_data->__n1.__n2.__n3.__binary[I];
+	new_mirror->message[I] = (char) message_data->__n1.__n2.__n3.__binary[I];
 	   }
-	object->last_element().value().__response.__n1.__n2.__n3.__message =
-	  object->last_element().key().message.c_str();
+	new_message->__response.__n1.__n2.__n3.__message =
+	  new_mirror->message.c_str();
 	  }
 
 	else if (message_data->__dimension == multi_message)
 	  {
-	object->last_element().value().__response.__dimension = multi_message;
-	object->last_element().value().__response.__n1.__n2.__size = 0x00;
+	new_message->__response.__dimension = multi_message;
+	new_message->__response.__n1.__n2.__size = 0x00;
 	info_list current = message_data->__n1.__list;
 
 	if (current) while (*current)
 	   {
-	object->last_element().key().message_list.push_back(*current++);
-	object->last_element().key().message_pointers.push_back(
-	  object->last_element().key().message_list[
-	    object->last_element().key().message_list.size() - 1 ].c_str() );
+	new_mirror->message_list.push_back(*current++);
+	new_mirror->message_pointers.push_back(
+	  new_mirror->message_list[ new_mirror->message_list.size() - 1 ].c_str() );
 	   }
 
-	object->last_element().key().message_pointers.push_back(NULL);
-	object->last_element().value().__response.__n1.__list =
-	  &object->last_element().key().message_pointers[0];
+	new_mirror->message_pointers.push_back(NULL);
+	new_message->__response.__n1.__list =
+	  &new_mirror->message_pointers[0];
 	  }
 	 }
 
@@ -268,11 +269,11 @@ const command_info *oOriginal, command_type tType, const void *mMessage)
 	else if (tType == command_remote)
 	 {
 	const struct incoming_remote_data *message_data =
-	  (const struct incoming_remote_data*) current_message;
+	  (const struct incoming_remote_data*) mMessage;
 
-	object->last_element().value().__remote.__pending = message_data->__pending;
+	new_message->__remote.__pending = message_data->__pending;
 
-	object->last_element().value().message_reference =
+	new_message->message_reference =
 	  oOriginal->orig_reference;
 	 }
 
@@ -280,26 +281,29 @@ const command_info *oOriginal, command_type tType, const void *mMessage)
 	else if (tType == command_null)
 	 {
 	const struct incoming_info_data *message_data =
-	  (const struct incoming_info_data*) current_message;
+	  (const struct incoming_info_data*) mMessage;
 
-	object->last_element().value().__info.__size = message_data->__size;
-	if (!message_data->__size) object->last_element().key().message =
+	new_message->__info.__size = message_data->__size;
+	if (!message_data->__size) new_mirror->message =
 	  message_data->__n1.__message;
 	else
 	  {
-	object->last_element().key().message.resize(message_data->__size);
+	new_mirror->message.resize(message_data->__size);
 	for (unsigned int I = 0; I < message_data->__size; I++)
-	object->last_element().key().message[I] = (char) message_data->__n1.__binary[I];
+	new_mirror->message[I] = (char) message_data->__n1.__binary[I];
 	  }
-	object->last_element().value().__info.__n1.__message =
-	  object->last_element().key().message.c_str();
+	new_message->__info.__n1.__message =
+	  new_mirror->message.c_str();
 	 }
 
 
 	//NOTE: default case is still valid for "future response" data
 
 	auto_pause_check(object->size(), object->max_size());
-	return &object->last_element().value();
+	object.clear(); //release the mutex in case this is being called within a hook
+	queue_sync_continue();
+
+	return new_message;
 }
 
 
@@ -311,7 +315,7 @@ message_handle mMessage)
 
 bool ATTR_INT remove_old_message(protected_message_list *lList, message_handle mMessage)
 {
-	if (!lList || !mMessage) return false;
+	if (!lList) return false; //NOTE: 'mMessage==0' is used to remove the current message
 	protected_message_list::write_object object = lList->writable();
 	if (!object) return false;
 
@@ -596,7 +600,7 @@ struct external_client_interface : public client_interface
 	return false;
 	 }
 
-	else return true;
+	return true;
 	}
 
 

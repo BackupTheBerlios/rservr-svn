@@ -675,7 +675,7 @@ int ATTR_INT get_file(const char *aAddress, text_info cClient)
 
 bool ATTR_INT fill_input_list(const fd_set *sSet)
 {
-	if (sSet) return false;
+	if (!sSet) return false;
 	protected_connection_list::read_object object = internal_connection_list.readable();
 	if (!object) return false;
 

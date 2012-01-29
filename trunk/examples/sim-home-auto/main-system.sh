@@ -15,13 +15,18 @@ if [ -n "$2" ]; then
   output="$2"
 fi
 
+if rservrd "system" 2> /dev/null; then
+  echo "'system' is already running" 1>&2
+  exit 1
+fi
+
 echo "start server 'system'..." 1>&2
 
 { echo "execute_critical rservrd -dxr";
   echo "execute rsv-fsrelay system-connect";
   echo "execute ./system-status status";
   echo "register_all_wait"; } | \
-rservr system "$output" || exit 1
+rservr "system" "$output" || exit 1
 
 #set up a local connection point for the other systems to connect to
 rservrd system @local_listen@system-connect@/tmp/system-connect > /dev/null || exit 1

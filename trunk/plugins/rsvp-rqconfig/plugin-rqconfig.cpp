@@ -57,7 +57,8 @@ extern "C" {
 	PLUGIN_SENDER_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(configure))
 
 	struct rqconfig_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
@@ -120,7 +121,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rqconfig_configure, rqconfig_configure_tag, type_
 	PLUGIN_SENDER_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(deconfigure))
 
 	struct rqconfig_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };

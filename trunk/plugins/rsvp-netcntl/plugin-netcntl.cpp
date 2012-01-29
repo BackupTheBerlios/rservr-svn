@@ -65,7 +65,8 @@ extern "C" {
 	PLUGIN_SENDER_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(connection_list))
 
 	struct netcntl_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
@@ -165,7 +166,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_connection_list, netcntl_connection_list_
 	command_event outcome = RSERVR_EVAL_NONE;
 
 	struct netcntl_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
@@ -275,7 +277,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_connect, netcntl_connect_tag, type_servic
 	command_event outcome = RSERVR_EVAL_NONE;
 
 	struct netcntl_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
@@ -385,7 +388,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_filtered_connect, netcntl_filtered_connec
 	PLUGIN_RANKING_CHECK(netcntl, PLUGIN_COMMAND_REQUEST(disconnect))
 
 	struct netcntl_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
@@ -466,7 +470,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_disconnect, netcntl_disconnect_tag, type_
 	PLUGIN_SENDER_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(listen_list))
 
 	struct netcntl_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
@@ -561,7 +566,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_listen_list, netcntl_listen_list_tag, typ
 	PLUGIN_SENDER_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(listen))
 
 	struct netcntl_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
@@ -644,7 +650,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_listen, netcntl_listen_tag, type_service_
 	PLUGIN_SENDER_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(unlisten))
 
 	struct netcntl_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };

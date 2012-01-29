@@ -194,7 +194,6 @@ static int configure_sub_function(text_info sSystem)
 	for (unsigned int I = 0; I < local_relays.size(); I++)
 	//get a list of connections from each relay services
 	{
-
 	//this command is from 'librsvp-netcntl.so' and is implemented by the
 	//relay program 'rsv-fsrelay', the standard relay used in this example
 	new_command = rsvp_netcntl_local_connection_list(local_relays[I].c_str());

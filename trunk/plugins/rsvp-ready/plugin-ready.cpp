@@ -57,7 +57,8 @@ extern "C" {
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready))
 
 	struct ready_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
@@ -120,7 +121,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_ready, ready_system_ready_tag, type_
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready))
 
 	struct ready_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
@@ -183,7 +185,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_not_ready, ready_system_not_ready_ta
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready))
 
 	struct ready_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
@@ -246,7 +249,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_never_ready, ready_system_never_read
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready_response))
 
 	struct ready_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
@@ -316,7 +320,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_ready_response, ready_system_ready_r
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready_response))
 
 	struct ready_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
@@ -386,7 +391,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_not_ready_response, ready_system_not
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready_response))
 
 	struct ready_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };

@@ -60,7 +60,8 @@ extern "C" {
 	PLUGIN_RANKING_CHECK(passthru, PLUGIN_COMMAND_REQUEST(reserve_channel))
 
 	struct passthru_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
@@ -126,7 +127,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(passthru_reserve_channel, passthru_reserve_channe
 	PLUGIN_RANKING_CHECK(passthru, PLUGIN_COMMAND_REQUEST(unreserve_channel))
 
 	struct passthru_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
@@ -194,7 +196,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(passthru_unreserve_channel, passthru_unreserve_ch
 	PLUGIN_RANKING_CHECK(passthru, PLUGIN_COMMAND_REQUEST(steal_channel))
 
 	struct passthru_source_info source_info = {
-	  origin:  request_origin.c_str(),
+	  origin:  request_origin.size()?
+	           request_origin.c_str() : external_command::get_sender_name(iInfo),
 	  target:  external_command::get_target_name(iInfo),
 	  sender:  external_command::get_sender_name(iInfo),
 	  address: external_command::get_sender_address(iInfo) };
