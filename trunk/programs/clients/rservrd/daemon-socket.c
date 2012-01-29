@@ -105,7 +105,7 @@ inline int unset_user()
 	int success = 0;
 
 	if ((geteuid() != getuid())  && (seteuid(getuid()) < 0)) success = -1;
-	if ((geteuid() != getgid())  && (setegid(getgid()) < 0)) success = -1;
+	if ((getegid() != getgid())  && (setegid(getgid()) < 0)) success = -1;
 
 	if (success < 0) fprintf(stderr, "%s: could not unset user/group\n", command_name);
 
