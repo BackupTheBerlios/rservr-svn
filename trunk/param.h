@@ -131,8 +131,8 @@ extern "C" {
 
 /* recursive mutex locking for the server */
 /* SET TO 'false' FOR TESTING AND 'true' FOR RELEASE VERSIONS! */
-/*#define PARAM_SERVER_MULTI_LOCK false*/
-#define PARAM_SERVER_MULTI_LOCK true
+#define PARAM_SERVER_MULTI_LOCK false
+/*#define PARAM_SERVER_MULTI_LOCK true*/
 
 /* limits for bad client commands (disconnect client when reached) */
 #define PARAM_MAX_CLIENT_ERROR   64
