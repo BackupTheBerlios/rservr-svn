@@ -65,12 +65,8 @@ public:
     return *this;
     }
 
-    inline int lock(bool block)
-    {
-    return
-      ((block? pthread_mutex_lock(&mutex) : pthread_mutex_trylock(&mutex)) == 0)?
-      protect::entry_success : protect::entry_denied;
-    }
+    inline bool lock(bool block)
+    { return (block? pthread_mutex_lock(&mutex) : pthread_mutex_trylock(&mutex)) == 0; }
 
     inline bool unlock()
     { return (pthread_mutex_unlock(&mutex) == 0); }

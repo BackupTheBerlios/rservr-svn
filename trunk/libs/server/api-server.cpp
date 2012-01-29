@@ -123,9 +123,13 @@ static void initialize_environment();
 result initialize_server()
 {
 	register_handlers();
+debug_output("1");
 	if (!initialize_timing_table()) return false;
+debug_output("2");
 	if (!initialize_label_check())  return false;
+debug_output("3");
 	if (!initialize_conduit())      return false;
+debug_output("4");
 	initialize_environment();
 	umask(default_mask);
 	return true;
@@ -361,32 +365,17 @@ private:
 	    }
 
 
-	    int set_mutex(bool sState, bool bBlock = true)
+	    bool set_mutex(bool sState, bool bBlock = true)
 	    {
-	    if (sState)
+	    bool outcome = true;
+	    if (!(outcome = protect::mutex_base::set_mutex(&set_one, sState, bBlock)) && sState)
+	    return false;
+	    if (!(outcome = protect::mutex_base::set_mutex(&set_two, sState, bBlock)) && sState)
 	     {
-	    protect::entry_result outcome = 0;
-	    if ((outcome = protect::mutex_base::set_mutex(&set_one, sState, bBlock)) != protect::entry_success)
-	    return outcome;
-	    if ((outcome = protect::mutex_base::set_mutex(&set_two, sState, bBlock)) != protect::entry_success)
-	      {
 	    protect::mutex_base::set_mutex(&set_one, !sState, bBlock);
-	    return outcome;
-	      }
-	    return outcome;
-	     }
-
-	    else
-	     {
-	    if (!protect::mutex_base::set_mutex(&set_one, sState))
 	    return false;
-	    if (!protect::mutex_base::set_mutex(&set_two, sState))
-	      {
-	    protect::mutex_base::set_mutex(&set_one, !sState);
-	    return false;
-	      }
-	    return true;
 	     }
+	    return outcome;
 	    }
 
 
@@ -602,6 +591,7 @@ bool set_server_timing(const struct server_timing_table *tTable)
 {
 	protect::capsule <protected_server::timing_access> ::write_object object =
 	  internal_server.protected_data->get_timing()->writable();
+debug_output("s1 %p", (protected_server::timing_access*) object);
 	return object && set_server_table(object->timing(), tTable);
 }
 
@@ -610,6 +600,7 @@ bool calculate_server_timing()
 {
 	protect::capsule <protected_server::timing_access> ::write_object object =
 	  internal_server.protected_data->get_timing()->writable();
+debug_output("s2 %p", (protected_server::timing_access*) object);
 	return object && calculate_server_timing_specs(object->timing(), &internal_server_timing_specs);
 }
 
@@ -667,7 +658,9 @@ int create_default_timing_table(struct server_timing_table*);
 static bool initialize_timing_table()
 {
 	struct server_timing_table temporary_table;
+debug_output("a1");
 	if (create_default_timing_table(&temporary_table) < 0) return false;
+debug_output("a2");
 	return set_server_timing(&temporary_table) && calculate_server_timing();
 }
 

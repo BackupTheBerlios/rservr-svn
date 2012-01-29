@@ -46,7 +46,7 @@ class mutex_base
 
 protected:
     static inline
-        int
+        bool
     set_mutex(mutex_base *base, bool status, bool block = true)
     { return !base? false : base->set_mutex(status, block); }
 
@@ -103,7 +103,7 @@ private:
     mutex_status() const = 0;
 
     virtual
-        int
+        bool
     set_mutex(bool, bool) = 0;
 
     virtual
@@ -157,7 +157,7 @@ protected:
         bool
     mutex_status() const;
 
-        int
+        bool
     set_mutex(bool, bool);
 
 private:
@@ -208,10 +208,10 @@ private:
   template <class Mutex> bool common_mutex <Mutex> ::mutex_status() const
   { return this->control_mutex.status(); }
 
-  template <class Mutex> int common_mutex <Mutex> ::set_mutex(bool status, bool block)
+  template <class Mutex> bool common_mutex <Mutex> ::set_mutex(bool status, bool block)
   {
   if (status) return this->control_mutex.lock(block);
-  else        return (int) this->control_mutex.unlock();
+  else        return this->control_mutex.unlock();
   }
 
   template <class Mutex> bool

@@ -44,11 +44,11 @@ public:
     default_lock(const default_lock&) : mutex(false) {}
     default_lock &operator = (const default_lock&) { return *this; }
 
-    inline int lock(bool block)
+    inline bool lock(bool block)
     {
-    if (mutex) return entry_wait;
+    if (mutex) return false;
     mutex = true;
-    return entry_success;
+    return true;
     }
 
     inline bool unlock()
