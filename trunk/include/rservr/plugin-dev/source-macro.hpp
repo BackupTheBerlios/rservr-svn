@@ -130,7 +130,7 @@ command_event name::evaluate_client(const command_info &RSERVR_INFO_ARG, client_
 #define RSERVR_EVAL_COMPLETE event_complete
 
 #define RSERVR_COMMAND_PARSE_HEAD(name) bool name::compile_command(const storage_section *RSERVR_COMMAND_TREE)
-#define RSERVR_COMMAND_BUILD_HEAD(name) storage_section *name::assemble_command() const
+#define RSERVR_COMMAND_BUILD_HEAD(name) storage_section *name::assemble_command(const command_info &RSERVR_INFO_ARG) const
 
 #define RSERVR_TEMP_UVALUE temp_uvalue
 #define RSERVR_TEMP_SVALUE temp_svalue

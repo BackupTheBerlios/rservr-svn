@@ -69,7 +69,7 @@ public:
 	external_command(const text_data&);
 
 	virtual bool compile_command(const storage_section*) = 0;
-	virtual storage_section *assemble_command() const = 0;
+	virtual storage_section *assemble_command(const command_info&) const = 0;
 	virtual external_command *copy() const = 0;
 
 	virtual text_info command_name() const;

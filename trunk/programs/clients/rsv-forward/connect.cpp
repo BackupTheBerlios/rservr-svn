@@ -417,7 +417,9 @@ const char *aAddress, int lListen = -1, bool pPass = true, char **mModified = NU
 	if (mModified)
 	*mModified = strdup(object->last_element().value().socket_address.c_str());
 
+	object.clear();
 	unblock_connection_wait();
+
 	return true;
 }
 
@@ -511,6 +513,8 @@ bool ATTR_INT steal_connection(int fFile, text_info cClient, socket_reference *r
 	*rReference = object->get_element(position).key().reference;
 
 	object->remove_single(position);
+
+	object.clear();
 	send_select_break();
 
 	return true;
@@ -611,7 +615,7 @@ bool ATTR_INT socket_error(int fFile, bool tType)
 
 multi_result ATTR_INT get_command(command_handle *cCommand, text_info nName, int fFile)
 {
-	if (!cCommand || !nName) return result_invalid;
+	if (!cCommand) return result_invalid; //NOTE: 'nName==NULL' is fine
 	protected_connection_list::write_object object = internal_connection_list.writable();
 	if (!object) return result_invalid;
 

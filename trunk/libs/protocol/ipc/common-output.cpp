@@ -176,6 +176,7 @@ bool send_protected_output(protected_output *iInterface, const data_exporter *dD
 	return outcome;
 }
 
+
 bool check_output_terminated(protected_output *iInterface)
 {
 	if (!iInterface) return false;

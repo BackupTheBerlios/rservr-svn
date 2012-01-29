@@ -66,7 +66,7 @@ name(const text_data&) RSERVR_RESTRICT_COMMAND_INTERNAL;\
 public: \
 constructors \
 bool compile_command(const storage_section*) RSERVR_RESTRICT_COMMAND_HIDDEN; \
-storage_section *assemble_command() const RSERVR_RESTRICT_COMMAND_HIDDEN; \
+storage_section *assemble_command(const command_info&) const RSERVR_RESTRICT_COMMAND_HIDDEN; \
 external_command *copy() const RSERVR_RESTRICT_COMMAND_HIDDEN; \
 command_event evaluate_server(const command_info&, server_interface*) const RSERVR_RESTRICT_COMMAND_HIDDEN; \
 command_event evaluate_client(const command_info&, client_interface*) const RSERVR_RESTRICT_COMMAND_HIDDEN; \

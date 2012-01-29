@@ -61,7 +61,7 @@ extern "C" {
 	bool null_command::compile_command(const storage_section *tTree)
 	{ return true; }
 
-	storage_section *null_command::assemble_command() const
+	storage_section *null_command::assemble_command(const command_info&) const
 	{ return NULL; }
 
 	external_command *null_command::copy() const

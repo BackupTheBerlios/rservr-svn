@@ -57,11 +57,10 @@ extern "C" {
 	PLUGIN_SENDER_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(configure))
 
 	struct rqconfig_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	return __rsvp_rqconfig_hook_request_configure(&source_info, configure_type.c_str());
 	}
@@ -96,7 +95,8 @@ extern "C" {
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", configure_type)
 
 	RSERVR_COMMAND_BUILD_END
@@ -121,11 +121,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rqconfig_configure, rqconfig_configure_tag, type_
 	PLUGIN_SENDER_CHECK(rqconfig, (type_admin_client | type_control_client), PLUGIN_COMMAND_REQUEST(deconfigure))
 
 	struct rqconfig_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	return __rsvp_rqconfig_hook_request_deconfigure(&source_info, deconfigure_type.c_str());
 	}
@@ -160,7 +159,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rqconfig_configure, rqconfig_configure_tag, type_
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", deconfigure_type)
 
 	RSERVR_COMMAND_BUILD_END

@@ -65,11 +65,10 @@ extern "C" {
 	PLUGIN_SENDER_CHECK(netcntl, type_active_client, PLUGIN_COMMAND_REQUEST(connection_list))
 
 	struct netcntl_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	char **list_data = NULL;
 	command_event outcome = RSERVR_EVAL_NONE;
@@ -84,7 +83,7 @@ extern "C" {
 
 	if (outcome == RSERVR_EVAL_COMPLETE)
 	 {
-	if (!external_command::auto_response_list(iInfo, event_complete, (info_list) list_data))
+	if (!external_command::auto_response_list(RSERVR_INFO_ARG, event_complete, (info_list) list_data))
 	outcome = RSERVR_EVAL_REJECTED;
 	else
 	outcome = RSERVR_EVAL_NONE;
@@ -129,7 +128,8 @@ extern "C" {
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_CONVERT16("", connect_type)
 
 	RSERVR_COMMAND_BUILD_END
@@ -166,11 +166,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_connection_list, netcntl_connection_list_
 	command_event outcome = RSERVR_EVAL_NONE;
 
 	struct netcntl_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	if (connect_type == NETCNTL_NET)
 	 {
@@ -188,7 +187,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_connection_list, netcntl_connection_list_
 
 	if (outcome == RSERVR_EVAL_COMPLETE && response && check_entity_label(response))
 	 {
-	bool outcome2 = external_command::auto_response(iInfo, event_complete, response);
+	bool outcome2 = external_command::auto_response(RSERVR_INFO_ARG, event_complete, response);
 	free(response);
 	return outcome2? RSERVR_EVAL_NONE : RSERVR_EVAL_REJECTED;
 	 }
@@ -237,7 +236,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_connection_list, netcntl_connection_list_
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", connect_address)
 	RSERVR_COMMAND_ADD_TEXT("", connect_port)
 	RSERVR_COMMAND_CONVERT16("", connect_type)
@@ -277,11 +277,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_connect, netcntl_connect_tag, type_servic
 	command_event outcome = RSERVR_EVAL_NONE;
 
 	struct netcntl_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	if (connect_type == NETCNTL_NET)
 	 {
@@ -299,7 +298,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_connect, netcntl_connect_tag, type_servic
 
 	if (outcome == RSERVR_EVAL_COMPLETE && response && check_entity_label(response))
 	 {
-	bool outcome2 = external_command::auto_response(iInfo, event_complete, response);
+	bool outcome2 = external_command::auto_response(RSERVR_INFO_ARG, event_complete, response);
 	free(response);
 	return outcome2? RSERVR_EVAL_NONE : RSERVR_EVAL_REJECTED;
 	 }
@@ -352,7 +351,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_connect, netcntl_connect_tag, type_servic
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", connect_address)
 	RSERVR_COMMAND_ADD_TEXT("", connect_port)
 	RSERVR_COMMAND_ADD_TEXT("", connect_filter)
@@ -388,11 +388,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_filtered_connect, netcntl_filtered_connec
 	PLUGIN_RANKING_CHECK(netcntl, PLUGIN_COMMAND_REQUEST(disconnect))
 
 	struct netcntl_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	if (disconnect_type == NETCNTL_NET)
 	return __rsvp_netcntl_hook_net_disconnect(&source_info, disconnect_address.c_str());
@@ -439,7 +438,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_filtered_connect, netcntl_filtered_connec
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", disconnect_address)
 	RSERVR_COMMAND_CONVERT16("", disconnect_type)
 
@@ -470,11 +470,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_disconnect, netcntl_disconnect_tag, type_
 	PLUGIN_SENDER_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(listen_list))
 
 	struct netcntl_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	char **list_data = NULL;
 	command_event outcome = RSERVR_EVAL_NONE;
@@ -489,7 +488,7 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_disconnect, netcntl_disconnect_tag, type_
 
 	if (outcome == RSERVR_EVAL_COMPLETE)
 	 {
-	if (!external_command::auto_response_list(iInfo, event_complete, (info_list) list_data))
+	if (!external_command::auto_response_list(RSERVR_INFO_ARG, event_complete, (info_list) list_data))
 	outcome = RSERVR_EVAL_REJECTED;
 	else
 	outcome = RSERVR_EVAL_NONE;
@@ -534,7 +533,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_disconnect, netcntl_disconnect_tag, type_
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_CONVERT16("", listen_type)
 
 	RSERVR_COMMAND_BUILD_END
@@ -566,11 +566,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_listen_list, netcntl_listen_list_tag, typ
 	PLUGIN_SENDER_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(listen))
 
 	struct netcntl_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	if (listen_type == NETCNTL_NET)
 	return __rsvp_netcntl_hook_net_listen(&source_info, listen_location.c_str());
@@ -617,7 +616,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_listen_list, netcntl_listen_list_tag, typ
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", listen_location)
 	RSERVR_COMMAND_CONVERT16("", listen_type)
 
@@ -650,11 +650,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_listen, netcntl_listen_tag, type_service_
 	PLUGIN_SENDER_CHECK(netcntl, type_admin_client, PLUGIN_COMMAND_REQUEST(unlisten))
 
 	struct netcntl_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	if (unlisten_type == NETCNTL_NET)
 	return __rsvp_netcntl_hook_net_unlisten(&source_info, unlisten_location.c_str());
@@ -701,7 +700,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(netcntl_listen, netcntl_listen_tag, type_service_
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", unlisten_location)
 	RSERVR_COMMAND_CONVERT16("", unlisten_type)
 

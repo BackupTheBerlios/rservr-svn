@@ -62,10 +62,10 @@ extern "C" {
 
 	struct dataref_source_info source_info = {
 	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	           request_origin.c_str() : external_command::get_sender_name(RSERVR_INFO_ARG),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	return __rsvp_dataref_hook_open_reference(&source_info, data_location.c_str(),
 	  location_reference, location_type, open_mode);
@@ -113,7 +113,8 @@ extern "C" {
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", data_location)
 	RSERVR_COMMAND_CONVERT10("", location_reference)
 	RSERVR_COMMAND_CONVERT16("", location_type)
@@ -146,10 +147,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(dataref_open_reference, dataref_open_reference_ta
 
 	struct dataref_source_info source_info = {
 	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	           request_origin.c_str() : external_command::get_sender_name(RSERVR_INFO_ARG),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	return __rsvp_dataref_hook_change_reference(&source_info, data_location.c_str(),
 	  location_reference, location_type, change_mode);
@@ -197,7 +198,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(dataref_open_reference, dataref_open_reference_ta
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", data_location)
 	RSERVR_COMMAND_CONVERT10("", location_reference)
 	RSERVR_COMMAND_CONVERT16("", location_type)
@@ -227,10 +229,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(dataref_change_reference, dataref_change_referenc
 
 	struct dataref_source_info source_info = {
 	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	           request_origin.c_str() : external_command::get_sender_name(RSERVR_INFO_ARG),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	return __rsvp_dataref_hook_close_reference(&source_info, location_reference);
 	}
@@ -265,7 +267,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(dataref_change_reference, dataref_change_referenc
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_CONVERT10("", location_reference)
 
 	RSERVR_COMMAND_BUILD_END
@@ -295,10 +298,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(dataref_close_reference, dataref_close_reference_
 
 	struct dataref_source_info source_info = {
 	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	           request_origin.c_str() : external_command::get_sender_name(RSERVR_INFO_ARG),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	return __rsvp_dataref_hook_transfer_data(&source_info, location_reference, transfer_mode,
 	  data_offset, data_size);
@@ -346,7 +349,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(dataref_close_reference, dataref_close_reference_
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_CONVERT10("", location_reference)
 	RSERVR_COMMAND_CONVERT16("", transfer_mode)
 	RSERVR_COMMAND_CONVERT10("", data_offset)
@@ -378,10 +382,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(dataref_transfer_data, dataref_transfer_data_tag,
 
 	struct dataref_source_info source_info = {
 	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	           request_origin.c_str() : external_command::get_sender_name(RSERVR_INFO_ARG),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	return __rsvp_dataref_hook_alteration(&source_info, location_reference, data_offset,
 	  data_size);
@@ -425,7 +429,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(dataref_transfer_data, dataref_transfer_data_tag,
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_CONVERT10("", location_reference)
 	RSERVR_COMMAND_CONVERT10("", data_offset)
 	RSERVR_COMMAND_CONVERT10("", data_size)

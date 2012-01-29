@@ -440,7 +440,7 @@ inline static bool ATTR_INL local_check_su()
 	bool command_transmit::assemble_command()
 	{
 	if (!command) return false;
-	storage_section *new_tree = command->assemble_command();
+	storage_section *new_tree = command->assemble_command(*this);
 	if (!new_tree) return false;
 	this->set_command_data(new_tree);
 	return true;

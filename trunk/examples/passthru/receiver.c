@@ -99,8 +99,8 @@ int main(int argc, char *argv[])
 }
 
 
-command_event __rsvp_dataref_hook_open_reference(const struct dataref_source_info *iInfo, text_info lLocation,
-int rReference, uint8_t tType, uint8_t mMode)
+command_event __rsvp_dataref_hook_open_reference(const struct dataref_source_info *iInfo,
+text_info lLocation, int rReference, uint8_t tType, uint8_t mMode)
 //hook function called by 'librsvp-dataref.so' in response to 'rsvp_dataref_open_reference'
 {
 	/*this macro allows the message queue to continue doing what it was

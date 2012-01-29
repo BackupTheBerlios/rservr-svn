@@ -57,11 +57,10 @@ extern "C" {
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready))
 
 	struct ready_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	return __rsvp_ready_hook_system_ready(&source_info, ready_type.c_str());
 	}
@@ -96,7 +95,8 @@ extern "C" {
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", ready_type)
 
 	RSERVR_COMMAND_BUILD_END
@@ -121,11 +121,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_ready, ready_system_ready_tag, type_
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready))
 
 	struct ready_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	return __rsvp_ready_hook_system_not_ready(&source_info, not_ready_type.c_str());
 	}
@@ -160,7 +159,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_ready, ready_system_ready_tag, type_
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", not_ready_type)
 
 	RSERVR_COMMAND_BUILD_END
@@ -185,11 +185,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_not_ready, ready_system_not_ready_ta
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready))
 
 	struct ready_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	return __rsvp_ready_hook_system_never_ready(&source_info, never_ready_type.c_str());
 	}
@@ -224,7 +223,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_not_ready, ready_system_not_ready_ta
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", never_ready_type)
 
 	RSERVR_COMMAND_BUILD_END
@@ -249,11 +249,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_never_ready, ready_system_never_read
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_ready_response))
 
 	struct ready_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	__rsvp_ready_hook_system_ready(&source_info, ready_type.c_str());
 
@@ -295,7 +294,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_never_ready, ready_system_never_read
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", ready_type)
 
 	RSERVR_COMMAND_BUILD_END
@@ -320,11 +320,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_ready_response, ready_system_ready_r
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_not_ready_response))
 
 	struct ready_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	__rsvp_ready_hook_system_not_ready(&source_info, not_ready_type.c_str());
 
@@ -366,7 +365,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_ready_response, ready_system_ready_r
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", not_ready_type)
 
 	RSERVR_COMMAND_BUILD_END
@@ -391,11 +391,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_not_ready_response, ready_system_not
 	PLUGIN_SENDER_CHECK(ready, type_active_client, PLUGIN_COMMAND_REQUEST(system_never_ready_response))
 
 	struct ready_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	__rsvp_ready_hook_system_never_ready(&source_info, never_ready_type.c_str());
 
@@ -437,7 +436,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(ready_system_not_ready_response, ready_system_not
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", never_ready_type)
 
 	RSERVR_COMMAND_BUILD_END

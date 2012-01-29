@@ -30,5 +30,4 @@ done
 echo "connect server '$server'..." 1>&2
 
 #connect the virtual floor's server system to the main system
-# rservrd "$server" @local_connect@"$server"-connect@/tmp/system-connect > /dev/null || exit 1
-rservrd "$server" @local_filtered_connect@"$server"-connect@%rsvf-log%~"$server-ipc.log"@/tmp/system-connect > /dev/null || exit 1
+rservrd "$server" @local_connect@"$server"-connect@/tmp/system-connect > /dev/null || exit 1

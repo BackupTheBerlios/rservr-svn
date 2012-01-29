@@ -57,11 +57,10 @@ extern "C" {
 	PLUGIN_SENDER_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(register_services))
 
 	struct rqsrvc_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	return __rsvp_rqsrvc_hook_register_services(&source_info, register_type.c_str());
 	}
@@ -96,7 +95,8 @@ extern "C" {
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", register_type)
 
 	RSERVR_COMMAND_BUILD_END
@@ -121,11 +121,10 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rqsrvc_register_services, rqsrvc_register_service
 	PLUGIN_SENDER_CHECK(rqsrvc, type_service_client, PLUGIN_COMMAND_REQUEST(deregister_services))
 
 	struct rqsrvc_source_info source_info = {
-	  origin:  request_origin.size()?
-	           request_origin.c_str() : external_command::get_sender_name(iInfo),
-	  target:  external_command::get_target_name(iInfo),
-	  sender:  external_command::get_sender_name(iInfo),
-	  address: external_command::get_sender_address(iInfo) };
+	  origin:  request_origin.c_str(),
+	  target:  external_command::get_target_name(RSERVR_INFO_ARG),
+	  sender:  external_command::get_sender_name(RSERVR_INFO_ARG),
+	  address: external_command::get_sender_address(RSERVR_INFO_ARG) };
 
 	return __rsvp_rqsrvc_hook_deregister_services(&source_info, deregister_type.c_str());
 	}
@@ -160,7 +159,8 @@ RSERVR_CLIENT_COMMAND_DEFAULTS(rqsrvc_register_services, rqsrvc_register_service
 
 	RSERVR_COMMAND_BUILD_START
 
-	RSERVR_COMMAND_ADD_TEXT("", request_origin)
+	RSERVR_COMMAND_ADD_TEXT("", request_origin.size()? request_origin : \
+	  text_data( external_command::get_sender_name(RSERVR_INFO_ARG) ))
 	RSERVR_COMMAND_ADD_TEXT("", deregister_type)
 
 	RSERVR_COMMAND_BUILD_END

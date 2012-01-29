@@ -41,7 +41,7 @@ struct null_command : public external_command
 	null_command(const text_data&);
 
 	bool compile_command(const storage_section*);
-	storage_section *assemble_command() const;
+	storage_section *assemble_command(const command_info&) const;
 	external_command *copy() const;
 
 	command_event evaluate_server(const command_info&, server_interface*) const;

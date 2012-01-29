@@ -136,6 +136,7 @@ int main(int argc, char *argv[])
 	{
 	fprintf(stderr, "%s: couldn't connect to '%s' via '%s'\n", argv[0], argv[3], argv[2]);
 	clear_command_status(connection2_status);
+	free((void*) connection1_name);
 	stop_message_queue();
 	return 1;
 	}
@@ -286,6 +287,7 @@ int main(int argc, char *argv[])
 
 	if (write(dataref_file, message1, sizeof message1) == sizeof message1)
 	{
+	/*after writing the data, tell the receiver how much to read*/
 	command_handle message1_read = rsvp_dataref_transfer_data(argv[4], dataref_reference,
 	  RSVP_DATAREF_MODE_READ, 0, sizeof message1);
 	insert_remote_target(message1_read, argv[2], connection1_name);
@@ -310,6 +312,7 @@ int main(int argc, char *argv[])
 
 	if (write(dataref_file, message2, sizeof message2) == sizeof message2)
 	{
+	/*after writing the data, tell the receiver how much to read*/
 	command_handle message2_read = rsvp_dataref_transfer_data(argv[4], dataref_reference,
 	  RSVP_DATAREF_MODE_READ, 0, sizeof message2);
 	insert_remote_target(message2_read, argv[2], connection1_name);

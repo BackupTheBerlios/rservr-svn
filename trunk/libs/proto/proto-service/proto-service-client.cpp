@@ -166,9 +166,9 @@ RSERVR_AUTO_BUILTIN_TAG(service_response)
 	bool outcome = RSERVR_CLIENT_ARG->register_response(RSERVR_INFO_ARG, &response);
 
 	if (!RSERVR_CHECK_FROM_REMOTE)
-	cClient->update_local_command_status(RSERVR_INFO_ARG, event_complete);
+	RSERVR_CLIENT_ARG->update_local_command_status(RSERVR_INFO_ARG, event_complete);
 	else
-	cClient->update_remote_command_status(RSERVR_INFO_ARG, event_complete);
+	RSERVR_CLIENT_ARG->update_remote_command_status(RSERVR_INFO_ARG, event_complete);
 	return  outcome? RSERVR_EVAL_NONE : RSERVR_EVAL_REJECTED;
 	 }
 	}
@@ -263,9 +263,9 @@ RSERVR_AUTO_BUILTIN_TAG(service_response_list)
 	bool outcome = RSERVR_CLIENT_ARG->register_response(RSERVR_INFO_ARG, &response);
 
 	if (!RSERVR_CHECK_FROM_REMOTE)
-	cClient->update_local_command_status(RSERVR_INFO_ARG, event_complete);
+	RSERVR_CLIENT_ARG->update_local_command_status(RSERVR_INFO_ARG, event_complete);
 	else
-	cClient->update_remote_command_status(RSERVR_INFO_ARG, event_complete);
+	RSERVR_CLIENT_ARG->update_remote_command_status(RSERVR_INFO_ARG, event_complete);
 	return  outcome? RSERVR_EVAL_NONE : RSERVR_EVAL_REJECTED;
 	 }
 	}
@@ -366,9 +366,9 @@ RSERVR_AUTO_BUILTIN_TAG(partial_response)
 	bool outcome = RSERVR_CLIENT_ARG->register_response(RSERVR_INFO_ARG, &response);
 
 	if (!RSERVR_CHECK_FROM_REMOTE)
-	cClient->update_local_command_status(RSERVR_INFO_ARG, convert_response(event_type));
+	RSERVR_CLIENT_ARG->update_local_command_status(RSERVR_INFO_ARG, convert_response(event_type));
 	else
-	cClient->update_remote_command_status(RSERVR_INFO_ARG, convert_response(event_type));
+	RSERVR_CLIENT_ARG->update_remote_command_status(RSERVR_INFO_ARG, convert_response(event_type));
 	return  outcome? RSERVR_EVAL_NONE : RSERVR_EVAL_REJECTED;
 	 }
 	}
@@ -464,9 +464,9 @@ RSERVR_AUTO_BUILTIN_TAG(partial_response_list)
 	bool outcome = RSERVR_CLIENT_ARG->register_response(RSERVR_INFO_ARG, &response);
 
 	if (!RSERVR_CHECK_FROM_REMOTE)
-	cClient->update_local_command_status(RSERVR_INFO_ARG,  convert_response(event_type));
+	RSERVR_CLIENT_ARG->update_local_command_status(RSERVR_INFO_ARG,  convert_response(event_type));
 	else
-	cClient->update_remote_command_status(RSERVR_INFO_ARG,  convert_response(event_type));
+	RSERVR_CLIENT_ARG->update_remote_command_status(RSERVR_INFO_ARG,  convert_response(event_type));
 	return  outcome? RSERVR_EVAL_NONE : RSERVR_EVAL_REJECTED;
 	 }
 	}
