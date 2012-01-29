@@ -123,13 +123,9 @@ static void initialize_environment();
 result initialize_server()
 {
 	register_handlers();
-debug_output("1");
 	if (!initialize_timing_table()) return false;
-debug_output("2");
 	if (!initialize_label_check())  return false;
-debug_output("3");
 	if (!initialize_conduit())      return false;
-debug_output("4");
 	initialize_environment();
 	umask(default_mask);
 	return true;
@@ -261,6 +257,14 @@ private:
 	    public protect::selfcontained_capsule <protected_server::common_access, data_set_one>,
 	    private mutex_type
     {
+    private:
+	    bool set_mutex(bool sState, bool bBlock = true)
+	    {
+	    //(to allow for debugging output)
+	    return this->mutex_type::set_mutex(sState, bBlock);
+	    }
+
+
 	    client_list ATTR_INT *clients()
 	    { return &client_table; }
 
@@ -308,6 +312,13 @@ private:
 
 
     private:
+	    bool set_mutex(bool sState, bool bBlock = true)
+	    {
+	    //(to allow for debugging output)
+	    return this->mutex_type::set_mutex(sState, bBlock);
+	    }
+
+
 	    execute_queue ATTR_INT *commands()
 	    { return &command_table; }
 
@@ -591,7 +602,6 @@ bool set_server_timing(const struct server_timing_table *tTable)
 {
 	protect::capsule <protected_server::timing_access> ::write_object object =
 	  internal_server.protected_data->get_timing()->writable();
-debug_output("s1 %p", (protected_server::timing_access*) object);
 	return object && set_server_table(object->timing(), tTable);
 }
 
@@ -600,7 +610,6 @@ bool calculate_server_timing()
 {
 	protect::capsule <protected_server::timing_access> ::write_object object =
 	  internal_server.protected_data->get_timing()->writable();
-debug_output("s2 %p", (protected_server::timing_access*) object);
 	return object && calculate_server_timing_specs(object->timing(), &internal_server_timing_specs);
 }
 
@@ -658,9 +667,7 @@ int create_default_timing_table(struct server_timing_table*);
 static bool initialize_timing_table()
 {
 	struct server_timing_table temporary_table;
-debug_output("a1");
 	if (create_default_timing_table(&temporary_table) < 0) return false;
-debug_output("a2");
 	return set_server_timing(&temporary_table) && calculate_server_timing();
 }
 
@@ -680,6 +687,7 @@ int enter_server_loop()
 	protect::capsule <protected_server::transfer_access> ::write_object object =
 	  internal_server.protected_data->get_transfer()->writable();
 	if (object) server_update_limits(object);
+	object.clear(); //NOTE: this avoids a deadlock since 'execute_server_thread' blocks
 	return execute_server_thread(&internal_server);
 }
 

@@ -472,28 +472,30 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	}
 
 
-bool receive_protected_input(protected_input *iInterface, command_transmit *cCommand)
+multi_result receive_protected_input(protected_input *iInterface, command_transmit *cCommand)
 {
-	if (!iInterface) return false;
+	if (!iInterface) return result_invalid;
 	protected_input::write_object object = iInterface->writable();
+	if (!object) return result_invalid;
 
 	if (!object || !object->parse_command(cCommand))
 	{
-	if (object->receive_input().size()) return false;
-	else if (object->is_terminated())   return false;
-	else                                return false;
+	if (object->receive_input().size()) return result_fail;
+	else if (object->is_terminated())   return result_invalid;
+	else                                return result_fail;
 	}
-	else return true;
+	else return result_success;
 }
 
 
-int check_input_waiting(protected_input *iInput)
+multi_result check_input_waiting(protected_input *iInput)
 {
-	if (!iInput) return protect::entry_denied;
+	if (!iInput) return result_invalid;
 	protected_input::write_object object = iInput->writable();
-	if (!object) return protect::entry_denied;
-	if (!object->set_input_mode(input_binary)) return protect::entry_fail; //removes "input_allow_underrun"
+	if (!object) return result_invalid;
+
+	if (!object->set_input_mode(input_binary)) return result_invalid; //removes "input_allow_underrun"
 	bool outcome = !object->empty_read() || object->receive_input().size();
-	if (!outcome && object->is_terminated()) return protect::exit_forced;
-	return outcome? protect::entry_success : protect::entry_retry;
+	if (!outcome && object->is_terminated()) return result_invalid;
+	return outcome? result_success : result_fail;
 }

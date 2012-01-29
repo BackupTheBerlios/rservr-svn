@@ -168,7 +168,7 @@ typedef lexer_input input_interface;
 typedef protect::capsule <input_interface> protected_input;
 
 
-extern bool receive_protected_input(protected_input*, command_transmit*);
-extern int check_input_waiting(protected_input*);
+extern multi_result receive_protected_input(protected_input*, command_transmit*);
+extern multi_result check_input_waiting(protected_input*);
 
 #endif //common_input_hpp

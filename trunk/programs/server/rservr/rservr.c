@@ -341,7 +341,7 @@ int main(int argc, char *argv[])
 	int outcome = enter_server_loop();
 
 
-	/*shutdown~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+	/*shutdown~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/\
 	disconnect_clients();
 
     log_server_normal_exit(getpid());

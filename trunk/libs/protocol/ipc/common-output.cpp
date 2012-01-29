@@ -165,11 +165,12 @@ bool send_protected_output(protected_output *iInterface, const data_exporter *dD
 {
 	if (!iInterface) return false;
 	protected_output::write_object object = iInterface->writable();
+	if (!object) return false;
 
-	bool outcome = object && export_data(dDestination, object);
+	bool outcome = export_data(dDestination, object);
 
     #ifdef PARAM_CACHE_COMMAND_OUTPUT
-	if (!object || !object->synchronize()) return false;
+	if (!object->synchronize()) return false;
     #endif
 
 	return outcome;

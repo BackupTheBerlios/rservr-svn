@@ -537,19 +537,19 @@ static void internal_execute()
 static const exposed_server *current_server = NULL;
 
 
-protect::entry_result ATTR_INT server_execute_next(protect::capsule <protected_server::execute_access> *lList)
+bool ATTR_INT server_execute_next(protect::capsule <protected_server::execute_access> *lList)
 {
-	if (!lList) return protect::exit_forced;
+	if (!lList) return false;
 	protect::capsule <protected_server::execute_access> ::write_object object = lList->writable();
-	if (!object) return protect::exit_forced;
+	if (!object) return false;
 
-	if (!object->commands()->number_waiting()) return protect::entry_retry;
+	if (!object->commands()->number_waiting()) return false;
 
 	unsigned int cache_size = calculate_execution(object->commands()->number_waiting());
 
 	while (cache_size-- && object->commands()->transfer_top_command(&check_priority, command_cache));
 
-	return command_cache.size()? protect::entry_success : protect::entry_fail;
+	return command_cache.size();
 }
 
 //END command execution---------------------------------------------------------
@@ -595,8 +595,7 @@ int execute_server_thread(const exposed_server *sServer)
 
 	local_server = sServer;
 
-	if ( server_continue_clients(sServer->protected_data->get_clients()) !=
-	       protect::entry_success )
+	if (!server_continue_clients(sServer->protected_data->get_clients()))
 	{
 	//continue the stopped clients if all else fails
 	killpg(0, SIGCONT);
@@ -629,10 +628,8 @@ int execute_server_thread(const exposed_server *sServer)
 
 	while (!get_exit_flag() && waiting_command_available())
 	 {
-	int waiting_commands = false;
-	if ((waiting_commands = server_execute_next(sServer->protected_data->get_commands())) ==
-	    protect::exit_forced) break;
-	if (waiting_commands == protect::entry_success) internal_execute();
+	if (!server_execute_next(sServer->protected_data->get_commands())) break;
+	internal_execute();
 	 }
 	}
 

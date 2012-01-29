@@ -341,7 +341,7 @@ bool ATTR_INT get_listen_select_list(fd_set *lList)
 
 	//NOTE: empty is a failure so that it doesn't actually enter 'select'
 	if (!object->sockets.size() || object->sockets.size() >= FD_SETSIZE)
-	return protect::entry_fail;
+	return false;
 
 	FD_ZERO(lList);
 

@@ -791,7 +791,7 @@ static bool internal_queue_loop()
 	                              client_timing_specs->read_standby_retry,
 	                              client_timing_specs->read_standby_wait);
 
-	int input_test = 0;
+	int input_test = result_fail;
 
 
 	struct stat current_status;
@@ -799,7 +799,7 @@ static bool internal_queue_loop()
 	fd_set input_set;
 
 
-	while (input_test != protect::entry_denied && input_test != protect::exit_forced && !exit_state)
+	while (input_test != result_invalid && !exit_state)
 	{
 	//NOTE: 'queue_pause_condition' must be deactivated when not pausing!
 	if (queue_pause_condition.active())
@@ -814,40 +814,37 @@ static bool internal_queue_loop()
 	                          client_timing_specs->read_standby_retry,
 	                          client_timing_specs->read_standby_wait);
 
-	while ((input_test = check_input_waiting(pipe_input)) != protect::entry_success && !exit_state)
+	while ((input_test = check_input_waiting(pipe_input)) == result_fail && !exit_state)
 	 {
-	if (input_test == protect::entry_denied || input_test == protect::exit_forced) break;
-
 	//(currently unused)
 	//local_standby.wait();
 
 	//NOTE: use 'select' to prevent mutex problems with input source
-	else
-	  {
+
 	FD_ZERO(&input_set);
 	FD_SET(execute_input, &input_set);
 
 	message_queue_event(RSERVR_QUEUE_BLOCK);
 	if (!inline_queue && pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) != 0) return false;
 	if (select(FD_SETSIZE, &input_set, NULL, NULL, NULL) < 0 && errno != EINTR)
-	   {
+	  {
 	if (!inline_queue && pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) return false;
 	message_queue_event(RSERVR_QUEUE_UNBLOCK);
 	return false;
-	   }
+	  }
 	pthread_testcancel(); //in case 'select' gets by when canceling
 	if (!inline_queue && pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) return false;
 	message_queue_event(RSERVR_QUEUE_UNBLOCK);
 	if (fstat(execute_input, &current_status) < 0) return false;
-	  }
 	 }
-	if (input_test == protect::entry_denied || input_test == protect::exit_forced) break;
+
+	if (input_test == result_invalid || exit_state) break;
 
 	//(currently unused)
 	//local_standby.reset();
 
 	input_test = receive_protected_input(pipe_input, &internal_command);
-	if (input_test == protect::entry_denied || input_test == protect::exit_forced) break;
+	if (input_test == result_invalid) break;
 
 	internal_command.send_to = &local_client_response_receiver;
 
