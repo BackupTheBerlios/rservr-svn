@@ -40,7 +40,7 @@ template <bool MultiLock = true>
 class global_sentry_pthread
 {
 public:
-    inline global_sentry_pthread()
+    inline global_sentry_pthread() : locked(0)
     {
     pthread_mutexattr_t attributes = pthread_mutexattr_t();
     pthread_mutexattr_init(&attributes);
@@ -49,7 +49,7 @@ public:
     pthread_mutex_init(&mutex, &attributes);
     }
 
-    inline global_sentry_pthread(const global_sentry_pthread&)
+    inline global_sentry_pthread(const global_sentry_pthread&) : locked(0)
     {
     pthread_mutexattr_t attributes = pthread_mutexattr_t();
     pthread_mutexattr_init(&attributes);
@@ -62,28 +62,35 @@ public:
     {
     pthread_mutex_destroy(&mutex);
     pthread_mutex_init(&mutex, NULL);
+    locked = 0;
     return *this;
     }
 
     inline bool lock(bool block)
-    { return (block? pthread_mutex_lock(&mutex) : pthread_mutex_trylock(&mutex)) == 0; }
+    {
+    bool outcome = ((block? pthread_mutex_lock(&mutex) : pthread_mutex_trylock(&mutex)) == 0);
+    if (outcome && locked < 0) locked = 0;
+    if (outcome) ++locked;
+    return outcome;
+    }
 
     inline bool unlock()
-    { return (pthread_mutex_unlock(&mutex) == 0); }
+    {
+    if (locked <= 0) return false;
+    bool outcome = (pthread_mutex_unlock(&mutex) == 0);
+    if (outcome) --locked;
+    return outcome;
+    }
 
     inline bool status() const
-    {
-    int result = pthread_mutex_trylock(&mutex);
-    if (result != 0) return true;
-    pthread_mutex_unlock(&mutex);
-    return false;
-    }
+    { return locked > 0; }
 
     virtual inline ~global_sentry_pthread()
     { pthread_mutex_destroy(&mutex); }
 
 private:
-    mutable pthread_mutex_t mutex;
+    int locked;
+    pthread_mutex_t mutex;
 };
 
 #endif

@@ -35,6 +35,7 @@
 #define base___HPP GLOBAL_SENTRY_HPP
 #include "mutex__.hpp"
 
+
 namespace base___HPP
 {
 
@@ -263,10 +264,7 @@ struct proxy_capsule_type <const Type>
 template <class Type>
 class mutex_proxy_base
 {
-private:
-    template <class> friend class mutex_proxy_base;
-    template <class> friend class mutex_proxy;
-
+public:
     typedef typename proxy_capsule_type <Type> ::base capsule_base;
     typedef typename proxy_capsule_type <Type> ::type capsule_type;
 
@@ -278,18 +276,20 @@ private:
     {
     if (!counter || !mutex_base::set_mutex(mutex, true, block))
      {
-    mutex = NULL;
-    this->opt_out();
+    pointer = NULL;
+    mutex   = NULL;
+    int *old_counter = counter;
+    counter = NULL;
+    delete old_counter;
      }
-    else mutex_base::set_viewing(mutex, true);
     }
 
-    inline explicit mutex_proxy_base(const mutex_proxy_base &copy) :
+    inline mutex_proxy_base(const mutex_proxy_base &copy) :
     pointer(NULL), mutex(NULL), counter(NULL)
     { *this = copy; }
 
     template <class Type2>
-    inline explicit mutex_proxy_base(const mutex_proxy_base <Type2> &copy) :
+    inline mutex_proxy_base(const mutex_proxy_base <Type2> &copy) :
     pointer(NULL), mutex(NULL), counter(NULL)
     { *this = copy; }
 
@@ -307,7 +307,6 @@ private:
     if (counter) ++*counter;
     pointer = counter? copy.pointer : NULL;
     mutex   = counter? copy.mutex   : NULL;
-    mutex_base::set_viewing(mutex, true);
     return *this;
     }
 
@@ -322,7 +321,6 @@ private:
     int *old_counter = counter;
     counter = NULL;
     delete old_counter;
-    mutex_base::set_viewing(mutex, false);
     mutex_base::set_mutex(mutex, false);
      }
     pointer = NULL;
@@ -330,13 +328,14 @@ private:
     counter = NULL;
     }
 
+protected:
     capsule_type pointer;
     mutex_base *mutex;
     int *counter;
 };
 
 template <class Type>
-class mutex_proxy : public mutex_proxy_base <Type>
+class mutex_proxy : private mutex_proxy_base <Type>
 {
 private:
     template <class> friend class capsule;
@@ -349,6 +348,9 @@ private:
 
 public:
     inline mutex_proxy() : mutex_proxy_base <Type> () {}
+
+    inline void clear()
+    { mutex_proxy_base <Type> ::opt_out(); }
 
     inline operator bool() const
     { return capsule_base::readable_object(mutex_proxy_base <Type> ::pointer); }
@@ -376,10 +378,8 @@ public:
     inline const Type *operator ->() const { return capsule_base::readable_object(mutex_proxy_base <Type> ::pointer); }
 };
 
-
-
 template <class Type>
-class mutex_proxy <const Type> : public mutex_proxy_base <const Type>
+class mutex_proxy <const Type> : private mutex_proxy_base <const Type>
 {
 private:
     template <class> friend class capsule;
@@ -395,6 +395,9 @@ public:
 
     inline mutex_proxy(const mutex_proxy <Type> &copy) :
     mutex_proxy_base <const Type> (copy) {}
+
+    inline void clear()
+    { mutex_proxy_base <const Type> ::opt_out(); }
 
     inline mutex_proxy &operator = (const mutex_proxy <Type> &copy)
     {

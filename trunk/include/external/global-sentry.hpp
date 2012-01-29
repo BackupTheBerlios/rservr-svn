@@ -35,22 +35,6 @@
 #define GLOBAL_SENTRY_HPP protect
 #include <memory>
 
-namespace GLOBAL_SENTRY_HPP
-{
-
-//Constants---------------------------------------------------------------------
-typedef int entry_result;
-
-const entry_result pre_entry_error = -6; //Error before attempting access
-const entry_result exit_forced     = -5; //Exit was forced by the capsule
-const entry_result entry_retry     = -4; //Retry later
-const entry_result entry_wait      = -3; //Wait and try again
-const entry_result entry_denied    = -2; //Do not try again; just exit
-const entry_result entry_fail      = -1; //Other failure
-const entry_result entry_success   =  0; //Entry was successful
-//END Constants-----------------------------------------------------------------
-}
-
 #include "components/base__.hpp"
 #include "components/literal__.hpp"
 #include "components/derivative__.hpp"

@@ -137,7 +137,7 @@ private:
         bool
     mutex_status() const;
 
-        int
+        bool
     set_mutex(bool, bool);
 
         bool
@@ -268,9 +268,9 @@ private:
   dynamic_capsule <Interface> ::mutex_status() const
   { return capsule <Interface> ::mutex_status(this->stored_capsule); }
 
-  template <class Interface> int
+  template <class Interface> bool
   dynamic_capsule <Interface> ::set_mutex(bool status, bool block)
-  { return entry_denied; }
+  { return false; }
 
   template <class Interface> bool
   dynamic_capsule <Interface> ::set_viewing(bool) const
