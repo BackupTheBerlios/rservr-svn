@@ -70,58 +70,23 @@ static protect::literal_capsule <command_status_list, global_sentry_pthread <> >
 protected_command_status_list *const client_command_status = &internal_status_list;
 
 
-class update_command : public protected_command_status_list::modifier
-{
-public:
-	ATTR_INT update_command() : current_reference(0), current_event(0), current_info(NULL) { }
-
-	bool ATTR_INT operator () (command_reference rReference, command_event eEvent,
-	const command_info *iInfo)
-	{
-	current_reference = rReference;
-	current_event     = eEvent;
-	current_info      = iInfo;
-	bool outcome = client_command_status->access_contents(this);
-	current_reference = 0;
-	current_event     = 0;
-	current_info      = NULL;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	if (!oObject) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	int position = object->f_find(current_reference, &command_status_list::find_by_key);
-
-	if (position == data::not_found) return protect::entry_fail;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	if ( object->get_element(position).value().update_status(current_reference,
-	       current_event, current_info) )
-	object->remove_single(position);
-
-	return protect::entry_success;
-	}
-
-	command_reference    current_reference;
-	command_event       current_event;
-	const command_info *current_info;
-};
-
-
 bool update_status(command_reference rReference, command_event eEvent,
 const command_info *iInfo)
 {
-	update_command new_status;
-	return new_status(rReference, eEvent, iInfo);
+	protected_command_status_list::write_object object = client_command_status->writable();
+	if (!object) return false;
+
+	int position = object->f_find(rReference, &command_status_list::find_by_key);
+
+	if (position == data::not_found) return false;
+
+	if ( object->get_element(position).value().update_status(rReference,
+	       eEvent, iInfo) )
+	object->remove_single(position);
+
+	return true;
 }
+
 
 
 static protect::literal_capsule <command_queue, global_sentry_pthread <> > queued_client_commands;
@@ -134,11 +99,11 @@ command_reference manual_message_number()
 }
 
 
+
 const command_transmit *register_new_command(command_transmit *cCommand)
 {
 	if (!cCommand) return NULL;
-	queue_new_command new_command(&queued_client_commands);
-	return new_command(cCommand);
+	return queue_new_command(&queued_client_commands, cCommand);
 }
 
 
@@ -175,172 +140,75 @@ static void update_status_mask(command_event &sStatus, command_event eEvent)
 	}
 
 
-class register_reference : public protected_command_status_list::modifier
+
+bool ATTR_INT register_reference(protected_command_status_list *lList,
+command_reference rReference)
 {
-public:
-	ATTR_INT register_reference(protected_command_status_list *lList) : current_list(lList),
-	current_reference(0) { }
+	if (!lList) return false;
+	protected_command_status_list::write_object object = lList->writable();
+	if (!object) return false;
 
-	bool ATTR_INT operator () (command_reference rReference)
-	{
-	current_reference = rReference;
-	bool outcome = current_list->access_contents(this);
-	current_reference = 0;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	if (!oObject) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	object->add_element( object->new_element(current_reference, command_status()) );
+	object->add_element( object->new_element(rReference, command_status()) );
 	object->f_remove_duplicates(&command_status_list::sort_by_key,
 	  &command_status_list::find_dup_key);
 
-	return protect::entry_success;
-	}
-
-	protected_command_status_list *current_list;
-	command_reference               current_reference;
-};
+	return true;
+}
 
 
-class deregister_reference : public protected_command_status_list::modifier
+
+bool ATTR_INT deregister_reference(protected_command_status_list *lList,
+command_reference rReference)
 {
-public:
-	ATTR_INT deregister_reference(protected_command_status_list *lList) : current_list(lList),
-	current_reference(0) { }
+	if (!lList) return false;
+	protected_command_status_list::write_object object = lList->writable();
+	if (!object) return false;
 
-	bool ATTR_INT operator () (command_reference rReference)
-	{
-	current_reference = rReference;
-	bool outcome = current_list->access_contents(this);
-	current_reference = 0;
-	return !outcome;
-	}
+	object->f_remove_pattern(rReference, &command_status_list::find_by_key);
 
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	if (!oObject) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject))    return protect::exit_forced;
-
-	object->f_remove_pattern(current_reference, &command_status_list::find_by_key);
-
-	return protect::entry_success;
-	}
-
-	protected_command_status_list *current_list;
-	command_reference               current_reference;
-};
+	return true;
+}
 
 
-class register_functor : public protected_command_status_list::modifier
+
+bool ATTR_INT register_functor(protected_command_status_list *lList,
+command_reference rReference, const event_functor_list *fFunctor)
 {
-public:
-	ATTR_INT register_functor(protected_command_status_list *lList) : current_list(lList),
-	current_reference(0), current_functors(NULL) { }
+	if (!lList) return false;
+	protected_command_status_list::write_object object = lList->writable();
+	if (!object) return false;
 
-	bool ATTR_INT operator () (command_reference rReference, const event_functor_list *fFunctors)
-	{
-	current_reference = rReference;
-	current_functors  = fFunctors;
-	bool outcome = current_list->access_contents(this);
-	current_reference = 0;
-	current_functors  = NULL;
-	return !outcome;
-	}
+	int position = object->f_find(rReference, &command_status_list::find_by_key);
 
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject)
-	{
-	if (!oObject) return protect::entry_denied;
+	if (position == data::not_found) return false;
 
-	if (!current_functors) return protect::entry_fail;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	int position = object->f_find(current_reference, &command_status_list::find_by_key);
-
-	if (position == data::not_found) return protect::entry_fail;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	if (!object->get_element(position).value().register_functors(*current_functors))
-	return protect::entry_fail;
-
-	return protect::entry_success;
-	}
-
-	protected_command_status_list *current_list;
-	command_reference              current_reference;
-	const event_functor_list      *current_functors;
-};
+	return object->get_element(position).value().register_functors(*fFunctor);
+}
 
 
-class retrieve_status : public protected_command_status_list::modifier
+
+command_event ATTR_INT retrieve_status(protected_command_status_list *lList,
+command_reference rReference)
 {
-public:
-	ATTR_INT retrieve_status(protected_command_status_list *lList) : current_list(lList),
-	current_reference(0), current_status(0) { }
+	if (!lList) return event_unavailable;
+	protected_command_status_list::write_object object = lList->writable();
+	if (!object) return event_unavailable;
 
-	command_event ATTR_INT operator () (command_reference rReference)
-	{
-	current_reference = rReference;
-	current_status    = event_unavailable;
-	bool outcome = current_list->access_contents(this);
-	current_reference = 0;
-	return (!outcome)? current_status : event_unavailable;
-	}
+	int position = object->f_find(rReference, &command_status_list::find_by_key);
 
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject)
-	{
-	if (!oObject) return protect::entry_denied;
+	if (position == data::not_found) return event_unavailable;
 
-	write_temp object = NULL;
+	return object->get_element(position).value().get_status();
+}
 
-	if (!(object = oObject)) return protect::exit_forced;
-
-	int position = object->f_find(current_reference, &command_status_list::find_by_key);
-
-	if (position == data::not_found) return protect::entry_fail;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	current_status = object->get_element(position).value().get_status();
-
-	return protect::entry_success;
-	}
-
-	protected_command_status_list *current_list;
-	command_reference               current_reference;
-	command_event                  current_status;
-};
 
 
 bool manual_command_status(command_reference rReference)
-{
-	register_reference new_register(client_command_status);
-	return new_register(rReference);
-}
+{ return register_reference(client_command_status, rReference); }
 
 
 result change_command_priority(command_handle cCommand, command_priority pPriority)
-{
-	change_priority new_priority(&queued_client_commands);
-	return new_priority(cCommand, pPriority);
-}
+{ return change_priority(&queued_client_commands, cCommand, pPriority); }
 
 
 command_reference send_command(command_handle cCommand)
@@ -363,15 +231,13 @@ command_reference send_command_no_status(command_handle cCommand)
 	return 0;
 	}
 
-	transmit_command new_transmit(&queued_client_commands);
 	command_reference next_reference = manual_message_number();
 	if (!next_reference) return 0;
 
 	reset_input_standby();
 
-	if (!new_transmit(cCommand, pipe_output, next_reference, true)) return 0;
-
-	return next_reference;
+	return transmit_command(&queued_client_commands, cCommand, pipe_output, next_reference, true)?
+	next_reference : 0;
 }
 
 
@@ -400,26 +266,20 @@ command_reference send_command_functors(command_handle cCommand,
 	return 0;
 	}
 
-	transmit_command new_transmit(&queued_client_commands);
 	command_reference next_reference = manual_message_number();
 	if (!next_reference) return 0;
 
-	register_reference new_register(client_command_status);
-	new_register(next_reference);
+	register_reference(client_command_status, next_reference);
 
 	if (fFunctors.size())
-	{
-	register_functor new_functor(client_command_status);
-	new_functor(next_reference, &fFunctors);
-	}
+	register_functor(client_command_status, next_reference, &fFunctors);
 
 	reset_input_standby();
 
-	if (!new_transmit(cCommand, pipe_output, next_reference, false))
+	if (!transmit_command(&queued_client_commands, cCommand, pipe_output, next_reference, false))
 	{
 	update_status(next_reference, event_unsent, NULL);
-	deregister_reference new_deregister(client_command_status);
-	new_deregister(next_reference);
+	deregister_reference(client_command_status, next_reference);
 	return 0;
 	}
 
@@ -456,15 +316,8 @@ result new_status_functor(command_reference rReference, event_functor *fFunctor)
 result new_status_functors(command_reference rReference,
   const event_functor_list &fFunctors)
 {
-	if (fFunctors.size())
-	{
-	register_functor new_functor(client_command_status);
-	if (!new_functor(rReference, &fFunctors)) return false;
-	}
-
-	else return false;
-
-	return true;
+	return fFunctors.size()?
+	  register_functor(client_command_status, rReference, &fFunctors) : false;
 }
 
 
@@ -486,10 +339,7 @@ const event_callback *cCallback)
 
 
 result destroy_command(command_handle cCommand)
-{
-	remove_command new_removal(&queued_client_commands);
-	return new_removal(cCommand);
-}
+{ return remove_command(&queued_client_commands, cCommand); }
 
 
 command_event wait_command_event(command_reference rReference, command_event sStatus,
@@ -544,24 +394,17 @@ long_time wWait, int(*cCallback)(command_reference, command_event))
 
 command_event find_command_status(command_reference rReference)
 /*obtain the status of a sent command*/
-{
-	retrieve_status new_status(client_command_status);
-	return new_status(rReference);
-}
+{ return retrieve_status(client_command_status, rReference); }
 
 
 result clear_command_status(command_reference rReference)
-{
-	deregister_reference new_deregister(client_command_status);
-	return new_deregister(rReference);
-}
+{ return deregister_reference(client_command_status, rReference); }
 
 
 text_info extract_remote_command(command_handle hHandle)
 {
 	if (!hHandle) return false;
-	extract_command new_extract(&queued_client_commands);
-	return new_extract(hHandle);
+	return extract_command(&queued_client_commands, hHandle);
 }
 
 
@@ -573,9 +416,8 @@ multi_result filtered_send_stream_command(remote_connection fFile, command_handl
 socket_reference sSocket, send_short_func sSend)
 {
 	if (!hHandle) return result_fail;
-	forward_command new_forward(&queued_client_commands);
 
-	command_transmit *copied_command = new_forward(hHandle);
+	command_transmit *copied_command = forward_command(&queued_client_commands, hHandle);
 	if (!copied_command) return result_fail;
 
 	common_output new_output(fFile);
@@ -790,8 +632,7 @@ result set_alternate_sender(command_handle hHandle, text_info rResponses)
 	if (!check_permission_all(local_type(), type_resource_client)) return false;
 
 	if (!hHandle || !check_entity_label(rResponses)) return false;
-	set_response_entity new_respond(&queued_client_commands);
-	return new_respond(hHandle, rResponses);
+	return set_response_entity(&queued_client_commands, hHandle, rResponses);
 }
 
 
@@ -799,8 +640,7 @@ result insert_remote_address(command_handle hHandle, text_info tTarget)
 {
 	if (!strlen(tTarget)) return true;
 	if (!check_address_label(tTarget) || !check_next_to_client(tTarget)) return false;
-	insert_remote_scope new_address(&queued_client_commands);
-	return new_address(hHandle, tTarget);
+	return insert_remote_scope(&queued_client_commands, hHandle, tTarget);
 }
 
 
@@ -810,8 +650,7 @@ result insert_remote_target(command_handle hHandle, text_info cClient, text_info
 	if (!check_entity_label(cClient) || !check_entity_label(aAddress)) return false;
 	text_data temporary = aAddress;
 	insert_remote_client(temporary, cClient);
-	insert_remote_scope new_address(&queued_client_commands);
-	return new_address(hHandle, temporary.c_str());
+	return insert_remote_scope(&queued_client_commands, hHandle, temporary.c_str());
 }
 
 
@@ -822,8 +661,7 @@ result insert_service_address(command_handle hHandle, text_info sService)
 	if (!check_entity_label(sService)) return false;
 	text_data temporary;
 	insert_remote_client(temporary, sService);
-	insert_remote_scope new_address(&queued_client_commands);
-	return new_address(hHandle, temporary.c_str());
+	return insert_remote_scope(&queued_client_commands, hHandle, temporary.c_str());
 }
 
 
@@ -832,16 +670,12 @@ result set_target_to_server_of(command_handle hHandle, text_info cClient, text_i
 	if (!strlen(cClient)) return false;
 	if (!check_entity_label(cClient)) return false;
 	if (!check_address_label(aAddress) || !check_next_to_client(aAddress)) return false;
-	set_server_address new_address(&queued_client_commands);
-	return new_address(hHandle, cClient, aAddress);
+	return set_server_address(&queued_client_commands, hHandle, cClient, aAddress);
 }
 
 
 text_info get_next_address(command_handle hHandle, char *cCopy, unsigned int sSize)
-{
-	next_remote_address new_address(&queued_client_commands);
-	return new_address(hHandle, cCopy, sSize);
-}
+{ return next_remote_address(&queued_client_commands, hHandle, cCopy, sSize); }
 
 
 //(from 'plugin-dev/manual-command.hpp')

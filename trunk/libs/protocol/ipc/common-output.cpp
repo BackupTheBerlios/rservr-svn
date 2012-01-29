@@ -160,38 +160,24 @@ extern "C" {
 	}
 
 
-	send_protected_output::send_protected_output(protected_output *oOutput) :
-	is_terminated(false), current_output(NULL), current_destination(oOutput) { }
 
-	bool send_protected_output::operator () (const data_exporter *oOutput)
-	{
-	is_terminated  = false;
-	current_output = oOutput;
-	bool outcome = current_destination->access_contents(this);
-	current_output = NULL;
-	return !outcome;
-	}
+bool send_protected_output(protected_output *iInterface, const data_exporter *dDestination)
+{
+	if (!iInterface) return false;
+	protected_output::write_object object = iInterface->writable();
 
-	protect::entry_result send_protected_output::access_entry(write_object oObject)
-	{
-	if (!oObject || !current_destination) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject) || object->is_closed()) return protect::exit_forced;
-
-	bool outcome = export_data(current_output, object);
-	if (!(object = oObject)) return protect::exit_forced;
+	bool outcome = object && export_data(dDestination, object);
 
     #ifdef PARAM_CACHE_COMMAND_OUTPUT
-	if (!object->synchronize())
-	{
-	is_terminated = object->is_closed();
-	return protect::entry_fail;
-	}
-    #else
-	is_terminated = !outcome && object->is_closed();
+	if (!object || !object->synchronize()) return false;
     #endif
 
-	return outcome? protect::entry_success : protect::entry_fail;
-	}
+	return outcome;
+}
+
+bool check_output_terminated(protected_output *iInterface)
+{
+	if (!iInterface) return false;
+	protected_output::read_object object = iInterface->readable();
+	return !object || object->is_closed();
+}

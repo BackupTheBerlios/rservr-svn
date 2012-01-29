@@ -50,11 +50,7 @@ class capsule_viewer;
 //Forward declaration
 
 template <class>
-class capsule_safety_pointer;
-//Forward declaration for use as friend
-
-template <class>
-class const_capsule_safety_pointer;
+class mutex_proxy;
 //Forward declaration for use as friend
 
 template <class Interface>
@@ -62,47 +58,31 @@ class capsule :
 	virtual public mutex_base
 {
 public:
-    typedef capsule_modifier <Interface> modifier;
-    //Modifier object type
+    template <class> friend class mutex_proxy;
 
-    typedef capsule_viewer <Interface> viewer;
-    //Viewer object type
+    typedef Interface *write_temp;
+    typedef mutex_proxy <Interface> write_object;
+
+    typedef const Interface *read_temp;
+    typedef mutex_proxy <const Interface> read_object;
 
     //Public Interface----------------------------------------------------------
 
     /*____________________________________________________________________*
       -Capsule Access Functions-
 
-      access_contents: Provides access to a 'capsule_modifier'.  Capsule
-      mutex applies for these functions only.
+      writable: return a writable proxy to the contained object
 
-      view_contents: Provides access to a 'capsule_viewer'.  Mutex does
-      not apply here even when the capsule is being modified.
+      readable: return a readable proxy to the contained object
      *____________________________________________________________________*/
 
     virtual
-        entry_result
-    access_contents(capsule_modifier <Interface>*);
+        write_object
+    writable(bool = true);
 
     virtual
-        entry_result
-    access_contents(const capsule_modifier <Interface>*);
-
-    virtual
-        entry_result
-    view_contents(capsule_viewer <Interface>*) const;
-
-    virtual
-        entry_result
-    view_contents(const capsule_viewer <Interface>*) const;
-
-    virtual
-        entry_result
-    view_contents_locked(capsule_viewer <Interface>*);
-
-    virtual
-        entry_result
-    view_contents_locked(const capsule_viewer <Interface>*);
+        read_object
+    readable(bool = true) const;
 
     /*____________________________________________________________________*
       -Capsule Cloning Functions-
@@ -118,18 +98,18 @@ public:
 
     inline
         capsule
-    *clone() const
-    { return new_copy(this); }
+    *clone(bool block = true) const
+    { return new_copy(this, block); }
 
     inline
         capsule
-    *clone_to(capsule *equal) const
-    { return copy_to(this, equal); }
+    *clone_to(capsule *equal, bool block = true) const
+    { return copy_to(this, equal, block); }
 
     inline
         size_t
-    clone_size() const
-    { return capsule_size(this); }
+    clone_size(bool block = true) const
+    { return capsule_size(this, block); }
 
     /*____________________________________________________________________*
       -Operators-
@@ -181,24 +161,28 @@ protected:
      *____________________________________________________________________*/
 
     static inline
-        const Interface
-    *readable_object(const capsule *base)
-    { return !base? NULL : base->readable_object(); }
+        capsule
+    *new_copy(const capsule *base, bool block = true)
+    {
+    read_object locked = !base? NULL : base->readable(block);
+    return !locked? NULL : base->new_copy();
+    }
 
     static inline
         capsule
-    *new_copy(const capsule *base)
-    { return !base? NULL : base->new_copy(); }
-
-    static inline
-        capsule
-    *copy_to(const capsule *base, capsule *to)
-    { return !base? NULL : base->copy_to(to); }
+    *copy_to(const capsule *base, capsule *to, bool block = true)
+    {
+    read_object locked = !base? NULL : base->readable(block);
+    return !locked? NULL : base->copy_to(to);
+    }
 
     static inline
         size_t
-    capsule_size(const capsule *base)
-    { return !base? 0 : base->capsule_size(); }
+    capsule_size(const capsule *base, bool block = true)
+    {
+    read_object locked = !base? NULL : base->readable(block);
+    return !locked? 0 : base->capsule_size();
+    }
     //--------------------------------------------------------------------------
 
 private:
@@ -243,6 +227,11 @@ private:
     //--------------------------------------------------------------------------
 
     static inline
+        const Interface
+    *readable_object(const capsule *base)
+    { return !base? NULL : base->readable_object(); }
+
+    static inline
         Interface
     *writable_object(capsule *base)
     { return !base? NULL : base->writable_object(); }
@@ -256,78 +245,186 @@ private:
 };
 //END capsule-------------------------------------------------------------------
 
-//Safety pointers---------------------------------------------------------------
-//Hold pointer for capsule access
-//writable______________________________________________________________________
-template <class Interface>
-class capsule_safety_pointer
+//proxy classes-----------------------------------------------------------------
+template <class Type>
+struct proxy_capsule_type
 {
-public:
-    inline
-        Interface
-    &operator * ()
-    { return *capsule <Interface> ::writable_object(actual_capsule); }
-
-    inline
-        Interface
-    *operator -> ()
-    { return capsule <Interface> ::writable_object(actual_capsule); }
-
-    inline
-    operator Interface*()
-    { return capsule <Interface> ::writable_object(actual_capsule); }
-
-    inline
-        bool
-    operator ! () const
-    { return !capsule <Interface> ::readable_object(actual_capsule); }
-
-private:
-    explicit
-    capsule_safety_pointer(capsule <Interface> *to_mirror) :
-    actual_capsule(to_mirror) { }
-
-        capsule <Interface>
-    *actual_capsule;
-
-    template <class> friend class capsule;
+    typedef capsule <Type> base;
+    typedef base *type;
 };
 
-//readable______________________________________________________________________
-template <class Interface>
-class const_capsule_safety_pointer
+template <class Type>
+struct proxy_capsule_type <const Type>
 {
-public:
-    inline
-        const Interface
-    &operator * () const
-    { return *capsule <Interface> ::readable_object(actual_capsule); }
-
-    inline
-        const Interface
-    *operator -> () const
-    { return capsule <Interface> ::readable_object(actual_capsule); }
-
-    inline
-    operator const Interface*() const
-    { return capsule <Interface> ::readable_object(actual_capsule); }
-
-    inline
-        bool
-    operator ! () const
-    { return !capsule <Interface> ::readable_object(actual_capsule); }
-
-private:
-    explicit
-    const_capsule_safety_pointer(const capsule <Interface> *to_mirror) :
-    actual_capsule(to_mirror) { }
-
-        const capsule <Interface>
-    *actual_capsule;
-
-    template <class> friend class capsule;
+    typedef capsule <Type> base;
+    typedef const base *type;
 };
-//END Safety pointers-----------------------------------------------------------
+
+template <class Type>
+class mutex_proxy_base
+{
+private:
+    template <class> friend class mutex_proxy_base;
+    template <class> friend class mutex_proxy;
+
+    typedef typename proxy_capsule_type <Type> ::base capsule_base;
+    typedef typename proxy_capsule_type <Type> ::type capsule_type;
+
+    inline mutex_proxy_base() :
+    pointer(NULL), mutex(NULL), counter(NULL) {}
+
+    inline mutex_proxy_base(capsule_type new_pointer, mutex_base *new_mutex, bool block) :
+    pointer(new_pointer), mutex(new_mutex), counter(new int(1))
+    {
+    if (!counter || !mutex_base::set_mutex(mutex, true, block))
+     {
+    mutex = NULL;
+    this->opt_out();
+     }
+    else mutex_base::set_viewing(mutex, true);
+    }
+
+    inline explicit mutex_proxy_base(const mutex_proxy_base &copy) :
+    pointer(NULL), mutex(NULL), counter(NULL)
+    { *this = copy; }
+
+    template <class Type2>
+    inline explicit mutex_proxy_base(const mutex_proxy_base <Type2> &copy) :
+    pointer(NULL), mutex(NULL), counter(NULL)
+    { *this = copy; }
+
+    inline mutex_proxy_base &operator = (const mutex_proxy_base &copy)
+    {
+    if (&copy == this) return *this;
+    return this->operator = <Type> (copy);
+    }
+
+    template <class Type2>
+    inline mutex_proxy_base &operator = (const mutex_proxy_base <Type2> &copy)
+    {
+    this->opt_out();
+    counter = copy.counter;
+    if (counter) ++*counter;
+    pointer = counter? copy.pointer : NULL;
+    mutex   = counter? copy.mutex   : NULL;
+    mutex_base::set_viewing(mutex, true);
+    return *this;
+    }
+
+    inline ~mutex_proxy_base()
+    { this->opt_out(); }
+
+    inline void opt_out()
+    {
+    if (counter && --*counter <= 0)
+     {
+    pointer = NULL;
+    int *old_counter = counter;
+    counter = NULL;
+    delete old_counter;
+    mutex_base::set_viewing(mutex, false);
+    mutex_base::set_mutex(mutex, false);
+     }
+    pointer = NULL;
+    mutex   = NULL;
+    counter = NULL;
+    }
+
+    capsule_type pointer;
+    mutex_base *mutex;
+    int *counter;
+};
+
+template <class Type>
+class mutex_proxy : public mutex_proxy_base <Type>
+{
+private:
+    template <class> friend class capsule;
+
+    typedef typename mutex_proxy_base <Type> ::capsule_base capsule_base;
+    typedef typename mutex_proxy_base <Type> ::capsule_type capsule_type;
+
+    inline mutex_proxy(capsule_type new_pointer, mutex_base *new_mutex, bool block = true) :
+    mutex_proxy_base <Type> (new_pointer, new_mutex, block) {}
+
+public:
+    inline mutex_proxy() : mutex_proxy_base <Type> () {}
+
+    inline operator bool() const
+    { return capsule_base::readable_object(mutex_proxy_base <Type> ::pointer); }
+
+    inline bool operator ! () const
+    { return !capsule_base::readable_object(mutex_proxy_base <Type> ::pointer); }
+
+    inline bool operator == (const mutex_proxy &equal) const
+    {
+    return capsule_base::readable_object(mutex_proxy_base <Type> ::pointer) ==
+           capsule_base::readable_object(equal.mutex_proxy_base <Type> ::pointer);
+    }
+
+    inline bool operator == (const mutex_proxy <const Type> &equal) const
+    {
+    return capsule_base::readable_object(mutex_proxy_base <Type> ::pointer) ==
+           capsule_base::readable_object(equal.mutex_proxy_base <const Type> ::pointer);
+    }
+
+    inline operator       Type*()          { return capsule_base::writable_object(mutex_proxy_base <Type> ::pointer); }
+    inline operator const Type*() const    { return capsule_base::readable_object(mutex_proxy_base <Type> ::pointer); }
+    inline       Type &operator *()        { return *capsule_base::writable_object(mutex_proxy_base <Type> ::pointer); }
+    inline const Type &operator *() const  { return *capsule_base::readable_object(mutex_proxy_base <Type> ::pointer); }
+    inline       Type *operator ->()       { return capsule_base::writable_object(mutex_proxy_base <Type> ::pointer); }
+    inline const Type *operator ->() const { return capsule_base::readable_object(mutex_proxy_base <Type> ::pointer); }
+};
+
+
+
+template <class Type>
+class mutex_proxy <const Type> : public mutex_proxy_base <const Type>
+{
+private:
+    template <class> friend class capsule;
+
+    typedef typename mutex_proxy_base <const Type> ::capsule_base capsule_base;
+    typedef typename mutex_proxy_base <const Type> ::capsule_type capsule_type;
+
+    inline mutex_proxy(capsule_type new_pointer, mutex_base *new_mutex, bool block = true) :
+    mutex_proxy_base <const Type> (new_pointer, new_mutex, block) {}
+
+public:
+    inline mutex_proxy() : mutex_proxy_base <const Type> () {}
+
+    inline mutex_proxy(const mutex_proxy <Type> &copy) :
+    mutex_proxy_base <const Type> (copy) {}
+
+    inline mutex_proxy &operator = (const mutex_proxy <Type> &copy)
+    {
+    mutex_proxy_base <const Type> ::operator = (copy);
+    return *this;
+    }
+
+    inline operator bool() const
+    { return capsule_base::readable_object(mutex_proxy_base <const Type> ::pointer); }
+
+    inline bool operator ! () const
+    { return !capsule_base::readable_object(mutex_proxy_base <const Type> ::pointer); }
+
+    inline bool operator == (const mutex_proxy &equal) const
+    {
+    return capsule_base::readable_object(mutex_proxy_base <const Type> ::pointer) ==
+           capsule_base::readable_object(equal.mutex_proxy_base <const Type> ::pointer);
+    }
+
+    inline bool operator == (const mutex_proxy <Type> &equal) const
+    {
+    return capsule_base::readable_object(mutex_proxy_base <const Type> ::pointer) ==
+           capsule_base::readable_object(equal.mutex_proxy_base <Type> ::pointer);
+    }
+
+    inline operator const Type*() const    { return capsule_base::readable_object(mutex_proxy_base <const Type> ::pointer); }
+    inline const Type &operator *() const  { return *capsule_base::readable_object(mutex_proxy_base <const Type> ::pointer); }
+    inline const Type *operator ->() const { return capsule_base::readable_object(mutex_proxy_base <const Type> ::pointer); }
+};
+//END proxy classes-------------------------------------------------------------
 //END Header Section############################################################
 
 //Source Section################################################################
@@ -338,81 +435,26 @@ private:
   //pointer; the static functions check for NULL.
 
   //Public Interface------------------------------------------------------------
-  template <class Interface> entry_result
-  capsule <Interface> ::access_contents(capsule_modifier <Interface> *module)
+
+  template <class Interface> typename capsule <Interface> ::write_object
+  capsule <Interface> ::writable(bool block)
   {
-  entry_result result = 0;
-  if (!module || condemn_status(this)) return entry_denied;
-  if ((result = set_mutex(this, true)) != entry_success) return result;
-  result = module->access_entry(capsule_safety_pointer <Interface> (this));
-  if (!set_mutex(this, false)) return entry_fail;
-  return result;
+  return mutex_base::condemn_status(this)? write_object() :
+    write_object(this, this, block);
   }
 
-  template <class Interface> entry_result
-  capsule <Interface> ::
-    access_contents(const capsule_modifier <Interface> *module)
+  template <class Interface> typename capsule <Interface> ::read_object
+  capsule <Interface> ::readable(bool block) const
   {
-  entry_result result = 0;
-  if (!module || condemn_status(this)) return entry_denied;
-  if ((result = set_mutex(this, true)) != entry_success) return result;
-  result = module->access_entry(capsule_safety_pointer <Interface> (this));
-  if (!set_mutex(this, false)) return entry_fail;
-  return result;
-  }
-
-  template <class Interface> entry_result
-  capsule <Interface> ::view_contents(capsule_viewer <Interface> *module) const
-  {
-  entry_result result = 0;
-  if (!module || condemn_status(this)) return entry_denied;
-  if (!set_viewing(this, true)) return entry_denied;
-  result = module->view_entry(const_capsule_safety_pointer <Interface> (this));
-  if (!set_viewing(this, false)) return entry_fail;
-  return result;
-  }
-
-  template <class Interface> entry_result
-  capsule <Interface> ::
-    view_contents(const capsule_viewer <Interface> *module) const
-  {
-  entry_result result = 0;
-  if (!module || condemn_status(this)) return entry_denied;
-  if (!set_viewing(this, true)) return entry_denied;
-  result = module->view_entry(const_capsule_safety_pointer <Interface> (this));
-  if (!set_viewing(this, false)) return entry_fail;
-  return result;
-  }
-
-  template <class Interface> entry_result
-  capsule <Interface> ::
-    view_contents_locked(capsule_viewer <Interface> *module)
-  {
-  entry_result result = 0;
-  if (!module || condemn_status(this)) return entry_denied;
-  if ((result = set_mutex(this, true)) != entry_success) return result;
-  result = module->view_entry(const_capsule_safety_pointer <Interface> (this));
-  if (!set_mutex(this, false)) return entry_fail;
-  return result;
-  }
-
-  template <class Interface> entry_result
-  capsule <Interface> ::
-    view_contents_locked(const capsule_viewer <Interface> *module)
-  {
-  entry_result result = 0;
-  if (!module || condemn_status(this)) return entry_denied;
-  if ((result = set_mutex(this, true)) != entry_success) return result;
-  result = module->view_entry(const_capsule_safety_pointer <Interface> (this));
-  if (!set_mutex(this, false)) return entry_fail;
-  return result;
+  return mutex_base::condemn_status(this)? read_object() :
+    read_object(this, const_cast <mutex_base*> (static_cast <const mutex_base*> (this)), block);
   }
 
   template <class Interface> bool
   capsule <Interface> ::operator < (const capsule &compare) const
   {
-  const Interface *left = readable_object(this);
-  const Interface *right = readable_object(&compare);
+  read_object left  = this->readable();
+  read_object right = compare.readable();
 
   if (!left && !right) return false;
   if (left && !right) return false;
@@ -423,8 +465,8 @@ private:
   template <class Interface> bool
   capsule <Interface> ::operator <= (const capsule &compare) const
   {
-  const Interface *left = readable_object(this);
-  const Interface *right = readable_object(&compare);
+  read_object left  = this->readable();
+  read_object right = compare.readable();
 
   if (!left && !right) return true;
   if (left && !right) return false;
@@ -435,8 +477,8 @@ private:
   template <class Interface> bool
   capsule <Interface> ::operator == (const capsule &compare) const
   {
-  const Interface *left = readable_object(this);
-  const Interface *right = readable_object(&compare);
+  read_object left  = this->readable();
+  read_object right = compare.readable();
 
   if (!left && !right) return true;
   if (left && !right) return false;
@@ -447,8 +489,8 @@ private:
   template <class Interface> bool
   capsule <Interface> ::operator != (const capsule &compare) const
   {
-  const Interface *left = readable_object(this);
-  const Interface *right = readable_object(&compare);
+  read_object left  = this->readable();
+  read_object right = compare.readable();
 
   if (!left && !right) return false;
   if (left && !right) return true;
@@ -459,8 +501,8 @@ private:
   template <class Interface> bool
   capsule <Interface> ::operator >= (const capsule &compare) const
   {
-  const Interface *left = readable_object(this);
-  const Interface *right = readable_object(&compare);
+  read_object left  = this->readable();
+  read_object right = compare.readable();
 
   if (!left && !right) return true;
   if (left && !right) return true;
@@ -471,8 +513,8 @@ private:
   template <class Interface> bool
   capsule <Interface> ::operator > (const capsule &compare) const
   {
-  const Interface *left = readable_object(this);
-  const Interface *right = readable_object(&compare);
+  read_object left  = this->readable();
+  read_object right = compare.readable();
 
   if (!left && !right) return false;
   if (left && !right) return true;

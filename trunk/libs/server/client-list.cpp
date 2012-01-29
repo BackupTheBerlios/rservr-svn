@@ -1294,12 +1294,10 @@ entity_handle hHandle, command_transmit *cCommand)
 	}
 
 
-	send_protected_output new_output(cClientTable->get_element(position2).response_output());
-
-
-	if (!cCommand->command_sendable() || !new_output(cCommand))
+	if (!cCommand->command_sendable() ||
+	  !send_protected_output(cClientTable->get_element(position2).response_output(), cCommand))
 	{
-	if (new_output.is_terminated)
+	if (check_output_terminated(cClientTable->get_element(position2).response_output()))
 	 {
 	send_server_response(*cCommand, event_error);
 	return false;

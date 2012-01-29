@@ -36,7 +36,7 @@
 #include <pthread.h>
 
 
-template <bool MultiLock = false>
+template <bool MultiLock = true>
 class global_sentry_pthread
 {
 public:
@@ -65,10 +65,11 @@ public:
     return *this;
     }
 
-    inline int lock()
+    inline int lock(bool block)
     {
-    if (pthread_mutex_lock(&mutex) == 0) return protect::entry_success;
-    else return protect::entry_denied;
+    return
+      ((block? pthread_mutex_lock(&mutex) : pthread_mutex_trylock(&mutex)) == 0)?
+      protect::entry_success : protect::entry_denied;
     }
 
     inline bool unlock()

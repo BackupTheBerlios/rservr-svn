@@ -199,84 +199,41 @@ static protect::literal_capsule <listen_data, global_sentry_pthread <> > interna
 
 //access modules----------------------------------------------------------------
 
-class add_new_listen : public protected_listen_data::modifier
+bool ATTR_INT add_new_listen(int sSocket, const std::string &lLocation)
 {
-public:
-	ATTR_INT add_new_listen() : current_socket(-1), current_location(NULL) { }
-
-	bool ATTR_INT operator () (int sSocket, const std::string &lLocation)
-	{
-	current_socket   = sSocket;
-	current_location = &lLocation;
-	bool outcome = internal_listen_data.access_contents(this);
-	current_socket   = -1;
-	current_location = NULL;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	if (!oObject || current_socket < 0 || !current_location) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
+	protected_listen_data::write_object object = internal_listen_data.writable();
+	if (!object) return false;
 
 	if (total_listen_max && object->sockets.size() >= total_listen_max)
-	return protect::entry_fail;
+	return false;
 
-	if ( object->sockets.find(current_socket) == object->sockets.end() &&
+	if ( object->sockets.find(sSocket) == object->sockets.end() &&
 	     object->sockets.size() + 1 >= FD_SETSIZE)
 	//(add one to account for the select breaker)
-	return protect::entry_fail;
+	return false;
 
-	object->sockets[current_socket] = listen_info(*current_location);
-	return protect::entry_success;
-	}
-
-	int                current_socket;
-	const std::string *current_location;
-};
+	object->sockets[sSocket] = listen_info(lLocation);
+	return true;
+}
 
 
-class add_connection_precheck : public protected_listen_data::viewer
+bool ATTR_INT add_connection_precheck(int sSocket)
 {
-public:
-	ATTR_INT add_connection_precheck() : current_socket(-1) { }
-
-	bool ATTR_INT operator () (int sSocket)
-	{
-	current_socket = sSocket;
-	bool outcome = internal_listen_data.view_contents_locked(this);
-	current_socket = -1;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT view_entry(read_object oObject) const
-	{
-	if (!oObject) return protect::entry_denied;
-
-	read_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
+	protected_listen_data::read_object object = internal_listen_data.readable();
+	if (!object) return false;
 
 	if ( total_connection_max &&
 	     object->total_connections >= total_connection_max )
-	return protect::entry_fail;
+	return false;
 
-	listen_list::const_iterator position = object->sockets.find(current_socket);
+	listen_list::const_iterator position = object->sockets.find(sSocket);
 	if (position != object->sockets.end())
 	if ( position->second.limit &&
 	     position->second.connections >= position->second.limit )
-	return protect::entry_fail;
+	return false;
 
-	return protect::entry_success;
-	}
-
-	int current_socket;
-};
+	return true;
+}
 
 
 static bool remove_common(listen_list &lList, const listen_list::iterator &pPosition)
@@ -294,401 +251,178 @@ static bool remove_common(listen_list &lList, const listen_list::iterator &pPosi
 }
 
 
-class remove_listen : public protected_listen_data::modifier
+bool ATTR_INT remove_listen(const std::string &lLocation)
 {
-public:
-	ATTR_INT remove_listen() : current_location(NULL) { }
-
-	bool ATTR_INT operator () (const std::string &lLocation)
-	{
-	current_location = &lLocation;
-	bool outcome = internal_listen_data.access_contents(this);
-	current_location = NULL;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	if (!oObject || !current_location) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
+	protected_listen_data::write_object object = internal_listen_data.writable();
+	if (!object) return false;
 
 	listen_list::iterator position = object->sockets.begin(),
 	                      end      = object->sockets.end();
 
 	while (position != end)
 	 {
-	if (position->second.location == *current_location) break;
+	if (position->second.location == lLocation) break;
 	++position;
 	 }
 
-	return remove_common(object->sockets, position)?
-	  protect::entry_success : protect::entry_fail;
-	}
-
-	const std::string *current_location;
-};
+	return remove_common(object->sockets, position);
+}
 
 
-class remove_socket_fd : public protected_listen_data::modifier
+bool ATTR_INT remove_socket_fd(int sSocket)
 {
-public:
-	ATTR_INT remove_socket_fd() : current_socket(-1) { }
+	protected_listen_data::write_object object = internal_listen_data.writable();
+	if (!object) return false;
 
-	bool ATTR_INT operator () (int sSocket)
-	{
-	current_socket = sSocket;
-	bool outcome = internal_listen_data.access_contents(this);
-	current_socket = -1;
-	return !outcome;
-	}
+	listen_list::iterator position = object->sockets.find(sSocket);
 
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	if (!oObject || current_socket < 0) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	listen_list::iterator position = object->sockets.find(current_socket);
-
-	return remove_common(object->sockets, position)?
-	  protect::entry_success : protect::entry_fail;
-	}
-
-	int current_socket;
-};
+	return remove_common(object->sockets, position);
+}
 
 
-class remove_all_sockets : public protected_listen_data::modifier
+bool ATTR_INT remove_all_sockets()
 {
-public:
-	bool ATTR_INT operator () () const
-	{ return !internal_listen_data.access_contents(this); }
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	if (!oObject) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
+	protected_listen_data::write_object object = internal_listen_data.writable();
+	if (!object) return false;
 
 	while (remove_common(object->sockets, object->sockets.begin()));
-	return protect::entry_success;
-	}
-};
+	return true;
+}
 
 
-class add_connection_count : public protected_listen_data::modifier
+bool ATTR_INT add_connection_count(int sSocket)
 {
-public:
-	ATTR_INT add_connection_count() : current_socket(-1) { }
-
-	bool ATTR_INT operator () (int sSocket)
-	{
-	current_socket = sSocket;
-	bool outcome = internal_listen_data.access_contents(this);
-	current_socket = -1;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	//NOTE: don't return early for 'current_socket < 0'!
-	if (!oObject) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
+	protected_listen_data::write_object object = internal_listen_data.writable();
+	if (!object) return false;
 
 	if ( total_connection_max &&
 	     object->total_connections >= total_connection_max )
-	return protect::entry_fail;
+	return false;
 
-	listen_list::iterator position = object->sockets.find(current_socket);
+	listen_list::iterator position = object->sockets.find(sSocket);
 	if (position != object->sockets.end())
 	//NOTE: this is for listen-based connections; not for initiated connections
 	 {
-	if ( object->sockets[current_socket].limit &&
-	     object->sockets[current_socket].connections >=
-	     object->sockets[current_socket].limit )
-	return protect::entry_fail;
+	if ( object->sockets[sSocket].limit &&
+	     object->sockets[sSocket].connections >=
+	     object->sockets[sSocket].limit )
+	return false;
 
-	++object->sockets[current_socket].connections;
+	++object->sockets[sSocket].connections;
 	 }
 
 	++object->total_connections;
-	return protect::entry_success;
-	}
-
-	int current_socket;
-};
+	return true;
+}
 
 
-class remove_connection_count : public protected_listen_data::modifier
+bool ATTR_INT remove_connection_count(int sSocket)
 {
-public:
-	ATTR_INT remove_connection_count() : current_socket(-1) { }
+	protected_listen_data::write_object object = internal_listen_data.writable();
+	if (!object) return false;
 
-	bool ATTR_INT operator () (int sSocket)
-	{
-	current_socket = sSocket;
-	bool outcome = internal_listen_data.access_contents(this);
-	current_socket = -1;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	//NOTE: don't return early for 'current_socket < 0'!
-	if (!oObject) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	listen_list::iterator position = object->sockets.find(current_socket);
+	listen_list::iterator position = object->sockets.find(sSocket);
 	if (position != object->sockets.end())
 	//NOTE: this is for listen-based connections; not for initiated connections
-	if (object->sockets[current_socket].connections > 0)
-	--object->sockets[current_socket].connections;
+	if (object->sockets[sSocket].connections > 0)
+	--object->sockets[sSocket].connections;
 
 	if (object->total_connections > 0)
 	--object->total_connections;
 
-	return protect::entry_success;
-	}
-
-	int current_socket;
-};
+	return true;
+}
 
 
-class get_listen_select_list : public protected_listen_data::viewer
+bool ATTR_INT get_listen_select_list(fd_set *lList)
 {
-public:
-	ATTR_INT get_listen_select_list() : current_list(NULL) { }
-
-	bool ATTR_INT operator () (fd_set *lList)
-	{
-	current_list = lList;
-	bool outcome = internal_listen_data.view_contents_locked(this);
-	current_list = NULL;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT view_entry(read_object oObject) const
-	{
-	if (!oObject || !current_list) return protect::entry_denied;
-
-	read_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
+	protected_listen_data::read_object object = internal_listen_data.readable();
+	if (!object) return false;
 
 	//NOTE: empty is a failure so that it doesn't actually enter 'select'
 	if (!object->sockets.size() || object->sockets.size() >= FD_SETSIZE)
 	return protect::entry_fail;
 
-	FD_ZERO(current_list);
+	FD_ZERO(lList);
 
 	listen_list::const_iterator current = object->sockets.begin(),
 	                            end     = object->sockets.end();
 
 	while (current != end)
 	 {
-	FD_SET(current->first, current_list);
+	FD_SET(current->first, lList);
 	++current;
 	 }
 
-	return protect::entry_success;
-	}
-
-	fd_set *current_list;
-};
+	return true;
+}
 
 
-class get_passthru_flag : public protected_listen_data::viewer
+bool ATTR_INT get_passthru_flag(int sSocket)
 {
-public:
-	ATTR_INT get_passthru_flag() : current_socket(-1) { }
+	protected_listen_data::read_object object = internal_listen_data.readable();
+	if (!object) return false;
 
-	bool ATTR_INT operator () (int sSocket)
-	{
-	current_socket = sSocket;
-	bool outcome = internal_listen_data.view_contents_locked(this);
-	current_socket = -1;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT view_entry(read_object oObject) const
-	{
-	if (!oObject) return protect::entry_denied;
-
-	read_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	listen_list::const_iterator position = object->sockets.find(current_socket);
-	if (position == object->sockets.end() || !position->second.allow_passthru)
-	return protect::entry_fail;
-
-	return protect::entry_success;
-	}
-
-	int current_socket;
-};
+	listen_list::const_iterator position = object->sockets.find(sSocket);
+	return position != object->sockets.end() && position->second.allow_passthru;
+}
 
 
-class get_set_socket_list : public protected_listen_data::viewer
+bool ATTR_INT get_set_socket_list(fd_set *lList, data::clist <const int> &tTable)
 {
-public:
-	ATTR_INT get_set_socket_list() : current_list(NULL), current_table(NULL) { }
+	protected_listen_data::read_object object = internal_listen_data.readable();
+	if (!object) return false;
 
-	bool ATTR_INT operator () (fd_set *lList, data::clist <const int> &tTable)
-	{
-	current_list  = lList;
-	current_table = &tTable;
-	bool outcome = internal_listen_data.view_contents_locked(this);
-	current_list  = NULL;
-	current_table = NULL;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT view_entry(read_object oObject) const
-	{
-	if (!oObject || !current_list || !current_table) return protect::entry_denied;
-
-	read_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	current_table->reset_list();
+	tTable.reset_list();
 
 	listen_list::const_iterator current = object->sockets.begin(),
 	                            end     = object->sockets.end();
 
 	while (current != end)
-	 {
-	if (FD_ISSET(current->first, current_list))
-	current_table->add_element(current->first);
+	{
+	if (FD_ISSET(current->first, lList))
+	tTable.add_element(current->first);
 	++current;
-	 }
-
-	return protect::entry_success;
 	}
 
-	fd_set                  *current_list;
-	data::clist <const int> *current_table;
-};
+	return true;
+}
 
 
-class check_listen_location : public protected_listen_data::viewer
+bool ATTR_INT check_listen_location(const std::string &lLocation)
 {
-public:
-	ATTR_INT check_listen_location() : current_location(NULL) { }
-
-	bool ATTR_INT operator () (const std::string &lLocation)
-	{
-	current_location = &lLocation;
-	bool outcome = internal_listen_data.view_contents_locked(this);
-	current_location = NULL;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT view_entry(read_object oObject) const
-	{
-	if (!oObject || !current_location) return protect::entry_denied;
-
-	read_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
+	protected_listen_data::read_object object = internal_listen_data.readable();
+	if (!object) return false;
 
 	listen_list::const_iterator current = object->sockets.begin(),
 	                            end     = object->sockets.end();
 
 	while (current != end)
-	if ((current++)->second.location == *current_location)
-	return protect::entry_fail;
+	if ((current++)->second.location == lLocation) return false;
 
-	return protect::entry_success;
-	}
-
-	const std::string *current_location;
-};
+	return true;
+}
 
 
-class have_listen_sockets : public protected_listen_data::viewer
+bool ATTR_INT have_listen_sockets()
 {
-public:
-	bool ATTR_INT operator () () const
-	{ return !internal_listen_data.view_contents_locked(this); }
-
-private:
-	protect::entry_result ATTR_INT view_entry(read_object oObject) const
-	{
-	if (!oObject) return protect::entry_denied;
-
-	read_temp object = NULL;
-	if (!(object = oObject)) return protect::exit_forced;
-
-	return object->sockets.size()? protect::entry_success : protect::entry_fail;
-	}
-};
+	protected_listen_data::read_object object = internal_listen_data.readable();
+	return object && object->sockets.size();
+}
 
 
-class have_listen_room : public protected_listen_data::viewer
+bool ATTR_INT have_listen_room()
 {
-public:
-	bool ATTR_INT operator () () const
-	{ return !internal_listen_data.view_contents_locked(this); }
-
-private:
-	protect::entry_result ATTR_INT view_entry(read_object oObject) const
-	{
-	if (!oObject) return protect::entry_denied;
-
-	read_temp object = NULL;
-	if (!(object = oObject)) return protect::exit_forced;
-
-	return (!total_listen_max || object->sockets.size() < total_listen_max)?
-	  protect::entry_success : protect::entry_fail;
-	}
-};
+	if (!total_listen_max) return true;
+	protected_listen_data::read_object object = internal_listen_data.readable();
+	return object && object->sockets.size() < total_listen_max;
+}
 
 
-class copy_listen_locations : public protected_listen_data::viewer
+bool ATTR_INT copy_listen_locations(char ***tTable)
 {
-public:
-	ATTR_INT copy_listen_locations() : current_table(NULL) { }
-
-	bool ATTR_INT operator () (char ***tTable)
-	{
-	current_table = tTable;
-	bool outcome = internal_listen_data.view_contents_locked(this);
-	current_table = NULL;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT view_entry(read_object oObject) const
-	{
-	if (!oObject || !current_table) return protect::entry_denied;
-
-	read_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
+	protected_listen_data::read_object object = internal_listen_data.readable();
+	if (!object) return false;
 
 	char **new_list = new char*[ object->sockets.size() + 1 ];
 
@@ -701,12 +435,9 @@ private:
 	new_list[I++] = strdup((current++)->second.location.c_str());
 	new_list[I] = NULL;
 
-	*current_table = new_list;
+	*tTable = new_list;
 
-	return protect::entry_success;
-	}
-
-	char ***current_table;
+	return true;
 };
 
 //END access modules------------------------------------------------------------
@@ -715,88 +446,46 @@ private:
 //access module interface-------------------------------------------------------
 
 static bool add_bound_socket(int sSocket, const std::string &lLocation)
-{
-	add_new_listen new_listen;
-	return new_listen(sSocket, lLocation);
-}
+{ return add_new_listen(sSocket, lLocation); }
 
 static bool pre_connection_check(int sSocket)
-{
-	add_connection_precheck new_check;
-	return new_check(sSocket);
-}
+{ return add_connection_precheck(sSocket); }
 
 bool pre_initiation_check()
-{
-	add_connection_precheck new_check;
-	return new_check(-1);
-}
+{ return add_connection_precheck(-1); }
 
 static bool remove_listen_socket(const std::string &lLocation)
-{
-	remove_listen new_remove;
-	return new_remove(lLocation);
-}
+{ return remove_listen(lLocation); }
 
 static bool remove_bad_socket(int sSocket)
-{
-	remove_socket_fd new_remove;
-	return new_remove(sSocket);
-}
+{ return remove_socket_fd(sSocket); }
 
 static bool clear_all_sockets()
-{
-	remove_all_sockets new_clear;
-	return new_clear();
-}
+{ return remove_all_sockets(); }
 
 bool add_listen_connection(int sSocket)
-{
-	add_connection_count new_connection;
-	return new_connection(sSocket);
-}
+{ return add_connection_count(sSocket); }
 
 void remove_listen_connection(int sSocket)
-{
-	remove_connection_count new_remove;
-	new_remove(sSocket);
-}
+{ remove_connection_count(sSocket); }
 
 static bool fill_listen_select(fd_set *lList)
-{
-	get_listen_select_list new_select;
-	return new_select(lList);
-}
+{ return get_listen_select_list(lList); }
 
 static bool get_set_sockets(fd_set *lList, data::clist <const int> &tTable)
-{
-	get_set_socket_list new_table;
-	return new_table(lList, tTable);
-}
+{ return get_set_socket_list(lList, tTable); }
 
 static bool check_unique_location(const std::string &lLocation)
-{
-	check_listen_location new_check;
-	return new_check(lLocation);
-}
+{ return check_listen_location(lLocation); }
 
 static bool check_listen_sockets()
-{
-	have_listen_sockets new_check;
-	return new_check();
-}
+{ return have_listen_sockets(); }
 
 static bool check_listen_room()
-{
-	have_listen_room new_check;
-	return new_check();
-}
+{ return have_listen_room(); }
 
 static bool copy_listen_table(char ***tTable)
-{
-	copy_listen_locations new_table;
-	return new_table(tTable);
-}
+{ return copy_listen_locations(tTable); }
 
 //END access module interface---------------------------------------------------
 
@@ -1129,7 +818,6 @@ static void *select_thread_loop(void *iIgnore)
 	return NULL;
 	}
 
-	get_passthru_flag passthru_flag;
 	fd_set current_sockets;
 	data::clist <const int> set_sockets;
 	socklen_t new_length = 0;
@@ -1238,12 +926,12 @@ static void *select_thread_loop(void *iIgnore)
 
 #ifdef RSV_NET
 	if ( !add_listen_connection(new_connection, new_reference, set_sockets[I],
-	         inet_ntoa(new_address.sin_addr), passthru_flag(set_sockets[I])) )
+	         inet_ntoa(new_address.sin_addr), get_passthru_flag(set_sockets[I])) )
 	shutdown(new_connection, SHUT_RDWR);
 #endif
 #ifdef RSV_LOCAL
 	if ( !add_listen_connection(new_connection, new_reference, set_sockets[I],
-	         new_address.sun_path, passthru_flag(set_sockets[I])) )
+	         new_address.sun_path, get_passthru_flag(set_sockets[I])) )
 	shutdown(new_connection, SHUT_RDWR);
 #endif
 	   }

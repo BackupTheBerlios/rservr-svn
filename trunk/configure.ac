@@ -1,11 +1,11 @@
-#                                               -*- Autoconf -*-
+﻿#                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(rservr-core, gamma.9, [Kevin P. Barry (ta0kira@users.berlios.de)])
+AC_INIT(rservr-core, gamma.10, [Kevin P. Barry (ta0kira@users.berlios.de)])
 AM_INIT_AUTOMAKE([dist-bzip2])
 PACKAGE=rservr-core
-VERSION=gamma.9
+VERSION=gamma.10
 
 AC_CONFIG_FILES([ Makefile
                   include/Makefile

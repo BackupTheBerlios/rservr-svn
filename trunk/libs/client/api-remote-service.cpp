@@ -57,7 +57,6 @@ result remote_service_broken_connection(const struct remote_service_data *dData)
 	return false;
 
 	command_transmit new_block;
-	send_protected_output new_output(pipe_output);
 
 
 	if (dData->direction == RSERVR_REMOTE_TOWARD_CLIENT && dData->notify_entity && dData->notify_address)
@@ -70,7 +69,8 @@ result remote_service_broken_connection(const struct remote_service_data *dData)
 	new_block.target_address = dData->notify_address;
 
 	if (set_to_server_scope(new_block.target_entity, new_block.target_address))
-	if (!new_block.command_sendable() || !new_output(&new_block)) return false;
+	if (!new_block.command_sendable() || !send_protected_output(pipe_output, &new_block))
+	return false;
 	}
 
 
@@ -84,7 +84,7 @@ result remote_service_broken_connection(const struct remote_service_data *dData)
 	new_block.target_entity  = dData->notify_entity;
 	new_block.target_address = dData->notify_address;
 
-	if (!new_output(&new_block)) return false;
+	if (!send_protected_output(pipe_output, &new_block)) return false;
 	}
 
 	return true;

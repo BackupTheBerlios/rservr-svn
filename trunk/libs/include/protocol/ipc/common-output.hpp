@@ -81,20 +81,7 @@ typedef data_output output_interface;
 typedef protect::capsule <output_interface> protected_output;
 
 
-class send_protected_output : public protected_output::modifier
-{
-public:
-	send_protected_output(protected_output*);
-
-	bool operator () (const data_exporter*);
-
-	bool is_terminated;
-
-private:
-	protect::entry_result access_entry(write_object);
-
-	const data_exporter *      current_output;
-	protected_output    *const current_destination;
-};
+extern bool send_protected_output(protected_output*, const data_exporter*);
+extern bool check_output_terminated(protected_output*);
 
 #endif //common_output_hpp

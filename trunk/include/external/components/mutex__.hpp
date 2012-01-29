@@ -42,11 +42,13 @@ namespace mutex___HPP
 //Common mutex base class
 class mutex_base
 {
+    template <class Type> friend class mutex_proxy_base;
+
 protected:
     static inline
         int
-    set_mutex(mutex_base *base, bool status)
-    { return !base? false : base->set_mutex(status); }
+    set_mutex(mutex_base *base, bool status, bool block = true)
+    { return !base? false : base->set_mutex(status, block); }
 
     static inline
         bool
@@ -102,7 +104,7 @@ private:
 
     virtual
         int
-    set_mutex(bool) = 0;
+    set_mutex(bool, bool) = 0;
 
     virtual
         bool
@@ -156,7 +158,7 @@ protected:
     mutex_status() const;
 
         int
-    set_mutex(bool);
+    set_mutex(bool, bool);
 
 private:
         bool
@@ -206,9 +208,9 @@ private:
   template <class Mutex> bool common_mutex <Mutex> ::mutex_status() const
   { return this->control_mutex.status(); }
 
-  template <class Mutex> int common_mutex <Mutex> ::set_mutex(bool status)
+  template <class Mutex> int common_mutex <Mutex> ::set_mutex(bool status, bool block)
   {
-  if (status) return this->control_mutex.lock();
+  if (status) return this->control_mutex.lock(block);
   else        return (int) this->control_mutex.unlock();
   }
 

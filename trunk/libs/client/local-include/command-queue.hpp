@@ -41,7 +41,6 @@ extern "C" {
 #include "external/clist.hpp"
 #undef RSERVR_CLIST_HACKS
 
-#include "module-macro.hpp"
 #include "protocol/ipc/command-transmit.hpp"
 
 extern "C" {
@@ -53,67 +52,26 @@ typedef data::clist <command_transmit> command_queue;
 typedef protect::capsule <command_queue> protected_command_queue;
 
 
-DECLARE_RETAINED_LIST_MODIFIER(queue_new_command, protected_command_queue, \
-	const command_transmit *operator () (command_transmit*), \
-	command_transmit       *current_command; \
-	const command_transmit *new_command_handle; )
+const command_transmit *queue_new_command(protected_command_queue*, command_transmit*);
 
+bool remove_command(protected_command_queue*, command_handle);
 
-DECLARE_RETAINED_LIST_MODIFIER(remove_command, protected_command_queue, \
-	bool operator () (command_handle), \
-	command_handle current_command; )
+bool transmit_command(protected_command_queue*, command_handle, protected_output*,
+command_reference, bool);
 
+text_info extract_command(protected_command_queue*, command_handle);
 
-DECLARE_RETAINED_LIST_MODIFIER(transmit_command, protected_command_queue, \
-	bool operator () (command_handle, protected_output*, command_reference, bool), \
-	command_handle     current_command; \
-	protected_output  *current_output; \
-	command_reference  current_reference; \
-	bool               current_silent; )
+command_transmit *forward_command(protected_command_queue*, command_handle);
 
+bool set_response_entity(protected_command_queue*, command_handle, text_info);
 
-DECLARE_RETAINED_LIST_MODIFIER(extract_command, protected_command_queue, \
-	text_info operator () (command_handle), \
-	command_handle current_command; \
-	text_info      current_extraction; )
+bool change_priority(protected_command_queue*, command_handle, command_priority);
 
+bool insert_remote_scope(protected_command_queue*, command_handle, text_info);
 
-DECLARE_RETAINED_LIST_MODIFIER(forward_command, protected_command_queue, \
-	command_transmit *operator () (command_handle), \
-	command_transmit *current_block; \
-	command_handle  current_command; )
+bool set_server_address(protected_command_queue*, command_handle, text_info, text_info);
 
-
-DECLARE_RETAINED_LIST_MODIFIER(set_response_entity, protected_command_queue, \
-	bool operator () (command_handle, text_info), \
-	command_handle current_command; \
-	text_info      current_entity; )
-
-
-DECLARE_RETAINED_LIST_MODIFIER(change_priority, protected_command_queue, \
-	bool operator () (command_handle, command_priority), \
-	command_handle   current_command; \
-	command_priority current_priority; )
-
-
-DECLARE_RETAINED_LIST_MODIFIER(insert_remote_scope, protected_command_queue, \
-	bool operator () (command_handle, text_info), \
-	command_handle current_command; \
-	text_info      current_address; )
-
-
-DECLARE_RETAINED_LIST_MODIFIER(set_server_address, protected_command_queue, \
-	bool operator () (command_handle, text_info, text_info), \
-	command_handle current_command; \
-	text_info      current_target; \
-	text_info      current_address; )
-
-
-DECLARE_RETAINED_LIST_MODIFIER(next_remote_address, protected_command_queue, \
-	text_info operator () (command_handle, char*, unsigned int), \
-	command_handle  current_command; \
-	char           *current_copy; \
-	unsigned int    current_size; )
+text_info next_remote_address(protected_command_queue*, command_handle, char*, unsigned int);
 
 
 #endif //command_queue_hpp

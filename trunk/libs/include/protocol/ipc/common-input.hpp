@@ -168,21 +168,7 @@ typedef lexer_input input_interface;
 typedef protect::capsule <input_interface> protected_input;
 
 
-class receive_protected_input : public protected_input::modifier
-{
-public:
-	receive_protected_input(protected_input*);
-
-	bool operator () (command_transmit*);
-
-private:
-	protect::entry_result access_entry(write_object) const;
-
-	command_transmit  *      current_input;
-	protected_input *const current_source;
-};
-
-
+extern bool receive_protected_input(protected_input*, command_transmit*);
 extern int check_input_waiting(protected_input*);
 
 #endif //common_input_hpp

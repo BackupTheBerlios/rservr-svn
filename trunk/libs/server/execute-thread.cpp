@@ -399,9 +399,10 @@ private	:
 	protected_server::common_access *unprotected_data;
 	const permission_mask            permissions;
 	client_id                       *client_handle;
-	const command_transmit            *actual_command;
+	const command_transmit          *actual_command;
 
-	friend class execute_single;
+	friend bool execute_single(protect::capsule <protected_server::common_access>*,
+	    execute_queue_base&);
 };
 //END server interface==========================================================
 
@@ -461,90 +462,65 @@ static execute_queue_base command_cache;
 static const exposed_server *local_server = NULL;
 
 
-class execute_single : public protect::capsule <protected_server::common_access> ::modifier
+bool ATTR_INT execute_single(protect::capsule <protected_server::common_access> *sServer,
+execute_queue_base &lList)
 {
-public:
-	ATTR_INT execute_single(protect::capsule <protected_server::common_access> *sServer) :
-	current_list(NULL), server_data(sServer) { }
+	if (!sServer) return false;
+	protect::capsule <protected_server::common_access> ::write_object object = sServer->writable();
 
-	bool ATTR_INT operator () (execute_queue_base &lList)
-	{
-	current_list = &lList;
-	protect::entry_result outcome = server_data->access_contents(this);
-	current_list = NULL;
-	return outcome != protect::entry_denied && outcome != protect::exit_forced;
-	}
+    log_server_execute_attempt(lList.first_element().value().command_name());
 
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject)
-	{
-	if (!oObject) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-    log_server_execute_attempt(current_list->first_element().value().command_name());
-
-	if (!decrement_client_waiting(object->clients(), current_list->first_element().key()))
+	if (!decrement_client_waiting(object->clients(), lList.first_element().key()))
 	 {
-    log_server_execute_fail(current_list->first_element().value().command_name(),
-      current_list->first_element().value().orig_entity.c_str());
-	current_list->f_remove_pattern(current_list->first_element().key(),
+    log_server_execute_fail(lList.first_element().value().command_name(),
+      lList.first_element().value().orig_entity.c_str());
+	lList.f_remove_pattern(lList.first_element().key(),
 	  &execute_queue_base::find_by_key);
-	return protect::entry_fail;
+	return false;
 	 }
 
-	if (!check_command_all(current_list->first_element().value().execute_type, command_server))
+	if (!check_command_all(lList.first_element().value().execute_type, command_server))
 	//forward the command if necessary
 	 {
 	//NOTE: this *must* stay here to preserve execution order for e.g. remote services
 	//NOTE: this *must not* be called within an 'execute_access' module
 	bool outcome = send_client_command(object->clients(), object->services(),
-	    current_list->first_element().key(), &current_list->first_element().value());
+	    lList.first_element().key(), &lList.first_element().value());
 
 	if (!outcome)
-    log_server_execute_fail(current_list->first_element().value().command_name(),
-      current_list->first_element().value().orig_entity.c_str());
+    log_server_execute_fail(lList.first_element().value().command_name(),
+      lList.first_element().value().orig_entity.c_str());
 
-	current_list->remove_single(0);
-	return outcome? protect::entry_success : protect::entry_fail;
+	lList.remove_single(0);
+	return outcome;
 	 }
 
 	external_server_interface local_interface(local_server, object,
-	  current_list->first_element().value().execute_permissions());
+	  lList.first_element().value().execute_permissions());
 
-	if ( !local_interface.set_effective_handle(current_list->first_element().key(),
-	       &current_list->first_element().value()) )
+	if ( !local_interface.set_effective_handle(lList.first_element().key(),
+	       &lList.first_element().value()) )
 	 {
-    log_server_execute_fail(current_list->first_element().value().command_name(),
-      current_list->first_element().value().orig_entity.c_str());
-	current_list->remove_single(0);
-	return protect::entry_fail;
+    log_server_execute_fail(lList.first_element().value().command_name(),
+      lList.first_element().value().orig_entity.c_str());
+	lList.remove_single(0);
+	return false;
 	 }
 
 	//NOTE: return ignored because the function logs errors, etc.
-	validate_and_execute( object, current_list->first_element().key(),
-	  current_list->first_element().value(), local_interface );
+	validate_and_execute( object, lList.first_element().key(),
+	  lList.first_element().value(), local_interface );
 
-	current_list->remove_single(0);
+	lList.remove_single(0);
 
 	send_all_monitor_updates(object->clients(), object->monitors());
 
-	return protect::entry_success;
-	}
-
-
-	execute_queue_base *current_list;
-
-	protect::capsule <protected_server::common_access> *const server_data;
-};
+	return true;
+}
 
 
 static void internal_execute()
 {
-	execute_single single_execution(local_server->protected_data->get_common());
-
 	while (!get_exit_flag() && !get_exit_status() && command_cache.size())
 	{
 	//TODO: add profiling hook here:
@@ -552,7 +528,8 @@ static void internal_execute()
 
 	unsigned int old_size = command_cache.size();
 
-	if (!single_execution(command_cache) || command_cache.size() == old_size)
+	if (!execute_single(local_server->protected_data->get_common(), command_cache) ||
+	  command_cache.size() == old_size)
 	command_cache.remove_single(0);
 	}
 }
@@ -560,23 +537,11 @@ static void internal_execute()
 static const exposed_server *current_server = NULL;
 
 
-class server_execute_next : public protect::capsule <protected_server::execute_access> ::modifier
+protect::entry_result ATTR_INT server_execute_next(protect::capsule <protected_server::execute_access> *lList)
 {
-public:
-	ATTR_INT server_execute_next(protect::capsule <protected_server::execute_access> *lList) :
-	current_list(lList) { }
-
-	protect::entry_result ATTR_INT operator () ()
-	{ return current_list->access_contents(this); }
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject)
-	{
-	if (!oObject) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject) || !object->commands()) return protect::exit_forced;
+	if (!lList) return protect::exit_forced;
+	protect::capsule <protected_server::execute_access> ::write_object object = lList->writable();
+	if (!object) return protect::exit_forced;
 
 	if (!object->commands()->number_waiting()) return protect::entry_retry;
 
@@ -585,56 +550,31 @@ private:
 	while (cache_size-- && object->commands()->transfer_top_command(&check_priority, command_cache));
 
 	return command_cache.size()? protect::entry_success : protect::entry_fail;
-	}
-
-
-	protect::capsule <protected_server::execute_access> *const current_list;
-};
+}
 
 //END command execution---------------------------------------------------------
 
 
 //check for existing clients----------------------------------------------------
 
-class client_check : protect::capsule <protected_server::client_access> ::viewer
+bool ATTR_INT client_check(protect::capsule <protected_server::client_access> *lList)
 {
-public:
-	client_check(protect::capsule <protected_server::client_access> *lList) :
-	current_list(lList) { }
-
-	bool ATTR_INT operator () () const
-	{return !current_list->view_contents_locked(this); }
-
-private	:
-	protect::entry_result ATTR_INT view_entry(read_object oObject) const
-	{
-	if (!oObject) return protect::entry_denied;
-
-	read_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	return object->clients()->size()? protect::entry_success : protect::entry_fail;
-	}
-
-
-	protect::capsule <protected_server::client_access> *const current_list;
-};
+	if (!lList) return false;
+	protect::capsule <protected_server::client_access> ::read_object object = lList->readable();
+	return object && object->clients()->size();
+}
 
 //END check for existing clients------------------------------------------------
 
 
 //execution thread--------------------------------------------------------------
 
-class server_continue_clients : public protect::capsule <protected_server::client_access> ::viewer
+bool ATTR_INT server_continue_clients(protect::capsule <protected_server::client_access> *lList)
 {
-	protect::entry_result view_entry(read_object oObject) const
-	{
-	read_temp object;
-	if (!(object = oObject)) return protect::exit_forced;
-	return continue_clients(object->clients())? protect::entry_success : protect::entry_fail;
-	}
-};
+	if (!lList) return false;
+	protect::capsule <protected_server::client_access> ::read_object object = lList->readable();
+	return object && continue_clients(object->clients());
+}
 
 
 int execute_server_thread(const exposed_server *sServer)
@@ -655,17 +595,13 @@ int execute_server_thread(const exposed_server *sServer)
 
 	local_server = sServer;
 
-	server_continue_clients new_continue;
-	if ( sServer->protected_data->get_clients()->view_contents_locked(&new_continue) !=
+	if ( server_continue_clients(sServer->protected_data->get_clients()) !=
 	       protect::entry_success )
 	{
 	//continue the stopped clients if all else fails
 	killpg(0, SIGCONT);
 	return -3;
 	}
-
-	server_execute_next local_server_execute(sServer->protected_data->get_commands());
-	client_check local_client_check(sServer->protected_data->get_clients());
 
     log_server_enter_loop();
 
@@ -677,7 +613,7 @@ int execute_server_thread(const exposed_server *sServer)
 
 	execute_resume.activate();
 
-	while (local_client_check() && !get_exit_flag())
+	while (client_check(sServer->protected_data->get_clients()) && !get_exit_flag())
 	{
 	//update timing profile every cycle to stay current
 	local_standby.new_profile(server_timing_specs->execute_normal_retry,
@@ -694,7 +630,8 @@ int execute_server_thread(const exposed_server *sServer)
 	while (!get_exit_flag() && waiting_command_available())
 	 {
 	int waiting_commands = false;
-	if ((waiting_commands = local_server_execute()) == protect::exit_forced) break;
+	if ((waiting_commands = server_execute_next(sServer->protected_data->get_commands())) ==
+	    protect::exit_forced) break;
 	if (waiting_commands == protect::entry_success) internal_execute();
 	 }
 	}

@@ -361,16 +361,16 @@ private:
 	    }
 
 
-	    int set_mutex(bool sState)
+	    int set_mutex(bool sState, bool bBlock = true)
 	    {
 	    if (sState)
 	     {
 	    protect::entry_result outcome = 0;
-	    if ((outcome = protect::mutex_base::set_mutex(&set_one, sState)) != protect::entry_success)
+	    if ((outcome = protect::mutex_base::set_mutex(&set_one, sState, bBlock)) != protect::entry_success)
 	    return outcome;
-	    if ((outcome = protect::mutex_base::set_mutex(&set_two, sState)) != protect::entry_success)
+	    if ((outcome = protect::mutex_base::set_mutex(&set_two, sState, bBlock)) != protect::entry_success)
 	      {
-	    protect::mutex_base::set_mutex(&set_one, !sState);
+	    protect::mutex_base::set_mutex(&set_one, !sState, bBlock);
 	    return outcome;
 	      }
 	    return outcome;
@@ -519,43 +519,21 @@ const timing_value *local_write_retry_max()
 
 //general server setup----------------------------------------------------------
 
-class server_abort_clients : public protect::capsule <protected_server::client_access> ::modifier
-{
-	protect::entry_result access_entry(write_object oObject) const
-	{
-	write_temp object;
-	if (!(object = oObject)) return protect::exit_forced;
-	return abort_all_clients(object->clients())?
-	  protect::entry_success : protect::entry_fail;
-	}
-};
-
 result abort_clients()
 {
-	server_abort_clients new_abort;
-	return internal_server.protected_data->get_clients()->access_contents(&new_abort) ==
-	         protect::entry_success;
+	protect::capsule <protected_server::common_access> ::write_object object =
+	  internal_server.protected_data->get_common()->writable();
+	return object && abort_all_clients(object->clients());
 }
 
-
-class server_disconnect_clients : public protect::capsule <protected_server::common_access> ::modifier
-{
-	protect::entry_result access_entry(write_object oObject) const
-	{
-	write_temp object;
-	if (!(object = oObject)) return protect::exit_forced;
-	return disconnect_all_clients(object->clients(), object->services(), object->monitors())?
-	  protect::entry_success : protect::entry_fail;
-	}
-};
 
 result disconnect_clients()
 {
-	server_disconnect_clients new_disconnect;
-	return internal_server.protected_data->get_common()->access_contents(&new_disconnect) ==
-	         protect::entry_success;
+	protect::capsule <protected_server::common_access> ::write_object object =
+	  internal_server.protected_data->get_common()->writable();
+	return object &&
+	  disconnect_all_clients(object->clients(), object->services(), object->monitors());
 }
-
 
 
 static bool set_ids_common(text_info uUser, text_info gGroup)
@@ -604,100 +582,35 @@ void set_initial_id()
 
 //server timing setup-----------------------------------------------------------
 
-class server_get_timing : public protect::capsule <protected_server::timing_access> ::viewer
-{
-public:
-	server_get_timing(struct server_timing_table *tTiming) :
-	current_timing(tTiming) { }
-
-private:
-	protect::entry_result view_entry(read_object oObject) const
-	{
-	read_temp object;
-	if (!(object = oObject)) return protect::exit_forced;
-	return read_server_table(object->timing(), current_timing)?
-	  protect::entry_success : protect::entry_fail;
-	}
-
-	struct server_timing_table *const current_timing;
-};
-
 bool get_server_timing(struct server_timing_table *tTable)
 {
-	server_get_timing new_timing(tTable);
-	return internal_server.protected_data->get_timing()->view_contents_locked(&new_timing) ==
-	         protect::entry_success;
+	protect::capsule <protected_server::timing_access> ::read_object object =
+	  internal_server.protected_data->get_timing()->readable();
+	return object && read_server_table(object->timing(), tTable);
 }
 
-
-class server_update_timing : public protect::capsule <protected_server::timing_access> ::modifier
-{
-public:
-	server_update_timing(const struct server_timing_table *tTiming) :
-	current_timing(tTiming) { }
-
-private:
-	protect::entry_result access_entry(write_object oObject) const
-	{
-	write_temp object;
-	if (!(object = oObject)) return protect::exit_forced;
-	return update_server_table(object->timing(), current_timing)?
-	  protect::entry_success : protect::entry_fail;
-	}
-
-	const struct server_timing_table *const current_timing;
-};
 
 bool update_server_timing(const struct server_timing_table *tTable)
 {
-	server_update_timing new_timing(tTable);
-	return internal_server.protected_data->get_timing()->access_contents(&new_timing) ==
-	         protect::entry_success;
+	protect::capsule <protected_server::timing_access> ::write_object object =
+	  internal_server.protected_data->get_timing()->writable();
+	return object && update_server_table(object->timing(), tTable);
 }
 
-
-class server_set_timing : public protect::capsule <protected_server::timing_access> ::modifier
-{
-public:
-	server_set_timing(const struct server_timing_table *tTiming) :
-	current_timing(tTiming) { }
-
-private:
-	protect::entry_result access_entry(write_object oObject) const
-	{
-	write_temp object;
-	if (!(object = oObject)) return protect::exit_forced;
-	return set_server_table(object->timing(), current_timing)?
-	  protect::entry_success : protect::entry_fail;
-	}
-
-	const struct server_timing_table *const current_timing;
-};
 
 bool set_server_timing(const struct server_timing_table *tTable)
 {
-	server_set_timing new_timing(tTable);
-	return internal_server.protected_data->get_timing()->access_contents(&new_timing) ==
-	         protect::entry_success;
+	protect::capsule <protected_server::timing_access> ::write_object object =
+	  internal_server.protected_data->get_timing()->writable();
+	return object && set_server_table(object->timing(), tTable);
 }
 
 
-class server_calculate_timing : public protect::capsule <protected_server::timing_access> ::modifier
-{
-	protect::entry_result access_entry(write_object oObject) const
-	{
-	write_temp object;
-	if (!(object = oObject)) return protect::exit_forced;
-	return calculate_server_timing_specs(object->timing(), &internal_server_timing_specs)?
-	  protect::entry_success : protect::entry_fail;
-	}
-};
-
 bool calculate_server_timing()
 {
-	server_calculate_timing new_timing;
-	return internal_server.protected_data->get_timing()->access_contents(&new_timing) ==
-	         protect::entry_success;
+	protect::capsule <protected_server::timing_access> ::write_object object =
+	  internal_server.protected_data->get_timing()->writable();
+	return object && calculate_server_timing_specs(object->timing(), &internal_server_timing_specs);
 }
 
 
@@ -768,22 +681,12 @@ static void server_update_limits(protected_server::transfer_access *sServer)
 	sServer->commands()->set_queue_limit(server_settings->max_commands + PARAM_ALLOW_SERVER_REQUEUE);
 }
 
-class server_update_with_params : public protect::capsule <protected_server::transfer_access> ::modifier
-{
-	protect::entry_result access_entry(write_object oObject) const
-	{
-	write_temp object;
-	if (!(object = oObject)) return protect::exit_forced;
-	server_update_limits(object);
-	return protect::entry_success;
-	}
-};
-
 
 int enter_server_loop()
 {
-	server_update_with_params new_update;
-	internal_server.protected_data->get_transfer()->access_contents(&new_update);
+	protect::capsule <protected_server::transfer_access> ::write_object object =
+	  internal_server.protected_data->get_transfer()->writable();
+	if (object) server_update_limits(object);
 	return execute_server_thread(&internal_server);
 }
 
@@ -1067,35 +970,6 @@ result clear_environment()
 
 //new clients-------------------------------------------------------------------
 
-class server_system_client : public protect::capsule <protected_server::client_access> ::modifier
-{
-public:
-	server_system_client(command_text cCommand, int cCritical) :
-	new_process(-1), current_command(cCommand), current_critical(cCritical) { }
-
-	pid_t new_process;
-
-private:
-	protect::entry_result access_entry(write_object oObject)
-	{
-	write_temp object;
-	if (!(object = oObject)) return protect::exit_forced;
-
-    log_server_sys_request(current_command);
-
-	new_process = add_system_client(object->clients(), current_command,
-	  internal_server.default_user, internal_server.default_group,
-	  internal_server.min_priority, internal_server.max_permissions,
-	  internal_server.max_permissions & internal_server.max_new_client,
-	  current_critical);
-
-	return (new_process >= 0)? protect::entry_success : protect::entry_fail;
-	}
-
-	command_text current_command;
-	int          current_critical;
-};
-
 pid_t create_system_client(command_text cCommand, int cCritical)
 {
 	//NOTE: server itself may violate number of clients
@@ -1106,41 +980,19 @@ pid_t create_system_client(command_text cCommand, int cCritical)
 	return false;
 	}
 
-	server_system_client new_client(cCommand, cCritical);
-	return ( internal_server.protected_data->get_clients()->access_contents(&new_client) ==
-	         protect::entry_success )?
-	new_client.new_process : -1;
+    log_server_sys_request(cCommand);
+
+	protect::capsule <protected_server::client_access> ::write_object object =
+	  internal_server.protected_data->get_clients()->writable();
+
+	return !object? -1 :
+	  add_system_client(object->clients(), cCommand,
+	    internal_server.default_user, internal_server.default_group,
+	    internal_server.min_priority, internal_server.max_permissions,
+	    internal_server.max_permissions & internal_server.max_new_client,
+	    cCritical);
 }
 
-
-class server_exec_client : public protect::capsule <protected_server::client_access> ::modifier
-{
-public:
-	server_exec_client(const command_text *cCommand, int cCritical) :
-	new_process(-1), current_command(cCommand), current_critical(cCritical) { }
-
-	pid_t new_process;
-
-private:
-	protect::entry_result access_entry(write_object oObject)
-	{
-	write_temp object;
-	if (!(object = oObject)) return protect::exit_forced;
-
-    log_server_exec_request(*current_command);
-
-	new_process = add_exec_client(object->clients(), current_command,
-	  internal_server.default_user, internal_server.default_group,
-	  internal_server.min_priority, internal_server.max_permissions,
-	  internal_server.max_permissions & internal_server.max_new_client,
-	  current_critical);
-
-	return (new_process >= 0)? protect::entry_success : protect::entry_fail;
-	}
-
-	const command_text *current_command;
-	int                 current_critical;
-};
 
 pid_t create_exec_client(const command_text *cCommand, int cCritical)
 {
@@ -1152,10 +1004,17 @@ pid_t create_exec_client(const command_text *cCommand, int cCritical)
 	return false;
 	}
 
-	server_exec_client new_client(cCommand, cCritical);
-	return ( internal_server.protected_data->get_clients()->access_contents(&new_client) ==
-	         protect::entry_success )?
-	new_client.new_process : -1;
+    log_server_exec_request(*cCommand);
+
+	protect::capsule <protected_server::client_access> ::write_object object =
+	  internal_server.protected_data->get_clients()->writable();
+
+	return !object? -1 :
+	  add_exec_client(object->clients(), cCommand,
+	    internal_server.default_user, internal_server.default_group,
+	    internal_server.min_priority, internal_server.max_permissions,
+	    internal_server.max_permissions & internal_server.max_new_client,
+	    cCritical);
 }
 
 //END new clients---------------------------------------------------------------
@@ -1175,8 +1034,8 @@ multi_result queue_client_command(execute_queue::insert_type eElement)
 
 	eElement->value().wait_start = check_priority.counter;
 
-	queue_new_execute new_command(internal_server.protected_data->get_commands());
-	if (new_command(eElement, static_priority_adjust))
+	if (queue_new_execute(internal_server.protected_data->get_commands(),
+	    eElement, static_priority_adjust))
 	{
 	execute_continue();
 	//TODO: protect this incrementation with mutex?
@@ -1193,8 +1052,8 @@ bool requeue_server_command(execute_queue::insert_type eElement)
 
 	//bypass all of the normal checks because the server calls this
 
-	queue_new_execute new_command(internal_server.protected_data->get_commands());
-	if (new_command(eElement, static_priority_adjust))
+	if (queue_new_execute(internal_server.protected_data->get_commands(),
+	    eElement, static_priority_adjust))
 	{
 	execute_continue();
 	//don't increment counter
@@ -1292,52 +1151,26 @@ const command_transmit &cCommand, server_interface &sServer)
 
 //client termination------------------------------------------------------------
 
-class client_self_remove : public protect::capsule <protected_server::transfer_access> ::modifier
-{
-public:
-	ATTR_INT client_self_remove(protect::capsule <protected_server::transfer_access> *sServer) :
-	current_client(NULL), server_data(sServer) { }
-
-	bool ATTR_INT operator () (const client_id *cClient)
-	{
-	current_client = cClient;
-	protect::entry_result outcome = server_data->access_contents(this);
-	current_client = NULL;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject)
-	{
-	if (!oObject) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	bool outcome = true;
-
-	remove_handle_commands(object->commands(), (entity_handle) current_client);
-
-	outcome &= terminate_running_client(object->clients(), object->services(), object->monitors(), current_client, false);
-
-	send_all_monitor_updates(object->clients(), object->monitors());
-
-	return outcome? protect::entry_success : protect::entry_fail;
-	}
-
-
-	const client_id *current_client;
-
-	protect::capsule <protected_server::transfer_access> *const server_data;
-};
-
-
 bool remove_local_client(const client_id *cClient)
 {
 	//NOTE: client termination will cause this to be called in thread
-	client_self_remove self_remove(internal_server.protected_data->get_transfer());
-	return self_remove(cClient);
+
+	protect::capsule <protected_server::transfer_access> ::write_object object =
+	  internal_server.protected_data->get_transfer()->writable();
+
+	bool outcome = object;
+
+	if (object)
+	{
+	remove_handle_commands(object->commands(), (entity_handle) cClient);
+
+	outcome &= terminate_running_client(object->clients(),
+	    object->services(), object->monitors(), cClient, false);
+
+	send_all_monitor_updates(object->clients(), object->monitors());
+	}
+
+	return outcome;
 }
 
 //END client termination--------------------------------------------------------
@@ -1354,8 +1187,8 @@ bool send_server_directive(client_id *cClient, server_directive dDirective)
 	directive_command.target_entity = cClient->client_name;
 	directive_command.orig_entity   = entity_name();
 
-	send_protected_output new_output(cClient->attached_client);
-	return directive_command.command_sendable() && new_output(&directive_command);
+	return directive_command.command_sendable() &&
+	  send_protected_output(cClient->attached_client, &directive_command);
 }
 
 
@@ -1369,8 +1202,8 @@ bool send_timing_table(const struct server_timing_table *tTiming, const client_i
 	timing_command.target_entity = cClient->client_name;
 	timing_command.orig_entity   = entity_name();
 
-	send_protected_output new_output(cClient->attached_client);
-	return timing_command.command_sendable() && new_output(&timing_command);
+	return timing_command.command_sendable() &&
+	  send_protected_output(cClient->attached_client, &timing_command);
 }
 
 
@@ -1387,8 +1220,8 @@ bool notify_register_attempt(const client_id *cClient, command_reference rRefere
 	notify_command.orig_entity      = entity_name();
 
 	notify_command.silent_auto_response = true;
-	send_protected_output new_output(cClient->attached_client);
-	return notify_command.command_sendable() && new_output(&notify_command);
+	return notify_command.command_sendable() &&
+	  send_protected_output(cClient->attached_client, &notify_command);
 }
 
 //END directives and broadcasts-------------------------------------------------

@@ -43,51 +43,30 @@ extern "C" {
 }
 
 
-	RETAINED_MODULE_CONSTRUCTOR(queue_new_execute, protect::capsule <protected_server::execute_access>),
-	current_element(NULL), new_command_handle(NULL) { }
+const command_transmit *queue_new_execute(protect::capsule <protected_server::execute_access> *qQueue,
+execute_queue::insert_type eElement, execute_queue::execute_compare cCompare)
+{
+	if (!qQueue || !eElement) return NULL;
+	protect::capsule <protected_server::execute_access> ::write_object object = qQueue->writable();
 
+	const command_transmit *new_command_handle = !object? NULL :
+	  object->commands()->insert_command(eElement, cCompare);
 
-	const command_transmit *queue_new_execute::
-	  operator () (execute_queue::insert_type eElement, execute_queue::execute_compare cCompare)
-	{
-	current_element    = eElement;
-	current_compare    = cCompare;
-	new_command_handle = NULL;
-	bool outcome  = RETAINED_MODIFY_CALL;
-	current_element = NULL;
-	current_compare = NULL;
-	return (!outcome)? new_command_handle : NULL;
-	}
+	if (!new_command_handle) return NULL;
 
-
-	RETAINED_ACCESS_HEAD(queue_new_execute)
-	{
-	if (!RETAINED_ENTRY_ARG) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = RETAINED_ENTRY_ARG) || !object->commands()) return protect::exit_forced;
-
-	if (!current_element) return protect::entry_fail;
-
-	new_command_handle = object->commands()->insert_command(current_element, current_compare);
-
-	if (!new_command_handle) return protect::entry_fail;
-
-    log_server_queue_command(current_element->value().command_name(),
-      current_element->value().orig_entity.c_str(), current_element->value().wait_start);
+    log_server_queue_command(eElement->value().command_name(),
+      eElement->value().orig_entity.c_str(), eElement->value().wait_start);
 
 	//NOTE: don't put this in 'local_client' because ownership was taken!
-	if ( !check_command_all(current_element->value().execute_type, command_response)
+	if ( !check_command_all(eElement->value().execute_type, command_response)
 #ifdef PARAM_DISABLE_REMOTE_RECEIPT
-	     && !current_element->value().orig_address.size()
+	     && !eElement->value().orig_address.size()
 #endif
 	     )
-	send_server_response(current_element->value(), event_received_server);
+	send_server_response(eElement->value(), event_received_server);
 
-	return protect::entry_success;
-	}
-
+	return new_command_handle;
+}
 
 
 bool remove_handle_commands(execute_queue *tTable, entity_handle eEntity)

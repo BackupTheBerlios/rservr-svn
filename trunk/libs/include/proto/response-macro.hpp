@@ -57,8 +57,7 @@ extern "C" {
 
 
 #define AUTO_SEND_COMMAND(left, right) \
-{ send_protected_output new_output(right.send_to->response_output()); \
-  return left.command_sendable() && new_output(&left); }
+  return left.command_sendable() && send_protected_output(right.send_to->response_output(), &left);
 
 
 #define RESPONSE_ORIGINAL_ARG cCommand

@@ -56,7 +56,6 @@ const entry_result entry_success   =  0; //Entry was successful
 #include "components/derivative__.hpp"
 #include "components/dynamic__.hpp"
 #include "components/selfcontained__.hpp"
-#include "components/accessors__.hpp"
 
 #endif
 //END Header Section############################################################

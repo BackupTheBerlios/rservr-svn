@@ -67,173 +67,53 @@ typedef protect::capsule <exit_list> protected_exit_list;
 static protect::literal_capsule <exit_list, global_sentry_pthread <> > pending_exits;
 
 
-class add_single : public protected_update_list::modifier
-{
-public:
-	void ATTR_INT operator () (monitor_event eEvent, text_info dData)
-	{
-	current_event = eEvent;
-	current_data  = dData;
-	pending_updates.access_contents(this);
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	write_temp object = oObject;
-	if (!object) return protect::entry_fail;
-
-	(*object)[current_event].push_back(current_data? current_data : "");
-
-	return protect::entry_success;
-	}
-
-	monitor_event current_event;
-	text_info     current_data;
-};
-
-
-class add_multi : public protected_update_list::modifier
-{
-public:
-	void ATTR_INT operator () (monitor_event eEvent, const data_list *dData)
-	{
-	current_event = eEvent;
-	current_data  = dData;
-	pending_updates.access_contents(this);
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	write_temp object = oObject;
-	if (!object) return protect::entry_fail;
-
-	for (unsigned int I = 0; I < current_data->size(); I++)
-	(*object)[current_event].push_back((*current_data)[I]);
-
-	return protect::entry_success;
-	}
-
-	monitor_event    current_event;
-	const data_list *current_data;
-};
-
-
-class add_exit : public protected_exit_list::modifier
-{
-public:
-	void ATTR_INT operator () (entity_handle hHandle, text_info nName)
-	{
-	current_client = hHandle;
-	current_name   = nName;
-	pending_exits.access_contents(this);
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	write_temp object = oObject;
-	if (!object) return protect::entry_fail;
-	object->add_element(exit_monitor(current_client, current_name? current_name : ""));
-	//NOTE: duplicates don't matter since exits are removed when an event is sent
-	return protect::entry_success;
-	}
-
-	entity_handle current_client;
-	text_info     current_name;
-};
-
-
-class send_updates : public protected_update_list::modifier
-{
-public:
-	send_updates(const client_list *cClients, monitor_list *mMonitors) :
-	current_clients(cClients), current_monitors(mMonitors) { }
-
-	void ATTR_INT operator () ()
-	{ pending_updates.access_contents(this); }
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	write_temp object = oObject;
-	if (!object) return protect::entry_fail;
-
-	while (object->size())
-	 {
-	send_monitor_update(current_clients, current_monitors,
-	  object->begin()->first,
-	  &object->begin()->second);
-	object->erase(object->begin());
-	 }
-	return protect::entry_success;
-	}
-
-
-	const client_list *const current_clients;
-	monitor_list      *const current_monitors;
-};
-
-
-class send_exits : public protected_exit_list::modifier
-{
-public:
-	send_exits(const client_list *cClients, monitor_list *mMonitors) :
-	current_clients(cClients), current_monitors(mMonitors) { }
-
-	void ATTR_INT operator () ()
-	{ pending_exits.access_contents(this); }
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	write_temp object = oObject;
-	if (!object) return protect::entry_fail;
-	while (object->size())
-	 {
-	send_exit_update(current_clients, current_monitors,
-	  object->first_element().client,
-	  object->first_element().name.c_str());
-	object->p_first_element();
-	 }
-	return protect::entry_success;
-	}
-
-
-	const client_list *const current_clients;
-	monitor_list      *const current_monitors;
-};
-
-
 
 static inline void add_single_update(monitor_event eEvent, text_info dData)
 {
-	add_single new_update;
-	new_update(eEvent, dData);
+	protected_update_list::write_object object = pending_updates.writable();
+	if (object) (*object)[eEvent].push_back(dData? dData : "");
 }
 
 
 static inline void add_multi_update(monitor_event eEvent, const data_list &dData)
 {
-	add_multi new_update;
-	new_update(eEvent, &dData);
+	protected_update_list::write_object object = pending_updates.writable();
+	if (object)
+	for (unsigned int I = 0; I < dData.size(); I++)
+	(*object)[eEvent].push_back(dData[I]);
 }
 
 
 void send_all_monitor_updates(const client_list *cClients, monitor_list *mMonitors)
 {
-	send_exits new_exit(cClients, mMonitors);
-	new_exit();
-	send_updates new_update(cClients, mMonitors);
-	new_update();
+	{
+	protected_update_list::write_object object = pending_updates.writable();
+	while (object->size())
+	 {
+	send_monitor_update(cClients, mMonitors,
+	  object->begin()->first,
+	  &object->begin()->second);
+	object->erase(object->begin());
+	 }
+	}
+
+	{
+	protected_exit_list::write_object object = pending_exits.writable();
+	while (object->size())
+	 {
+	send_exit_update(cClients, mMonitors,
+	  object->first_element().client,
+	  object->first_element().name.c_str());
+	object->p_first_element();
+	 }
+	}
 }
 
 
 void monitor_client_exit(entity_handle cClient, text_info nName)
 {
-	add_exit new_exit;
-	new_exit(cClient, nName);
+	protected_exit_list::write_object object = pending_exits.writable();
+	if (object) object->add_element(exit_monitor(cClient, nName? nName : ""));
 }
 
 

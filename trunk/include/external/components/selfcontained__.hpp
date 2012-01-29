@@ -113,11 +113,11 @@ class selfcontained_capsule <Interface, Derived, Interface> :
 
   template <class Interface> Interface
   *selfcontained_capsule_base <Interface> ::writable_object()
-  { return (!mutex_base::condemn_status(this))? this : NULL; }
+  { return this; }
 
   template <class Interface> const Interface
   *selfcontained_capsule_base <Interface> ::readable_object() const
-  { return (!mutex_base::condemn_status(this))? this : NULL; }
+  { return this; }
 
   template <class Interface>
   selfcontained_capsule_base <Interface> ::~selfcontained_capsule_base()

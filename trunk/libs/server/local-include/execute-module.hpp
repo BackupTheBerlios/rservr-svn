@@ -43,16 +43,11 @@ extern "C" {
 #include "external/clist.hpp"
 #include "external/global-sentry.hpp"
 
-#include "module-macro.hpp"
 #include "execute-thread.hpp"
 
 
-DECLARE_RETAINED_LIST_MODIFIER(queue_new_execute, protect::capsule <protected_server::execute_access>, \
-	const command_transmit *operator () (execute_queue::insert_type, execute_queue::execute_compare), \
-	execute_queue::insert_type      current_element; \
-        execute_queue::execute_compare  current_compare; \
-	const command_transmit           *new_command_handle; )
-
+const command_transmit *queue_new_execute(protect::capsule <protected_server::execute_access>*,
+execute_queue::insert_type, execute_queue::execute_compare);
 
 bool remove_handle_commands(execute_queue*, entity_handle);
 

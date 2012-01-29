@@ -472,58 +472,28 @@ static int parse_loop(struct protocol_scanner_context *cContext, void *sScanner,
 	}
 
 
-	receive_protected_input::receive_protected_input(protected_input *iInput) :
-	current_input(NULL), current_source(iInput) { }
-
-	bool receive_protected_input::operator () (command_transmit *iInput)
-	{
-	current_input = iInput;
-	bool outcome = current_source->access_contents(this);
-	current_input = NULL;
-	return !outcome;
-	}
-
-	protect::entry_result receive_protected_input::
-	  access_entry(write_object oObject) const
-	{
-	if (!oObject) return protect::entry_denied;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::entry_fail;
-
-	if (!object->parse_command(current_input))
-	//NOTE: this allows input loops to distinguish between end of data and bad data
-	if (object->receive_input().size()) return protect::entry_retry;
-	else if (object->is_terminated())   return protect::exit_forced;
-	else                                return protect::entry_fail;
-
-	else return protect::entry_success;
-	}
-
-
-class is_input_waiting : public protected_input::modifier
+bool receive_protected_input(protected_input *iInterface, command_transmit *cCommand)
 {
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
+	if (!iInterface) return false;
+	protected_input::write_object object = iInterface->writable();
+
+	if (!object || !object->parse_command(cCommand))
 	{
-	if (!oObject) return protect::entry_denied;
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	//NOTE: blocking should be turned off for the input source
-	if (!object->set_input_mode(input_binary)) return protect::entry_fail; //removes "input_allow_underrun"
-	bool outcome = !object->empty_read() || object->receive_input().size();
-	if (!outcome && (!(object = oObject) || object->is_terminated())) return protect::exit_forced;
-
-	return outcome? protect::entry_success : protect::entry_retry;
+	if (object->receive_input().size()) return false;
+	else if (object->is_terminated())   return false;
+	else                                return false;
 	}
-};
+	else return true;
+}
 
 
 int check_input_waiting(protected_input *iInput)
 {
 	if (!iInput) return protect::entry_denied;
-	static is_input_waiting local_waiting;
-	return iInput->access_contents(&local_waiting);
+	protected_input::write_object object = iInput->writable();
+	if (!object) return protect::entry_denied;
+	if (!object->set_input_mode(input_binary)) return protect::entry_fail; //removes "input_allow_underrun"
+	bool outcome = !object->empty_read() || object->receive_input().size();
+	if (!outcome && object->is_terminated()) return protect::exit_forced;
+	return outcome? protect::entry_success : protect::entry_retry;
 }

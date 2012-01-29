@@ -88,9 +88,9 @@ command_event SEND_SERVER_COMMAND_OUTCOME; \
   if (!lookup_command(new_block.command_name(), new_block.execute_type)) return event_unsent; \
   new_block.orig_reference = manual_message_number(); \
   new_block.orig_entity = entity_name(); \
-  send_protected_output new_output(pipe_output); \
   reset_input_standby(); \
-  if (!manual_command_status(new_block.orig_reference) || (new_block.command_sendable() && !new_output(&new_block))) \
+  if (!manual_command_status(new_block.orig_reference) || (new_block.command_sendable() && \
+    !send_protected_output(pipe_output, &new_block))) \
   { clear_command_status(new_block.orig_reference); \
     return event_error; } \
   SEND_SERVER_COMMAND_OUTCOME = wait_command_event(new_block.orig_reference, event_complete, wait); \
@@ -104,9 +104,9 @@ command_event SEND_SERVER_COMMAND_OUTCOME; \
   if (!lookup_command(new_block.command_name(), new_block.execute_type)) return false; \
   new_block.orig_reference = manual_message_number(); \
   new_block.orig_entity = entity_name(); \
-  send_protected_output new_output(pipe_output); \
   reset_input_standby(); \
-  if (!manual_command_status(new_block.orig_reference) || !(new_block.command_sendable() && new_output(&new_block))) \
+  if (!manual_command_status(new_block.orig_reference) || !(new_block.command_sendable() && \
+      send_protected_output(pipe_output, &new_block))) \
   { clear_command_status(new_block.orig_reference); \
     return false; } \
   SEND_SERVER_COMMAND_OUTCOME = wait_command_event(new_block.orig_reference, event_complete, wait); \
@@ -119,7 +119,6 @@ command_event SEND_SERVER_COMMAND_OUTCOME; \
   if (!lookup_command(new_block.command_name(), new_block.execute_type)) return false; \
   new_block.orig_reference = manual_message_number(); \
   new_block.orig_entity = entity_name(); \
-  send_protected_output new_output(pipe_output); \
-  return new_block.command_sendable() && new_output(&new_block); }
+  return new_block.command_sendable() && send_protected_output(pipe_output, &new_block); }
 
 #endif //command_macro_hpp

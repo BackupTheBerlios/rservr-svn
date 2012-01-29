@@ -56,20 +56,6 @@ public:
         derivative_capsule
     &operator = (const derivative_capsule&);
 
-    //Public Interface----------------------------------------------------------
-
-    /*____________________________________________________________________*
-      This function provides const access to the encapsulated object
-      locally so that the creator of the capsule doesn't have to use a
-      module to view its contents.  Always returns a valid pointer when
-      called from a valid object.
-     *____________________________________________________________________*/
-
-    inline
-        const Derivative
-    *local_access() const;
-    //--------------------------------------------------------------------------
-
     ~derivative_capsule();
 
 private:
@@ -151,25 +137,18 @@ private:
   return *this;
   }
 
-  //Public Interface------------------------------------------------------------
-  template <class Interface, class Derivative, class Mutex> inline
-    const Derivative
-  *derivative_capsule <Interface, Derivative, Mutex> ::local_access() const
-  { return &this->stored_object; }
-  //----------------------------------------------------------------------------
-
   template <class Interface, class Derivative, class Mutex>
   derivative_capsule <Interface, Derivative, Mutex> ::~derivative_capsule()
   {
   capsule <Interface> ::condemn(this);
-  if (this && this->set_mutex(true)) this->set_mutex(false);
+  if (this && mutex_base::set_mutex(this, true)) mutex_base::set_mutex(this, false);
   }
 
   template <class Interface, class Derivative, class Mutex> Interface
   *derivative_capsule <Interface, Derivative, Mutex> ::writable_object()
   {
   Interface *holding = NULL;
-  if (!this->condemn_status()) auto_convert(holding, this->stored_object);
+  auto_convert(holding, this->stored_object);
   return holding;
   }
 
@@ -177,7 +156,7 @@ private:
   *derivative_capsule <Interface, Derivative, Mutex> ::readable_object() const
   {
   const Interface *holding = NULL;
-  if (!this->condemn_status()) auto_convert(holding, this->stored_object);
+  auto_convert(holding, this->stored_object);
   return holding;
   }
 

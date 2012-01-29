@@ -140,10 +140,9 @@ bool master_register_client(text_info nName, permission_mask tType)
 	else
     log_client_deregister_attempt();
 
-	send_protected_output new_output(pipe_output);
-
 	reset_input_standby();
-	if (manual_command_status(new_block.orig_reference) && new_block.command_sendable() && new_output(&new_block))
+	if (manual_command_status(new_block.orig_reference) && new_block.command_sendable() &&
+	    send_protected_output(pipe_output, &new_block))
 	{
 	command_event outcome = wait_command_event(new_block.orig_reference, event_complete,
 	  client_timing_specs->register_wait);

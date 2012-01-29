@@ -281,174 +281,77 @@ private:
 };
 
 
-class add_new_respawn : public protected_actions::modifier
+bool add_new_respawn(protected_actions *lList, action_list_item *aAction)
 {
-public:
-	add_new_respawn(protected_actions *lList) :
-	current_action(NULL), current_list(lList) {}
+	if (!lList || !aAction) return false;
+	protected_actions::write_object object = lList->writable();
+	if (!object) return false;
 
-	bool operator () (action_list_item *aAction)
-	{
-	current_action = aAction;
-	protect::entry_result outcome = current_list->access_contents(this);
-	current_action = NULL;
-	if (!outcome) unblock_respawn();
-	return !outcome;
-	}
+	if (!object->respawn.add_element(aAction)) return false;
 
-private:
-	protect::entry_result access_entry(write_object oObject) const
-	{
-	if (!oObject) return protect::exit_forced;
-
-	write_temp object = NULL;
-	if (!(object = oObject)) return protect::exit_forced;
-
-	return object->respawn.add_element(current_action)?
-	  protect::entry_success : protect::entry_fail;
-	}
+	unblock_respawn();
+	return true;
+}
 
 
-	action_list_item  *      current_action;
-	protected_actions *const current_list;
-};
-
-
-class transfer_respawn : public protected_actions::modifier
+bool transfer_respawn(protected_actions *lList, pid_t pProcess)
 {
-public:
-	transfer_respawn(protected_actions *lList) :
-	current_process(-1), current_list(lList) {}
+	if (!lList) return false;
+	protected_actions::write_object object = lList->writable();
+	if (!object) return false;
 
-	bool operator () (pid_t pProcess)
-	{
-	current_process = pProcess;
-	protect::entry_result outcome = current_list->access_contents(this);
-	current_process = -1;
-	if (!outcome) unblock_respawn();
-	return !outcome;
-	}
-
-private:
-	protect::entry_result access_entry(write_object oObject) const
-	{
-	if (!oObject) return protect::exit_forced;
-
-	write_temp object = NULL;
-	if (!(object = oObject)) return protect::exit_forced;
-
-	int position = object->active.f_find(current_process, &active_list::find_by_key);
-	if (position == data::not_found) return protect::entry_fail;
+	int position = object->active.f_find(pProcess, &active_list::find_by_key);
+	if (position == data::not_found) return false;
 
 	active_list::element_type moved_element = object->active.p_get_element(position);
 	if (!object->respawn.add_element(moved_element.value()))
-	 {
+	{
 	delete moved_element.value();
-	return protect::entry_fail;
-	 }
-	else return protect::entry_success;
+	return false;
 	}
 
+	unblock_respawn();
+	return true;
+}
 
-	pid_t                    current_process;
-	protected_actions *const current_list;
-};
 
-
-class remove_respawn : public protected_actions::modifier
+action_list_item *remove_respawn(protected_actions *lList)
 {
-public:
-	remove_respawn(protected_actions *lList) :
-	current_action(NULL), current_list(lList) {}
+	if (!lList) return NULL;
+	protected_actions::write_object object = lList->writable();
 
-	action_list_item *operator () ()
-	{
-	current_action = NULL;
-	protect::entry_result outcome = current_list->access_contents(this);
-	return outcome? NULL : current_action;
-	}
-
-private:
-	protect::entry_result access_entry(write_object oObject)
-	{
-	if (!oObject) return protect::exit_forced;
-
-	write_temp object = NULL;
-	if (!(object = oObject)) return protect::exit_forced;
-
-	if (object->respawn.size())
-	 {
-	current_action = object->respawn.p_first_element();
-	return protect::entry_success;
-	 }
-	else return protect::entry_fail;
-	}
+	return (object && object->respawn.size())?
+	  object->respawn.p_first_element() : NULL;
+}
 
 
-	action_list_item  *      current_action;
-	protected_actions *const current_list;
-};
-
-
-class check_monitoring : public protected_actions::viewer
+bool respawn_waiting(protected_actions *lList)
 {
-public:
-	check_monitoring(protected_actions *lList) :
-	current_list(lList) {}
-
-	bool operator () () const
-	{ return !current_list->view_contents_locked(this); }
-
-private:
-	protect::entry_result view_entry(read_object oObject) const
-	{
-	if (!oObject) return protect::exit_forced;
-
-	read_temp object = NULL;
-	if (!(object = oObject)) return protect::exit_forced;
-
-	return (object->respawn.size() || object->active.size())?
-	  protect::entry_success : protect::entry_fail;
-	}
+	if (!lList) return NULL;
+	protected_actions::read_object object = lList->readable();
+	return object && object->respawn.size();
+}
 
 
-	protected_actions *const current_list;
-};
-
-
-class add_executed : public protected_actions::modifier
+bool check_monitoring(protected_actions *lList)
 {
-public:
-	add_executed(protected_actions *lList) :
-	current_process(-1), current_action(NULL), current_list(lList) {}
-
-	bool operator () (pid_t pProcess, action_list_item *aAction)
-	{
-	current_process = pProcess;
-	current_action  = aAction;
-	protect::entry_result outcome = current_list->access_contents(this);
-	current_process = -1;
-	current_action  = NULL;
-	if (!outcome) unblock_respawn();
-	return !outcome;
-	}
-
-private:
-	protect::entry_result access_entry(write_object oObject) const
-	{
-	if (!oObject) return protect::exit_forced;
-
-	write_temp object = NULL;
-	if (!(object = oObject)) return protect::exit_forced;
-
-	return object->active.add_element( active_list::new_element(current_process, current_action) )?
-	  protect::entry_success : protect::entry_fail;
-	}
+	if (!lList) return NULL;
+	protected_actions::read_object object = lList->readable();
+	return object && (object->respawn.size() || object->active.size());
+}
 
 
-	pid_t                    current_process;
-	action_list_item  *      current_action;
-	protected_actions *const current_list;
+bool add_executed(protected_actions *lList, pid_t pProcess, action_list_item *aAction)
+{
+	if (!lList || !aAction) return false;
+	protected_actions::write_object object = lList->writable();
+	if (!object) return false;
+
+	if (!object->active.add_element( active_list::new_element(pProcess, aAction) ))
+	return false;
+
+	unblock_respawn();
+	return true;
 };
 
 
@@ -456,24 +359,18 @@ int block_for_respawn()
 {
 	static auto_mutex respawn_mutex;
 
-	//NOTE: make these non-static if using multiple threads
-	static remove_respawn   new_respawn(&client_actions);
-	static add_executed     new_executed(&client_actions);
-	static check_monitoring new_check(&client_actions);
-
-	if (!new_check())
+	if (!check_monitoring(&client_actions))
 	{
     log_message_no_clients();
 	stop_message_queue();
 	return false;
 	}
 
-	if ( client_actions.local_access()->respawn.size() ||
-	     respawn_block.block(respawn_mutex) )
+	if (respawn_waiting(&client_actions) || respawn_block.block(respawn_mutex))
 	{
 	//NOTE: execution must stay outside of modules to prevent updates from blocking responses
 
-	action_list_item *next_execute = new_respawn();
+	action_list_item *next_execute = remove_respawn(&client_actions);
 	if (!next_execute) return false;
 
 	allow_privileged_responses();
@@ -482,7 +379,7 @@ int block_for_respawn()
 	clear_messages();
 
 	if (new_process < 0) delete next_execute;
-	else if (!new_executed(new_process, next_execute))
+	else if (!add_executed(&client_actions, new_process, next_execute))
 	 {
 	delete next_execute;
 	return false;
@@ -500,13 +397,11 @@ static int add_execute_common(text_info sShell, bool cCritical)
 	config_arguments arguments;
 	steal_config_arguments(&arguments);
 
-	add_new_respawn new_execute(&client_actions);
-
 	action_list_item *new_item = new respawn_execute(arguments, sShell, cCritical);
 
 	if (!new_item) return -1;
 
-	if (!new_execute(new_item))
+	if (!add_new_respawn(&client_actions, new_item))
 	{
 	delete new_item;
 	return -1;
@@ -526,14 +421,12 @@ static int add_system_common(text_info sShell, bool cCritical)
 	config_arguments arguments;
 	steal_config_arguments(&arguments);
 
-	add_new_respawn new_system(&client_actions);
-
 	action_list_item *new_item =
 	  new respawn_system(convert_config_concat(&arguments), sShell, cCritical);
 
 	if (!new_item) return -1;
 
-	if (!new_system(new_item))
+	if (!add_new_respawn(&client_actions, new_item))
 	{
 	delete new_item;
 	return -1;
@@ -552,15 +445,13 @@ void __monitor_update_hook(const struct monitor_update_data *dData)
 {
 	if (dData && (dData->event_type == (monitor_attached_clients | monitor_remove)))
 	{
-	transfer_respawn new_transfer(&client_actions);
-
 	info_list current = dData->event_data;
 	if (current) while (*current)
 	//TODO: add logging point for respawning? maybe in action class
 	 {
 	int process = -1;
 	if (!parse_integer10(*current++, &process)) continue;
-	new_transfer(process);
+	transfer_respawn(&client_actions, process);
 	 }
 	}
 }

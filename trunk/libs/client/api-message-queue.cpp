@@ -171,71 +171,40 @@ static void auto_pause_check(unsigned int, unsigned int);
 static void auto_unpause_check(unsigned int, unsigned int);
 
 
-class add_new_message : public protected_message_list::modifier
+const message_info ATTR_INT *add_new_message(protected_message_list *lList,
+const command_info *oOriginal, command_type tType, const void *mMessage)
 {
-public:
-	ATTR_INT add_new_message(protected_message_list *lList) :
-	current_original(NULL), current_message(NULL), current_type(0x00), current_info(NULL),
-	current_list(lList) { }
-
-	const message_info ATTR_INT *operator () (const command_info *oOrigin, command_type tType,
-	const void *mMessage)
-	{
-	current_original = oOrigin;
-	current_type     = tType;
-	current_message  = mMessage;
-	current_info     = NULL;
-	bool outcome = current_list->access_contents(this);
-	current_original = NULL;
-	current_type     = 0x00;
-	current_message  = NULL;
-
-	//NOTE: this must be outside of the access function in case a hook processes the message
-	queue_sync_continue();
-
-	return (!outcome)? current_info : NULL;
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject)
-	{
-	if (!oObject) return protect::entry_denied;
-	if (!current_original) return protect::entry_fail;
-	if (!current_original->command_name()) return protect::entry_fail;
-
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
+	if (!lList || !oOriginal || !mMessage) return NULL;
+	protected_message_list::write_object object = lList->writable();
+	if (!object) return NULL;
 
 	//NOTE: this is safe because an element can't be retrieved while the index is 0
 	int current_index = object->index;
 	object->index = 0;
-	if ( !object->add_element(message_list::base_type()) ) return protect::entry_fail;
+	if ( !object->add_element(message_list::base_type()) ) return NULL;
 	object->index = current_index;
 
-	object->last_element().key().command_name     = current_original->command_name();
-	object->last_element().key().received_from    = current_original->orig_entity;
-	object->last_element().key().received_address = current_original->orig_address;
-	object->last_element().key().sent_to          = current_original->target_entity;
-	object->last_element().key().sent_address     = current_original->target_address;
+	object->last_element().key().command_name     = oOriginal->command_name();
+	object->last_element().key().received_from    = oOriginal->orig_entity;
+	object->last_element().key().received_address = oOriginal->orig_address;
+	object->last_element().key().sent_to          = oOriginal->target_entity;
+	object->last_element().key().sent_address     = oOriginal->target_address;
 
-	object->last_element().value().last_reference   = current_original->orig_reference;
-	object->last_element().value().creator_pid      = current_original->creator_pid;
-	object->last_element().value().__type           = current_type;
+	object->last_element().value().last_reference   = oOriginal->orig_reference;
+	object->last_element().value().creator_pid      = oOriginal->creator_pid;
+	object->last_element().value().__type           = tType;
 	object->last_element().value().time_received    = clock();
-	object->last_element().value().priority         = current_original->priority;
+	object->last_element().value().priority         = oOriginal->priority;
 	object->last_element().value().command_name     = object->last_element().key().command_name.c_str();
 	object->last_element().value().received_from    = object->last_element().key().received_from.c_str();
 	object->last_element().value().received_address = object->last_element().key().received_address.c_str();
 	object->last_element().value().sent_to          = object->last_element().key().sent_to.c_str();
 	object->last_element().value().sent_address     = object->last_element().key().sent_address.c_str();
-	object->last_element().value().message_reference = current_original->remote_reference?
-		current_original->remote_reference : current_original->target_reference;
-
-	if (!(object = oObject)) return protect::exit_forced;
+	object->last_element().value().message_reference = oOriginal->remote_reference?
+		oOriginal->remote_reference : oOriginal->target_reference;
 
 
-	if (current_type == command_request)
+	if (tType == command_request)
 	 {
 	const struct incoming_request_data *message_data = (const struct incoming_request_data*) current_message;
 
@@ -251,7 +220,7 @@ private:
 	 }
 
 
-	else if (current_type == command_response)
+	else if (tType == command_response)
 	 {
 	const struct incoming_response_data *message_data =
 	  (const struct incoming_response_data*) current_message;
@@ -296,7 +265,7 @@ private:
 	 }
 
 
-	else if (current_type == command_remote)
+	else if (tType == command_remote)
 	 {
 	const struct incoming_remote_data *message_data =
 	  (const struct incoming_remote_data*) current_message;
@@ -304,11 +273,11 @@ private:
 	object->last_element().value().__remote.__pending = message_data->__pending;
 
 	object->last_element().value().message_reference =
-	  current_original->orig_reference;
+	  oOriginal->orig_reference;
 	 }
 
 
-	else if (current_type == command_null)
+	else if (tType == command_null)
 	 {
 	const struct incoming_info_data *message_data =
 	  (const struct incoming_info_data*) current_message;
@@ -329,20 +298,10 @@ private:
 
 	//NOTE: default case is still valid for "future response" data
 
-	current_info = &object->last_element().value();
-
 	auto_pause_check(object->size(), object->max_size());
-	return protect::entry_success;
-	}
+	return &object->last_element().value();
+}
 
-
-	const command_info *current_original;
-	const void         *current_message;
-	command_type        current_type;
-	const message_info *current_info;
-
-	protected_message_list *const current_list;
-};
 
 
 static bool find_message_handle(message_list::const_return_type eElement,
@@ -350,81 +309,37 @@ message_handle mMessage)
 { return &eElement.value() == (const void*) mMessage; }
 
 
-class remove_old_message : public protected_message_list::modifier
+bool ATTR_INT remove_old_message(protected_message_list *lList, message_handle mMessage)
 {
-public:
-	ATTR_INT remove_old_message(protected_message_list *lList) :
-	current_info(NULL), current_list(lList) { }
+	if (!lList || !mMessage) return false;
+	protected_message_list::write_object object = lList->writable();
+	if (!object) return false;
 
-	bool ATTR_INT operator () (message_handle mMessage)
-	{
-	current_info = mMessage;
-	bool outcome = current_list->access_contents(this);
-	current_info = NULL;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	if (!oObject) return protect::entry_denied;
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	if (!object->size()) return protect::entry_fail;
-
-	if (!current_info)
+	if (!mMessage)
 	 {
 	object->p_get_element(0);
 	object->index = 0;
 	auto_unpause_check(object->size(), object->max_size());
-	return protect::entry_success;
+	return true;
 	 }
 
-	int position = object->f_find(current_info, &find_message_handle);
-	if (position == data::not_found) return protect::entry_fail;
+	int position = object->f_find(mMessage, &find_message_handle);
+	if (position == data::not_found) return false;
 	object->remove_single(position);
 
 	auto_unpause_check(object->size(), object->max_size());
-	return protect::entry_success;
-	}
-
-	message_handle current_info;
-
-	protected_message_list *const current_list;
-};
+	return true;
+}
 
 
-class get_current_message : public protected_message_list::modifier
+
+const struct message_info ATTR_INT *get_current_message(protected_message_list *lList)
 {
-public:
-	ATTR_INT get_current_message(protected_message_list *lList) :
-	current_info(NULL), current_list(lList) { }
+	if (!lList) return NULL;
+	protected_message_list::write_object object = lList->writable();
+	return (object && object->size())? &(*object)[0].value() : NULL;
+}
 
-	const struct message_info ATTR_INT *operator () ()
-	{
-	current_info = NULL;
-	bool outcome = current_list->access_contents(this);
-	return outcome? NULL : current_info;
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject)
-	{
-	if (!oObject) return protect::entry_denied;
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-	if (object->size()) current_info = &(*object)[0].value();
-
-	return protect::entry_success;
-	}
-
-	const struct message_info *current_info;
-
-	protected_message_list *const current_list;
-};
 
 
 static bool find_by_reference(message_list::const_return_type eElement,
@@ -435,116 +350,49 @@ command_reference rReference)
 }
 
 
-class count_responses : public protected_message_list::modifier
+unsigned int ATTR_INT count_responses(protected_message_list *lList,
+command_reference rReference)
 {
-public:
-	ATTR_INT count_responses(protected_message_list *lList) :
-	current_reference(0), current_count(0), current_list(lList) { }
-
-	unsigned int ATTR_INT operator () (command_reference rReference)
-	{
-	current_reference = rReference;
-	current_count     = 0;
-	bool outcome = current_list->access_contents(this);
-	current_reference = 0;
-	return outcome? 0: current_count;
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject)
-	{
-	if (!oObject) return protect::entry_denied;
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-	current_count = object->f_count(current_reference, &find_by_reference);
-
-	return protect::entry_success;
-	}
-
-	command_reference current_reference;
-	unsigned int     current_count;
-
-	protected_message_list *const current_list;
-};
+	if (!lList) return 0;
+	protected_message_list::read_object object = lList->readable();
+	return (object && object->size())?
+	  object->f_count(rReference, &find_by_reference) : 0;
+}
 
 
-class rotate_messages : public protected_message_list::modifier
+
+const struct message_info ATTR_INT *rotate_messages(protected_message_list *lList,
+command_reference rReference, command_type tType)
 {
-public:
-	ATTR_INT rotate_messages(protected_message_list *lList) :
-	current_reference(0), current_type(0x00), current_info(NULL),
-	current_list(lList) { }
+	if (!lList) return NULL;
+	protected_message_list::write_object object = lList->writable();
+	if (!object) return NULL;
 
-	const struct message_info ATTR_INT *operator () (command_reference rReference,
-	  command_type tType)
-	{
-	current_reference = rReference;
-	current_type      = tType;
-	current_info      = NULL;
-	bool outcome = current_list->access_contents(this);
-	current_reference = 0;
-	current_type      = 0x00;
-	return outcome? NULL: current_info;
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject)
-	{
-	if (!oObject) return protect::entry_denied;
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-	if (!object->size()) return protect::entry_fail;
+	if (!object->size()) return NULL;
 
 	object->index = 0;
-	int position = object->f_find(current_reference, &find_by_reference);
-	if (position == data::not_found) return protect::entry_fail;
-
-	if (!(object = oObject)) return protect::exit_forced;
+	int position = object->f_find(rReference, &find_by_reference);
+	if (position == data::not_found) return NULL;
 
 	object->index = position;
-	current_info = &(*object)[0].value();
+	return &(*object)[0].value();
+}
 
-	return protect::entry_success;
-	}
-
-	command_reference          current_reference;
-	command_type               current_type;
-	const struct message_info *current_info;
-
-	protected_message_list *const current_list;
-};
 
 
 static bool find_non_respond(message_list::const_return_type eElement)
 { return eElement.value().__type != command_none; }
 
 
-class remove_all_responses : public protected_message_list::modifier
+bool ATTR_INT remove_all_responses(protected_message_list *lList,
+command_reference rReference)
 {
-public:
-	ATTR_INT remove_all_responses(protected_message_list *lList) :
-	current_reference(0), current_list(lList) { }
+	if (!lList) return false;
+	protected_message_list::write_object object = lList->writable();
+	if (!object) return false;
 
-	bool ATTR_INT operator () (command_reference rReference)
-	{
-	current_reference = rReference;
-	bool outcome = current_list->access_contents(this);
-	current_reference = 0;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	if (!oObject) return protect::entry_denied;
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	if (current_reference != 0)
-	object->f_remove_pattern(current_reference, &find_by_reference);
+	if (rReference != 0)
+	object->f_remove_pattern(rReference, &find_by_reference);
 
 	else
 	object->fe_remove_pattern(&find_non_respond);
@@ -552,160 +400,67 @@ private:
 	object->index = 0;
 
 	auto_unpause_check(object->size(), object->max_size());
-	return protect::entry_success;
-	}
-
-	command_reference current_reference;
-
-	protected_message_list *const current_list;
-};
+	return true;
+}
 
 
-class copy_message_response : public protected_message_list::viewer
+
+bool ATTR_INT copy_message_response(protected_message_list *lList,
+message_handle mMessage, command_transmit *cCommand)
 {
-public:
-	ATTR_INT copy_message_response(protected_message_list *lList) :
-	current_info(NULL), current_command(NULL), current_list(lList) { }
+	if (!lList || !mMessage || !cCommand) return false;
+	protected_message_list::write_object object = lList->writable();
+	if (!object) return false;
 
-	bool ATTR_INT operator () (message_handle mMessage, command_transmit *cCommand)
-	{
-	current_info    = mMessage;
-	current_command = cCommand;
-	bool outcome = current_list->view_contents_locked(this);
-	current_info    = NULL;
-	current_command = NULL;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT view_entry(read_object oObject) const
-	{
-	if (!oObject) return protect::entry_denied;
-	read_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	if (!object->size() || !current_info || !current_command) return protect::entry_fail;
-
-	int position = object->f_find(current_info, &find_message_handle);
-	if (position == data::not_found) return protect::entry_fail;
+	int position = object->f_find(mMessage, &find_message_handle);
+	if (position == data::not_found) return false;
 
 	const struct message_info *original = &object->get_element(position).value();
 
-	current_command->orig_entity      = original->sent_to;
+	cCommand->orig_entity      = original->sent_to;
 	//NOTE: don't use 'sent_address' because it interferes with remote-send errors!
-	current_command->orig_address     = "";
-	current_command->creator_pid      = original->creator_pid;
-	current_command->priority         = original->priority;
-	current_command->target_entity    = original->received_from;
-	current_command->target_address   = original->received_address;
-	current_command->target_reference = original->last_reference;
-	current_command->remote_reference = original->message_reference;
+	cCommand->orig_address     = "";
+	cCommand->creator_pid      = original->creator_pid;
+	cCommand->priority         = original->priority;
+	cCommand->target_entity    = original->received_from;
+	cCommand->target_address   = original->received_address;
+	cCommand->target_reference = original->last_reference;
+	cCommand->remote_reference = original->message_reference;
 
-	return protect::entry_success;
-	}
-
-	message_handle  current_info;
-	command_transmit *current_command;
-
-	protected_message_list *const current_list;
-};
+	return true;
+}
 
 
-class set_message_list_max : public protected_message_list::modifier
+
+bool ATTR_INT set_message_list_max(protected_message_list *lList, unsigned int lLimit)
 {
-public:
-	ATTR_INT set_message_list_max(protected_message_list *lList) :
-	current_limit(0), current_list(lList) { }
+	if (!lList) return false;
+	protected_message_list::write_object object = lList->writable();
+	if (!object) return false;
 
-	bool ATTR_INT operator () (unsigned int lLimit)
-	{
-	current_limit = lLimit;
-	bool outcome = current_list->access_contents(this);
-	current_limit = 0;
-	return !outcome;
-	}
-
-private:
-	protect::entry_result ATTR_INT access_entry(write_object oObject) const
-	{
-	if (!oObject) return protect::entry_denied;
-	write_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	object->set_max_size(current_limit);
+	object->set_max_size(lLimit);
 
 	auto_pause_check(object->size(), object->max_size());
-	return protect::entry_success;
-	}
-
-	unsigned int current_limit;
-
-	protected_message_list *const current_list;
-};
+	return true;
+}
 
 
-class check_messages_waiting : public protected_message_list::viewer
+
+unsigned int ATTR_INT check_messages_waiting(protected_message_list *lList)
 {
-public:
-	ATTR_INT check_messages_waiting(protected_message_list *lList) :
-	current_size(0), current_list(lList) { }
-
-	unsigned int ATTR_INT operator () ()
-	{
-	current_size = 0;
-	bool outcome = current_list->view_contents_locked(this);
-	return outcome? 0 : current_size;
-	}
-
-private:
-	protect::entry_result ATTR_INT view_entry(read_object oObject)
-	{
-	if (!oObject) return protect::entry_denied;
-	read_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	current_size = object->size();
-	return protect::entry_success;
-	}
-
-	unsigned int current_size;
-
-	protected_message_list *const current_list;
-};
+	if (!lList) return 0;
+	protected_message_list::read_object object = lList->readable();
+	return object? object->size() : 0;
+}
 
 
-class check_messages_max : public protected_message_list::viewer
+
+unsigned int ATTR_INT check_messages_max(protected_message_list *lList)
 {
-public:
-	ATTR_INT check_messages_max(protected_message_list *lList) :
-	current_max(0), current_list(lList) { }
-
-	unsigned int ATTR_INT operator () ()
-	{
-	current_max = 0;
-	bool outcome = current_list->view_contents_locked(this);
-	return outcome? 0 : current_max;
-	}
-
-private:
-	protect::entry_result ATTR_INT view_entry(read_object oObject)
-	{
-	if (!oObject) return protect::entry_denied;
-	read_temp object = NULL;
-
-	if (!(object = oObject)) return protect::exit_forced;
-
-	current_max = object->max_size();
-	return protect::entry_success;
-	}
-
-	unsigned int current_max;
-
-	protected_message_list *const current_list;
-};
+	if (!lList) return 0;
+	protected_message_list::read_object object = lList->readable();
+	return object? object->max_size() : 0;
+}
 
 
 result message_queue_sync()
@@ -779,8 +534,7 @@ struct external_client_interface : public client_interface
 	bool ATTR_INT register_request(const command_info &iInfo, const struct incoming_request_data *rRequest)
 	{
 	if (requirement_fail(command_request) || block_messages_status()) return false;
-	add_new_message new_message(&local_message_list);
-	return new_message(&iInfo, command_request, rRequest);
+	return add_new_message(&local_message_list, &iInfo, command_request, rRequest);
 	}
 
 
@@ -792,8 +546,7 @@ struct external_client_interface : public client_interface
 	       !requirement_fail(command_builtin | command_privileged) ) )
 	return false;
 	if ((signed) iInfo.creator_pid != getpid()) return false;
-	add_new_message new_response(&local_message_list);
-	return new_response(&iInfo, command_response, rResponse);
+	return add_new_message(&local_message_list, &iInfo, command_response, rResponse);
 	}
 
 
@@ -832,13 +585,12 @@ struct external_client_interface : public client_interface
 
 	command_copy = NULL;
 
-	add_new_message new_remote(&local_message_list);
 	struct incoming_remote_data command = {
 	  __pending: (command_handle) registered_command };
 
 	//NOTE: using the copied command will provide invalid response data (use '&iInfo')
 
-	if (!new_remote(&iInfo, command_remote, &command))
+	if (!add_new_message(&local_message_list, &iInfo, command_remote, &command))
 	 {
 	destroy_command((command_handle) registered_command);
 	return false;
@@ -910,13 +662,12 @@ struct external_client_interface : public client_interface
 
 	command_copy = NULL;
 
-	add_new_message new_remote(&local_message_list);
 	struct incoming_remote_data command = {
 	  __pending: (command_handle) registered_command };
 
 	//NOTE: using the copied command will provide invalid response data (use '&iInfo')
 
-	if (!new_remote(&iInfo, command_remote, &command))
+	if (!add_new_message(&local_message_list, &iInfo, command_remote, &command))
 	 {
 	destroy_command((command_handle) registered_command);
 	return false;
@@ -929,8 +680,7 @@ struct external_client_interface : public client_interface
 	bool ATTR_INT register_message(const command_info &iInfo, const struct incoming_info_data *mMessage)
 	{
 	if (requirement_fail(command_request) || block_messages_status()) return false;
-	add_new_message new_message(&local_message_list);
-	return new_message(&iInfo, command_null, mMessage);
+	return add_new_message(&local_message_list, &iInfo, command_null, mMessage);
 	}
 
 
@@ -1004,8 +754,7 @@ static bool execute_client_command(const command_transmit &cCommand)
 message_handle set_async_response()
 {
 	if (!calling_from_message_queue()) return NULL;
-	add_new_message new_message(&local_message_list);
-	return RSERVR_RESPOND( new_message(executing_command, command_none, NULL) );
+	return RSERVR_RESPOND( add_new_message(&local_message_list, executing_command, command_none, NULL) );
 }
 
 
@@ -1035,8 +784,6 @@ static bool internal_queue_loop()
 	if (!inline_queue && pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0) return false;
 
 	command_transmit internal_command(&internal_finder);
-
-	receive_protected_input new_input(pipe_input);
 
     log_client_message_monitor_start();
 
@@ -1099,7 +846,7 @@ static bool internal_queue_loop()
 	//(currently unused)
 	//local_standby.reset();
 
-	input_test = new_input(&internal_command);
+	input_test = receive_protected_input(pipe_input, &internal_command);
 	if (input_test == protect::entry_denied || input_test == protect::exit_forced) break;
 
 	internal_command.send_to = &local_client_response_receiver;
@@ -1406,75 +1153,48 @@ static void *pause_timeout_thread(void *tTimeout)
 
 
 unsigned int message_queue_size()
-{
-	check_messages_waiting new_check(&local_message_list);
-	return new_check();
-}
+{ return check_messages_waiting(&local_message_list); }
 
 unsigned int message_queue_limit()
-{
-	check_messages_max new_check(&local_message_list);
-	return new_check();
-}
+{ return check_messages_max(&local_message_list); }
 
 void set_message_queue_limit(unsigned int mMax)
-{
-	set_message_list_max new_max(&local_message_list);
-	new_max(mMax);
-}
+{ set_message_list_max(&local_message_list, mMax); }
 
 
 const struct message_info *current_message()
-{
-	get_current_message new_current(&local_message_list);
-	return new_current();
-}
+{ return get_current_message(&local_message_list); }
 
 
 result remove_current_message()
-{
-	remove_old_message new_remove(&local_message_list);
-	return new_remove(NULL);
+{ return remove_old_message(&local_message_list, NULL);
 }
 
 
 result remove_message(message_handle mMessage)
 {
+	//NOTE: check for 'NULL' since it will clear ALL messages
 	if (!mMessage) return false;
-	remove_old_message new_remove(&local_message_list);
-	return new_remove(mMessage);
+	return remove_old_message(&local_message_list, mMessage);
 }
 
 void clear_messages()
-{
-	remove_all_responses new_remove(&local_message_list);
-	new_remove(0);
-}
+{ remove_all_responses(&local_message_list, 0); }
 
 
 unsigned int check_responses(command_reference rReference)
-{
-	count_responses new_count(&local_message_list);
-	return new_count(rReference);
-}
+{ return count_responses(&local_message_list, rReference); }
 
 
 const struct message_info *rotate_response(command_reference rReference)
-{
-	rotate_messages new_rotate(&local_message_list);
-	return new_rotate(rReference, command_response);
-}
+{ return rotate_messages(&local_message_list, rReference, command_response); }
 
 
 result remove_responses(command_reference rReference)
 {
 	if (rReference == 0) return false;
-	remove_all_responses new_remove(&local_message_list);
-	return new_remove(rReference);
+	return remove_all_responses(&local_message_list, rReference);
 }
 
 bool copy_response(message_handle mMessage, command_transmit &cCommand)
-{
-	copy_message_response new_response(&local_message_list);
-	return new_response(mMessage, &cCommand);
-}
+{ return copy_message_response(&local_message_list, mMessage, &cCommand); }

@@ -69,17 +69,13 @@ public:
       from directly accessing the capsule's contents.
      *____________________________________________________________________*/
 
-        entry_result
-    access_contents(capsule_modifier <Interface>*);
+    virtual
+        typename capsule <Interface> ::write_object
+    writable(bool = true);
 
-        entry_result
-    access_contents(const capsule_modifier <Interface>*);
-
-        entry_result
-    view_contents(capsule_viewer <Interface>*) const;
-
-        entry_result
-    view_contents(const capsule_viewer <Interface>*) const;
+    virtual
+        typename capsule <Interface> ::read_object
+    readable(bool = true) const;
 
         bool
     viewing_status() const;
@@ -142,7 +138,7 @@ private:
     mutex_status() const;
 
         int
-    set_mutex(bool);
+    set_mutex(bool, bool);
 
         bool
     set_viewing(bool) const;
@@ -191,36 +187,18 @@ private:
   }
 
   //Public Interface------------------------------------------------------------
-  template <class Interface> entry_result
-  dynamic_capsule <Interface> ::
-    access_contents(capsule_modifier <Interface> *cap)
+  template <class Interface> typename capsule <Interface> ::write_object
+  dynamic_capsule <Interface> ::writable(bool block)
   {
   return !this->stored_capsule?
-           entry_denied : this->stored_capsule->access_contents(cap);
+    capsule <Interface> ::write_object() : this->stored_capsule->writable(block);
   }
 
-  template <class Interface> entry_result
-  dynamic_capsule <Interface> ::
-    access_contents(const capsule_modifier <Interface> *cap)
+  template <class Interface> typename capsule <Interface> ::read_object
+  dynamic_capsule <Interface> ::readable(bool block) const
   {
   return !this->stored_capsule?
-           entry_denied : this->stored_capsule->access_contents(cap);
-  }
-
-  template <class Interface> entry_result
-  dynamic_capsule <Interface> ::
-    view_contents(capsule_viewer <Interface> *cap) const
-  {
-  return !this->stored_capsule?
-           entry_denied : this->stored_capsule->view_contents(cap);
-  }
-
-  template <class Interface> entry_result
-  dynamic_capsule <Interface> ::
-    view_contents(const capsule_viewer <Interface> *cap) const
-  {
-  return !this->stored_capsule?
-           entry_denied : this->stored_capsule->view_contents(cap);
+    capsule <Interface> ::read_object() : this->stored_capsule->readable(block);
   }
 
   template <class Interface> bool
@@ -291,7 +269,7 @@ private:
   { return capsule <Interface> ::mutex_status(this->stored_capsule); }
 
   template <class Interface> int
-  dynamic_capsule <Interface> ::set_mutex(bool status)
+  dynamic_capsule <Interface> ::set_mutex(bool status, bool block)
   { return entry_denied; }
 
   template <class Interface> bool

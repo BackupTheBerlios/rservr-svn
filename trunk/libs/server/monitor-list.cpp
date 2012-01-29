@@ -193,8 +193,8 @@ monitor_event eEvent, const data_list *dData)
 	monitor_command.target_entity = sending_list[I]->client_name;
 	monitor_command.orig_entity   = entity_name();
 
-	send_protected_output new_output(sending_list[I]->attached_client);
-	monitor_command.command_sendable() && new_output(&monitor_command);
+	if (monitor_command.command_sendable())
+	send_protected_output(sending_list[I]->attached_client, &monitor_command);
 	}
 
 	return true;
@@ -223,9 +223,8 @@ entity_handle cClient, text_info nName)
 	monitor_command.target_entity = sending_list[I].key()->client_name;
 	monitor_command.orig_entity   = entity_name();
 
-	send_protected_output new_output(sending_list[I].key()->attached_client);
-
-	if (monitor_command.command_sendable() && new_output(&monitor_command))
+	if (monitor_command.command_sendable() &&
+	  send_protected_output(sending_list[I].key()->attached_client, &monitor_command))
     log_server_client_exit_sent(sending_list[I].key()->process_id,
       sending_list[I].key()->logging_name(), sending_list[I].value().c_str());
 	}

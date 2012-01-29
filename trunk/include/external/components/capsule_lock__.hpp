@@ -44,7 +44,7 @@ public:
     default_lock(const default_lock&) : mutex(false) {}
     default_lock &operator = (const default_lock&) { return *this; }
 
-    inline int lock()
+    inline int lock(bool block)
     {
     if (mutex) return entry_wait;
     mutex = true;
