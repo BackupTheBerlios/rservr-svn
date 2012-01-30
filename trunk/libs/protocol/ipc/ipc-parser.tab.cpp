@@ -1,10 +1,9 @@
-
-/* A Bison parser, made by GNU Bison 2.4.1.  */
+/* A Bison parser, made by GNU Bison 2.4.3.  */
 
 /* Skeleton implementation for Bison's Yacc-like parsers in C
    
-      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
+      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
+   2009, 2010 Free Software Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -46,7 +45,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "2.4.1"
+#define YYBISON_VERSION "2.4.3"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -109,7 +108,7 @@ void protocol_error(protocol_scanner_context*, void*, const char*);
 
 
 /* Line 189 of yacc.c  */
-#line 113 "ipc-parser.tab.cpp"
+#line 112 "ipc-parser.tab.cpp"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -181,7 +180,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 185 "ipc-parser.tab.cpp"
+#line 184 "ipc-parser.tab.cpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -217,7 +216,7 @@ void yypstate_delete ();
 
 
 /* Line 264 of yacc.c  */
-#line 221 "ipc-parser.tab.cpp"
+#line 220 "ipc-parser.tab.cpp"
 
 #ifdef short
 # undef short
@@ -267,7 +266,7 @@ typedef short int yytype_int16;
 #define YYSIZE_MAXIMUM ((YYSIZE_T) -1)
 
 #ifndef YY_
-# if YYENABLE_NLS
+# if defined YYENABLE_NLS && YYENABLE_NLS
 #  if ENABLE_NLS
 #   include <libintl.h> /* INFRINGES ON USER NAME SPACE */
 #   define YY_(msgid) dgettext ("bison-runtime", msgid)
@@ -612,9 +611,18 @@ static const yytype_uint8 yystos[] =
 
 /* Like YYERROR except do call yyerror.  This remains here temporarily
    to ease the transition to the new meaning of YYERROR, for GCC.
-   Once GCC version 2 has supplanted version 1, this can go.  */
+   Once GCC version 2 has supplanted version 1, this can go.  However,
+   YYFAIL appears to be in use.  Nevertheless, it is formally deprecated
+   in Bison 2.4.2's NEWS entry, where a plan to phase it out is
+   discussed.  */
 
 #define YYFAIL		goto yyerrlab
+#if defined YYFAIL
+  /* This is here to suppress warnings from the GCC cpp's
+     -Wunused-macros.  Normally we don't worry about that warning, but
+     some users do, and we want to make it easy for users to remove
+     YYFAIL uses, which will produce warnings from Bison 2.5.  */
+#endif
 
 #define YYRECOVERING()  (!!yyerrstatus)
 
@@ -671,7 +679,7 @@ while (YYID (0))
    we won't break user code: when these are the locations we know.  */
 
 #ifndef YY_LOCATION_PRINT
-# if YYLTYPE_IS_TRIVIAL
+# if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
 #  define YY_LOCATION_PRINT(File, Loc)			\
      fprintf (File, "%d.%d-%d.%d",			\
 	      (Loc).first_line, (Loc).first_column,	\
@@ -1122,93 +1130,93 @@ yydestruct (yymsg, yytype, yyvaluep, cContext, sScanner)
     {
       case 3: /* "LABEL" */
 
-/* Line 1000 of yacc.c  */
+/* Line 1009 of yacc.c  */
 #line 76 "ipc-parser.y"
 	{ free((yyvaluep->data).string); };
 
-/* Line 1000 of yacc.c  */
-#line 1131 "ipc-parser.tab.cpp"
+/* Line 1009 of yacc.c  */
+#line 1139 "ipc-parser.tab.cpp"
 	break;
       case 4: /* "TEXT" */
 
-/* Line 1000 of yacc.c  */
+/* Line 1009 of yacc.c  */
 #line 76 "ipc-parser.y"
 	{ free((yyvaluep->data).string); };
 
-/* Line 1000 of yacc.c  */
-#line 1140 "ipc-parser.tab.cpp"
+/* Line 1009 of yacc.c  */
+#line 1148 "ipc-parser.tab.cpp"
 	break;
       case 5: /* "BINARY" */
 
-/* Line 1000 of yacc.c  */
+/* Line 1009 of yacc.c  */
 #line 76 "ipc-parser.y"
 	{ free((yyvaluep->data).string); };
 
-/* Line 1000 of yacc.c  */
-#line 1149 "ipc-parser.tab.cpp"
+/* Line 1009 of yacc.c  */
+#line 1157 "ipc-parser.tab.cpp"
 	break;
       case 6: /* "EXTENDED" */
 
-/* Line 1000 of yacc.c  */
+/* Line 1009 of yacc.c  */
 #line 76 "ipc-parser.y"
 	{ free((yyvaluep->data).string); };
 
-/* Line 1000 of yacc.c  */
-#line 1158 "ipc-parser.tab.cpp"
+/* Line 1009 of yacc.c  */
+#line 1166 "ipc-parser.tab.cpp"
 	break;
       case 23: /* "text" */
 
-/* Line 1000 of yacc.c  */
+/* Line 1009 of yacc.c  */
 #line 78 "ipc-parser.y"
 	{ delete (yyvaluep->holding); };
 
-/* Line 1000 of yacc.c  */
-#line 1167 "ipc-parser.tab.cpp"
+/* Line 1009 of yacc.c  */
+#line 1175 "ipc-parser.tab.cpp"
 	break;
       case 24: /* "binary" */
 
-/* Line 1000 of yacc.c  */
+/* Line 1009 of yacc.c  */
 #line 78 "ipc-parser.y"
 	{ delete (yyvaluep->holding); };
 
-/* Line 1000 of yacc.c  */
-#line 1176 "ipc-parser.tab.cpp"
+/* Line 1009 of yacc.c  */
+#line 1184 "ipc-parser.tab.cpp"
 	break;
       case 25: /* "group" */
 
-/* Line 1000 of yacc.c  */
+/* Line 1009 of yacc.c  */
 #line 78 "ipc-parser.y"
 	{ delete (yyvaluep->holding); };
 
-/* Line 1000 of yacc.c  */
-#line 1185 "ipc-parser.tab.cpp"
+/* Line 1009 of yacc.c  */
+#line 1193 "ipc-parser.tab.cpp"
 	break;
       case 26: /* "block" */
 
-/* Line 1000 of yacc.c  */
+/* Line 1009 of yacc.c  */
 #line 78 "ipc-parser.y"
 	{ delete (yyvaluep->holding); };
 
-/* Line 1000 of yacc.c  */
-#line 1194 "ipc-parser.tab.cpp"
+/* Line 1009 of yacc.c  */
+#line 1202 "ipc-parser.tab.cpp"
 	break;
       case 27: /* "data" */
 
-/* Line 1000 of yacc.c  */
+/* Line 1009 of yacc.c  */
 #line 78 "ipc-parser.y"
 	{ delete (yyvaluep->holding); };
 
-/* Line 1000 of yacc.c  */
-#line 1203 "ipc-parser.tab.cpp"
+/* Line 1009 of yacc.c  */
+#line 1211 "ipc-parser.tab.cpp"
 	break;
       case 28: /* "content" */
 
-/* Line 1000 of yacc.c  */
+/* Line 1009 of yacc.c  */
 #line 78 "ipc-parser.y"
 	{ delete (yyvaluep->holding); };
 
-/* Line 1000 of yacc.c  */
-#line 1212 "ipc-parser.tab.cpp"
+/* Line 1009 of yacc.c  */
+#line 1220 "ipc-parser.tab.cpp"
 	break;
 
       default:
@@ -1562,7 +1570,7 @@ yyreduce:
     {
         case 4:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 102 "ipc-parser.y"
     {
 		cContext->command->set_command_data((yyvsp[(7) - (8)].holding));
@@ -1575,7 +1583,7 @@ yyreduce:
 
   case 10:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 118 "ipc-parser.y"
     {
 		if (!cContext->command->string_property((yyvsp[(1) - (3)].data).string, (yyvsp[(3) - (3)].data).string)) YYERROR;
@@ -1587,7 +1595,7 @@ yyreduce:
 
   case 11:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 124 "ipc-parser.y"
     {
 		if (!cContext->command->string_property((yyvsp[(1) - (3)].data).string, (yyvsp[(3) - (3)].data).string)) YYERROR;
@@ -1599,7 +1607,7 @@ yyreduce:
 
   case 12:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 130 "ipc-parser.y"
     {
 		if (!cContext->command->sinteger_property((yyvsp[(1) - (3)].data).string, (yyvsp[(3) - (3)].s_integer))) YYERROR;
@@ -1609,7 +1617,7 @@ yyreduce:
 
   case 13:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 134 "ipc-parser.y"
     {
 		if (!cContext->command->uinteger_property((yyvsp[(1) - (3)].data).string, (yyvsp[(3) - (3)].u_integer))) YYERROR;
@@ -1619,7 +1627,7 @@ yyreduce:
 
   case 14:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 141 "ipc-parser.y"
     {
 		storage_section *new_section = new actual_data_section((yyvsp[(1) - (3)].data).string, (yyvsp[(3) - (3)].data).string);
@@ -1632,7 +1640,7 @@ yyreduce:
 
   case 15:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 148 "ipc-parser.y"
     {
 		storage_section *new_section = new actual_data_section("", (yyvsp[(1) - (1)].data).string);
@@ -1643,7 +1651,7 @@ yyreduce:
 
   case 16:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 156 "ipc-parser.y"
     {
 		storage_section *new_section = new actual_data_section((yyvsp[(1) - (3)].data).string, (yyvsp[(3) - (3)].data).string, (yyvsp[(3) - (3)].data).length);
@@ -1656,7 +1664,7 @@ yyreduce:
 
   case 17:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 163 "ipc-parser.y"
     {
 		storage_section *new_section = new actual_data_section("", (yyvsp[(1) - (1)].data).string, (yyvsp[(1) - (1)].data).length);
@@ -1667,7 +1675,7 @@ yyreduce:
 
   case 18:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 171 "ipc-parser.y"
     {
 		storage_section *new_section = new group_data_section((yyvsp[(1) - (5)].data).string);
@@ -1680,7 +1688,7 @@ yyreduce:
 
   case 19:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 178 "ipc-parser.y"
     {
 		storage_section *new_section = new group_data_section("");
@@ -1691,7 +1699,7 @@ yyreduce:
 
   case 20:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 186 "ipc-parser.y"
     {
 		(yyval.holding) = (yyvsp[(1) - (1)].holding);
@@ -1700,7 +1708,7 @@ yyreduce:
 
   case 21:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 189 "ipc-parser.y"
     {
 		(yyval.holding) = (yyvsp[(1) - (1)].holding);
@@ -1709,7 +1717,7 @@ yyreduce:
 
   case 22:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 192 "ipc-parser.y"
     {
 		(yyval.holding) = (yyvsp[(1) - (1)].holding);
@@ -1718,7 +1726,7 @@ yyreduce:
 
   case 23:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 197 "ipc-parser.y"
     {
 		(yyval.holding) = (yyvsp[(1) - (1)].holding); }
@@ -1726,7 +1734,7 @@ yyreduce:
 
   case 24:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 199 "ipc-parser.y"
     {
 		(yyvsp[(1) - (2)].holding)->add_next((yyvsp[(2) - (2)].holding));
@@ -1736,7 +1744,7 @@ yyreduce:
 
   case 25:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 206 "ipc-parser.y"
     {
 		(yyval.holding) = (yyvsp[(1) - (1)].holding);
@@ -1745,7 +1753,7 @@ yyreduce:
 
   case 26:
 
-/* Line 1455 of yacc.c  */
+/* Line 1464 of yacc.c  */
 #line 209 "ipc-parser.y"
     {
 		(yyval.holding) = NULL; }
@@ -1753,8 +1761,8 @@ yyreduce:
 
 
 
-/* Line 1455 of yacc.c  */
-#line 1758 "ipc-parser.tab.cpp"
+/* Line 1464 of yacc.c  */
+#line 1766 "ipc-parser.tab.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1968,7 +1976,7 @@ yypushreturn:
 
 
 
-/* Line 1675 of yacc.c  */
+/* Line 1684 of yacc.c  */
 #line 213 "ipc-parser.y"
 
 

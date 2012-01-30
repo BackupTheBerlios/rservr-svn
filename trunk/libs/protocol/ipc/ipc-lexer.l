@@ -78,7 +78,8 @@ ssize_t parser_get_input(struct data_input*, char*, ssize_t);
 
 	/*NOTE: '<TEXT_DATA>' and '<BINARY_DATA>' must be first!*/
 
-<TEXT_DATA>[ -~] {
+	/*TODO: use "[ -~\n]" and add a check to 'actual_data_section' for non-binary*/
+<TEXT_DATA>[^\0] {
 		if (yylval->data.length < yylval->data.target - 1)
 		yylval->data.string[yylval->data.length++] = *yytext;
 		else

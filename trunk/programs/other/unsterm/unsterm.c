@@ -122,11 +122,11 @@ int main(int argc, char *argv[])
 
 	if (argc > 2)
 	{
-	int current_state = fcntl(socket_file, F_GETFL);
-	fcntl(socket_file, F_SETFL, current_state & ~O_NONBLOCK);
+	fcntl(socket_file, F_SETFL, current_state);
 
 	dup2(socket_file, STDIN_FILENO);
 	dup2(socket_file, STDOUT_FILENO);
+	close(socket_file);
 
 	execvp(argv[2], argv + 2);
 	fprintf(stderr, "%s: couldn't execute '%s': %s\n", argv[0], argv[2],
