@@ -42,7 +42,7 @@
 #include <signal.h> /* 'signal', 'kill' */
 #include <string.h> /* 'strerror' */
 #include <errno.h> /* 'errno' */
-#include <unistd.h> /* 'fork', 'isatty' */
+#include <unistd.h> /* 'fork', 'isatty', 'execvp' */
 #include <fcntl.h> /* 'fcntl' */
 
 #ifdef HAVE_READLINE_READLINE_H
@@ -63,9 +63,9 @@ static FILE *socket_stream = NULL;
 
 int main(int argc, char *argv[])
 {
-	if (argc != 2)
+	if (argc < 2)
 	{
-	fprintf(stderr, "%s [socket name]\n", argv[0]);
+	fprintf(stderr, "%s [socket name] (program...)\n", argv[0]);
 	return 1;
 	}
 
@@ -119,6 +119,22 @@ int main(int argc, char *argv[])
 	return 1;
 	}
 
+
+	if (argc > 2)
+	{
+	int current_state = fcntl(socket_file, F_GETFL);
+	fcntl(socket_file, F_SETFL, current_state & ~O_NONBLOCK);
+
+	dup2(socket_file, STDIN_FILENO);
+	dup2(socket_file, STDOUT_FILENO);
+
+	execvp(argv[2], argv + 2);
+	fprintf(stderr, "%s: couldn't execute '%s': %s\n", argv[0], argv[2],
+	  strerror(errno));
+	_exit(1);
+	}
+
+
 	socket_stream = fdopen(socket_file, "r+");
 
 	if (!socket_stream)
@@ -128,6 +144,7 @@ int main(int argc, char *argv[])
 	shutdown(socket_file, SHUT_RDWR);
 	return 1;
 	}
+
 
 	int new_process = -1;
 	static char input_data[PARAM_MAX_INPUT_SECTION];
