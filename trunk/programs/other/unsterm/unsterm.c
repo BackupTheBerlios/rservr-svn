@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 
 	struct timeval connect_timeout = { tv_sec: 1, tv_usec: 0 };
 
-	if (select(FD_SETSIZE, &wait_connect, NULL, NULL, &connect_timeout) < 1)
+	if (select(FD_SETSIZE, NULL, &wait_connect, NULL, &connect_timeout) < 1)
 	{
 	shutdown(socket_file, SHUT_RDWR);
 	fprintf(stderr, "%s: couldn't connect to socket '%s': %s\n", argv[0],
