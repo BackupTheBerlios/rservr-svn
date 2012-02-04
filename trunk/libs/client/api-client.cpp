@@ -180,13 +180,19 @@ result deregister_client()
 { return master_register_client("", type_none); }
 
 
-command_handle short_response(message_handle rRequest, command_event eEvent)
-{ GENERAL_RESPONSE(rRequest, new proto_short_response(eEvent)) }
-
-
 command_handle client_response(message_handle rRequest, command_event eEvent,
 text_info mMessage)
 { GENERAL_RESPONSE(rRequest, new proto_client_response(eEvent, mMessage)) }
+
+
+command_handle client_response_list(message_handle rRequest, command_event eEvent,
+info_list lList)
+{ GENERAL_RESPONSE(rRequest, new proto_client_response_list(eEvent, lList)) }
+
+
+command_handle short_response(message_handle rRequest, command_event eEvent)
+{ GENERAL_RESPONSE(rRequest, new proto_short_response(eEvent)) }
+
 
 
 //(for 'auto-response.hpp')

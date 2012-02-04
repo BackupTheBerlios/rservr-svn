@@ -897,7 +897,8 @@ static void *message_queue_thread(void*)
 
 	message_queue_event(RSERVR_QUEUE_STOP);
 
-	if (pthread_mutex_trylock(queue_exit_mutex) == 0)
+	//NOTE: mutex seems to invalidate during loop for some reason
+	if (queue_exit_mutex.valid() && pthread_mutex_trylock(queue_exit_mutex) == 0)
 	{
 	if (!pthread_equal(internal_thread, pthread_t()) && !inline_queue)
 	pthread_detach(pthread_self());

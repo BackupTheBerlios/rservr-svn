@@ -468,6 +468,13 @@ static int service_message_func(FILE *fFile, text_info cCommand)
 	if (current_line) fprintf(fFile, "%s\n", current_line);
 	 }
 
+	else if (RSERVR_IS_LIST_RESPONSE(message))
+	 {
+	info_list current_line = RSERVR_TO_LIST_RESPONSE(message);
+	if (current_line) while (*current_line)
+	fprintf(fFile, "%s\n", *current_line++);
+	 }
+
 	remove_message(RSERVR_RESPOND(message));
 	}
 

@@ -163,6 +163,20 @@ extern command_handle short_response(message_handle Message,
 extern command_handle client_response(message_handle Message,
   command_event Event, text_info Data);
 
+/*! \brief Respond to a message with a message.
+ *
+ * Send a text message in addition to an event in response to a received
+ * message.
+ * @see message-queue.h
+ *
+ * \param Message message received from another client
+ * \param Event event mask to send to the sending client
+ * \param Data text-formated message data (NULL-terminated list)
+ * \return handle of queued command or failure (NULL)
+ */
+extern command_handle client_response_list(message_handle Message,
+  command_event Event, info_list Data);
+
 
 /*! \brief Get the client's registered name.
  *  \return client's name
