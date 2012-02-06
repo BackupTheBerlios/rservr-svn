@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2012, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -30,17 +30,11 @@
  | POSSIBILITY OF SUCH DAMAGE.
  +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef terminal_h
-#define terminal_h
+#ifndef socket_mutex_h
+#define socket_mutex_h
 
 
-#ifndef RSV_CONSOLE
-int create_socket(const char*);
-void remove_socket();
-#endif
+int lock_mutex();
+int unlock_mutex();
 
-#ifndef RSV_MESSAGE
-int start_terminal(int);
-#endif
-
-#endif /*terminal_h*/
+#endif /*socket_mutex_h*/

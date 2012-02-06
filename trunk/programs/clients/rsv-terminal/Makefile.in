@@ -34,7 +34,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = rsv-terminal$(EXEEXT) rsv-console$(EXEEXT)
+bin_PROGRAMS = rsv-terminal$(EXEEXT) rsv-console$(EXEEXT) \
+	rsv-messages$(EXEEXT)
 subdir = programs/clients/rsv-terminal
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -56,6 +57,11 @@ rsv_console_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	../../../plugins/rsvp-rqsrvc/librsvp-rqsrvc.la \
 	../../../plugins/rsvp-netcntl/librsvp-netcntl.la \
 	../../../libs/client/librservr-client.la
+am_rsv_messages_OBJECTS = rsv_messages-rsv-terminal.$(OBJEXT) \
+	rsv_messages-terminal.$(OBJEXT) \
+	rsv_messages-socket-mutex.$(OBJEXT)
+rsv_messages_OBJECTS = $(am_rsv_messages_OBJECTS)
+rsv_messages_DEPENDENCIES = ../../../libs/client/librservr-client.la
 am_rsv_terminal_OBJECTS = rsv_terminal-rsv-terminal.$(OBJEXT) \
 	rsv_terminal-terminal.$(OBJEXT) \
 	rsv_terminal-interpreter.$(OBJEXT) \
@@ -87,8 +93,10 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(rsv_console_SOURCES) $(rsv_terminal_SOURCES)
-DIST_SOURCES = $(rsv_console_SOURCES) $(rsv_terminal_SOURCES)
+SOURCES = $(rsv_console_SOURCES) $(rsv_messages_SOURCES) \
+	$(rsv_terminal_SOURCES)
+DIST_SOURCES = $(rsv_console_SOURCES) $(rsv_messages_SOURCES) \
+	$(rsv_terminal_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -221,12 +229,15 @@ ALL_INCLUDES = $(STANDARD_INCLUDES) -I$(srcdir)/../../.. -I$(srcdir)/../../../in
 AM_CPPFLAGS = -DENABLE_VIRT_ARRAY_ALL $(ALL_INCLUDES)
 @LINK_READLINE_TRUE@USE_READLINE = -lreadline -lncurses
 @LINK_HISTORY_TRUE@USE_HISTORY = -lhistory
-rsv_terminal_CPPFLAGS = $(ALL_INCLUDES)
+rsv_terminal_CPPFLAGS = $(ALL_INCLUDES) -DRSV_TERMINAL
 rsv_terminal_SOURCES = rsv-terminal.c terminal.c interpreter.c commands.cpp terminal.h interpreter.h commands.h
 rsv_terminal_LDADD = ../../../plugins/rsvp-rqsrvc/librsvp-rqsrvc.la ../../../plugins/rsvp-netcntl/librsvp-netcntl.la ../../../libs/client/librservr-client.la
 rsv_console_CPPFLAGS = $(ALL_INCLUDES) -DRSV_CONSOLE
 rsv_console_SOURCES = rsv-terminal.c terminal.c interpreter.c commands.cpp terminal.h interpreter.h commands.h
 rsv_console_LDADD = $(STANDARD_LIBRARIES) $(USE_READLINE) $(USE_HISTORY) ../../../plugins/rsvp-rqsrvc/librsvp-rqsrvc.la ../../../plugins/rsvp-netcntl/librsvp-netcntl.la ../../../libs/client/librservr-client.la
+rsv_messages_CPPFLAGS = $(ALL_INCLUDES) -DRSV_MESSAGES
+rsv_messages_SOURCES = rsv-terminal.c terminal.c socket-mutex.cpp terminal.h socket-mutex.h
+rsv_messages_LDADD = $(STANDARD_LIBRARIES) ../../../libs/client/librservr-client.la
 all: all-am
 
 .SUFFIXES:
@@ -307,6 +318,9 @@ clean-binPROGRAMS:
 rsv-console$(EXEEXT): $(rsv_console_OBJECTS) $(rsv_console_DEPENDENCIES) 
 	@rm -f rsv-console$(EXEEXT)
 	$(CXXLINK) $(rsv_console_OBJECTS) $(rsv_console_LDADD) $(LIBS)
+rsv-messages$(EXEEXT): $(rsv_messages_OBJECTS) $(rsv_messages_DEPENDENCIES) 
+	@rm -f rsv-messages$(EXEEXT)
+	$(CXXLINK) $(rsv_messages_OBJECTS) $(rsv_messages_LDADD) $(LIBS)
 rsv-terminal$(EXEEXT): $(rsv_terminal_OBJECTS) $(rsv_terminal_DEPENDENCIES) 
 	@rm -f rsv-terminal$(EXEEXT)
 	$(CXXLINK) $(rsv_terminal_OBJECTS) $(rsv_terminal_LDADD) $(LIBS)
@@ -321,6 +335,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_console-interpreter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_console-rsv-terminal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_console-terminal.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_messages-rsv-terminal.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_messages-socket-mutex.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_messages-terminal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_terminal-commands.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_terminal-interpreter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsv_terminal-rsv-terminal.Po@am__quote@
@@ -388,6 +405,34 @@ rsv_console-interpreter.obj: interpreter.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='interpreter.c' object='rsv_console-interpreter.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_console_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o rsv_console-interpreter.obj `if test -f 'interpreter.c'; then $(CYGPATH_W) 'interpreter.c'; else $(CYGPATH_W) '$(srcdir)/interpreter.c'; fi`
+
+rsv_messages-rsv-terminal.o: rsv-terminal.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_messages_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT rsv_messages-rsv-terminal.o -MD -MP -MF $(DEPDIR)/rsv_messages-rsv-terminal.Tpo -c -o rsv_messages-rsv-terminal.o `test -f 'rsv-terminal.c' || echo '$(srcdir)/'`rsv-terminal.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/rsv_messages-rsv-terminal.Tpo $(DEPDIR)/rsv_messages-rsv-terminal.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rsv-terminal.c' object='rsv_messages-rsv-terminal.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_messages_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o rsv_messages-rsv-terminal.o `test -f 'rsv-terminal.c' || echo '$(srcdir)/'`rsv-terminal.c
+
+rsv_messages-rsv-terminal.obj: rsv-terminal.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_messages_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT rsv_messages-rsv-terminal.obj -MD -MP -MF $(DEPDIR)/rsv_messages-rsv-terminal.Tpo -c -o rsv_messages-rsv-terminal.obj `if test -f 'rsv-terminal.c'; then $(CYGPATH_W) 'rsv-terminal.c'; else $(CYGPATH_W) '$(srcdir)/rsv-terminal.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/rsv_messages-rsv-terminal.Tpo $(DEPDIR)/rsv_messages-rsv-terminal.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='rsv-terminal.c' object='rsv_messages-rsv-terminal.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_messages_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o rsv_messages-rsv-terminal.obj `if test -f 'rsv-terminal.c'; then $(CYGPATH_W) 'rsv-terminal.c'; else $(CYGPATH_W) '$(srcdir)/rsv-terminal.c'; fi`
+
+rsv_messages-terminal.o: terminal.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_messages_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT rsv_messages-terminal.o -MD -MP -MF $(DEPDIR)/rsv_messages-terminal.Tpo -c -o rsv_messages-terminal.o `test -f 'terminal.c' || echo '$(srcdir)/'`terminal.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/rsv_messages-terminal.Tpo $(DEPDIR)/rsv_messages-terminal.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='terminal.c' object='rsv_messages-terminal.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_messages_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o rsv_messages-terminal.o `test -f 'terminal.c' || echo '$(srcdir)/'`terminal.c
+
+rsv_messages-terminal.obj: terminal.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_messages_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT rsv_messages-terminal.obj -MD -MP -MF $(DEPDIR)/rsv_messages-terminal.Tpo -c -o rsv_messages-terminal.obj `if test -f 'terminal.c'; then $(CYGPATH_W) 'terminal.c'; else $(CYGPATH_W) '$(srcdir)/terminal.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/rsv_messages-terminal.Tpo $(DEPDIR)/rsv_messages-terminal.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='terminal.c' object='rsv_messages-terminal.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_messages_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o rsv_messages-terminal.obj `if test -f 'terminal.c'; then $(CYGPATH_W) 'terminal.c'; else $(CYGPATH_W) '$(srcdir)/terminal.c'; fi`
 
 rsv_terminal-rsv-terminal.o: rsv-terminal.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_terminal_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT rsv_terminal-rsv-terminal.o -MD -MP -MF $(DEPDIR)/rsv_terminal-rsv-terminal.Tpo -c -o rsv_terminal-rsv-terminal.o `test -f 'rsv-terminal.c' || echo '$(srcdir)/'`rsv-terminal.c
@@ -465,6 +510,20 @@ rsv_console-commands.obj: commands.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='commands.cpp' object='rsv_console-commands.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_console_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_console-commands.obj `if test -f 'commands.cpp'; then $(CYGPATH_W) 'commands.cpp'; else $(CYGPATH_W) '$(srcdir)/commands.cpp'; fi`
+
+rsv_messages-socket-mutex.o: socket-mutex.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_messages_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_messages-socket-mutex.o -MD -MP -MF $(DEPDIR)/rsv_messages-socket-mutex.Tpo -c -o rsv_messages-socket-mutex.o `test -f 'socket-mutex.cpp' || echo '$(srcdir)/'`socket-mutex.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_messages-socket-mutex.Tpo $(DEPDIR)/rsv_messages-socket-mutex.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='socket-mutex.cpp' object='rsv_messages-socket-mutex.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_messages_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_messages-socket-mutex.o `test -f 'socket-mutex.cpp' || echo '$(srcdir)/'`socket-mutex.cpp
+
+rsv_messages-socket-mutex.obj: socket-mutex.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_messages_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_messages-socket-mutex.obj -MD -MP -MF $(DEPDIR)/rsv_messages-socket-mutex.Tpo -c -o rsv_messages-socket-mutex.obj `if test -f 'socket-mutex.cpp'; then $(CYGPATH_W) 'socket-mutex.cpp'; else $(CYGPATH_W) '$(srcdir)/socket-mutex.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/rsv_messages-socket-mutex.Tpo $(DEPDIR)/rsv_messages-socket-mutex.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='socket-mutex.cpp' object='rsv_messages-socket-mutex.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_messages_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o rsv_messages-socket-mutex.obj `if test -f 'socket-mutex.cpp'; then $(CYGPATH_W) 'socket-mutex.cpp'; else $(CYGPATH_W) '$(srcdir)/socket-mutex.cpp'; fi`
 
 rsv_terminal-commands.o: commands.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(rsv_terminal_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT rsv_terminal-commands.o -MD -MP -MF $(DEPDIR)/rsv_terminal-commands.Tpo -c -o rsv_terminal-commands.o `test -f 'commands.cpp' || echo '$(srcdir)/'`commands.cpp

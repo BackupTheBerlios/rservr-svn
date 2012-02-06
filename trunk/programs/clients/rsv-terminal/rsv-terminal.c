@@ -35,15 +35,21 @@
 #include "api/log-output.h"
 #include "api/client.h"
 #include "api/client-timing.h"
-#include "api/control-client.h"
 #include "api/message-queue.h"
 #include "api/command-queue.h"
+
+#ifndef RSV_MESSAGES
+#include "api/control-client.h"
 #include "api/load-plugin.h"
+#else
+#include "api/resource-client.h"
+#include "api/request.h"
+#endif
 
 #include <stdio.h> /* 'fprintf' */
 #include <stdlib.h> /* 'exit' */
 #include <signal.h> /* 'signal' */
-#include <string.h> /* 'strsignal' */
+#include <string.h> /* 'strsignal', 'strsep' */
 #include <errno.h> /* 'errno' */
 
 #ifndef RSV_CONSOLE
@@ -51,8 +57,18 @@
 #include <sys/socket.h> /* 'accept' */
 #endif
 
+#ifdef RSV_MESSAGES
+#include <fcntl.h> /* 'fcntl' */
+#include <unistd.h> /* 'close' */
+#endif
+
 #include "terminal.h"
+
+#ifndef RSV_MESSAGES
 #include "commands.h"
+#else
+#include "socket-mutex.h"
+#endif
 
 
 static void register_handlers();
@@ -60,14 +76,24 @@ static void register_handlers();
 static void message_queue_hook(int);
 
 
+#ifdef RSV_MESSAGES
+static FILE *read_file  = NULL;
+static FILE *write_file = NULL;
+
+static void file_cleanup();
+#endif
+
+
 int main(int argc, char *argv[])
 {
+#ifdef RSV_CONSOLE
 	if (argc != 2)
 	{
-#ifdef RSV_CONSOLE
 	fprintf(stderr, "%s [client name]\n", argv[0]);
 #else
-	fprintf(stderr, "%s [socket name]\n", argv[0]);
+	if (argc != 2 && argc != 3)
+	{
+	fprintf(stderr, "%s [socket name] (client name)\n", argv[0]);
 #endif
 	return 1;
 	}
@@ -82,11 +108,13 @@ int main(int argc, char *argv[])
 	return 1;
 	}
 
+#ifndef RSV_MESSAGES
 	if (setup_commands() < 0)
 	{
 	client_cleanup();
 	return 1;
 	}
+#endif
 
 #ifndef RSV_CONSOLE
 	int listen_socket = -1;
@@ -107,8 +135,10 @@ int main(int argc, char *argv[])
 	}
 #endif
 
+#ifndef RSV_MESSAGES
 	/*NOTE: can't have queue running to load plugins*/
 	load_internal_plugins(); /*NOTE: ignore return value*/
+#endif
 
 	set_queue_event_hook(&message_queue_hook);
 
@@ -123,8 +153,10 @@ int main(int argc, char *argv[])
 
 #ifdef RSV_CONSOLE
 	if (!register_control_client(argv[1]))
+#elif defined RSV_TERMINAL
+	if (!register_control_client((argc >= 3)? argv[2] : PARAM_TERMINAL_NAME))
 #else
-	if (!register_control_client(PARAM_TERMINAL_NAME))
+	if (!register_resource_client((argc >= 3)? argv[2] : PARAM_TERMINAL_NAME))
 #endif
 	{
 	fprintf(stderr, "%s: could not register client\n", argv[0]);
@@ -180,7 +212,89 @@ int main(int argc, char *argv[])
 
 	while ( message_queue_status() &&
 	        (new_connection = accept(listen_socket, (struct sockaddr*) &new_address, &new_length)) >= 0 )
+    #ifdef RSV_TERMINAL
 	if (start_terminal(new_connection) < 0) break;
+    #else
+	{
+	allow_messages();
+
+	int current_state = fcntl(new_connection, F_GETFL);
+	fcntl(new_connection, F_SETFL, current_state & ~O_NONBLOCK);
+
+	static char buffer[PARAM_MAX_INPUT_SECTION];
+
+	if (!lock_mutex()) break;
+
+	file_cleanup();
+
+	if (!(read_file = fdopen(dup(new_connection), "r")))
+	 {
+	unlock_mutex();
+	close(new_connection);
+	block_messages();
+	clear_messages();
+	continue;
+	 }
+
+	if (!(write_file = fdopen(dup(new_connection), "a")))
+	 {
+	unlock_mutex();
+	close(new_connection);
+	file_cleanup();
+	block_messages();
+	clear_messages();
+	continue;
+	 }
+
+	close(new_connection);
+	unlock_mutex();
+
+	while (fgets(buffer, sizeof buffer, read_file) && !ferror(read_file) && !feof(read_file))
+	 {
+	if (strlen(buffer) < 1) break;
+	buffer[strlen(buffer) - 1] = 0x00;
+
+	char **messages = NULL;
+	int count = argument_delim_split(buffer, &messages);
+
+	if (count < 3 || !messages)
+	  {
+	free_delim_split(messages);
+	continue;
+	  }
+
+	result outcome = 1;
+
+	int I;
+	for (I = 2; I < count; I++)
+	  {
+	command_handle new_message = service_request(messages[0], messages[I]);
+
+	if (!new_message) continue;
+
+	if (strlen(messages[1]) && !insert_remote_address(new_message, messages[1]))
+	   {
+	destroy_command(new_message);
+	continue;
+	   }
+
+	result outcome = send_command_no_status(new_message);
+	destroy_command(new_message);
+	if (!outcome) break;
+	  }
+
+	free_delim_split(messages);
+	if (!outcome) break;
+	 }
+
+	block_messages();
+	clear_messages();
+
+	if (!lock_mutex()) break;
+	file_cleanup();
+	unlock_mutex();
+	}
+    #endif
 
 	remove_socket();
 
@@ -198,6 +312,49 @@ int main(int argc, char *argv[])
 }
 
 
+#ifdef RSV_MESSAGES
+static void file_cleanup()
+{
+	if (read_file)
+	{
+	FILE *old_file = read_file;
+	read_file = NULL;
+	fclose(old_file);
+	}
+
+	if (write_file)
+	{
+	FILE *old_file = write_file;
+	write_file = NULL;
+	fclose(old_file);
+	}
+}
+
+
+static int transpose_message(const char *sSender, const char *aAddress, const char *mMessage)
+{
+	if (!lock_mutex()) return 0;
+
+	if (!write_file)
+	{
+	unlock_mutex();
+	return 0;
+	}
+
+	if (!fprintf(write_file, "!%s!%s!%s\n", sSender, aAddress, mMessage))
+	{
+	/*TODO: can the main thread crash with a race condition at 'fgets'?*/
+	file_cleanup();
+	unlock_mutex();
+	return 0;
+	}
+
+	else fflush(write_file);
+
+	unlock_mutex();
+	return 1;
+}
+#endif
 
 static void message_queue_hook(int eEvent)
 {
@@ -209,6 +366,39 @@ static void message_queue_hook(int eEvent)
 	client_cleanup();
 	exit(0);
 	}
+
+#ifdef RSV_MESSAGES
+	const struct message_info *message;
+
+	if (eEvent == RSERVR_QUEUE_MESSAGE)
+	while ((message = current_message()))
+	{
+	if (RSERVR_IS_REQUEST(message) && !RSERVR_IS_BINARY(message))
+	transpose_message(message->received_from, message->received_address, RSERVR_TO_REQUEST_MESSAGE(message));
+
+
+	else if (RSERVR_IS_RESPONSE(message) && !RSERVR_IS_BINARY(message))
+	 {
+	if (RSERVR_IS_SINGLE_RESPONSE(message))
+	transpose_message(message->received_from, message->received_address, RSERVR_TO_SINGLE_RESPONSE(message));
+
+	else if (RSERVR_IS_LIST_RESPONSE(message))
+	  {
+	info_list current_text = RSERVR_TO_LIST_RESPONSE(message);
+	while (current_text && *current_text)
+	transpose_message(message->received_from, message->received_address, *current_text++);
+	  }
+	 }
+
+
+	else if (RSERVR_IS_INFO(message) && !RSERVR_IS_BINARY(message))
+	transpose_message(message->received_from, message->received_address, RSERVR_TO_INFO_MESSAGE(message));
+
+
+	/*NOTE: ignore return of 'transpose_message' so all messages can be removed*/
+	remove_current_message();
+	}
+#endif
 }
 
 

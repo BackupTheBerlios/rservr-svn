@@ -215,7 +215,10 @@ int main(int argc, char *argv[])
 	fcntl(socket_file, F_SETFL, current_state & ~O_NONBLOCK);
 
 	while (fgets(input_data, PARAM_MAX_INPUT_SECTION, socket_stream))
+	 {
 	fprintf(stdout, "%s", input_data);
+	fflush(stdout);
+	 }
 
 	shutdown(socket_file, SHUT_RDWR);
 	fclose(socket_stream);

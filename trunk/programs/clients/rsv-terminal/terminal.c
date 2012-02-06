@@ -113,6 +113,7 @@ void remove_socket()
 #endif
 
 
+#ifndef RSV_MESSAGES
 int start_terminal(int fFile)
 {
 	/*NOTE: only return < 1 to exit client*/
@@ -184,3 +185,4 @@ int start_terminal(int fFile)
 	fclose(terminal_file);
 	return 0;
 }
+#endif
