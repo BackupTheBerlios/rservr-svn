@@ -62,7 +62,7 @@ extern "C" {
 extern int load_plugin_lib(text_info);
 
 /*! Load plug-ins that are hard-linked into the client program.*/
-extern int load_internal_plugins();
+extern int load_internal_plugins(void);
 
 #ifdef __cplusplus
 }

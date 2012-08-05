@@ -67,7 +67,7 @@ extern "C" {
  *
  * \return success (true) or failure (false)
  */
-extern result register_monitor_client();
+extern result register_monitor_client(void);
 
 /*! \brief Determine "monitoring ability" attribute.
  *
@@ -75,7 +75,7 @@ extern result register_monitor_client();
  * attribute.
  * \return yes (true) or no (false)
  */
-extern result monitoring_allowed();
+extern result monitoring_allowed(void);
 
 /*! \brief Set server-monitoring profile.
  *

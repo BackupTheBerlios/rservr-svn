@@ -96,7 +96,7 @@ extern result set_log_fd(int File);
  *
  * \return yes (true) or no (false)
  */
-extern result have_log_access();
+extern result have_log_access(void);
 
 /*! \brief Set the logging profile.
  *

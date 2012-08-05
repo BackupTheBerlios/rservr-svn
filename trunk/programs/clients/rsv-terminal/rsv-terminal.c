@@ -62,6 +62,10 @@
 #include <unistd.h> /* 'close' */
 #endif
 
+#if defined(HAVE_READLINE_READLINE_H) && defined(RSV_CONSOLE)
+#include <readline/readline.h>
+#endif
+
 #include "terminal.h"
 
 #ifndef RSV_MESSAGES
@@ -304,7 +308,6 @@ int main(int argc, char *argv[])
 	if (message_queue_status())
 	{
 	deregister_client();
-	stop_message_queue();
 	}
 
 	client_cleanup();
@@ -410,7 +413,9 @@ void cleanup_routines()
 #ifndef RSV_CONSOLE
 	remove_socket();
 #endif
-	stop_message_queue();
+#if defined(HAVE_READLINE_READLINE_H) && defined(RSV_CONSOLE)
+	rl_cleanup_after_signal();
+#endif
 }
 
 

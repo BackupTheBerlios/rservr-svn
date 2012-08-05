@@ -295,7 +295,7 @@ struct message_info
  *
  * \return success (true) or failure (false)
  */
-extern result start_message_queue();
+extern result start_message_queue(void);
 
 /*! \brief Inline the message queue.
  *
@@ -304,7 +304,7 @@ extern result start_message_queue();
  *
  * \return success (true) or failure (false)
  */
-extern result inline_message_queue();
+extern result inline_message_queue(void);
 
 /*! \brief Stop the message queue.
  *
@@ -314,7 +314,7 @@ extern result inline_message_queue();
  *
  * \return success (true) or failure (false)
  */
-extern result stop_message_queue();
+extern result stop_message_queue(void);
 
 /*! \brief Determine the message queue's status.
  *
@@ -322,26 +322,26 @@ extern result stop_message_queue();
  *
  * \return running (true) or not running (false)
  */
-extern result message_queue_status();
+extern result message_queue_status(void);
 
 
 /*! \brief Pause the message queue.
  *
  * \return running (true) or not running (false)
  */
-extern result message_queue_pause();
+extern result message_queue_pause(void);
 
 /*! \brief Unpause the message queue.
  *
  * \return running (true) or not running (false)
  */
-extern result message_queue_unpause();
+extern result message_queue_unpause(void);
 
 /*! \brief Check the message queue pause state.
  *
  * \return paused (true) or not paused (false)
  */
-extern result message_queue_pause_state();
+extern result message_queue_pause_state(void);
 
 /*! \brief Temporarily pause the message queue.
  *
@@ -373,46 +373,46 @@ extern result message_queue_auto_pause(double Threshold, double Restore,
 
 
 /*! Total number of messages in the queue.*/
-extern unsigned int message_queue_size();
+extern unsigned int message_queue_size(void);
 
 /*! Maximum number of messages allowed in the queue.*/
-extern unsigned int message_queue_limit();
+extern unsigned int message_queue_limit(void);
 
 /*! Set the maximum number of messages allowed in the queue.*/
 extern void set_message_queue_limit(unsigned int);
 
 
 /*! Disallow all incoming messages.*/
-extern void block_messages();
+extern void block_messages(void);
 
 /*! Allow all incoming messages. This is the default.*/
-extern void allow_messages();
+extern void allow_messages(void);
 
 /*! Determine the status of message blocking.*/
-extern result block_messages_status();
+extern result block_messages_status(void);
 
 
 /*! Disallow all incoming messages except for server responses.*/
-extern void allow_privileged_responses();
+extern void allow_privileged_responses(void);
 
 /*! Disallow all incoming messages except for responses.*/
-extern void allow_responses();
+extern void allow_responses(void);
 
 /*! Determine the status of non-server-response blocking.*/
-extern result allow_privileged_responses_status();
+extern result allow_privileged_responses_status(void);
 
 /*! Determine the status of non-response blocking.*/
-extern result allow_responses_status();
+extern result allow_responses_status(void);
 
 
 /*! Disallow all incoming remote commands. This is the default.*/
-extern void block_remote();
+extern void block_remote(void);
 
 /*! Allow all incoming remote commands.*/
-extern void allow_remote();
+extern void allow_remote(void);
 
 /*! Determine the status of remote command blocking.*/
-extern result block_remote_status();
+extern result block_remote_status(void);
 
 
 /*! Callback function to be hooked into the message queue.*/
@@ -464,27 +464,27 @@ extern queue_event_hook set_queue_event_hook(queue_event_hook Callback);
  *
  * \return success (true) or failure (false)
  */
-extern result message_queue_sync();
+extern result message_queue_sync(void);
 
 /*! \brief Continue blocked synchronizations.
  *
  * Cause all functions blocked waiting for new messages to continue.
  * @see message_queue_sync
  */
-extern void queue_sync_continue();
+extern void queue_sync_continue(void);
 
 
 /*! Obtain the current message.*/
-extern const struct message_info *current_message();
+extern const struct message_info *current_message(void);
 
 /*! Remove the current message.*/
-extern result remove_current_message();
+extern result remove_current_message(void);
 
 /*! Remove a specified message.*/
 extern result remove_message(message_handle);
 
 /*! Clear all messages from the queue.*/
-extern void clear_messages();
+extern void clear_messages(void);
 
 
 /*! Determine the number of responses to a sent command.*/
@@ -507,7 +507,7 @@ extern result remove_responses(command_reference);
  * \note Remove the created message with remove_message when done.
  * \note clear_messages will not remove messages created with this function.
  */
-extern message_handle set_async_response();
+extern message_handle set_async_response(void);
 
 #ifdef __cplusplus
 }

@@ -88,19 +88,23 @@ int log_client_register(text_string nName, unsigned int tType)
 	return local_log(logging_normal, message_string);
 }
 
-int log_client_register_fail(text_string nName, unsigned int tType)
+int log_client_register_fail(text_string nName, unsigned int tType, unsigned int oOutcome)
 {
 	char message_string[max_message];
-	snprintf(message_string, max_message, "/n/ client register failure: '%s' (0x%.4x)",
-	  nName, tType);
+	snprintf(message_string, max_message, "/n/ client register failure with status %.4x: '%s' (0x%.4x)",
+	  oOutcome, nName, tType);
 	return local_log(logging_normal, message_string);
 }
 
 int log_client_deregister(text_string nName)
 { return local_log(logging_normal, "/n/ client deregistered"); }
 
-int log_client_deregister_fail()
-{ return local_log(logging_normal, "/n/ client deregister failure"); }
+int log_client_deregister_fail(unsigned int oOutcome)
+{
+	char message_string[max_message];
+	snprintf(message_string, max_message, "/n/ client deregister failure with status %.4x", oOutcome);
+	return local_log(logging_normal, message_string);
+}
 
 int log_client_file_error(text_string fFile)
 {

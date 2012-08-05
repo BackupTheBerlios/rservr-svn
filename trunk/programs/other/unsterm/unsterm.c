@@ -247,6 +247,9 @@ static void exit_handler(int sSignal)
 	{
 	handling_error = 1;
 	if (socket_file >= 0) shutdown(socket_file, SHUT_RDWR);
+#ifdef HAVE_READLINE_READLINE_H
+	rl_cleanup_after_signal();
+#endif
 	}
 
 	raise(sSignal);

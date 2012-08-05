@@ -76,7 +76,7 @@ extern result register_admin_client(text_info Name);
  * Determine if the client possesses the "server control" attribute.
  * \return yes (true) or no (false)
  */
-extern result have_server_control();
+extern result have_server_control(void);
 
 
 /*! \brief Request a new shell-interpreted client.
@@ -222,7 +222,7 @@ extern command_handle kill_client_pid(pid_t Process);
  *
  * \return success (true) or failure (false)
  */
-extern result terminate_server();
+extern result terminate_server(void);
 
 
 /*! \brief Find and list registered clients.

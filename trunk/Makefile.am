@@ -1,4 +1,4 @@
-SUBDIRS=include lang libs plugins security programs
+SUBDIRS=include lang libs plugins security programs extensions
 EXTRA_DIST=param.h attributes.h
 export AM_CXXFLAGS=-Wall
 export AM_CFLAGS=-Wall

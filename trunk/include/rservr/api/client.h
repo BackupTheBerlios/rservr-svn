@@ -69,7 +69,7 @@ extern "C" {
  *
  * \return success (true) or failure (false)
  */
-extern result initialize_client();
+extern result initialize_client(void);
 
 /*! \brief Free client resources prior to exit.
  *
@@ -78,14 +78,14 @@ extern result initialize_client();
  * before exiting a client program if it was initialized.
  * @see initialize_client
  */
-extern void client_cleanup();
+extern void client_cleanup(void);
 
 /*! \brief Isolate a non-client fork.
  *
  * Isolate a fork of a client program from the client/server IPC of its parent
  * process to avoid interference.
  */
-extern void isolate_client();
+extern void isolate_client(void);
 
 /*! \brief Check IPC status.
  *
@@ -93,7 +93,7 @@ extern void isolate_client();
  *
  * \return success (true) or failure (false)
  */
-extern result check_ipc_status();
+extern result check_ipc_status(void);
 
 /*! \brief Deregister the client.
  *
@@ -103,7 +103,7 @@ extern result check_ipc_status();
  *
  * \return success (true) or failure (false)
  */
-extern result deregister_client();
+extern result deregister_client(void);
 
 
 /*! \brief Send a basic text message.
@@ -134,7 +134,7 @@ extern command_handle ping_client(text_info Target);
  *
  * \return handle of queued command or failure (NULL)
  */
-extern command_handle ping_server();
+extern command_handle ping_server(void);
 
 
 /*! \brief Respond to a message.
@@ -181,17 +181,17 @@ extern command_handle client_response_list(message_handle Message,
 /*! \brief Get the client's registered name.
  *  \return client's name
  */
-extern text_info get_client_name();
+extern text_info get_client_name(void);
 
 /*! \brief Get the client's registered permissions.
  *  \return client's permissions
  */
-extern permission_mask get_client_type();
+extern permission_mask get_client_type(void);
 
 /*! \brief Get the attaching server's name.
  *  \return server's name
  */
-extern text_info get_server_name();
+extern text_info get_server_name(void);
 
 
 /*! \brief Request terminal control.
@@ -214,7 +214,7 @@ extern command_event request_terminal(int *Descriptor);
  *
  * \return success (true) or failure (false)
  */
-extern result return_terminal();
+extern result return_terminal(void);
 
 /*! \brief Determine terminal control.
  *
@@ -222,7 +222,7 @@ extern result return_terminal();
  *
  * \return yes (true) or no (false)
  */
-extern result terminal_control();
+extern result terminal_control(void);
 
 
 /*! \brief Delay indication of client readiness.
@@ -231,7 +231,7 @@ extern result terminal_control();
  * request from implicitly indicating that the client is ready.
  * @see manual_indicate_ready
  */
-extern void disable_indicate_ready();
+extern void disable_indicate_ready(void);
 
 /*! \brief Manually indicate client readiness.
  *
@@ -243,7 +243,7 @@ extern void disable_indicate_ready();
  *
  * \return success (true) or failure (false)
  */
-extern result manual_indicate_ready();
+extern result manual_indicate_ready(void);
 
 #ifdef __cplusplus
 }

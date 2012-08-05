@@ -53,7 +53,7 @@ extern "C" {
 #include "../api/command.h"
 
 
-extern result __rsvp_netcntl_hook_allow_remote();
+extern result __rsvp_netcntl_hook_allow_remote(void);
 
 struct netcntl_source_info
 {

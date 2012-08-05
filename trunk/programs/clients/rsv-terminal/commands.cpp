@@ -406,12 +406,12 @@ static int request_service_func(FILE *fFile, text_info cCommand)
 }
 
 
-const text_info service_message_label = "service_message";
-static int service_message_func(FILE *fFile, text_info cCommand)
+static int message_func_common(FILE *fFile, text_info cCommand, text_info lLabel,
+  command_handle(*cCreate)(text_info, text_info))
 {
-	if (!cCommand || strcmp(cCommand, service_message_label) != 0)
+	if (!cCommand || strcmp(cCommand, lLabel) != 0)
 	{
-	fprintf(fFile, "%s <name> <message> (address)\n", service_message_label);
+	fprintf(fFile, "%s <name> <message> (address)\n", lLabel);
 	return cCommand? -1 : 0;
 	}
 
@@ -438,7 +438,7 @@ static int service_message_func(FILE *fFile, text_info cCommand)
 	if (next_argument(&next_element) >= 0) return -1;
 
 
-	command_handle new_command = service_request(name_full.c_str(), message_text.c_str());
+	command_handle new_command = (*cCreate)(name_full.c_str(), message_text.c_str());
 	if (!new_command) return -1;
 	if (!insert_remote_address(new_command, address.c_str())) return -1;
 
@@ -483,6 +483,16 @@ static int service_message_func(FILE *fFile, text_info cCommand)
 }
 
 
+const text_info service_message_label = "service_message";
+static int service_message_func(FILE *fFile, text_info cCommand)
+{ return message_func_common(fFile, cCommand, service_message_label, &service_request); }
+
+
+const text_info client_message_label = "client_message";
+static int client_message_func(FILE *fFile, text_info cCommand)
+{ return message_func_common(fFile, cCommand, client_message_label, &client_message); }
+
+
 int setup_commands()
 {
 	local_action_list.reset_list();
@@ -493,6 +503,7 @@ int setup_commands()
 	local_action_list.add_element( action_list::new_element(list_net_connections_label, list_net_connections_func) );
 	local_action_list.add_element( action_list::new_element(request_service_label, request_service_func) );
 	local_action_list.add_element( action_list::new_element(service_message_label, service_message_func) );
+	local_action_list.add_element( action_list::new_element(client_message_label, client_message_func) );
 
 	local_action_list.f_sort(&action_list::sort_by_key);
 

@@ -264,9 +264,9 @@ extern int log_client_initialize();
 extern int log_client_initialize_error(text_string);
 extern int log_client_initialized();
 extern int log_client_register(text_string, unsigned int);
-extern int log_client_register_fail(text_string, unsigned int);
+extern int log_client_register_fail(text_string, unsigned int, unsigned int);
 extern int log_client_deregister();
-extern int log_client_deregister_fail();
+extern int log_client_deregister_fail(unsigned int);
 
 extern int log_client_file_error(text_string);
 extern text_string standardized_input;

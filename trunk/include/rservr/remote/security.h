@@ -76,7 +76,7 @@ struct remote_security_filter
 	disconnect_func disconnect_general; /*connection cleanup*/
 	send_func       send_command;       /*send over socket (preserve 'write' 'errno')*/
 	receive_func    receive_command;    /*receive from socket (preserve 'read' 'errno')*/
-	void (*cleanup)();                  /*general cleanup*/
+	void (*cleanup)(void);                  /*general cleanup*/
 } __attribute__ ((packed));
 
 

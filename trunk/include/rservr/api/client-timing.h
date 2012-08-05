@@ -68,44 +68,44 @@ extern "C" {
  *
  * \return success (true) or failure (false)
  */
-extern result initialize_timing_table();
+extern result initialize_timing_table(void);
 
 
 /*! Default cycle timing rate.*/
-extern short_time local_default_cycle();
+extern short_time local_default_cycle(void);
 
 /*! Default slow cycle timing rate.*/
-extern short_time local_default_slow_cycle();
+extern short_time local_default_slow_cycle(void);
 
 /*! Default timeout value.*/
-extern long_time  local_default_timeout();
+extern long_time  local_default_timeout(void);
 
 /*! Default short timeout value.*/
-extern long_time  local_default_short_timeout();
+extern long_time  local_default_short_timeout(void);
 
 /*! Default connection timeout value.*/
-extern short_time local_default_connect_timeout();
+extern short_time local_default_connect_timeout(void);
 
 /*! @see local_default_cycle*/
-extern long_time  local_default_cycle_dec();
+extern long_time  local_default_cycle_dec(void);
 
 /*! @see local_default_slow_cycle*/
-extern long_time  local_default_slow_cycle_dec();
+extern long_time  local_default_slow_cycle_dec(void);
 
 /*! @see local_default_timeout*/
-extern long_time  local_default_timeout_dec();
+extern long_time  local_default_timeout_dec(void);
 
 /*! @see local_default_short_timeout*/
-extern long_time  local_default_short_timeout_dec();
+extern long_time  local_default_short_timeout_dec(void);
 
 /*! @see local_default_connect_timeout*/
-extern long_time  local_default_connect_timeout_dec();
+extern long_time  local_default_connect_timeout_dec(void);
 
 
-extern const struct client_timing_table *get_client_timing();
+extern const struct client_timing_table *get_client_timing(void);
 extern result set_client_timing(const struct client_timing_table*);
 extern result update_client_timing(const struct client_timing_table*);
-extern result compile_client_timing();
+extern result compile_client_timing(void);
 
 #ifdef __cplusplus
 }

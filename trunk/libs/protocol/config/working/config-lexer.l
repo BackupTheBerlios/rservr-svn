@@ -131,7 +131,7 @@ fprintf(stderr, "double stop\n");
 \\. {
 		push_data_char(yyextra, *(yytext + 1)); }
 
-[\t ]+"#"[^\n\r]*[\n\r] { /*discard comments*/
+[\t\n\r ]+"#"[^\n\r]*[\n\r] { /*discard comments*/
 		yylval->data.string = NULL;
 		yylval->data.length = separate_token(yyextra, &yylval->data.string);
 		if (yylval->data.length < 0) /*return ERROR*/;

@@ -123,6 +123,7 @@ extern const entity_type type_control_client;  /**< Control client type.*/
 extern const entity_type type_all_clients;     /**< Sum of all client types.*/
 
 
+extern const command_type command_none;     /**< Not a command.*/
 extern const command_type command_server;   /**< Server command.*/
 extern const command_type command_request;  /**< Request command type.*/
 extern const command_type command_response; /**< Response command type.*/

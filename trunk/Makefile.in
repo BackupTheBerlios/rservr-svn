@@ -160,6 +160,8 @@ PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POW_LIB = @POW_LIB@
+PYTHON_CFLAGS = @PYTHON_CFLAGS@
+PYTHON_LDFLAGS = @PYTHON_LDFLAGS@
 RANLIB = @RANLIB@
 RSERVRD_DELETE_GROUP = @RSERVRD_DELETE_GROUP@
 RSERVRD_DELETE_USER = @RSERVRD_DELETE_USER@
@@ -225,7 +227,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = include lang libs plugins security programs
+SUBDIRS = include lang libs plugins security programs extensions
 EXTRA_DIST = param.h attributes.h
 all: all-recursive
 

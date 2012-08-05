@@ -108,7 +108,7 @@ extern command_handle deregister_own_service(text_info Name);
  *
  * \return handle of queued command or failure (NULL)
  */
-extern command_handle deregister_all_own_services();
+extern command_handle deregister_all_own_services(void);
 
 /*! \brief Deregister remote services.
  *

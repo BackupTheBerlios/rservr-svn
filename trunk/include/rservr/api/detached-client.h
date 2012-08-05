@@ -74,7 +74,7 @@ extern "C" {
 extern result convert_client_detached(int Socket);
 
 /*! Determine if a client was started independently of the server.*/
-extern result is_client_detached();
+extern result is_client_detached(void);
 
 #ifdef __cplusplus
 }

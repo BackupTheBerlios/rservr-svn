@@ -106,7 +106,7 @@ extern void set_command_substitution(int State);
  *
  * \return non-zero is on and zero is off
  */
-extern int command_substition_state();
+extern int command_substition_state(void);
 
 /*! \brief Determine if there are extra lines.
  *
@@ -114,14 +114,14 @@ extern int command_substition_state();
  *
  * \return non-zero is yes and zero is no
  */
-extern int extra_lines();
+extern int extra_lines(void);
 
 /*! \brief Clear all remaining extra lines.
  *
  * @see set_command_substitution
  * @see extra_lines
  */
-extern void clear_extra_lines();
+extern void clear_extra_lines(void);
 
 /*! \brief Get option name.
  *
@@ -160,7 +160,7 @@ extern int remaining_line(const char **Variable);
  *
  * \return number of arguments left after current
  */
-extern unsigned int number_remaining();
+extern unsigned int number_remaining(void);
 
 
 struct config_arguments;

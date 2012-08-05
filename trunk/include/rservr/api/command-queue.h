@@ -273,9 +273,9 @@ extern result set_target_to_server_of(command_handle Command, text_info Client,
 
 
 
-extern void nonblocking_send();       /**< Enable non-blocking command sending (default).*/
-extern void blocking_send();          /**< Enable blocking command sending.*/
-extern result blocking_send_status(); /**< Check status of command-send blocking.*/
+extern void nonblocking_send(void);       /**< Enable non-blocking command sending (default).*/
+extern void blocking_send(void);          /**< Enable blocking command sending.*/
+extern result blocking_send_status(void); /**< Check status of command-send blocking.*/
 
 
 extern text_info extract_remote_command(command_handle);
@@ -286,7 +286,7 @@ socket_reference, send_short_func);
 extern command_handle insert_remote_command(text_info, text_info, text_info);
 extern multi_result receive_stream_command(command_handle*, int, text_info,
 text_info);
-extern result residual_stream_input();
+extern result residual_stream_input(void);
 
 struct external_buffer;
 extern multi_result buffered_receive_stream_command(command_handle*, int,

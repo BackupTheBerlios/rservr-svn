@@ -74,7 +74,6 @@ extern const command_type command_privileged;
 extern const command_type command_no_remote;
 extern const command_type command_bypass;
 extern const command_type command_plugin_allowed;
-extern const command_type command_none;
 BIT_CHECK_FUNCTIONS(command, command_type)
 
 
