@@ -132,7 +132,7 @@ bool master_register_client(text_info nName, permission_mask tType)
 	if (!lookup_command(new_block.command_name(), new_block.execute_type)) return false;
 
 	new_block.orig_reference = manual_message_number();
-	new_block.orig_entity    = nName? nName : "";
+	new_block.orig_entity    = (tType == type_none)? get_client_name() : (nName? nName : "");
 
 	if (tType != type_none)
     log_client_register_attempt(nName? nName : "", tType & type_all_clients);
@@ -140,11 +140,13 @@ bool master_register_client(text_info nName, permission_mask tType)
 	else
     log_client_deregister_attempt();
 
+	command_event outcome = event_unsent;
+
 	reset_input_standby();
 	if (manual_command_status(new_block.orig_reference) && new_block.command_sendable() &&
 	    send_protected_output(pipe_output, &new_block))
 	{
-	command_event outcome = wait_command_event(new_block.orig_reference, event_complete,
+	outcome = wait_command_event(new_block.orig_reference, event_complete,
 	  client_timing_specs->register_wait);
 
 	clear_command_status(new_block.orig_reference);
@@ -166,10 +168,10 @@ bool master_register_client(text_info nName, permission_mask tType)
 	clear_command_status(new_block.orig_reference);
 
 	if (tType != type_none)
-    log_client_register_fail(nName? nName : "", tType & type_all_clients);
+    log_client_register_fail(nName? nName : "", tType & type_all_clients, outcome);
 
 	else
-    log_client_deregister_fail();
+    log_client_deregister_fail(outcome);
 
 	return false;
 }
