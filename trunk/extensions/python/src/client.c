@@ -29,7 +29,7 @@ macro(manual_indicate_ready)
 
 GLOBAL_BINDING_START(initialize_client, "")
 	NO_ARGUMENTS
-	if (!initialize_client()) return auto_exception("exception.IOError");
+	if (!initialize_client()) return auto_exception(PyExc_IOError, "");
 	NO_RETURN
 GLOBAL_BINDING_END(initialize_client)
 
@@ -60,38 +60,60 @@ GLOBAL_BINDING_END(check_ipc_status)
 
 GLOBAL_BINDING_START(deregister_client, "")
 	NO_ARGUMENTS
-	if (!deregister_client()) return auto_exception("exception.RuntimeError");
+	if (!deregister_client()) return auto_exception(PyExc_RuntimeError, "");
 	NO_RETURN
 GLOBAL_BINDING_END(deregister_client)
 
 
 
 GLOBAL_BINDING_START(client_message, "")
-	NOT_IMPLEMENTED
+	STATIC_KEYWORDS(keywords) = { "target", "data", NULL };
+	const char *target = NULL, *data = NULL;
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "ss", keywords, &target, &data)) return NULL;
+	return new_handle_instance("command_handle", client_message(target, data));
 GLOBAL_BINDING_END(client_message)
 
 
 
 GLOBAL_BINDING_START(ping_client, "")
-	NOT_IMPLEMENTED
+	STATIC_KEYWORDS(keywords) = { "target", NULL };
+	const char *target = NULL;
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "s", keywords, &target)) return NULL;
+	return new_handle_instance("command_handle", ping_client(target));
 GLOBAL_BINDING_END(ping_client)
 
 
 
 GLOBAL_BINDING_START(ping_server, "")
-	NOT_IMPLEMENTED
+	NO_ARGUMENTS
+	return new_handle_instance("command_handle", ping_server());
 GLOBAL_BINDING_END(ping_server)
 
 
 
 GLOBAL_BINDING_START(short_response, "")
-	NOT_IMPLEMENTED
+	STATIC_KEYWORDS(keywords) = { "handle", "event", NULL };
+	PyObject *object = NULL;
+	long event = 0;
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "Oi", keywords, &object, &event)) return NULL;
+	if (!check_instance("message_info", object) && !check_instance("message_handle", object)) return NULL;
+	long message = 0;
+	if (!py_to_long(&message, object)) return NULL;
+	return new_handle_instance("command_handle", short_response((message_handle) (void*) message, event));
 GLOBAL_BINDING_END(short_response)
 
 
 
 GLOBAL_BINDING_START(client_response, "")
-	NOT_IMPLEMENTED
+	STATIC_KEYWORDS(keywords) = { "handle", "event", "data", NULL };
+	PyObject *object = NULL;
+	long event = 0;
+	const char *data = NULL;
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "Ois", keywords, &object, &event, &data)) return NULL;
+	if (!check_instance("message_info", object) && !check_instance("message_handle", object)) return NULL;
+	long message = 0;
+	if (!py_to_long(&message, object)) return NULL;
+	return new_handle_instance("command_handle", client_response((message_handle) (void*) message, event, data));
 GLOBAL_BINDING_END(client_response)
 
 
@@ -126,7 +148,7 @@ GLOBAL_BINDING_END(get_server_name)
 GLOBAL_BINDING_START(request_terminal, "")
 	NO_ARGUMENTS
 	int descriptor = -1;
-	if (!request_terminal(&descriptor)) return auto_exception("exception.RuntimeError");
+	if (!request_terminal(&descriptor)) return auto_exception(PyExc_RuntimeError, "");
 	return Py_BuildValue("i", descriptor);
 GLOBAL_BINDING_END(request_terminal)
 
@@ -134,7 +156,7 @@ GLOBAL_BINDING_END(request_terminal)
 
 GLOBAL_BINDING_START(return_terminal, "")
 	NO_ARGUMENTS
-	if (!return_terminal()) return auto_exception("exception.RuntimeError");
+	if (!return_terminal()) return auto_exception(PyExc_RuntimeError, "");
 	NO_RETURN
 GLOBAL_BINDING_END(return_terminal)
 
@@ -157,7 +179,7 @@ GLOBAL_BINDING_END(disable_indicate_ready)
 
 GLOBAL_BINDING_START(manual_indicate_ready, "")
 	NO_ARGUMENTS
-	if (!manual_indicate_ready()) return auto_exception("exception.IOError");
+	if (!manual_indicate_ready()) return auto_exception(PyExc_IOError, "");
 	NO_RETURN
 GLOBAL_BINDING_END(manual_indicate_ready)
 

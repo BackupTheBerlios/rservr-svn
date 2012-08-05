@@ -8,17 +8,23 @@ extern "C" {
 #include <Python.h>
 
 
-static inline PyObject __attribute__ ((warn_unused_result)) *auto_exception(char *exception)
+static inline PyObject __attribute__ ((warn_unused_result)) *auto_exception(PyObject *eException,
+  const char *mMessage)
 {
-	PyErr_SetObject( PyErr_NewException(exception, NULL, NULL), NULL );
+	PyErr_SetString(eException, mMessage);
 	return NULL;
 }
 
-static inline int __attribute__ ((warn_unused_result)) delay_exception(char *exception)
+static inline int __attribute__ ((warn_unused_result)) delay_exception(PyObject *eException,
+  const char *mMessage)
 {
-	PyErr_SetObject( PyErr_NewException(exception, NULL, NULL), NULL );
+	PyErr_SetString(eException, mMessage);
 	return 0;
 }
+
+
+static inline PyObject __attribute__ ((deprecated)) *not_implemented()
+{ return auto_exception(PyExc_NotImplementedError, ""); }
 
 
 #define SELF sSelf
@@ -26,22 +32,25 @@ static inline int __attribute__ ((warn_unused_result)) delay_exception(char *exc
 
 #define GLOBAL_BINDING_START(name, doc) \
 const char name##_doc[] = doc; \
-static PyObject *name##_function(PyObject *SELF, PyObject *ARGS) { \
+static PyObject *name##_function(PyObject *SELF, PyObject *ARGS, PyObject *KEYWORDS) { \
 
 #define GLOBAL_BINDING_END(name) } \
-static PyMethodDef name##_binding = {#name, &name##_function, METH_VARARGS, name##_doc};
+static PyMethodDef name##_binding = {#name, (PyCFunction) &name##_function, METH_KEYWORDS, name##_doc};
 
 #define LOAD_GLOBAL_BINDING(name) \
 if (!load_global_binding(MODULE, &name##_binding)) return 0;
 
 #define NOT_IMPLEMENTED \
-return auto_exception("exception.NotImplementedError");
+return not_implemented();
 
 #define NO_ARGUMENTS \
 if (!PyArg_ParseTuple(ARGS, "")) return NULL;
 
 #define NO_RETURN \
 return Py_BuildValue("");
+
+#define STATIC_KEYWORDS(name) \
+static char *name[]
 
 
 #ifdef __cplusplus

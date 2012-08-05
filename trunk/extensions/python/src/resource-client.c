@@ -16,9 +16,10 @@ macro(set_alternate_sender)
 
 
 GLOBAL_BINDING_START(register_resource_client, "")
+	STATIC_KEYWORDS(keywords) = { "name", NULL };
 	const char *name = NULL;
-	if(!PyArg_ParseTuple(ARGS, "|s", &name)) return NULL;
-	if (!register_resource_client(name)) return auto_exception("exception.RuntimeError");
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "|s", keywords, &name)) return NULL;
+	if (!register_resource_client(name)) return auto_exception(PyExc_RuntimeError, "");
 	NO_RETURN
 GLOBAL_BINDING_END(register_resource_client)
 
@@ -31,25 +32,35 @@ GLOBAL_BINDING_END(find_resource_clients)
 
 
 GLOBAL_BINDING_START(register_service, "")
-	NOT_IMPLEMENTED
+	STATIC_KEYWORDS(keywords) = { "name", "type", NULL };
+	const char *name = NULL, *type = NULL;
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "ss", keywords, &name, &type)) return NULL;
+	return new_handle_instance("command_handle", register_service(name, type));
 GLOBAL_BINDING_END(register_service)
 
 
 
 GLOBAL_BINDING_START(deregister_own_service, "")
-	NOT_IMPLEMENTED
+	STATIC_KEYWORDS(keywords) = { "name", NULL };
+	const char *name = NULL;
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "s", keywords, &name)) return NULL;
+	return new_handle_instance("command_handle", deregister_own_service(name));
 GLOBAL_BINDING_END(deregister_own_service)
 
 
 
 GLOBAL_BINDING_START(deregister_all_own_services, "")
-	NOT_IMPLEMENTED
+	NO_ARGUMENTS
+	return new_handle_instance("command_handle", deregister_all_own_services());
 GLOBAL_BINDING_END(deregister_all_own_services)
 
 
 
 GLOBAL_BINDING_START(deregister_remote_services, "")
-	NOT_IMPLEMENTED
+	STATIC_KEYWORDS(keywords) = { "address", NULL };
+	const char *address = NULL;
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "s", keywords, &address)) return NULL;
+	return new_handle_instance("command_handle", deregister_remote_services(address));
 GLOBAL_BINDING_END(deregister_remote_services)
 
 
