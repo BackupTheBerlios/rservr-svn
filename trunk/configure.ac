@@ -1,4 +1,4 @@
-﻿#                                               -*- Autoconf -*-
+#                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
@@ -54,7 +54,9 @@ AC_CONFIG_FILES([ Makefile
                   programs/other/safexec/Makefile
                   programs/other/rsvbits/Makefile
                   programs/other/pipexec/Makefile
-                  programs/other/unsterm/Makefile ])
+                  programs/other/unsterm/Makefile
+                  extensions/Makefile
+                  extensions/python/Makefile ])
 
 AC_CONFIG_SRCDIR([param.h])
 
@@ -93,6 +95,14 @@ AC_SUBST(RSERVRD_HOME)
 AC_SUBST(RSERVRD_TABLE)
 
 
+#get python flags
+HAVE_PYTHON=`which python 2> /dev/null`
+PYTHON_CFLAGS=`python-config --cflags 2> /dev/null`
+PYTHON_LDFLAGS=`python-config --ldflags 2> /dev/null`
+AC_SUBST(PYTHON_CFLAGS)
+AC_SUBST(PYTHON_LDFLAGS)
+
+
 # Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_STDC
@@ -112,6 +122,7 @@ AM_CONDITIONAL([LINK_HISTORY], [test x$HISTORY = xtrue])
 AM_CONDITIONAL([LINK_GNUTLS], [test x$GNUTLS = xtrue && test x$EXTRA = xtrue])
 AM_CONDITIONAL([LINK_LIBDL], [test x$LIBDL = xtrue])
 AM_CONDITIONAL([LINK_LIBPTHREAD], [test x$LIBPTHREAD = xtrue])
+AM_CONDITIONAL([USE_PYTHON], [test x$HAVE_PYTHON != x])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL

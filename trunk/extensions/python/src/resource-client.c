@@ -1,0 +1,67 @@
+#include "resource-client.h"
+
+#include "load-all.h"
+#include "python-macro.h"
+
+
+#define ALL_GLOBAL_BINDINGS(macro) \
+macro(register_resource_client) \
+macro(find_resource_clients) \
+macro(register_service) \
+macro(deregister_own_service) \
+macro(deregister_all_own_services) \
+macro(deregister_remote_services) \
+macro(set_alternate_sender)
+
+
+
+GLOBAL_BINDING_START(register_resource_client, "")
+	const char *name = NULL;
+	if(!PyArg_ParseTuple(ARGS, "|s", &name)) return NULL;
+	if (!register_resource_client(name)) return auto_exception("exception.RuntimeError");
+	NO_RETURN
+GLOBAL_BINDING_END(register_resource_client)
+
+
+
+GLOBAL_BINDING_START(find_resource_clients, "")
+	NOT_IMPLEMENTED
+GLOBAL_BINDING_END(find_resource_clients)
+
+
+
+GLOBAL_BINDING_START(register_service, "")
+	NOT_IMPLEMENTED
+GLOBAL_BINDING_END(register_service)
+
+
+
+GLOBAL_BINDING_START(deregister_own_service, "")
+	NOT_IMPLEMENTED
+GLOBAL_BINDING_END(deregister_own_service)
+
+
+
+GLOBAL_BINDING_START(deregister_all_own_services, "")
+	NOT_IMPLEMENTED
+GLOBAL_BINDING_END(deregister_all_own_services)
+
+
+
+GLOBAL_BINDING_START(deregister_remote_services, "")
+	NOT_IMPLEMENTED
+GLOBAL_BINDING_END(deregister_remote_services)
+
+
+
+GLOBAL_BINDING_START(set_alternate_sender, "")
+	NOT_IMPLEMENTED
+GLOBAL_BINDING_END(set_alternate_sender)
+
+
+
+int python_load_resource_client(PyObject *mModule)
+{
+	ALL_GLOBAL_BINDINGS(LOAD_GLOBAL_BINDING)
+	return 1;
+}

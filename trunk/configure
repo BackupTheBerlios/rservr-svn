@@ -618,6 +618,8 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 POW_LIB
 LIBOBJS
+USE_PYTHON_FALSE
+USE_PYTHON_TRUE
 LINK_LIBPTHREAD_FALSE
 LINK_LIBPTHREAD_TRUE
 LINK_LIBDL_FALSE
@@ -628,6 +630,8 @@ LINK_HISTORY_FALSE
 LINK_HISTORY_TRUE
 LINK_READLINE_FALSE
 LINK_READLINE_TRUE
+PYTHON_LDFLAGS
+PYTHON_CFLAGS
 RSERVRD_TABLE
 RSERVRD_HOME
 RSERVRD_DELETE_GROUP
@@ -3054,7 +3058,7 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 PACKAGE=rservr-core
 VERSION=gamma.10
 
-ac_config_files="$ac_config_files Makefile include/Makefile lang/Makefile lang/us-english/Makefile libs/Makefile libs/protocol/Makefile libs/proto/Makefile libs/proto/proto-server/Makefile libs/proto/proto-common/Makefile libs/proto/proto-admin/Makefile libs/proto/proto-service/Makefile libs/proto/proto-control/Makefile libs/proto/proto-resource/Makefile libs/proto/proto-monitor/Makefile libs/server/Makefile libs/client/Makefile libs/filter/Makefile plugins/Makefile plugins/rsvp-netcntl/Makefile plugins/rsvp-rqsrvc/Makefile plugins/rsvp-rqconfig/Makefile plugins/rsvp-ready/Makefile plugins/rsvp-dataref/Makefile plugins/rsvp-trigger/Makefile plugins/rsvp-passthru/Makefile security/Makefile security/rsvx-localhost/Makefile security/rsvx-ipregex/Makefile security/rsvx-dnsregex/Makefile security/rsvx-penalty/Makefile security/rsvx-tls/Makefile security/rsvx-inert/Makefile programs/Makefile programs/server/Makefile programs/server/rservr/Makefile programs/clients/Makefile programs/clients/rservrd/Makefile programs/clients/rsv-forward/Makefile programs/clients/rsv-echo/Makefile programs/clients/rsv-terminal/Makefile programs/clients/rsv-respawn/Makefile programs/filters/Makefile programs/filters/rsvf-log/Makefile programs/other/Makefile programs/other/safexec/Makefile programs/other/rsvbits/Makefile programs/other/pipexec/Makefile programs/other/unsterm/Makefile"
+ac_config_files="$ac_config_files Makefile include/Makefile lang/Makefile lang/us-english/Makefile libs/Makefile libs/protocol/Makefile libs/proto/Makefile libs/proto/proto-server/Makefile libs/proto/proto-common/Makefile libs/proto/proto-admin/Makefile libs/proto/proto-service/Makefile libs/proto/proto-control/Makefile libs/proto/proto-resource/Makefile libs/proto/proto-monitor/Makefile libs/server/Makefile libs/client/Makefile libs/filter/Makefile plugins/Makefile plugins/rsvp-netcntl/Makefile plugins/rsvp-rqsrvc/Makefile plugins/rsvp-rqconfig/Makefile plugins/rsvp-ready/Makefile plugins/rsvp-dataref/Makefile plugins/rsvp-trigger/Makefile plugins/rsvp-passthru/Makefile security/Makefile security/rsvx-localhost/Makefile security/rsvx-ipregex/Makefile security/rsvx-dnsregex/Makefile security/rsvx-penalty/Makefile security/rsvx-tls/Makefile security/rsvx-inert/Makefile programs/Makefile programs/server/Makefile programs/server/rservr/Makefile programs/clients/Makefile programs/clients/rservrd/Makefile programs/clients/rsv-forward/Makefile programs/clients/rsv-echo/Makefile programs/clients/rsv-terminal/Makefile programs/clients/rsv-respawn/Makefile programs/filters/Makefile programs/filters/rsvf-log/Makefile programs/other/Makefile programs/other/safexec/Makefile programs/other/rsvbits/Makefile programs/other/pipexec/Makefile programs/other/unsterm/Makefile extensions/Makefile extensions/python/Makefile"
 
 
 
@@ -16191,6 +16195,14 @@ RSERVRD_TABLE=`grep -E '^( |\t)*#define[ \t]+PARAM_RSERVRD_SUBTABLE[ \t]+' "$src
 
 
 
+#get python flags
+HAVE_PYTHON=`which python 2> /dev/null`
+PYTHON_CFLAGS=`python-config --cflags 2> /dev/null`
+PYTHON_LDFLAGS=`python-config --ldflags 2> /dev/null`
+
+
+
+
 # Checks for header files.
 ac_header_dirent=no
 for ac_hdr in dirent.h sys/ndir.h sys/dir.h ndir.h; do
@@ -16759,6 +16771,14 @@ fi
 else
   LINK_LIBPTHREAD_TRUE='#'
   LINK_LIBPTHREAD_FALSE=
+fi
+
+ if test x$HAVE_PYTHON != x; then
+  USE_PYTHON_TRUE=
+  USE_PYTHON_FALSE='#'
+else
+  USE_PYTHON_TRUE='#'
+  USE_PYTHON_FALSE=
 fi
 
 
@@ -18094,6 +18114,10 @@ if test -z "${LINK_LIBPTHREAD_TRUE}" && test -z "${LINK_LIBPTHREAD_FALSE}"; then
   as_fn_error $? "conditional \"LINK_LIBPTHREAD\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${USE_PYTHON_TRUE}" && test -z "${USE_PYTHON_FALSE}"; then
+  as_fn_error $? "conditional \"USE_PYTHON\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 
 : "${CONFIG_STATUS=./config.status}"
 ac_write_fail=0
@@ -19103,6 +19127,8 @@ do
     "programs/other/rsvbits/Makefile") CONFIG_FILES="$CONFIG_FILES programs/other/rsvbits/Makefile" ;;
     "programs/other/pipexec/Makefile") CONFIG_FILES="$CONFIG_FILES programs/other/pipexec/Makefile" ;;
     "programs/other/unsterm/Makefile") CONFIG_FILES="$CONFIG_FILES programs/other/unsterm/Makefile" ;;
+    "extensions/Makefile") CONFIG_FILES="$CONFIG_FILES extensions/Makefile" ;;
+    "extensions/python/Makefile") CONFIG_FILES="$CONFIG_FILES extensions/python/Makefile" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
 
