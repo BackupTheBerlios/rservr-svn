@@ -1,4 +1,4 @@
-﻿/* This software is released under the BSD License.
+/* This software is released under the BSD License.
  |
  | Copyright (c) 2012, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
@@ -333,6 +333,19 @@ bool ATTR_INT remove_old_message(protected_message_list *lList, message_handle m
 
 	auto_unpause_check(object->size(), object->max_size());
 	return true;
+}
+
+
+const struct message_info ATTR_INT *find_message(protected_message_list *lList, message_handle mMessage)
+{
+	if (!lList || !mMessage) return NULL;
+	protected_message_list::read_object object = lList->readable();
+	if (!object) return NULL;
+
+	int position = object->f_find(mMessage, &find_message_handle);
+	if (position == data::not_found) return NULL;
+
+	return &object->get_element(position).value();
 }
 
 
@@ -1168,9 +1181,12 @@ const struct message_info *current_message()
 { return get_current_message(&local_message_list); }
 
 
+const struct message_info *validate_message(message_handle mMessage)
+{ return find_message(&local_message_list, mMessage); }
+
+
 result remove_current_message()
-{ return remove_old_message(&local_message_list, NULL);
-}
+{ return remove_old_message(&local_message_list, NULL); }
 
 
 result remove_message(message_handle mMessage)

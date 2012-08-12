@@ -1,4 +1,4 @@
-#include "rsvp-rqconfig-thread.h"
+#include <rservr/plugins/rsvp-rqconfig-thread.h>
 
 #include "load-all.h"
 

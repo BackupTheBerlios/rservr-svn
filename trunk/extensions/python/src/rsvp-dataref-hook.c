@@ -1,4 +1,4 @@
-#include "rsvp-dataref-hook.h"
+#include <rservr/plugins/rsvp-dataref-hook.h>
 
 #include "load-all.h"
 

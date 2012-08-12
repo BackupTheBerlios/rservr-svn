@@ -1,4 +1,4 @@
-#include "rsvp-rqsrvc-auto.h"
+#include <rservr/plugins/rsvp-rqsrvc-auto.h>
 
 #include "load-all.h"
 

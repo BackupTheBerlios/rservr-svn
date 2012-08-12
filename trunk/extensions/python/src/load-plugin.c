@@ -1,4 +1,4 @@
-#include "load-plugin.h"
+#include <rservr/api/load-plugin.h>
 
 #include "load-all.h"
 

@@ -5,25 +5,36 @@
 extern "C" {
 #endif
 
-#include "attributes.h"
-
 #include <Python.h>
+
+#include <rservr/api/command.h>
+
+
+#define ATTR_INT    __attribute__ ((visibility("internal")))
+#define ATTR_HIDE   __attribute__ ((visibility("hidden")))
+#define ATTR_PROT   __attribute__ ((visibility("protected")))
+#define ATTR_INL    __attribute__ ((always_inline))
+#define ATTR_WEAK   __attribute__ ((weak))
+#define ATTR_PACK   __attribute__ ((packed))
+#define ATTR_UNUSED __attribute__ ((unused))
 
 
 typedef int(python_load_function)(PyObject*);
 
 int load_all(PyObject*);
 
-int ATTR_HIDE load_global_binding(PyObject*, PyMethodDef*);
+int ATTR_INT load_global_binding(PyObject*, PyMethodDef*);
 
-int ATTR_HIDE load_long_constant(PyObject*, const char*, long);
-int ATTR_HIDE load_double_constant(PyObject*, const char*, double);
+int ATTR_INT load_long_constant(PyObject*, const char*, long);
+int ATTR_INT load_double_constant(PyObject*, const char*, double);
 
-PyObject ATTR_HIDE *new_handle_instance(const char*, const void*);
-int ATTR_HIDE check_instance(const char*, PyObject*);
+int ATTR_INT check_instance(const char*, PyObject*);
 
-int ATTR_HIDE py_to_double(double*, PyObject*);
-int ATTR_HIDE py_to_long(long*, PyObject*);
+int ATTR_INT py_to_double(double*, PyObject*);
+int ATTR_INT py_to_long(long*, PyObject*);
+int ATTR_INT py_to_info_list(info_list*, PyObject*);
+
+PyObject ATTR_INT *info_list_to_py(info_list);
 
 #define MODULE mModule
 

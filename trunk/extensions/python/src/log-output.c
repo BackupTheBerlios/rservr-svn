@@ -1,4 +1,4 @@
-#include "log-output.h"
+#include <rservr/api/log-output.h>
 
 #include "load-all.h"
 

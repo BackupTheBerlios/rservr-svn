@@ -1,7 +1,9 @@
-#include "control-client.h"
+#include <rservr/api/control-client.h>
 
 #include "load-all.h"
 #include "python-macro.h"
+
+#include "command-queue.h"
 
 
 #define ALL_GLOBAL_BINDINGS(macro) \
@@ -21,7 +23,10 @@ GLOBAL_BINDING_END(register_control_client)
 
 
 GLOBAL_BINDING_START(find_control_clients, "")
-	NOT_IMPLEMENTED
+	STATIC_KEYWORDS(keywords) = { "name", NULL };
+	const char *name = NULL;
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "s", keywords, &name)) return NULL;
+	return NEW_TYPE_WRAPPER(command_handle, find_control_clients(name));
 GLOBAL_BINDING_END(find_control_clients)
 
 

@@ -1,4 +1,4 @@
-#include "remote-service.h"
+#include <rservr/api/remote-service.h>
 
 #include "load-all.h"
 

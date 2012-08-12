@@ -1,4 +1,4 @@
-#include "label-check.h"
+#include <rservr/api/label-check.h>
 
 #include "load-all.h"
 

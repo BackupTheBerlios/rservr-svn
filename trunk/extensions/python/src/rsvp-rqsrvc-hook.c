@@ -1,4 +1,4 @@
-#include "rsvp-rqsrvc-hook.h"
+#include <rservr/plugins/rsvp-rqsrvc-hook.h>
 
 #include "load-all.h"
 

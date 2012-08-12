@@ -1,4 +1,4 @@
-#include "command-table.h"
+#include <rservr/api/command-table.h>
 
 #include "load-all.h"
 

@@ -1,4 +1,4 @@
-﻿/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\
 
 ______]|]]]]|]__]|]]]]|]__]|]]]]]|]__]|]]]]|]__]|]__]|]__]|]]]]|]_______,_______
 _____]|]__]|]__]|]_______]|]___]|]__]|]__]|]___]|]_]|]__]|]__]|]_______, ,______
@@ -476,6 +476,9 @@ extern void queue_sync_continue(void);
 
 /*! Obtain the current message.*/
 extern const struct message_info *current_message(void);
+
+/*! Verify that the given message is in the queue.*/
+extern const struct message_info *validate_message(message_handle);
 
 /*! Remove the current message.*/
 extern result remove_current_message(void);

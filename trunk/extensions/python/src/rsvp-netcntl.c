@@ -1,4 +1,4 @@
-#include "rsvp-netcntl.h"
+#include <rservr/plugins/rsvp-netcntl.h>
 
 #include "load-all.h"
 

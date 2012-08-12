@@ -1,4 +1,4 @@
-#include "rsvp-dataref-thread.h"
+#include <rservr/plugins/rsvp-dataref-thread.h>
 
 #include "load-all.h"
 

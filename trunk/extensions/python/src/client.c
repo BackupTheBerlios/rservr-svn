@@ -1,7 +1,10 @@
-#include "client.h"
+#include <rservr/api/client.h>
 
 #include "load-all.h"
 #include "python-macro.h"
+
+#include "command-queue.h"
+#include "message-queue.h"
 
 
 #define ALL_GLOBAL_BINDINGS(macro) \
@@ -70,7 +73,7 @@ GLOBAL_BINDING_START(client_message, "")
 	STATIC_KEYWORDS(keywords) = { "target", "data", NULL };
 	const char *target = NULL, *data = NULL;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "ss", keywords, &target, &data)) return NULL;
-	return new_handle_instance("command_handle", client_message(target, data));
+	return NEW_TYPE_WRAPPER(command_handle, client_message(target, data));
 GLOBAL_BINDING_END(client_message)
 
 
@@ -79,14 +82,14 @@ GLOBAL_BINDING_START(ping_client, "")
 	STATIC_KEYWORDS(keywords) = { "target", NULL };
 	const char *target = NULL;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "s", keywords, &target)) return NULL;
-	return new_handle_instance("command_handle", ping_client(target));
+	return NEW_TYPE_WRAPPER(command_handle, ping_client(target));
 GLOBAL_BINDING_END(ping_client)
 
 
 
 GLOBAL_BINDING_START(ping_server, "")
 	NO_ARGUMENTS
-	return new_handle_instance("command_handle", ping_server());
+	return NEW_TYPE_WRAPPER(command_handle, ping_server());
 GLOBAL_BINDING_END(ping_server)
 
 
@@ -96,10 +99,9 @@ GLOBAL_BINDING_START(short_response, "")
 	PyObject *object = NULL;
 	long event = 0;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "Oi", keywords, &object, &event)) return NULL;
-	if (!check_instance("message_info", object) && !check_instance("message_handle", object)) return NULL;
-	long message = 0;
-	if (!py_to_long(&message, object)) return NULL;
-	return new_handle_instance("command_handle", short_response((message_handle) (void*) message, event));
+	message_handle message = auto_message_handle(object);
+	if (!message) return NULL;
+	return NEW_TYPE_WRAPPER(command_handle, short_response(message, event));
 GLOBAL_BINDING_END(short_response)
 
 
@@ -110,16 +112,24 @@ GLOBAL_BINDING_START(client_response, "")
 	long event = 0;
 	const char *data = NULL;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "Ois", keywords, &object, &event, &data)) return NULL;
-	if (!check_instance("message_info", object) && !check_instance("message_handle", object)) return NULL;
-	long message = 0;
-	if (!py_to_long(&message, object)) return NULL;
-	return new_handle_instance("command_handle", client_response((message_handle) (void*) message, event, data));
+	message_handle message = auto_message_handle(object);
+	if (!message) return NULL;
+	return NEW_TYPE_WRAPPER(command_handle, client_response(message, event, data));
 GLOBAL_BINDING_END(client_response)
 
 
 
 GLOBAL_BINDING_START(client_response_list, "")
-	NOT_IMPLEMENTED
+	STATIC_KEYWORDS(keywords) = { "handle", "event", "data", NULL };
+	PyObject *object = NULL;
+	long event = 0;
+	PyObject *data = NULL;
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "OiO", keywords, &object, &event, &data)) return NULL;
+	message_handle message = auto_message_handle(object);
+	if (!message) return NULL;
+	info_list list = NULL;
+	if (!py_to_info_list(&list, data)) return NULL;
+	return NEW_TYPE_WRAPPER(command_handle, client_response_list(message, event, list));
 GLOBAL_BINDING_END(client_response_list)
 
 

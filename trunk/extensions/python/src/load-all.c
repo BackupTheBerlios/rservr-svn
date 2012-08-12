@@ -1,22 +1,23 @@
 #include "load-all.h"
 
+#include <string.h>
+
 #include "python-macro.h"
 
 
 #define DECLARE_LOADER(name) python_load_function python_load_##name;
-#define CALL_LOADER(name)    if (!python_load_##name(MODULE)) return 1;
+#define CALL_LOADER(name)    if (!python_load_##name(module_object)) return;
 
 
 static PyObject *module_object = NULL;
 
 
-int load_all(PyObject *MODULE)
+PyMODINIT_FUNC initrservr(void)
 {
-	if (module_object) return 0;
+	module_object = Py_InitModule3("rservr", NULL, "Python bindings for librservr-client.");
+	if (!module_object) return;
 	ALL_BINDINGS(DECLARE_LOADER)
 	ALL_BINDINGS(CALL_LOADER)
-	module_object = MODULE;
-	return 1;
 }
 
 
@@ -61,20 +62,9 @@ static inline PyObject *get_class_object(const char *nName)
 	return object;
 }
 
-
-PyObject *new_handle_instance(const char *nName, const void *pPointer)
-{
-	if (!pPointer) return delay_exception(PyExc_ValueError, "");
-	PyObject *class_object = get_class_object(nName);
-	if (!class_object) return NULL;
-	PyObject *instance = PyObject_CallFunction(class_object, "l", (long) pPointer);
-	Py_XDECREF(class_object);
-	return instance;
-}
-
 int ATTR_HIDE check_instance(const char *nName, PyObject *oObject)
 {
-	PyErr_SetObject( PyErr_NewException("", NULL, NULL), NULL );
+	PyErr_Clear();
 	PyObject *class_object = get_class_object(nName);
 	if (!class_object) return 0;
 	int result = PyObject_IsInstance(oObject, class_object);
@@ -102,4 +92,56 @@ int ATTR_HIDE py_to_long(long *vValue, PyObject *oObject)
 	if ((value = PyInt_AsLong(oObject)) == -1 && PyErr_Occurred()) return delay_exception(PyExc_ValueError, "");
 	*vValue = value;
 	return 1;
+}
+
+
+int ATTR_HIDE py_to_info_list(info_list *vValue, PyObject *oObject)
+{
+	if (!PyList_Check(oObject)) return delay_exception(PyExc_TypeError, "");
+
+	Py_ssize_t list_size = PyList_Size(oObject);
+
+	text_info *text_list = calloc(list_size + 1, sizeof(text_info));
+	if (!text_list) return delay_exception(PyExc_RuntimeError, "");
+
+	int I = 0;
+	for (; I < (signed) list_size; I++)
+	{
+	text_info next_item = (text_info) strdup(PyString_AsString(PyList_GetItem(oObject, I)));
+	if (!next_item) break;
+	text_list[I] = next_item;
+	}
+
+	if (I != list_size)
+	{
+	while (I > 0) free(text_list[I--]);
+	free(text_list);
+	return delay_exception(PyExc_TypeError, "");
+	}
+
+	*vValue = (info_list) text_list;
+	return 1;
+}
+
+
+PyObject *info_list_to_py(info_list lList)
+{
+	unsigned int size = 0;
+	info_list current = lList;
+
+	if (current) while (current++) size++;
+
+	PyObject *new_list = PyList_New(size);
+	if (!new_list) return NULL;
+
+	current = lList;
+	int I = 0;
+	for (; I < (signed) size; I++)
+	if (!PyList_SetItem(new_list, I++, Py_BuildValue("i", current++)))
+	{
+	Py_XDECREF(new_list);
+	return NULL;
+	}
+
+	return new_list;
 }

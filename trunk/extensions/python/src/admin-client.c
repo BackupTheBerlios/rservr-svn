@@ -1,4 +1,4 @@
-#include "admin-client.h"
+#include <rservr/api/admin-client.h>
 
 #include "load-all.h"
 

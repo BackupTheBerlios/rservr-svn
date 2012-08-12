@@ -57,7 +57,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 extern "C" {
 #endif
 
-#include "api/command.h"
+#include "command.h"
 
 
 /*! Check a client, service, or immediate address name for validity.*/

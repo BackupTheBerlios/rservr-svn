@@ -1,4 +1,4 @@
-#include "rsvp-passthru.h"
+#include <rservr/plugins/rsvp-passthru.h>
 
 #include "load-all.h"
 

@@ -1,4 +1,4 @@
-#include "command.h"
+#include <rservr/api/command.h>
 
 #include "load-all.h"
 

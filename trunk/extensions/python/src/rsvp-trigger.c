@@ -1,4 +1,4 @@
-#include "rsvp-trigger.h"
+#include <rservr/plugins/rsvp-trigger.h>
 
 #include "load-all.h"
 

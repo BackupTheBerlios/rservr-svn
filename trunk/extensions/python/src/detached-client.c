@@ -1,4 +1,4 @@
-#include "detached-client.h"
+#include <rservr/api/detached-client.h>
 
 #include "load-all.h"
 

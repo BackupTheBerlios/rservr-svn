@@ -54,9 +54,7 @@ AC_CONFIG_FILES([ Makefile
                   programs/other/safexec/Makefile
                   programs/other/rsvbits/Makefile
                   programs/other/pipexec/Makefile
-                  programs/other/unsterm/Makefile
-                  extensions/Makefile
-                  extensions/python/Makefile ])
+                  programs/other/unsterm/Makefile ])
 
 AC_CONFIG_SRCDIR([param.h])
 

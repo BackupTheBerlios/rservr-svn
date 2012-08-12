@@ -1,4 +1,4 @@
-#include "config-parser.h"
+#include <rservr/config-parser.h>
 
 #include "load-all.h"
 
