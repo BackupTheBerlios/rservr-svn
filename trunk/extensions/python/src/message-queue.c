@@ -3,7 +3,18 @@
 #include "load-all.h"
 #include "python-macro.h"
 
-#include "command-queue.h"
+
+#define ALL_LONG_CONSTANTS(macro) \
+macro(RSERVR_QUEUE_START) \
+macro(RSERVR_QUEUE_STOP) \
+macro(RSERVR_QUEUE_BLOCK) \
+macro(RSERVR_QUEUE_UNBLOCK) \
+macro(RSERVR_QUEUE_MESSAGE) \
+macro(RSERVR_QUEUE_PAUSE) \
+macro(RSERVR_QUEUE_UNPAUSE)
+
+
+MESSAGE_QUEUE_ALL_GLOBAL_TYPES(TYPE_WRAPPER_COMPARE_DEFINE)
 
 
 #define ALL_MESSAGE_INFO_METHODS(macro) \
@@ -322,31 +333,42 @@ TYPE_BINDING_START(message_info, "proxy to 'struct message_info'")
 	,tp_getattro: (getattrofunc) &python_message_info_getattro
 	,tp_flags:    Py_TPFLAGS_DEFAULT
 	,tp_methods:  METHOD_BINDING_LIST(message_info)
+	,tp_compare:  (cmpfunc) &TYPE_WRAPPER_COMPARE(message_info)
 TYPE_BINDING_END(message_info)
 
 
 
 TYPE_BINDING_START(incoming_request_data, "proxy to 'struct incoming_request_data'")
+	,tp_flags:   Py_TPFLAGS_DEFAULT
+	,tp_compare: (cmpfunc) &TYPE_WRAPPER_COMPARE(incoming_request_data)
 TYPE_BINDING_END(incoming_request_data)
 
 
 
 TYPE_BINDING_START(incoming_response_data, "proxy to 'struct incoming_response_data'")
+	,tp_flags:   Py_TPFLAGS_DEFAULT
+	,tp_compare: (cmpfunc) &TYPE_WRAPPER_COMPARE(incoming_response_data)
 TYPE_BINDING_END(incoming_response_data)
 
 
 
 TYPE_BINDING_START(incoming_remote_data, "proxy to 'struct incoming_response_data'")
+	,tp_flags:   Py_TPFLAGS_DEFAULT
+	,tp_compare: (cmpfunc) &TYPE_WRAPPER_COMPARE(incoming_remote_data)
 TYPE_BINDING_END(incoming_remote_data)
 
 
 
 TYPE_BINDING_START(incoming_info_data, "proxy to 'struct incoming_response_data'")
+	,tp_flags:   Py_TPFLAGS_DEFAULT
+	,tp_compare: (cmpfunc) &TYPE_WRAPPER_COMPARE(incoming_info_data)
 TYPE_BINDING_END(incoming_info_data)
 
 
 
-TYPE_BINDING_START(message_handle, "proxy to 'message_handle'")
+TYPE_BINDING_START(message_handle, "'message_handle' wrapper")
+	,tp_flags:   Py_TPFLAGS_DEFAULT
+	,tp_compare: (cmpfunc) &TYPE_WRAPPER_COMPARE(message_handle)
 TYPE_BINDING_END(message_handle)
 
 
@@ -620,7 +642,7 @@ GLOBAL_BINDING_END(queue_sync_continue)
 
 
 GLOBAL_BINDING_START(current_message, "")
-	return new_python_message_info(current_message());
+	return NEW_TYPE_WRAPPER(message_info, current_message());
 GLOBAL_BINDING_END(current_message)
 
 
@@ -705,6 +727,7 @@ GLOBAL_BINDING_END(set_async_response)
 
 int python_load_message_queue(PyObject *mModule)
 {
+	ALL_LONG_CONSTANTS(LONG_CONSTANT)
 	ALL_GLOBAL_BINDINGS(LOAD_GLOBAL_BINDING)
 	MESSAGE_QUEUE_ALL_GLOBAL_TYPES(LOAD_GLOBAL_TYPE)
 	return 1;

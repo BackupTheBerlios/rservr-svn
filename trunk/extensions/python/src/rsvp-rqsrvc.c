@@ -3,7 +3,11 @@
 #include "load-all.h"
 
 
-int python_load_rsvp_rqsrvc(PyObject *mModule)
+static PyObject *module_object = NULL;
+
+
+PyMODINIT_FUNC initrsvp_rqsrvc(void)
 {
-	return 1;
+	module_object = Py_InitModule3("rsvp_rqsrvc", NULL, "Python bindings for librsvp-rqsrvc.");
+	if (!module_object) return;
 }

@@ -12,9 +12,9 @@
 static PyObject *module_object = NULL;
 
 
-PyMODINIT_FUNC initrservr(void)
+PyMODINIT_FUNC init_rservr(void)
 {
-	module_object = Py_InitModule3("rservr", NULL, "Python bindings for librservr-client.");
+	module_object = Py_InitModule3("_rservr", NULL, "Python bindings for librservr-client.");
 	if (!module_object) return;
 	ALL_BINDINGS(DECLARE_LOADER)
 	ALL_BINDINGS(CALL_LOADER)
@@ -114,8 +114,8 @@ int ATTR_HIDE py_to_info_list(info_list *vValue, PyObject *oObject)
 
 	if (I != list_size)
 	{
-	while (I > 0) free(text_list[I--]);
-	free(text_list);
+	while (I > 0) free((void*) text_list[I--]);
+	free((void*) text_list);
 	return delay_exception(PyExc_TypeError, "");
 	}
 

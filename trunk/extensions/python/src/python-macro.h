@@ -81,6 +81,16 @@ PyObject *new_python_##type(object pointer) { \
 NEW_TYPE_WRAPPER_DEFINE(type, const struct type*)
 
 
+#define TYPE_WRAPPER_COMPARE(type) \
+python_##type##_compare
+
+#define TYPE_WRAPPER_COMPARE_DEFINE(type) \
+static int TYPE_WRAPPER_COMPARE(type)(const TYPE_WRAPPER(type) *lLeft, const TYPE_WRAPPER(type) *rRight) { \
+  if (!lLeft || !rRight || !lLeft->pointer || !rRight->pointer) return delay_exception2(PyExc_IndexError, ""); \
+  if (lLeft->pointer == rRight->pointer) return 0; \
+  return (lLeft->pointer < rRight->pointer)? -1 : 1; }
+
+
 #define TYPE_BINDING(type) \
 python_##type##_type
 
@@ -126,7 +136,7 @@ static PyMethodDef name##_binding = {#name, (PyCFunction) &name##_function, METH
 if (!load_global_binding(MODULE, &name##_binding)) return 0;
 
 #define LOAD_GLOBAL_TYPE(name) \
-if (PyType_Ready(&python_##name##_type) < 0) return; \
+if (PyType_Ready(&python_##name##_type) < 0) return 0; \
 Py_INCREF(&python_##name##_type); \
 PyModule_AddObject(MODULE, #name, (PyObject*) &python_##name##_type);
 
@@ -143,6 +153,9 @@ return Py_BuildValue("");
 #define STATIC_KEYWORDS(name) \
 static char *name[]
 
+
+#define LONG_CONSTANT(name) \
+if (!load_long_constant(MODULE, #name, name)) return 0;
 
 #ifdef __cplusplus
 }

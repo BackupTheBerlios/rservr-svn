@@ -3,7 +3,11 @@
 #include "load-all.h"
 
 
-int python_load_rsvp_netcntl(PyObject *mModule)
+static PyObject *module_object = NULL;
+
+
+PyMODINIT_FUNC initrsvp_netcntl(void)
 {
-	return 1;
+	module_object = Py_InitModule3("rsvp_netcntl", NULL, "Python bindings for librsvp-netcntl.");
+	if (!module_object) return;
 }

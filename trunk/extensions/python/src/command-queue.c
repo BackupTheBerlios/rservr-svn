@@ -4,7 +4,12 @@
 #include "python-macro.h"
 
 
-TYPE_BINDING_START(command_handle, "proxy to 'command_handle'")
+COMMAND_QUEUE_ALL_GLOBAL_TYPES(TYPE_WRAPPER_COMPARE_DEFINE)
+
+
+TYPE_BINDING_START(command_handle, "'command_handle' wrapper")
+	,tp_flags:   Py_TPFLAGS_DEFAULT
+	,tp_compare: (cmpfunc) &TYPE_WRAPPER_COMPARE(command_handle)
 TYPE_BINDING_END(command_handle)
 
 

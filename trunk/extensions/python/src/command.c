@@ -1,6 +1,7 @@
 #include <rservr/api/command.h>
 
 #include "load-all.h"
+#include "python-macro.h"
 
 
 #define ALL_LONG_CONSTANTS(macro) \
@@ -98,10 +99,6 @@ macro(monitor_clients) \
 macro(client_scope_char) \
 macro(address_scope_char) \
 macro(standard_delimiter_char)
-
-
-#define LONG_CONSTANT(name) \
-if (!load_long_constant(MODULE, #name, name)) return 0;
 
 
 int python_load_command(PyObject *MODULE)

@@ -3,7 +3,11 @@
 #include "load-all.h"
 
 
-int python_load_rsvp_passthru(PyObject *mModule)
+static PyObject *module_object = NULL;
+
+
+PyMODINIT_FUNC initrsvp_passthru(void)
 {
-	return 1;
+	module_object = Py_InitModule3("rsvp_passthru", NULL, "Python bindings for librsvp-passthru.");
+	if (!module_object) return;
 }

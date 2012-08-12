@@ -3,7 +3,11 @@
 #include "load-all.h"
 
 
-int python_load_rsvp_trigger(PyObject *mModule)
+static PyObject *module_object = NULL;
+
+
+PyMODINIT_FUNC initrsvp_trigger(void)
 {
-	return 1;
+	module_object = Py_InitModule3("rsvp_trigger", NULL, "Python bindings for librsvp-trigger.");
+	if (!module_object) return;
 }

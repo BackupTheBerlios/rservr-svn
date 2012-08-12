@@ -3,7 +3,11 @@
 #include "load-all.h"
 
 
-int python_load_rsvp_dataref(PyObject *mModule)
+static PyObject *module_object = NULL;
+
+
+PyMODINIT_FUNC initrsvp_dataref(void)
 {
-	return 1;
+	module_object = Py_InitModule3("rsvp_dataref", NULL, "Python bindings for librsvp-dataref.");
+	if (!module_object) return;
 }

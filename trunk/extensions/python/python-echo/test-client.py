@@ -1,49 +1,54 @@
 #!/usr/bin/python
 
-import sys
-sys.path.insert(0, '.')
-
-import rservr
+import sys, rservr
 
 
 def queue_event_hook(event):
-    print 'there was an event: %s' % (str(event))
+    if event == rservr.RSERVR_QUEUE_MESSAGE:
+        while True:
+            try:
+                message = rservr.current_message()
+            except IndexError:
+                break
+            try:
+                if message.is_info():
+                    print >> sys.stderr, 'info message: "%s"' % (message.to_info_message())
+                    response = rservr.short_response(message, rservr.event_complete)
+                    rservr.send_command_no_status(response)
+                    rservr.destroy_command(response)
+                elif message.is_request():
+                    print >> sys.stderr, 'request message: "%s"' % (message.to_request_message())
+                    response = rservr.client_response(message, rservr.event_complete, message.to_request_message())
+                    rservr.send_command_no_status(response)
+                    rservr.destroy_command(response)
+                rservr.remove_message(message)
+            except (TypeError, IndexError, RuntimeError):
+                rservr.remove_message(message)
 
-rservr.set_queue_event_hook(queue_event_hook)
 
-
+print >> sys.stderr, 'initializing...'
 rservr.initialize_client()
+
+print >> sys.stderr, 'starting message queue...'
 rservr.start_message_queue()
 
+print >> sys.stderr, 'registering client...'
 rservr.register_resource_client()
-service = rservr.register_service(sys.argv[1] if len(sys.argv) >= 2 else '', 'test')
+
+print >> sys.stderr, 'registering service...'
+service = rservr.register_service(sys.argv[1] if len(sys.argv) >= 2 else '', 'echo')
 rservr.send_command_no_status(service)
 rservr.destroy_command(service)
 
-while True:
-    try:
-        rservr.message_queue_sync()
-    except RuntimeError:
-        quit()
-    try:
-        message = rservr.current_message()
-    except ValueError:
-        pass
-    try:
-        if message.is_info():
-            print 'info message: "%s"' % (message.to_info_message())
-            response = rservr.short_response(message, rservr.event_complete)
-            rservr.send_command_no_status(response)
-            rservr.destroy_command(response)
-        elif message.is_request():
-            print 'request message: "%s"' % (message.to_request_message())
-            response = rservr.client_response(message, rservr.event_complete, message.to_request_message())
-            rservr.send_command_no_status(response)
-            rservr.destroy_command(response)
-        rservr.remove_message(message)
-    except ValueError:
-        pass
 
-rservr.deregister_client()
+print >> sys.stderr, 'inlining message queue...'
+rservr.set_queue_event_hook(queue_event_hook)
 rservr.stop_message_queue()
+outcome = rservr.inline_message_queue()
+
+
+print >> sys.stderr, 'cleaning up...'
 rservr.client_cleanup()
+
+print >> sys.stderr, 'done.'
+quit(0 if outcome else 1)
