@@ -9,6 +9,8 @@ extern "C" {
 
 #include "load-all.h"
 
+#include "rservr.h"
+
 
 #define TYPE_PREFIX "rservr."
 
@@ -32,6 +34,15 @@ static inline int __attribute__ ((warn_unused_result)) delay_exception2(PyObject
 {
 	PyErr_SetString(eException, mMessage);
 	return -1;
+}
+
+
+static inline PyObject __attribute__ ((warn_unused_result)) *thread_started(const char *mMessage)
+{
+	PyObject *thread_exception = get_module_object(rservr_module, "ThreadStarted");
+	PyErr_SetString(thread_exception, mMessage);
+	Py_XDECREF(thread_exception);
+	return NULL;
 }
 
 
@@ -141,6 +152,10 @@ if (!PyArg_ParseTuple(ARGS, "")) return NULL;
 #define NO_RETURN \
 return Py_BuildValue("");
 
+#define BOOL_RETURN(value) { \
+  if (value) Py_RETURN_TRUE; \
+  else       Py_RETURN_FALSE; }
+
 #define STATIC_KEYWORDS(name) \
 static char *name[]
 
@@ -185,11 +200,32 @@ if (!HOOK || !PyCallable_Check(HOOK)) { \
   Py_XDECREF(HOOK); \
   return default; }
 
-#define DEFAULT_CALL_HOOK_CALLBACK(args) \
-PyObject *VALUE = PyEval_CallObject(HOOK, args); \
-PyErr_Clear(); \
-Py_XDECREF(HOOK); \
-if (!VALUE) return event_error;
+#define DEFAULT_CALL_HOOK_CALLBACK(args, default) \
+PyObject *VALUE = NULL; \
+{ PyObject *callback_args = args; \
+  VALUE = PyEval_CallObject(HOOK, args); \
+  PyErr_Clear(); \
+  Py_XDECREF(callback_args); \
+  Py_XDECREF(HOOK); \
+  if (!VALUE) return default; }
+
+#define DEFAULT_HOOK_RETURN { \
+  if (VALUE == Py_None) { \
+    Py_DECREF(VALUE); \
+    return event_none; } \
+  long status = 0; \
+  int outcome = py_to_long(&status, VALUE); \
+  Py_XDECREF(VALUE); \
+  return outcome? status : event_discarded; }
+
+#define DEFAULT_HOOK_VOID \
+Py_XDECREF(VALUE);
+
+#define DEFAULT_THREAD_RETURN(call) { \
+  int outcome = call; \
+  if (outcome < 0) return auto_exception(PyExc_RuntimeError, ""); \
+  if (outcome == 0) return thread_started(""); \
+  NO_RETURN }
 
 #ifdef __cplusplus
 }

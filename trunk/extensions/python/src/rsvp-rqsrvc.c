@@ -11,7 +11,7 @@
 #include "command-queue.h"
 
 
-const struct rqsrvc_source_info ATTR_INT *auto_rqsrvc_source_info(PyObject *object);
+const struct rqsrvc_source_info ATTR_INT *auto_rqsrvc_source_info(PyObject*);
 
 
 #define ALL_HOOK_FUNCTIONS(macro) \
@@ -161,14 +161,14 @@ PyMODINIT_FUNC initrsvp_rqsrvc(void)
 
 
 
-const struct rqsrvc_source_info *auto_rqsrvc_source_info(PyObject *object)
+const struct rqsrvc_source_info *auto_rqsrvc_source_info(PyObject *oObject)
 {
 	const struct rqsrvc_source_info *info = NULL;
 
-	if (check_instance(module_object, "rqsrvc_source_info", object))
+	if (check_instance(module_object, "rqsrvc_source_info", oObject))
 	{
-	if (!object || !((TYPE_WRAPPER(rqsrvc_source_info)*) object)->pointer) return auto_exception(PyExc_IndexError, "");
-	info = ((TYPE_WRAPPER(rqsrvc_source_info)*) object)->pointer;
+	if (!oObject || !((TYPE_WRAPPER(rqsrvc_source_info)*) oObject)->pointer) return auto_exception(PyExc_IndexError, "");
+	info = ((TYPE_WRAPPER(rqsrvc_source_info)*) oObject)->pointer;
 	}
 
 	else return auto_exception(PyExc_TypeError, "");
@@ -183,12 +183,9 @@ command_event __rsvp_rqsrvc_hook_register_services(const struct rqsrvc_source_in
 	DEFAULT_HOOK_FUNCTION_HEAD(__rsvp_rqsrvc_hook_register_services, \
 	  rsvp_rqsrvc_auto_hook_register_services(iInfo, tType))
 
-	DEFAULT_CALL_HOOK_CALLBACK(Py_BuildValue("(Os)", NEW_TYPE_WRAPPER(rqsrvc_source_info, iInfo), tType))
+	DEFAULT_CALL_HOOK_CALLBACK(Py_BuildValue("(Os)", NEW_TYPE_WRAPPER(rqsrvc_source_info, iInfo), tType), event_error)
 
-	long status = 0;
-	int outcome = py_to_long(&status, VALUE);
-	Py_XDECREF(VALUE);
-	return outcome? status : event_discarded;
+	DEFAULT_HOOK_RETURN
 }
 
 
@@ -198,12 +195,9 @@ command_event __rsvp_rqsrvc_hook_deregister_services(const struct rqsrvc_source_
 	DEFAULT_HOOK_FUNCTION_HEAD(__rsvp_rqsrvc_hook_deregister_services, \
 	  rsvp_rqsrvc_auto_hook_deregister_services(iInfo, tType))
 
-	DEFAULT_CALL_HOOK_CALLBACK(Py_BuildValue("(Os)", NEW_TYPE_WRAPPER(rqsrvc_source_info, iInfo), tType))
+	DEFAULT_CALL_HOOK_CALLBACK(Py_BuildValue("(Os)", NEW_TYPE_WRAPPER(rqsrvc_source_info, iInfo), tType), event_error)
 
-	long status = 0;
-	int outcome = py_to_long(&status, VALUE);
-	Py_XDECREF(VALUE);
-	return outcome? status : event_discarded;
+	DEFAULT_HOOK_RETURN
 }
 
 

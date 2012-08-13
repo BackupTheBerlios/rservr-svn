@@ -56,7 +56,7 @@ GLOBAL_BINDING_END(isolate_client)
 
 GLOBAL_BINDING_START(check_ipc_status, "")
 	NO_ARGUMENTS
-	return Py_BuildValue("i", check_ipc_status());
+	BOOL_RETURN(check_ipc_status())
 GLOBAL_BINDING_END(check_ipc_status)
 
 
@@ -95,7 +95,7 @@ GLOBAL_BINDING_END(ping_server)
 
 
 GLOBAL_BINDING_START(short_response, "")
-	STATIC_KEYWORDS(keywords) = { "handle", "event", NULL };
+	STATIC_KEYWORDS(keywords) = { "message", "event", NULL };
 	PyObject *object = NULL;
 	long event = 0;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "Oi", keywords, &object, &event)) return NULL;
@@ -107,7 +107,7 @@ GLOBAL_BINDING_END(short_response)
 
 
 GLOBAL_BINDING_START(client_response, "")
-	STATIC_KEYWORDS(keywords) = { "handle", "event", "data", NULL };
+	STATIC_KEYWORDS(keywords) = { "message", "event", "data", NULL };
 	PyObject *object = NULL;
 	long event = 0;
 	const char *data = NULL;
@@ -120,16 +120,22 @@ GLOBAL_BINDING_END(client_response)
 
 
 GLOBAL_BINDING_START(client_response_list, "")
-	STATIC_KEYWORDS(keywords) = { "handle", "event", "data", NULL };
+	STATIC_KEYWORDS(keywords) = { "message", "event", "data", NULL };
 	PyObject *object = NULL;
 	long event = 0;
 	PyObject *data = NULL;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "OiO", keywords, &object, &event, &data)) return NULL;
 	message_handle message = auto_message_handle(object);
 	if (!message) return NULL;
-	info_list list = NULL;
+	info_list list = NULL, current = NULL;
 	if (!py_to_info_list(&list, data)) return NULL;
-	return NEW_TYPE_WRAPPER(command_handle, client_response_list(message, event, list));
+	PyObject *command = NEW_TYPE_WRAPPER(command_handle, client_response_list(message, event, list));
+	if ((current = list))
+	{
+	while (*current) free((void*) *current++);
+	free((void*) list);
+	}
+	return command;
 GLOBAL_BINDING_END(client_response_list)
 
 
@@ -174,7 +180,7 @@ GLOBAL_BINDING_END(return_terminal)
 
 GLOBAL_BINDING_START(terminal_control, "")
 	NO_ARGUMENTS
-	return Py_BuildValue("i", terminal_control());
+	BOOL_RETURN(terminal_control())
 GLOBAL_BINDING_END(terminal_control)
 
 

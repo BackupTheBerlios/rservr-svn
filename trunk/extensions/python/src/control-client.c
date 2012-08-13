@@ -15,7 +15,7 @@ macro(find_control_clients)
 GLOBAL_BINDING_START(register_control_client, "")
 	STATIC_KEYWORDS(keywords) = { "name", NULL };
 	const char *name = NULL;
-	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "|s", keywords, &name)) return NULL;
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "s", keywords, &name)) return NULL;
 	if (!register_control_client(name)) return auto_exception(PyExc_RuntimeError, "");
 	NO_RETURN
 GLOBAL_BINDING_END(register_control_client)

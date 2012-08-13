@@ -21,7 +21,7 @@ GLOBAL_BINDING_END(find_services)
 
 
 GLOBAL_BINDING_START(insert_service_address, "")
-	STATIC_KEYWORDS(keywords) = { "handle", "name", NULL };
+	STATIC_KEYWORDS(keywords) = { "command", "name", NULL };
 	PyObject *object = NULL;
 	const char *name = NULL;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "Os", keywords, &object, &name)) return NULL;

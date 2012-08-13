@@ -13,3 +13,5 @@ PyMODINIT_FUNC initrsvp_ready(void)
 	module_object = Py_InitModule3("rsvp_ready", NULL, "Python bindings for librsvp-ready.");
 	if (!module_object) return;
 }
+
+#warning IMPLEMENT THE PLUGIN!

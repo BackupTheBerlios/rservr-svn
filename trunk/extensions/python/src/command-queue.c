@@ -43,7 +43,7 @@ macro(blocking_send_status)
 
 
 GLOBAL_BINDING_START(change_command_priority, "")
-	STATIC_KEYWORDS(keywords) = { "handle", "priority", NULL };
+	STATIC_KEYWORDS(keywords) = { "command", "priority", NULL };
 	PyObject *object = NULL;
 	int priority = 0;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "Oi", keywords, &object, priority)) return NULL;
@@ -56,7 +56,7 @@ GLOBAL_BINDING_END(change_command_priority)
 
 
 GLOBAL_BINDING_START(send_command, "")
-	STATIC_KEYWORDS(keywords) = { "handle", NULL };
+	STATIC_KEYWORDS(keywords) = { "command", NULL };
 	PyObject *object = NULL;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "O", keywords, &object)) return NULL;
 	command_handle command = auto_command_handle(object);
@@ -69,7 +69,7 @@ GLOBAL_BINDING_END(send_command)
 
 
 GLOBAL_BINDING_START(send_command_no_status, "")
-	STATIC_KEYWORDS(keywords) = { "handle", NULL };
+	STATIC_KEYWORDS(keywords) = { "command", NULL };
 	PyObject *object = NULL;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "O", keywords, &object)) return NULL;
 	command_handle command = auto_command_handle(object);
@@ -94,7 +94,7 @@ GLOBAL_BINDING_END(send_command_callbacks)
 
 
 GLOBAL_BINDING_START(destroy_command, "")
-	STATIC_KEYWORDS(keywords) = { "handle", NULL };
+	STATIC_KEYWORDS(keywords) = { "command", NULL };
 	PyObject *object = NULL;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "O", keywords, &object)) return NULL;
 	command_handle command = auto_command_handle(object);
@@ -153,7 +153,7 @@ GLOBAL_BINDING_END(clear_command_status)
 
 
 GLOBAL_BINDING_START(insert_remote_address, "")
-	STATIC_KEYWORDS(keywords) = { "handle", "address", NULL };
+	STATIC_KEYWORDS(keywords) = { "command", "address", NULL };
 	PyObject *object = NULL;
 	const char *address = NULL;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "Os", keywords, &object, &address)) return NULL;
@@ -166,7 +166,7 @@ GLOBAL_BINDING_END(insert_remote_address)
 
 
 GLOBAL_BINDING_START(insert_remote_target, "")
-	STATIC_KEYWORDS(keywords) = { "handle", "client", "location", NULL };
+	STATIC_KEYWORDS(keywords) = { "command", "client", "location", NULL };
 	PyObject *object = NULL;
 	const char *client = NULL, *location = NULL;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "Os", keywords, &object, &client, &location)) return NULL;
@@ -179,7 +179,7 @@ GLOBAL_BINDING_END(insert_remote_target)
 
 
 GLOBAL_BINDING_START(set_target_to_server_of, "")
-	STATIC_KEYWORDS(keywords) = { "handle", "client", "location", NULL };
+	STATIC_KEYWORDS(keywords) = { "command", "client", "location", NULL };
 	PyObject *object = NULL;
 	const char *client = NULL, *location = NULL;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "Os", keywords, &object, &client, &location)) return NULL;
@@ -209,7 +209,7 @@ GLOBAL_BINDING_END(blocking_send)
 
 GLOBAL_BINDING_START(blocking_send_status, "")
 	NO_ARGUMENTS
-	return Py_BuildValue("i", blocking_send_status());
+	BOOL_RETURN(blocking_send_status());
 GLOBAL_BINDING_END(blocking_send_status)
 
 
@@ -223,14 +223,14 @@ int python_load_command_queue(PyObject *MODULE)
 
 
 
-command_handle auto_command_handle(PyObject *object)
+command_handle auto_command_handle(PyObject *oObject)
 {
 	command_handle command = NULL;
 
-	if (check_instance(module_object, "command_handle", object))
+	if (check_instance(rservr_module, "command_handle", oObject))
 	{
-	if (!object || !((TYPE_WRAPPER(command_handle)*) object)->pointer) return auto_exception(PyExc_IndexError, "");
-	command = ((TYPE_WRAPPER(command_handle)*) object)->pointer;
+	if (!oObject || !((TYPE_WRAPPER(command_handle)*) oObject)->pointer) return auto_exception(PyExc_IndexError, "");
+	command = ((TYPE_WRAPPER(command_handle)*) oObject)->pointer;
 	}
 
 	else return auto_exception(PyExc_TypeError, "");

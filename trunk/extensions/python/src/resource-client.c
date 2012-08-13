@@ -71,7 +71,7 @@ GLOBAL_BINDING_END(deregister_remote_services)
 
 
 GLOBAL_BINDING_START(set_alternate_sender, "")
-	STATIC_KEYWORDS(keywords) = { "handle", "name", NULL };
+	STATIC_KEYWORDS(keywords) = { "command", "name", NULL };
 	PyObject *object = NULL;
 	const char *name = NULL;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "Os", keywords, &object, &name)) return NULL;

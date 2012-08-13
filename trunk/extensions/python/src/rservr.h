@@ -4,6 +4,6 @@
 #include <Python.h>
 
 
-extern PyObject *module_object;
+extern PyObject *rservr_module;
 
 #endif /*python_rservr_h*/

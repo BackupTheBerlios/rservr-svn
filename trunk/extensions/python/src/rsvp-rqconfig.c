@@ -13,3 +13,5 @@ PyMODINIT_FUNC initrsvp_rqconfig(void)
 	module_object = Py_InitModule3("rsvp_rqconfig", NULL, "Python bindings for librsvp-rqconfig.");
 	if (!module_object) return;
 }
+
+#warning IMPLEMENT THE PLUGIN!
