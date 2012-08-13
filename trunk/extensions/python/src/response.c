@@ -3,7 +3,7 @@
 #include "load-all.h"
 
 
-int python_load_response(PyObject *mModule)
+int python_load_response(PyObject *MODULE)
 {
 	return 1;
 }

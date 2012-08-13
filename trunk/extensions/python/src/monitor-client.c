@@ -3,7 +3,7 @@
 #include "load-all.h"
 
 
-int python_load_monitor_client(PyObject *mModule)
+int python_load_monitor_client(PyObject *MODULE)
 {
 	return 1;
 }

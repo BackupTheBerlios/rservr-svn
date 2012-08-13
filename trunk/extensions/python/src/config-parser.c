@@ -3,7 +3,7 @@
 #include "load-all.h"
 
 
-int python_load_config_parser(PyObject *mModule)
+int python_load_config_parser(PyObject *MODULE)
 {
 	return 1;
 }

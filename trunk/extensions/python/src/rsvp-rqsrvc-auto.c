@@ -3,7 +3,7 @@
 #include "load-all.h"
 
 
-int python_load_rsvp_rqsrvc_auto(PyObject *mModule)
+int python_load_rsvp_rqsrvc_auto(PyObject *MODULE)
 {
 	return 1;
 }

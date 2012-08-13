@@ -33,7 +33,7 @@ GLOBAL_BINDING_END(insert_service_address)
 
 
 
-int python_load_service_client(PyObject *mModule)
+int python_load_service_client(PyObject *MODULE)
 {
 	ALL_GLOBAL_BINDINGS(LOAD_GLOBAL_BINDING)
 	return 1;

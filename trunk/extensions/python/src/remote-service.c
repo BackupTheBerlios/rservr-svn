@@ -3,7 +3,7 @@
 #include "load-all.h"
 
 
-int python_load_remote_service(PyObject *mModule)
+int python_load_remote_service(PyObject *MODULE)
 {
 	return 1;
 }

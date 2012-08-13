@@ -3,6 +3,8 @@
 #include "load-all.h"
 #include "python-macro.h"
 
+#include "rservr.h"
+
 
 #define ALL_LONG_CONSTANTS(macro) \
 macro(RSERVR_QUEUE_START) \
@@ -319,7 +321,7 @@ static PyObject *python_message_info_getattro(python_message_info *self, PyObjec
 	return Py_BuildValue("s", self->pointer->command_name);
 	}
 
-	else return PyObject_GenericGetAttr(self, name_object);
+	else return PyObject_GenericGetAttr((PyObject*) self, name_object);
 }
 
 
@@ -593,11 +595,12 @@ GLOBAL_BINDING_END(block_remote_status)
 
 
 static PyObject *python_queue_event_hook = NULL;
+static queue_event_hook old_queue_event_hook = NULL;
 
 static void queue_event_hook_wrapper(int eEvent)
 {
 	if (python_queue_event_hook && PyCallable_Check(python_queue_event_hook))
-	PyEval_CallObject(python_queue_event_hook, Py_BuildValue("(i)", eEvent));
+	Py_XDECREF(PyEval_CallObject(python_queue_event_hook, Py_BuildValue("(i)", eEvent)));
 }
 
 
@@ -609,14 +612,21 @@ GLOBAL_BINDING_START(set_queue_event_hook, "")
 	if (function != Py_None)
 	{
 	if (!function || !PyCallable_Check(function)) return auto_exception(PyExc_TypeError, "");
-	set_queue_event_hook(&queue_event_hook_wrapper);
+	if (!old_queue_event_hook)
+	 {
+	queue_event_hook last_queue_event_hook = set_queue_event_hook(&queue_event_hook_wrapper);
+	if (last_queue_event_hook != &queue_event_hook_wrapper) old_queue_event_hook = last_queue_event_hook;
+	 }
 	}
 
 	else
-	set_queue_event_hook(NULL);
+	{
+	queue_event_hook last_queue_event_hook = set_queue_event_hook(old_queue_event_hook);
+	if (last_queue_event_hook != &queue_event_hook_wrapper) set_queue_event_hook(last_queue_event_hook);
+	old_queue_event_hook = NULL;
+	}
 
 	Py_INCREF(function);
-	Py_XDECREF(python_queue_event_hook);
 	PyObject *old_function = python_queue_event_hook;
 	python_queue_event_hook = function;
 
@@ -725,7 +735,7 @@ GLOBAL_BINDING_END(set_async_response)
 
 
 
-int python_load_message_queue(PyObject *mModule)
+int python_load_message_queue(PyObject *MODULE)
 {
 	ALL_LONG_CONSTANTS(LONG_CONSTANT)
 	ALL_GLOBAL_BINDINGS(LOAD_GLOBAL_BINDING)
@@ -735,20 +745,20 @@ int python_load_message_queue(PyObject *mModule)
 
 
 
-PyObject *auto_message_handle(PyObject *object)
+message_handle auto_message_handle(PyObject *object)
 {
 	message_handle message = NULL;
 
-	if (check_instance("message_info", object))
+	if (check_instance(module_object, "message_info", object))
 	{
 	if (!object || !((TYPE_WRAPPER(message_info)*) object)->pointer) return auto_exception(PyExc_IndexError, "");
 	message = (message_handle) ((TYPE_WRAPPER(message_info)*) object)->pointer;
 	}
 
-	else if (check_instance("message_handle", object))
+	else if (check_instance(module_object, "message_handle", object))
 	{
 	if (!object || !((TYPE_WRAPPER(message_handle)*) object)->pointer) return auto_exception(PyExc_IndexError, "");
-	message = (message_handle) ((TYPE_WRAPPER(message_handle)*) object)->pointer;
+	message = ((TYPE_WRAPPER(message_handle)*) object)->pointer;
 	}
 
 	else return auto_exception(PyExc_TypeError, "");

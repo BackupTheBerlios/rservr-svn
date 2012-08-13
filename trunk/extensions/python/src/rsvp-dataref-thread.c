@@ -3,7 +3,7 @@
 #include "load-all.h"
 
 
-int python_load_rsvp_dataref_thread(PyObject *mModule)
+int python_load_rsvp_dataref_thread(PyObject *MODULE)
 {
 	return 1;
 }

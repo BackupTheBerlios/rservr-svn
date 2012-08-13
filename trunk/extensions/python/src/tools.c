@@ -3,7 +3,7 @@
 #include "load-all.h"
 
 
-int python_load_tools(PyObject *mModule)
+int python_load_tools(PyObject *MODULE)
 {
 	return 1;
 }

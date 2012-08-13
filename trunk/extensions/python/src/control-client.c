@@ -31,7 +31,7 @@ GLOBAL_BINDING_END(find_control_clients)
 
 
 
-int python_load_control_client(PyObject *mModule)
+int python_load_control_client(PyObject *MODULE)
 {
 	ALL_GLOBAL_BINDINGS(LOAD_GLOBAL_BINDING)
 	return 1;

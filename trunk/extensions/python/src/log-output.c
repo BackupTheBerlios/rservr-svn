@@ -3,7 +3,7 @@
 #include "load-all.h"
 
 
-int python_load_log_output(PyObject *mModule)
+int python_load_log_output(PyObject *MODULE)
 {
 	return 1;
 }

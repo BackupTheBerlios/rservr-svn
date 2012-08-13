@@ -30,7 +30,7 @@ MESSAGE_QUEUE_POINTER_GLOBAL_TYPES(NEW_POINTER_TYPE_WRAPPER_DECLARE)
 NEW_TYPE_WRAPPER_DECLARE(message_handle, message_handle)
 
 
-PyObject ATTR_INT *auto_message_handle(PyObject *object);
+extern message_handle auto_message_handle(PyObject *object);
 
 #ifdef __cplusplus
 }

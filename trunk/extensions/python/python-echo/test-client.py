@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, rservr
+import sys, rservr, rservr.rsvp_rqsrvc
 
 
 def queue_event_hook(event):
@@ -26,6 +26,12 @@ def queue_event_hook(event):
                 rservr.remove_message(message)
 
 
+def __rsvp_rqsrvc_auto_hook_type_check(type_string, name_string):
+    return len(name_string) and type_string == 'echo'
+
+rservr.rsvp_rqsrvc.__rsvp_rqsrvc_auto_hook_type_check = __rsvp_rqsrvc_auto_hook_type_check
+
+
 print >> sys.stderr, 'initializing...'
 rservr.initialize_client()
 
@@ -36,16 +42,19 @@ print >> sys.stderr, 'registering client...'
 rservr.register_resource_client()
 
 print >> sys.stderr, 'registering service...'
-service = rservr.register_service(sys.argv[1] if len(sys.argv) >= 2 else '', 'echo')
+service = rservr.register_service(sys.argv[1] if len(sys.argv) >= 2 else 'test-client', 'echo')
 rservr.send_command_no_status(service)
 rservr.destroy_command(service)
 
 
 print >> sys.stderr, 'inlining message queue...'
-rservr.set_queue_event_hook(queue_event_hook)
 rservr.stop_message_queue()
-outcome = rservr.inline_message_queue()
+rservr.set_queue_event_hook(queue_event_hook)
 
+try:
+    outcome = rservr.inline_message_queue()
+except RuntimeError:
+    outcome = False
 
 print >> sys.stderr, 'cleaning up...'
 rservr.client_cleanup()

@@ -3,6 +3,8 @@
 #include "load-all.h"
 #include "python-macro.h"
 
+#include "rservr.h"
+
 
 COMMAND_QUEUE_ALL_GLOBAL_TYPES(TYPE_WRAPPER_COMPARE_DEFINE)
 
@@ -37,15 +39,6 @@ macro(set_target_to_server_of) \
 macro(nonblocking_send) \
 macro(blocking_send) \
 macro(blocking_send_status)
-// macro(extract_remote_command) \
-// macro(send_stream_command) \
-// macro(filtered_send_stream_command) \
-// macro(insert_remote_command) \
-// macro(residual_stream_input) \
-// macro(buffered_receive_stream_command) \
-// macro(filtered_receive_stream_command) \
-// macro(buffered_residual_stream_input) \
-// macro(get_next_address)
 
 
 
@@ -221,61 +214,7 @@ GLOBAL_BINDING_END(blocking_send_status)
 
 
 
-// GLOBAL_BINDING_START(extract_remote_command, "")
-// 	NOT_IMPLEMENTED
-// GLOBAL_BINDING_END(extract_remote_command)
-//
-//
-//
-// GLOBAL_BINDING_START(send_stream_command, "")
-// 	NOT_IMPLEMENTED
-// GLOBAL_BINDING_END(send_stream_command)
-//
-//
-//
-// GLOBAL_BINDING_START(filtered_send_stream_command, "")
-// 	NOT_IMPLEMENTED
-// GLOBAL_BINDING_END(filtered_send_stream_command)
-//
-//
-//
-// GLOBAL_BINDING_START(insert_remote_command, "")
-// 	NOT_IMPLEMENTED
-// GLOBAL_BINDING_END(insert_remote_command)
-//
-//
-//
-// GLOBAL_BINDING_START(residual_stream_input, "")
-// 	NOT_IMPLEMENTED
-// GLOBAL_BINDING_END(residual_stream_input)
-//
-//
-//
-// GLOBAL_BINDING_START(buffered_receive_stream_command, "")
-// 	NOT_IMPLEMENTED
-// GLOBAL_BINDING_END(buffered_receive_stream_command)
-//
-//
-//
-// GLOBAL_BINDING_START(filtered_receive_stream_command, "")
-// 	NOT_IMPLEMENTED
-// GLOBAL_BINDING_END(filtered_receive_stream_command)
-//
-//
-//
-// GLOBAL_BINDING_START(buffered_residual_stream_input, "")
-// 	NOT_IMPLEMENTED
-// GLOBAL_BINDING_END(buffered_residual_stream_input)
-//
-//
-//
-// GLOBAL_BINDING_START(get_next_address, "")
-// 	NOT_IMPLEMENTED
-// GLOBAL_BINDING_END(get_next_address)
-
-
-
-int python_load_command_queue(PyObject *mModule)
+int python_load_command_queue(PyObject *MODULE)
 {
 	ALL_GLOBAL_BINDINGS(LOAD_GLOBAL_BINDING)
 	COMMAND_QUEUE_ALL_GLOBAL_TYPES(LOAD_GLOBAL_TYPE)
@@ -284,14 +223,14 @@ int python_load_command_queue(PyObject *mModule)
 
 
 
-PyObject *auto_command_handle(PyObject *object)
+command_handle auto_command_handle(PyObject *object)
 {
 	command_handle command = NULL;
 
-	if (check_instance("command_handle", object))
+	if (check_instance(module_object, "command_handle", object))
 	{
 	if (!object || !((TYPE_WRAPPER(command_handle)*) object)->pointer) return auto_exception(PyExc_IndexError, "");
-	command = (command_handle) ((TYPE_WRAPPER(command_handle)*) object)->pointer;
+	command = ((TYPE_WRAPPER(command_handle)*) object)->pointer;
 	}
 
 	else return auto_exception(PyExc_TypeError, "");

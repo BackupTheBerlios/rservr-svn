@@ -3,7 +3,7 @@
 #include "load-all.h"
 
 
-int python_load_label_check(PyObject *mModule)
+int python_load_label_check(PyObject *MODULE)
 {
 	return 1;
 }

@@ -23,6 +23,8 @@ include src/remote-service.c
 include src/request.c
 include src/resource-client.c
 include src/response.c
+include src/rservr.c
+include src/rservr.h
 include src/rsvp-dataref-hook.c
 include src/rsvp-dataref-thread.c
 include src/rsvp-dataref.c

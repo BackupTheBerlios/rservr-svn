@@ -5,22 +5,6 @@
 #include "python-macro.h"
 
 
-#define DECLARE_LOADER(name) python_load_function python_load_##name;
-#define CALL_LOADER(name)    if (!python_load_##name(module_object)) return;
-
-
-static PyObject *module_object = NULL;
-
-
-PyMODINIT_FUNC init_rservr(void)
-{
-	module_object = Py_InitModule3("_rservr", NULL, "Python bindings for librservr-client.");
-	if (!module_object) return;
-	ALL_BINDINGS(DECLARE_LOADER)
-	ALL_BINDINGS(CALL_LOADER)
-}
-
-
 int load_global_binding(PyObject *MODULE, PyMethodDef *bBinding)
 {
 	if (!bBinding || !bBinding->ml_name || !MODULE) return 0;
@@ -54,18 +38,30 @@ int load_double_constant(PyObject *MODULE, const char *nName, double vValue)
 }
 
 
-static inline PyObject *get_class_object(const char *nName)
+int load_none_value(PyObject *MODULE, const char *nName)
+{
+	Py_INCREF(Py_None);
+	if (!PyModule_AddObject(MODULE, nName, Py_None) != 0)
+	{
+	Py_XDECREF(Py_None);
+	return 0;
+	}
+	return 1;
+}
+
+
+PyObject *get_module_object(PyObject *MODULE, const char *nName)
 {
 	PyObject *string = Py_BuildValue("s", nName);
-	PyObject *object = PyObject_GetAttr(module_object, string);
+	PyObject *object = PyObject_GetAttr(MODULE, string);
 	Py_XDECREF(string);
 	return object;
 }
 
-int ATTR_HIDE check_instance(const char *nName, PyObject *oObject)
+int check_instance(PyObject *MODULE, const char *nName, PyObject *oObject)
 {
 	PyErr_Clear();
-	PyObject *class_object = get_class_object(nName);
+	PyObject *class_object = get_module_object(MODULE, nName);
 	if (!class_object) return 0;
 	int result = PyObject_IsInstance(oObject, class_object);
 	Py_XDECREF(class_object);
@@ -75,7 +71,7 @@ int ATTR_HIDE check_instance(const char *nName, PyObject *oObject)
 
 
 
-int ATTR_HIDE py_to_double(double *vValue, PyObject *oObject)
+int py_to_double(double *vValue, PyObject *oObject)
 {
 	double value = 0;
 	if (!oObject) return delay_exception(PyExc_TypeError, "");
@@ -85,7 +81,7 @@ int ATTR_HIDE py_to_double(double *vValue, PyObject *oObject)
 }
 
 
-int ATTR_HIDE py_to_long(long *vValue, PyObject *oObject)
+int py_to_long(long *vValue, PyObject *oObject)
 {
 	long value = 0;
 	if (!oObject) return delay_exception(PyExc_TypeError, "");
@@ -95,7 +91,7 @@ int ATTR_HIDE py_to_long(long *vValue, PyObject *oObject)
 }
 
 
-int ATTR_HIDE py_to_info_list(info_list *vValue, PyObject *oObject)
+int py_to_info_list(info_list *vValue, PyObject *oObject)
 {
 	if (!PyList_Check(oObject)) return delay_exception(PyExc_TypeError, "");
 

@@ -1,5 +1,4 @@
-import os, distutils.core
-
+import os, distutils.core, distutils.sysconfig
 
 try:
     prefix_paths = [os.environ['RSERVR_PREFIX']]
@@ -30,10 +29,20 @@ extra_libs = {
     'rqsrvc': ['rsvp-rqsrvc-auto'],
     'trigger': [] }
 
+extra_objects = {
+    'dataref': [],
+    'netcntl': [],
+    'passthru': [],
+    'ready': [],
+    'rqconfig': [],
+    'rqsrvc': ['_rservr.so'],
+    'trigger': [] }
+
 
 ext_modules = [
     distutils.core.Extension(name = 'rservr._rservr',
         sources = [
+        'src/rservr.c',
         'src/load-all.c',
         'src/command.c',
         'src/client.c',
@@ -59,12 +68,15 @@ ext_modules = [
         include_dirs = include_search_paths)] + [
     distutils.core.Extension(name = 'rservr.rsvp_' + submodules[i],
         sources = [
+        'src/load-all.c',
         'src/rsvp-' + submodules[i] + '-hook.c',
         'src/rsvp-' + submodules[i] + '.c'] + extra_files[submodules[i]],
-        libraries = ['rservr-client', 'rsvp-' + submodules[i]] + extra_libs[submodules[i]],
+        libraries = ['rservr-client'] + extra_libs[submodules[i]] + ['rsvp-' + submodules[i]],
+        extra_objects = extra_objects[submodules[i]],
         include_dirs = include_search_paths,
         library_dirs = libexec_search_paths,
-        runtime_library_dirs = libexec_search_paths) for i in range(len(submodules))]
+        runtime_library_dirs = libexec_search_paths + [distutils.sysconfig.get_python_lib()])
+    for i in range(len(submodules))]
 
 
 distutils.core.setup(name = 'rservr', version = '0.1', packages = ['rservr'],

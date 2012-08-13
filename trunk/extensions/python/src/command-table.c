@@ -3,7 +3,7 @@
 #include "load-all.h"
 
 
-int python_load_command_table(PyObject *mModule)
+int python_load_command_table(PyObject *MODULE)
 {
 	return 1;
 }

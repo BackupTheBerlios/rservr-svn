@@ -62,7 +62,7 @@ DEFINE_TYPE_WRAPPER(type, const struct type*)
 new_python_##type(pointer)
 
 #define NEW_TYPE_WRAPPER_DECLARE(type, object) \
-PyObject ATTR_INT *new_python_##type(object);
+extern PyObject *new_python_##type(object);
 
 #define NEW_POINTER_TYPE_WRAPPER_DECLARE(type) \
 NEW_TYPE_WRAPPER_DECLARE(type, const struct type*);
@@ -132,15 +132,6 @@ static PyObject *name##_function(PyObject *SELF, PyObject *ARGS, PyObject *KEYWO
 static PyMethodDef name##_binding = {#name, (PyCFunction) &name##_function, METH_KEYWORDS, name##_doc};
 
 
-#define LOAD_GLOBAL_BINDING(name) \
-if (!load_global_binding(MODULE, &name##_binding)) return 0;
-
-#define LOAD_GLOBAL_TYPE(name) \
-if (PyType_Ready(&python_##name##_type) < 0) return 0; \
-Py_INCREF(&python_##name##_type); \
-PyModule_AddObject(MODULE, #name, (PyObject*) &python_##name##_type);
-
-
 #define NOT_IMPLEMENTED \
 return not_implemented();
 
@@ -154,8 +145,51 @@ return Py_BuildValue("");
 static char *name[]
 
 
+#define LOAD_GLOBAL_BINDING(name) \
+if (!load_global_binding(MODULE, &name##_binding)) return 0;
+
+#define LOAD_GLOBAL_TYPE(name) \
+if (PyType_Ready(&python_##name##_type) < 0) return 0; \
+Py_INCREF(&python_##name##_type); \
+if (PyModule_AddObject(MODULE, #name, (PyObject*) &python_##name##_type) < 0) return 0;
+
 #define LONG_CONSTANT(name) \
 if (!load_long_constant(MODULE, #name, name)) return 0;
+
+#define NONE_VALUE(name) \
+if (!load_none_value(MODULE, #name)) return 0;
+
+
+#define LOAD_GLOBAL_BINDING2(name) \
+if (!load_global_binding(MODULE, &name##_binding)) return;
+
+#define LOAD_GLOBAL_TYPE2(name) \
+if (PyType_Ready(&python_##name##_type) < 0) return; \
+Py_INCREF(&python_##name##_type); \
+if (PyModule_AddObject(MODULE, #name, (PyObject*) &python_##name##_type) < 0) return;
+
+#define LONG_CONSTANT2(name) \
+if (!load_long_constant(MODULE, #name, name)) return;
+
+#define NONE_VALUE2(name) \
+if (!load_none_value(MODULE, #name)) return;
+
+
+#define HOOK hook
+
+#define VALUE value
+
+#define DEFAULT_HOOK_FUNCTION_HEAD(name, default) \
+PyObject *HOOK = get_module_object(MODULE, #name); \
+if (!HOOK || !PyCallable_Check(HOOK)) { \
+  Py_XDECREF(HOOK); \
+  return default; }
+
+#define DEFAULT_CALL_HOOK_CALLBACK(args) \
+PyObject *VALUE = PyEval_CallObject(HOOK, args); \
+PyErr_Clear(); \
+Py_XDECREF(HOOK); \
+if (!VALUE) return event_error;
 
 #ifdef __cplusplus
 }
