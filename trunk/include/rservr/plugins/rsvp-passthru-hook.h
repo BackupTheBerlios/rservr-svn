@@ -59,8 +59,6 @@ struct passthru_source_info
 	text_info target;
 	text_info sender;
 	text_info address;
-
-	message_handle respond;
 } __attribute__ ((packed));
 
 extern command_event __rsvp_passthru_hook_reserve_channel(const struct passthru_source_info*, text_info);
