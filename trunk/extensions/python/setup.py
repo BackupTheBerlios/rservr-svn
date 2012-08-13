@@ -1,4 +1,19 @@
-import os, distutils.core, distutils.sysconfig
+import os, errno, platform, distutils.core, distutils.sysconfig
+
+
+build_path_guess = 'build/lib.%s-%s-%s.%s' % (
+    platform.system().lower(),
+    platform.machine(),
+    platform.python_version_tuple()[0],
+    platform.python_version_tuple()[1])
+
+
+try:
+    os.symlink(build_path_guess + '/rservr/_rservr.so', '_rservr.so')
+except OSError as error:
+    if error.errno != errno.EEXIST:
+        raise error
+
 
 try:
     prefix_paths = [os.environ['RSERVR_PREFIX']]
@@ -35,7 +50,7 @@ extra_objects = {
     'passthru': [],
     'ready': [],
     'rqconfig': [],
-    'rqsrvc': ['_rservr.so'],
+    'rqsrvc': [],
     'trigger': [] }
 
 
@@ -72,10 +87,10 @@ ext_modules = [
         'src/rsvp-' + submodules[i] + '-hook.c',
         'src/rsvp-' + submodules[i] + '.c'] + extra_files[submodules[i]],
         libraries = ['rservr-client'] + extra_libs[submodules[i]] + ['rsvp-' + submodules[i]],
-        extra_objects = extra_objects[submodules[i]],
+        extra_objects = ['_rservr.so'] + extra_objects[submodules[i]],
         include_dirs = include_search_paths,
         library_dirs = libexec_search_paths,
-        runtime_library_dirs = libexec_search_paths + [distutils.sysconfig.get_python_lib()])
+        runtime_library_dirs = libexec_search_paths + [distutils.sysconfig.get_python_lib() + '/rservr'])
     for i in range(len(submodules))]
 
 
