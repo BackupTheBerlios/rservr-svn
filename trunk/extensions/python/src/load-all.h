@@ -21,20 +21,20 @@ extern "C" {
 
 typedef int(python_load_function)(PyObject*);
 
-int ATTR_INT load_global_binding(PyObject*, PyMethodDef*);
+extern int load_global_binding(PyObject*, PyMethodDef*);
 
-int ATTR_INT load_long_constant(PyObject*, const char*, long);
-int ATTR_INT load_double_constant(PyObject*, const char*, double);
-int ATTR_INT load_none_value(PyObject*, const char*);
+extern int load_long_constant(PyObject*, const char*, long);
+extern int load_double_constant(PyObject*, const char*, double);
+extern int load_none_value(PyObject*, const char*);
 
-PyObject ATTR_INT *get_module_object(PyObject*, const char*);
-int ATTR_INT check_instance(PyObject*, const char*, PyObject*);
+extern PyObject *get_module_object(PyObject*, const char*);
+extern int check_instance(PyObject*, const char*, PyObject*);
 
-int ATTR_INT py_to_double(double*, PyObject*);
-int ATTR_INT py_to_long(long*, PyObject*);
-int ATTR_INT py_to_info_list(info_list*, PyObject*);
+extern int py_to_double(double*, PyObject*);
+extern int py_to_long(long*, PyObject*);
+extern int py_to_info_list(info_list*, PyObject*);
 
-PyObject ATTR_INT *info_list_to_py(info_list);
+extern PyObject *info_list_to_py(info_list);
 
 #define MODULE module_object
 

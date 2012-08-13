@@ -1,6 +1,14 @@
 #!/usr/bin/python
 
-import sys, rservr, rservr.rsvp_rqsrvc
+import sys
+
+
+if len(sys.argv) != 2 or not len(sys.argv[1]):
+     print >> sys.stderr, '%s [client name]' % (sys.argv[0])
+     quit(1)
+
+
+import rservr, rservr.rsvp_rqsrvc
 
 
 def queue_event_hook(event):
@@ -27,7 +35,7 @@ def queue_event_hook(event):
 
 
 def __rsvp_rqsrvc_auto_hook_type_check(type_string, name_string):
-    return len(name_string) and type_string == 'echo'
+    return type_string == 'echo'
 
 rservr.rsvp_rqsrvc.__rsvp_rqsrvc_auto_hook_type_check = __rsvp_rqsrvc_auto_hook_type_check
 
@@ -42,7 +50,7 @@ print >> sys.stderr, 'registering client...'
 rservr.register_resource_client()
 
 print >> sys.stderr, 'registering service...'
-service = rservr.register_service(sys.argv[1] if len(sys.argv) >= 2 else 'test-client', 'echo')
+service = rservr.register_service(sys.argv[1], 'echo')
 rservr.send_command_no_status(service)
 rservr.destroy_command(service)
 

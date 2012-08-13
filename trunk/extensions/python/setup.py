@@ -27,12 +27,12 @@ include_search_paths = [prefix_paths[i] + '/include' for i in range(len(prefix_p
 submodules = ['dataref', 'netcntl', 'passthru', 'ready', 'rqconfig', 'rqsrvc', 'trigger']
 
 extra_files = {
-    'dataref': ['src/rsvp-dataref-thread.c'],
+    'dataref': [],
     'netcntl': [],
-    'passthru': ['src/rsvp-passthru-assist.c'],
+    'passthru': [],
     'ready': [],
-    'rqconfig': ['src/rsvp-rqconfig-thread.c'],
-    'rqsrvc': ['src/rsvp-rqsrvc-auto.c'],
+    'rqconfig': [],
+    'rqsrvc': [],
     'trigger': [] }
 
 extra_libs = {
@@ -82,10 +82,7 @@ ext_modules = [
         libraries = ['rservr-client'],
         include_dirs = include_search_paths)] + [
     distutils.core.Extension(name = 'rservr.rsvp_' + submodules[i],
-        sources = [
-        'src/load-all.c',
-        'src/rsvp-' + submodules[i] + '-hook.c',
-        'src/rsvp-' + submodules[i] + '.c'] + extra_files[submodules[i]],
+        sources = ['src/rsvp-' + submodules[i] + '.c'] + extra_files[submodules[i]],
         libraries = ['rservr-client'] + extra_libs[submodules[i]] + ['rsvp-' + submodules[i]],
         extra_objects = ['_rservr.so'] + extra_objects[submodules[i]],
         include_dirs = include_search_paths,

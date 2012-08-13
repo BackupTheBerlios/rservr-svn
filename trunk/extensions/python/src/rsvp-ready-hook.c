@@ -1,9 +1,0 @@
-#include <rservr/plugins/rsvp-ready-hook.h>
-
-#include "load-all.h"
-
-
-int python_load_rsvp_ready_hook(PyObject *MODULE)
-{
-	return 1;
-}
