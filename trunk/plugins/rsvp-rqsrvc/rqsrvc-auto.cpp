@@ -152,7 +152,7 @@ void __resource_exit_hook(text_info nName)
 { rsvp_rqsrvc_auto_resource_exit_hook(nName); }
 
 
-command_event __rsvp_rqsrvc_hook_register_services(const struct rqsrvc_source_info *iInfo, text_info tType)
+command_event rsvp_rqsrvc_auto_hook_register_services(const struct rqsrvc_source_info *iInfo, text_info tType)
 {
 	if (!iInfo || check_service(iInfo, tType)) return event_rejected;
 
@@ -186,9 +186,15 @@ command_event __rsvp_rqsrvc_hook_register_services(const struct rqsrvc_source_in
 	return event_complete;
 }
 
+command_event __rsvp_rqsrvc_hook_register_services(const struct rqsrvc_source_info *iInfo, text_info tType)
+{ return rsvp_rqsrvc_auto_hook_register_services(iInfo, tType); }
+
+
+command_event rsvp_rqsrvc_auto_hook_deregister_services(const struct rqsrvc_source_info *iInfo, text_info tType)
+{ return unlist_service(iInfo, tType); }
 
 command_event __rsvp_rqsrvc_hook_deregister_services(const struct rqsrvc_source_info *iInfo, text_info tType)
-{ return unlist_service(iInfo, tType); }
+{ return rsvp_rqsrvc_auto_hook_deregister_services(iInfo, tType); }
 
 
 extern result __rsvp_rqsrvc_auto_hook_type_check(text_info, text_info, text_info*, text_info*)

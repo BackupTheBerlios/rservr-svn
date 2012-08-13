@@ -58,6 +58,19 @@ extern "C" {
 #include "../api/remote-service.h"
 
 
+/*! Call this if you redefine __rsvp_rqsrvc_hook_register_services and still
+ *  want the automatic action executed.
+ * @see rsvp-rqsrvc-hook.h
+ */
+extern command_event rsvp_rqsrvc_auto_hook_register_services(const struct rqsrvc_source_info*, text_info);
+
+/*! Call this if you redefine __rsvp_rqsrvc_hook_deregister_services and still
+ *  want the automatic action executed.
+ * @see rsvp-rqsrvc-hook.h
+ */
+extern command_event rsvp_rqsrvc_auto_hook_deregister_services(const struct rqsrvc_source_info*, text_info);
+
+
 /*! Call this if you redefine __remote_service_action_hook and still want the
  *  automatic action executed.
  * @see remote-service.h
