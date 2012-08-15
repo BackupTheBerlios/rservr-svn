@@ -180,7 +180,8 @@ static pthread_mutex_t cancel_callback_mutex = PTHREAD_MUTEX_INITIALIZER;
 static int common_cancel_callback(command_reference rReference, command_event eEvent)
 {
 	if (pthread_mutex_lock(&cancel_callback_mutex) != 0) return -1;
-	unsigned long thread_id = *(unsigned long*) (void*) pthread_self();
+	pthread_t self = pthread_self();
+	unsigned long thread_id = *(unsigned long*) (void*) &self;
 	cancel_function_map::iterator position = cancel_by_thread.find(thread_id);
 	if (position == cancel_by_thread.end())
 	{
@@ -202,7 +203,8 @@ GLOBAL_BINDING_START(cancelable_wait_command_event, "")
 	if (!PyCallable_Check(pointer)) return auto_exception(PyExc_TypeError, "");
 
 	if (pthread_mutex_lock(&cancel_callback_mutex) != 0) return auto_exception(PyExc_RuntimeError, "");
-	unsigned long thread_id = *(unsigned long*) (void*) pthread_self();
+	pthread_t self = pthread_self();
+	unsigned long thread_id = *(unsigned long*) (void*) &self;
 	cancel_by_thread[thread_id] = pointer;
 	if (pthread_mutex_unlock(&cancel_callback_mutex) != 0) return auto_exception(PyExc_RuntimeError, "");
 
