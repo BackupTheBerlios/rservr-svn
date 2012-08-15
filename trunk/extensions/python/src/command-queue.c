@@ -24,13 +24,8 @@ NEW_TYPE_WRAPPER_DEFINE(command_handle, command_handle)
 macro(change_command_priority) \
 macro(send_command) \
 macro(send_command_no_status) \
-macro(send_command_callback) \
-macro(send_command_callbacks) \
 macro(destroy_command) \
-macro(new_status_callback) \
-macro(new_status_callbacks) \
 macro(wait_command_event) \
-macro(cancelable_wait_command_event) \
 macro(find_command_status) \
 macro(clear_command_status) \
 macro(insert_remote_address) \
@@ -81,18 +76,6 @@ GLOBAL_BINDING_END(send_command_no_status)
 
 
 
-GLOBAL_BINDING_START(send_command_callback, "")
-	NOT_IMPLEMENTED
-GLOBAL_BINDING_END(send_command_callback)
-
-
-
-GLOBAL_BINDING_START(send_command_callbacks, "")
-	NOT_IMPLEMENTED
-GLOBAL_BINDING_END(send_command_callbacks)
-
-
-
 GLOBAL_BINDING_START(destroy_command, "")
 	STATIC_KEYWORDS(keywords) = { "command", NULL };
 	PyObject *object = NULL;
@@ -105,18 +88,6 @@ GLOBAL_BINDING_END(destroy_command)
 
 
 
-GLOBAL_BINDING_START(new_status_callback, "")
-	NOT_IMPLEMENTED
-GLOBAL_BINDING_END(new_status_callback)
-
-
-
-GLOBAL_BINDING_START(new_status_callbacks, "")
-	NOT_IMPLEMENTED
-GLOBAL_BINDING_END(new_status_callbacks)
-
-
-
 GLOBAL_BINDING_START(wait_command_event, "")
 	STATIC_KEYWORDS(keywords) = { "reference", "event", "timeout", NULL };
 	long reference = 0, event = 0;
@@ -124,12 +95,6 @@ GLOBAL_BINDING_START(wait_command_event, "")
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "llf", keywords, &reference, &event, &timeout)) return NULL;
 	return Py_BuildValue("l", wait_command_event(reference, event, timeout));
 GLOBAL_BINDING_END(wait_command_event)
-
-
-
-GLOBAL_BINDING_START(cancelable_wait_command_event, "")
-	NOT_IMPLEMENTED
-GLOBAL_BINDING_END(cancelable_wait_command_event)
 
 
 
@@ -201,7 +166,7 @@ GLOBAL_BINDING_END(nonblocking_send)
 
 GLOBAL_BINDING_START(blocking_send, "")
 	NO_ARGUMENTS
-	nonblocking_send();
+	blocking_send();
 	NO_RETURN
 GLOBAL_BINDING_END(blocking_send)
 
@@ -218,6 +183,8 @@ int python_load_command_queue(PyObject *MODULE)
 {
 	ALL_GLOBAL_BINDINGS(LOAD_GLOBAL_BINDING)
 	COMMAND_QUEUE_ALL_GLOBAL_TYPES(LOAD_GLOBAL_TYPE)
+	//NOTE: this needs to come after 'command_handle' is registered (from "command.h")
+	if (PyModule_AddObject(MODULE, "default_command", NEW_TYPE_WRAPPER2(command_handle, default_command)) != 0) return 0;
 	return 1;
 }
 

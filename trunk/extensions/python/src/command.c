@@ -107,7 +107,6 @@ int python_load_command(PyObject *MODULE)
 	ALL_LONG_CONSTANTS(LONG_CONSTANT)
 	if (!load_double_constant(MODULE, "time_indefinite", time_indefinite)) return 0;
 	if (!load_double_constant(MODULE, "time_none",       0.))              return 0;
-	if (!PyModule_AddObject(MODULE, "default_command", NEW_TYPE_WRAPPER(command_handle, default_command))) return 0;
 
 	return 1;
 }

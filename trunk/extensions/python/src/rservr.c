@@ -6,17 +6,18 @@
 #define ALL_BINDINGS(macro) \
 macro(command) \
 macro(client) \
-macro(log_output) \
+macro(command_queue) \
+macro(command_queue2) \
+macro(message_queue) \
 macro(admin_client) \
 macro(service_client) \
 macro(control_client) \
 macro(resource_client) \
 macro(monitor_client) \
 macro(detached_client) \
-macro(command_queue) \
-macro(message_queue) \
 macro(request) \
 macro(response) \
+macro(log_output) \
 macro(load_plugin) \
 macro(command_table) \
 macro(remote_service) \

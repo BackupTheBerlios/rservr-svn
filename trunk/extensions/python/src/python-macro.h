@@ -70,17 +70,20 @@ typedef struct { \
 DEFINE_TYPE_WRAPPER(type, const struct type*)
 
 #define NEW_TYPE_WRAPPER(type, pointer) \
-new_python_##type(pointer)
+new_python_##type(pointer, 0)
+
+#define NEW_TYPE_WRAPPER2(type, pointer) \
+new_python_##type(pointer, 1)
 
 #define NEW_TYPE_WRAPPER_DECLARE(type, object) \
-extern PyObject *new_python_##type(object);
+extern PyObject *new_python_##type(object, int);
 
 #define NEW_POINTER_TYPE_WRAPPER_DECLARE(type) \
 NEW_TYPE_WRAPPER_DECLARE(type, const struct type*);
 
 #define NEW_TYPE_WRAPPER_DEFINE(type, object) \
-PyObject *new_python_##type(object pointer) { \
-  if (!pointer) return auto_exception(PyExc_IndexError, #type); \
+PyObject *new_python_##type(object pointer, int accept_null) { \
+  if (!pointer && !accept_null) return auto_exception(PyExc_IndexError, #type); \
   python_##type *self = calloc(1, sizeof(python_##type)); \
   if (!self) return auto_exception(PyExc_RuntimeError, #type); \
   self->ob_type = &TYPE_BINDING(type); \

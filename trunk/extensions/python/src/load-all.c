@@ -41,7 +41,7 @@ int load_double_constant(PyObject *MODULE, const char *nName, double vValue)
 int load_none_value(PyObject *MODULE, const char *nName)
 {
 	Py_INCREF(Py_None);
-	if (!PyModule_AddObject(MODULE, nName, Py_None) != 0)
+	if (PyModule_AddObject(MODULE, nName, Py_None) != 0)
 	{
 	Py_XDECREF(Py_None);
 	return 0;

@@ -6,6 +6,7 @@ include src/admin-client.c
 include src/client-timing.c
 include src/client.c
 include src/command-queue.c
+include src/command-queue2.cpp
 include src/command-queue.h
 include src/command-table.c
 include src/command.c

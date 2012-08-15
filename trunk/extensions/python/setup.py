@@ -1,6 +1,17 @@
 import os, errno, platform, distutils.core, distutils.sysconfig
 
 
+package_base = 'rservr-python'
+package_version = '0.1'
+package_summary = 'Python extensions for the Resourcerver project.'
+package_author = { 'name': 'Kevin P. Barry', 'email': 'ta0kira@users.berlios.de' }
+package_license = 'BSD License'
+package_description = 'This is a Python extension package that provides \
+bindings for the Resourcerver C API. These bindings provide access to the \
+"client" API as well as the command plugins that are included in the "core" \
+Resourcerver package.'
+
+
 build_path_guess = 'build/lib.%s-%s-%s.%s' % (
     platform.system().lower(),
     platform.machine(),
@@ -60,18 +71,19 @@ ext_modules = [
         'src/rservr.c',
         'src/load-all.c',
         'src/command.c',
+        'src/command-queue.c',
+        'src/command-queue2.cpp',
+        'src/message-queue.c',
         'src/client.c',
-        'src/log-output.c',
         'src/admin-client.c',
         'src/service-client.c',
         'src/control-client.c',
         'src/resource-client.c',
         'src/monitor-client.c',
         'src/detached-client.c',
-        'src/command-queue.c',
-        'src/message-queue.c',
         'src/request.c',
         'src/response.c',
+        'src/log-output.c',
         'src/load-plugin.c',
         'src/command-table.c',
         'src/remote-service.c',
@@ -91,7 +103,7 @@ ext_modules = [
     for i in range(len(submodules))]
 
 
-distutils.core.setup(name = 'rservr', version = '0.1', packages = ['rservr'],
-    description = 'Python extensions for the Resourcerver project.',
-    author = 'Kevin P. Barry', author_email = 'ta0kira@users.berlios.de',
+distutils.core.setup(name = package_base, version = package_version, packages = ['rservr'],
+    description = package_summary, long_description = package_description,
+    author = package_author['name'], author_email = package_author['email'], license = package_license,
     package_data = {'rservr' : ['rservr/__init__.py'] }, ext_modules = ext_modules)
