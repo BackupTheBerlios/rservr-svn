@@ -171,7 +171,24 @@ GLOBAL_BINDING_END(new_status_callback)
 
 
 
-typedef std::map <long, python_wait_cancel> cancel_function_map;
+class pthread_reference
+{
+public:
+	pthread_reference() : thread() {}
+	pthread_reference(const pthread_t &tThread) : thread(tThread) {}
+
+	bool operator == (const pthread_reference &oOther) const
+	{ return pthread_equal(thread, oOther.thread); }
+
+	bool operator < (const pthread_reference &oOther) const
+	{ return memcmp(&thread, &oOther.thread, sizeof(pthread_t)) < 0; }
+
+private:
+	pthread_t thread;
+};
+
+
+typedef std::map <pthread_reference, python_wait_cancel> cancel_function_map;
 static cancel_function_map cancel_by_thread;
 
 static pthread_mutex_t cancel_callback_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -180,9 +197,7 @@ static pthread_mutex_t cancel_callback_mutex = PTHREAD_MUTEX_INITIALIZER;
 static int common_cancel_callback(command_reference rReference, command_event eEvent)
 {
 	if (pthread_mutex_lock(&cancel_callback_mutex) != 0) return -1;
-	pthread_t self = pthread_self();
-	unsigned long thread_id = *(unsigned long*) (void*) &self;
-	cancel_function_map::iterator position = cancel_by_thread.find(thread_id);
+	cancel_function_map::iterator position = cancel_by_thread.find(pthread_self());
 	if (position == cancel_by_thread.end())
 	{
 	pthread_mutex_unlock(&cancel_callback_mutex);
@@ -203,15 +218,13 @@ GLOBAL_BINDING_START(cancelable_wait_command_event, "")
 	if (!PyCallable_Check(pointer)) return auto_exception(PyExc_TypeError, "");
 
 	if (pthread_mutex_lock(&cancel_callback_mutex) != 0) return auto_exception(PyExc_RuntimeError, "");
-	pthread_t self = pthread_self();
-	unsigned long thread_id = *(unsigned long*) (void*) &self;
-	cancel_by_thread[thread_id] = pointer;
+	cancel_by_thread[pthread_self()] = pointer;
 	if (pthread_mutex_unlock(&cancel_callback_mutex) != 0) return auto_exception(PyExc_RuntimeError, "");
 
 	command_event outcome = cancelable_wait_command_event(reference, event, timeout, &common_cancel_callback);
 
 	if (pthread_mutex_lock(&cancel_callback_mutex) != 0) return auto_exception(PyExc_RuntimeError, "");
-	cancel_by_thread.erase(thread_id);
+	cancel_by_thread.erase(pthread_self());
 	if (pthread_mutex_unlock(&cancel_callback_mutex) != 0) return auto_exception(PyExc_RuntimeError, "");
 
 	return Py_BuildValue("l", outcome);
