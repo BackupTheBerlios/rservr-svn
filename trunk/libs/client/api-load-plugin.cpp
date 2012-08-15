@@ -146,6 +146,29 @@ int load_plugin_lib(text_info fFile)
 }
 
 
+int load_plugin_callback(plugin_loader_callback cCallback)
+{
+	if (!cCallback)
+	{
+    log_client_plugin_load_error("(callback)", dlerror());
+	return -1;
+	}
+
+	allow_client_load();
+	int outcome = (*cCallback)(command_loader);
+	deny_client_load();
+
+	if (outcome < 0)
+	{
+    log_client_plugin_load_error("(callback)", error_unknown);
+	return outcome;
+	}
+
+    log_client_plugin_loaded("(callback)");
+	return outcome;
+}
+
+
 int load_internal_plugins()
 {
 	allow_client_load();

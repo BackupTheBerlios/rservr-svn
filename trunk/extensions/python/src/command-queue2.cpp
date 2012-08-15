@@ -181,7 +181,11 @@ public:
 	{ return pthread_equal(thread, oOther.thread); }
 
 	bool operator < (const pthread_reference &oOther) const
-	{ return memcmp(&thread, &oOther.thread, sizeof(pthread_t)) < 0; }
+	{
+	//(in case "equal" threads can actually differ in value)
+	if (pthread_equal(thread, oOther.thread)) return false;
+	return memcmp(&thread, &oOther.thread, sizeof(pthread_t)) < 0;
+	}
 
 private:
 	pthread_t thread;

@@ -128,7 +128,7 @@ static PyObject *MODULE = NULL;
 
 PyMODINIT_FUNC initrsvp_passthru(void)
 {
-	if (load_plugin_lib("librsvp-passthru.so") != 0) return;
+	if (load_plugin_callback(&rsvp_passthru_load) != 0) return;
 	MODULE = Py_InitModule3("rsvp_passthru", NULL, "Python bindings for librsvp-passthru.");
 	ALL_HOOK_FUNCTIONS(NONE_VALUE2)
 	ALL_GLOBAL_BINDINGS(LOAD_GLOBAL_BINDING2)

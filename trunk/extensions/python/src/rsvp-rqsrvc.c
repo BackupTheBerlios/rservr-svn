@@ -151,7 +151,7 @@ static PyObject *MODULE = NULL;
 
 PyMODINIT_FUNC initrsvp_rqsrvc(void)
 {
-	if (load_plugin_lib("librsvp-rqsrvc.so") != 0) return;
+	if (load_plugin_callback(&rsvp_rqsrvc_load) != 0) return;
 	MODULE = Py_InitModule3("rsvp_rqsrvc", NULL, "Python bindings for librsvp-rqsrvc.");
 	ALL_HOOK_FUNCTIONS(NONE_VALUE2)
 	ALL_GLOBAL_BINDINGS(LOAD_GLOBAL_BINDING2)

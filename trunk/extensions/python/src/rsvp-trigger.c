@@ -9,7 +9,7 @@ static PyObject *module_object = NULL;
 
 PyMODINIT_FUNC initrsvp_trigger(void)
 {
-	if (load_plugin_lib("librsvp-trigger.so") != 0) return;
+	if (load_plugin_callback(&rsvp_trigger_load) != 0) return;
 	module_object = Py_InitModule3("rsvp_trigger", NULL, "Python bindings for librsvp-trigger.");
 	if (!module_object) return;
 }

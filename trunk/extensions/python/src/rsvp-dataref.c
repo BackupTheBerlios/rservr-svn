@@ -239,7 +239,7 @@ static PyObject *MODULE = NULL;
 
 PyMODINIT_FUNC initrsvp_dataref(void)
 {
-	if (load_plugin_lib("librsvp-dataref.so") != 0) return;
+	if (load_plugin_callback(&rsvp_dataref_load) != 0) return;
 	MODULE = Py_InitModule3("rsvp_dataref", NULL, "Python bindings for librsvp-dataref.");
 	ALL_LONG_CONSTANTS(LONG_CONSTANT2)
 	ALL_HOOK_FUNCTIONS(NONE_VALUE2)

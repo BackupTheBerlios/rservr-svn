@@ -58,8 +58,14 @@ extern "C" {
 #include "command.h"
 
 
+/*! Callback function defined by a plug-in library.*/
+typedef int (*plugin_loader_callback)(struct local_commands*);
+
 /*! Load the specified plug-in library.*/
 extern int load_plugin_lib(text_info);
+
+/*! Load a plug-in using its callback function.*/
+extern int load_plugin_callback(plugin_loader_callback);
 
 /*! Load plug-ins that are hard-linked into the client program.*/
 extern int load_internal_plugins(void);

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, rservr, rservr.rsvp_rqsrvc
+import sys
 
 
 if len(sys.argv) != 2 or not len(sys.argv[1]):
@@ -8,9 +8,16 @@ if len(sys.argv) != 2 or not len(sys.argv[1]):
      quit(1)
 
 
+import rservr
+
+
 print >> sys.stderr, 'initializing...'
 rservr.set_program_name(sys.argv[0])
 rservr.initialize_client()
+
+
+import rservr.rsvp_rqsrvc
+
 
 print >> sys.stderr, 'starting message queue...'
 rservr.start_message_queue()
@@ -66,7 +73,8 @@ rservr.stop_message_queue()
 rservr.set_queue_event_hook(queue_event_hook)
 
 try:
-    outcome = rservr.inline_message_queue()
+    rservr.inline_message_queue()
+    outcome = True
 except RuntimeError:
     outcome = False
 
