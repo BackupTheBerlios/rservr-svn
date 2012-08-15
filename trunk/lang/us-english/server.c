@@ -709,24 +709,24 @@ int log_server_deregister_handler(int pPid, int sSignal, text_string mMessage)
 }
 
 /*debug_______________________________________________________________________*/
-int log_server_client_thread_start(unsigned int uUid, int pPid)
+int log_server_client_thread_start(unsigned long uUid, int pPid)
 {
 	char message_string[max_message];
-	snprintf(message_string, max_message, "/d/ client thread started for %i (%x)", pPid, uUid);
+	snprintf(message_string, max_message, "/d/ client thread started for %i (%lx)", pPid, uUid);
 	return local_log(logging_debug, message_string);
 }
 
-int log_server_client_thread_end(unsigned int uUid, int pPid)
+int log_server_client_thread_end(unsigned long uUid, int pPid)
 {
 	char message_string[max_message];
-	snprintf(message_string, max_message, "/d/ client thread ended for %i (%x)", pPid, uUid);
+	snprintf(message_string, max_message, "/d/ client thread ended for %i (%lx)", pPid, uUid);
 	return local_log(logging_debug, message_string);
 }
 
-int log_server_client_thread_error(unsigned int uUid, int pPid)
+int log_server_client_thread_error(unsigned long uUid, int pPid)
 {
 	char message_string[max_message];
-	snprintf(message_string, max_message, "/d/ client thread exit error for %i (%x)", pPid, uUid);
+	snprintf(message_string, max_message, "/d/ client thread exit error for %i (%lx)", pPid, uUid);
 	return local_log(logging_debug, message_string);
 }
 

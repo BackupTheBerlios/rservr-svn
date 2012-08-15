@@ -46,6 +46,6 @@ extern command_handle partial_service_response(message_handle rRequest, text_inf
 response_type tType)
 { GENERAL_RESPONSE(rRequest, new proto_partial_response(tType, mMessage)) }
 
-extern command_handle partial_service_response(message_handle rRequest, info_list mMessages,
+extern command_handle partial_service_response_list(message_handle rRequest, info_list mMessages,
 response_type tType)
 { GENERAL_RESPONSE(rRequest, new proto_partial_response_list(tType, mMessages)) }

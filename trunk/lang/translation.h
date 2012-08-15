@@ -203,9 +203,9 @@ extern int log_server_register_handler(int, int, text_string);
 extern int log_server_deregister_handler(int, int, text_string);
 
 /*debug_______________________________________________________________________*/
-extern int log_server_client_thread_start(unsigned int, int);
-extern int log_server_client_thread_end(unsigned int, int);
-extern int log_server_client_thread_error(unsigned int, int);
+extern int log_server_client_thread_start(unsigned long, int);
+extern int log_server_client_thread_end(unsigned long, int);
+extern int log_server_client_thread_error(unsigned long, int);
 extern int log_server_fail_client_thread(text_string);
 
 extern int log_server_register_abnormal_handlers();
