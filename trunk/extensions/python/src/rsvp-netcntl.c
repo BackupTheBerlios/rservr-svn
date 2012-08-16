@@ -275,48 +275,134 @@ static command_event get_list_common(const char *hHook, const struct netcntl_sou
 {
 	if (!lList) return event_error;
 
-	DEFAULT_HOOK_FUNCTION_HEAD2(hHook)
+	DEFAULT_HOOK_FUNCTION_HEAD2(hHook, event_error)
 
 	DEFAULT_CALL_HOOK_CALLBACK(Py_BuildValue("(O)", NEW_TYPE_WRAPPER(netcntl_source_info, iInfo)), event_error)
 
-	if (!PyList_check(VALUE) && !PyTuple_Check(names) && !PyDict_Check(names))
+	if (!PyList_Check(VALUE) && !PyTuple_Check(VALUE) && !PyDict_Check(VALUE))
 	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event_error; })
 
-	if (!PyList_check(VALUE) && PyObject_Not(VALUE))
+	if (!PyList_Check(VALUE) && PyObject_Not(VALUE))
 	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event_error; })
 
 	PyObject *object = NULL;
 	long event = event_complete;
 
-	if (PyList_check(VALUE)) object = VALUE;
+	PyObject *tuple_object = NULL;
+	PyObject *dict_object  = NULL;
+
+	if (PyList_Check(VALUE)) object = VALUE;
 
 	else
 	{
-	PyObject *tuple_object = PyTuple_Check(VALUE)? VALUE : PyTuple_New(0);
-	PyObject *dict_object  = PyDict_Check(VALUE)?  VALUE : PyDict_New();
+	tuple_object = PyTuple_Check(VALUE)? VALUE : PyTuple_New(0);
+	dict_object  = PyDict_Check(VALUE)?  VALUE : PyDict_New();
 
 	STATIC_KEYWORDS(keywords) = { "list", "event", NULL };
 	if(!PyArg_ParseTupleAndKeywords(tuple_object, dict_object, "|Ol", keywords, &object, &event))
 	 {
+	PyErr_Clear();
 	if (!PyTuple_Check(VALUE)) Py_DECREF(tuple_object);
 	if (!PyDict_Check(VALUE))  Py_DECREF(dict_object);
-	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event_error; })
+	Py_XDECREF(VALUE);
+	PYTHON_UNLOCK2(return event_error)
 	 }
-
-	if (!PyTuple_Check(VALUE)) Py_DECREF(tuple_object);
-	if (!PyDict_Check(VALUE))  Py_DECREF(dict_object);
 	}
 
 	if (object)
 	{
 	info_list list = NULL;
-	if (!py_to_info_list(&list, VALUE))
-	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event_error; })
+	int outcome = py_to_info_list(&list, object);
+	PyErr_Clear();
+
+	if (!PyList_Check(VALUE))
+	 {
+	if (!PyTuple_Check(VALUE)) Py_XDECREF(tuple_object);
+	if (!PyDict_Check(VALUE))  Py_XDECREF(dict_object);
+	 }
+	Py_XDECREF(VALUE);
+
+	if (!outcome) PYTHON_UNLOCK2({ free_info_list(list); return event_error; })
 	*lList = (char**) list;
-	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event; })
+	PYTHON_UNLOCK2(return event)
 	}
 
-	else PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event; })
+	else
+	{
+	if (!PyList_Check(VALUE))
+	 {
+	if (!PyTuple_Check(VALUE)) Py_XDECREF(tuple_object);
+	if (!PyDict_Check(VALUE))  Py_XDECREF(dict_object);
+	 }
+	Py_XDECREF(VALUE);
+
+	PYTHON_UNLOCK2(return event)
+	}
+}
+
+
+
+static command_event connection_common(const char *hHook, PyObject *vValue, char **nName)
+{
+	if (!nName) return event_error;
+
+	DEFAULT_HOOK_FUNCTION_HEAD2(hHook, event_error)
+
+	Py_INCREF(vValue); //(this is because the call below will 'Py_DECREF')
+	DEFAULT_CALL_HOOK_CALLBACK(vValue, event_error)
+
+	if (!PyString_Check(VALUE) && !PyTuple_Check(VALUE) && !PyDict_Check(VALUE))
+	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event_error; })
+
+	if (PyObject_Not(VALUE)) //(an empty string is an error)
+	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event_error; })
+
+	text_info string = NULL;
+	long event = event_complete;
+
+	PyObject *tuple_object = NULL;
+	PyObject *dict_object  = NULL;
+
+	if (PyString_Check(VALUE)) string = PyString_AsString(VALUE);
+
+	else
+	{
+	tuple_object = PyTuple_Check(VALUE)? VALUE : PyTuple_New(0);
+	dict_object  = PyDict_Check(VALUE)?  VALUE : PyDict_New();
+
+	STATIC_KEYWORDS(keywords) = { "name", "event", NULL };
+	if(!PyArg_ParseTupleAndKeywords(tuple_object, dict_object, "s|l", keywords, &string, &event))
+	 {
+	PyErr_Clear();
+	if (!PyTuple_Check(VALUE)) Py_DECREF(tuple_object);
+	if (!PyDict_Check(VALUE))  Py_DECREF(dict_object);
+	Py_XDECREF(VALUE);
+	PYTHON_UNLOCK2(return event_error)
+	 }
+	}
+
+	if (!string || !strlen(string))
+	{
+	if (!PyString_Check(VALUE))
+	 {
+	if (!PyTuple_Check(VALUE)) Py_XDECREF(tuple_object);
+	if (!PyDict_Check(VALUE))  Py_XDECREF(dict_object);
+	 }
+	Py_XDECREF(VALUE);
+
+	PYTHON_UNLOCK2(return event_error)
+	}
+
+	*nName = (char*) strdup(string);
+
+	if (!PyString_Check(VALUE))
+	 {
+	if (!PyTuple_Check(VALUE)) Py_XDECREF(tuple_object);
+	if (!PyDict_Check(VALUE))  Py_XDECREF(dict_object);
+	 }
+	Py_XDECREF(VALUE);
+
+	PYTHON_UNLOCK2(return event)
 }
 
 
@@ -326,29 +412,126 @@ command_event __rsvp_netcntl_hook_net_connection_list(const struct netcntl_sourc
 
 
 
-command_event __rsvp_netcntl_hook_net_connect(const struct netcntl_source_info*, text_info, text_info, char**);
-command_event __rsvp_netcntl_hook_net_filtered_connect(const struct netcntl_source_info*, text_info, text_info, text_info, char**);
-command_event __rsvp_netcntl_hook_net_disconnect(const struct netcntl_source_info*, text_info);
+command_event __rsvp_netcntl_hook_net_connect(const struct netcntl_source_info *iInfo,
+  text_info aAddress, text_info pPort, char **aAddress2)
+{
+	PyObject *arguments = Py_BuildValue("(Oss)", NEW_TYPE_WRAPPER(netcntl_source_info, iInfo), aAddress, pPort);
+	command_event outcome = connection_common("__rsvp_netcntl_hook_net_connect", arguments, aAddress2);
+	Py_XDECREF(arguments);
+	return outcome;
+}
+
+
+
+command_event __rsvp_netcntl_hook_net_filtered_connect(const struct netcntl_source_info *iInfo,
+  text_info aAddress, text_info pPort, text_info fFilter, char **aAddress2)
+{
+	PyObject *arguments = Py_BuildValue("(Osss)", NEW_TYPE_WRAPPER(netcntl_source_info, iInfo), aAddress, pPort, fFilter);
+	command_event outcome = connection_common("__rsvp_netcntl_hook_net_filtered_connect", arguments, aAddress2);
+	Py_XDECREF(arguments);
+	return outcome;
+}
+
+
+
+
+command_event __rsvp_netcntl_hook_net_disconnect(const struct netcntl_source_info *iInfo, text_info aAddress)
+{
+	DEFAULT_HOOK_FUNCTION_HEAD(__rsvp_netcntl_hook_net_disconnect, event_error)
+
+	DEFAULT_CALL_HOOK_CALLBACK(Py_BuildValue("(Os)", NEW_TYPE_WRAPPER(netcntl_source_info, iInfo), aAddress), event_error)
+
+	DEFAULT_HOOK_RETURN
+}
+
+
+
 command_event __rsvp_netcntl_hook_net_listen_list(const struct netcntl_source_info *iInfo, char ***lList)
-{ return get_list_common("__rsvp_netcntl_hook_net_connection_list", iInfo, lList); }
+{ return get_list_common("__rsvp_netcntl_hook_net_listen_list", iInfo, lList); }
 
 
 
-command_event __rsvp_netcntl_hook_net_listen(const struct netcntl_source_info*, text_info);
-command_event __rsvp_netcntl_hook_net_unlisten(const struct netcntl_source_info*, text_info);
+command_event __rsvp_netcntl_hook_net_listen(const struct netcntl_source_info *iInfo, text_info pPort)
+{
+	DEFAULT_HOOK_FUNCTION_HEAD(__rsvp_netcntl_hook_net_listen, event_error)
+
+	DEFAULT_CALL_HOOK_CALLBACK(Py_BuildValue("(Os)", NEW_TYPE_WRAPPER(netcntl_source_info, iInfo), pPort), event_error)
+
+	DEFAULT_HOOK_RETURN
+}
+
+
+
+command_event __rsvp_netcntl_hook_net_unlisten(const struct netcntl_source_info *iInfo, text_info pPort)
+{
+	DEFAULT_HOOK_FUNCTION_HEAD(__rsvp_netcntl_hook_net_unlisten, event_error)
+
+	DEFAULT_CALL_HOOK_CALLBACK(Py_BuildValue("(Os)", NEW_TYPE_WRAPPER(netcntl_source_info, iInfo), pPort), event_error)
+
+	DEFAULT_HOOK_RETURN
+}
+
+
 
 command_event __rsvp_netcntl_hook_local_connection_list(const struct netcntl_source_info *iInfo, char ***lList)
-{ return get_list_common("__rsvp_netcntl_hook_net_connection_list", iInfo, lList); }
+{ return get_list_common("__rsvp_netcntl_hook_local_connection_list", iInfo, lList); }
 
 
 
-command_event __rsvp_netcntl_hook_local_connect(const struct netcntl_source_info*, text_info, char**);
-command_event __rsvp_netcntl_hook_local_filtered_connect(const struct netcntl_source_info*, text_info, text_info, char**);
-command_event __rsvp_netcntl_hook_local_disconnect(const struct netcntl_source_info*, text_info);
+command_event __rsvp_netcntl_hook_local_connect(const struct netcntl_source_info *iInfo,
+  text_info sSocket, char **sSocket2)
+{
+	PyObject *arguments = Py_BuildValue("(Os)", NEW_TYPE_WRAPPER(netcntl_source_info, iInfo), sSocket);
+	command_event outcome = connection_common("__rsvp_netcntl_hook_local_connect", arguments, sSocket2);
+	Py_XDECREF(arguments);
+	return outcome;
+}
+
+
+
+command_event __rsvp_netcntl_hook_local_filtered_connect(const struct netcntl_source_info *iInfo,
+  text_info sSocket, text_info fFilter, char **sSocket2)
+{
+	PyObject *arguments = Py_BuildValue("(Oss)", NEW_TYPE_WRAPPER(netcntl_source_info, iInfo), sSocket, fFilter);
+	command_event outcome = connection_common("__rsvp_netcntl_hook_local_filtered_connect", arguments, sSocket2);
+	Py_XDECREF(arguments);
+	return outcome;
+}
+
+
+
+command_event __rsvp_netcntl_hook_local_disconnect(const struct netcntl_source_info *iInfo, text_info sSocket)
+{
+	DEFAULT_HOOK_FUNCTION_HEAD(__rsvp_netcntl_hook_local_disconnect, event_error)
+
+	DEFAULT_CALL_HOOK_CALLBACK(Py_BuildValue("(Os)", NEW_TYPE_WRAPPER(netcntl_source_info, iInfo), sSocket), event_error)
+
+	DEFAULT_HOOK_RETURN
+}
+
+
+
 command_event __rsvp_netcntl_hook_local_listen_list(const struct netcntl_source_info *iInfo, char ***lList)
-{ return get_list_common("__rsvp_netcntl_hook_net_connection_list", iInfo, lList); }
+{ return get_list_common("__rsvp_netcntl_hook_local_listen_list", iInfo, lList); }
 
 
 
-command_event __rsvp_netcntl_hook_local_listen(const struct netcntl_source_info*, text_info);
-command_event __rsvp_netcntl_hook_local_unlisten(const struct netcntl_source_info*, text_info);
+command_event __rsvp_netcntl_hook_local_listen(const struct netcntl_source_info *iInfo, text_info sSocket)
+{
+	DEFAULT_HOOK_FUNCTION_HEAD(__rsvp_netcntl_hook_local_listen, event_error)
+
+	DEFAULT_CALL_HOOK_CALLBACK(Py_BuildValue("(Os)", NEW_TYPE_WRAPPER(netcntl_source_info, iInfo), sSocket), event_error)
+
+	DEFAULT_HOOK_RETURN
+}
+
+
+
+command_event __rsvp_netcntl_hook_local_unlisten(const struct netcntl_source_info *iInfo, text_info sSocket)
+{
+	DEFAULT_HOOK_FUNCTION_HEAD(__rsvp_netcntl_hook_local_unlisten, event_error)
+
+	DEFAULT_CALL_HOOK_CALLBACK(Py_BuildValue("(Os)", NEW_TYPE_WRAPPER(netcntl_source_info, iInfo), sSocket), event_error)
+
+	DEFAULT_HOOK_RETURN
+}

@@ -239,6 +239,7 @@ result __rsvp_rqsrvc_auto_hook_type_check(text_info tType, text_info nName,
 	const char *type = NULL, *name = NULL;
 	if(!PyArg_ParseTupleAndKeywords(tuple_object, dict_object, "|ss", keywords, &type, &name))
 	{
+	PyErr_Clear();
 	if (!PyTuple_Check(names)) Py_DECREF(tuple_object);
 	if (!PyDict_Check(names))  Py_DECREF(dict_object);
 	Py_XDECREF(names);

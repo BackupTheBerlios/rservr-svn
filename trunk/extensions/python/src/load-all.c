@@ -120,6 +120,14 @@ int py_to_info_list(info_list *vValue, PyObject *oObject)
 }
 
 
+void free_info_list(info_list lList)
+{
+	info_list current = lList;
+	if (current) while (*current) free((void*) current++);
+	free((void*) lList);
+}
+
+
 PyObject *info_list_to_py(info_list lList)
 {
 	unsigned int size = 0;

@@ -33,6 +33,7 @@ extern int check_instance(PyObject*, const char*, PyObject*);
 extern int py_to_double(double*, PyObject*);
 extern int py_to_long(long*, PyObject*);
 extern int py_to_info_list(info_list*, PyObject*);
+extern void free_info_list(info_list);
 
 extern PyObject *info_list_to_py(info_list);
 
