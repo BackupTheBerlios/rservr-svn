@@ -159,7 +159,7 @@ RSERVR_AUTO_BUILTIN_TAG(client_response_list)
 	{
 	unsigned int current_size = 0;
 
-	while (*lList)
+	if (lList) while (*lList)
 	 {
 	if ((current_size += strlen(*lList)) > PARAM_BYPASS_SIZE_MAX) break;
 	response_data.push_back(*lList);
