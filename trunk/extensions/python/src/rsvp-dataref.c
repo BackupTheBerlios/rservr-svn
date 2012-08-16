@@ -162,7 +162,7 @@ GLOBAL_BINDING_START(rsvp_dataref_alteration_response, "")
 	PyObject *object = NULL;
 	int reference = 0;
 	long offset = 0, size = 0;
-	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "oill", keywords, &object, &reference, &offset, &size)) return NULL;
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "Oill", keywords, &object, &reference, &offset, &size)) return NULL;
 	message_handle message = auto_message_handle(object);
 	if (!message) return NULL;
 	return NEW_TYPE_WRAPPER(command_handle, rsvp_dataref_alteration_response(message, reference, offset, size));
