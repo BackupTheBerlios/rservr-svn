@@ -74,7 +74,11 @@ macro(set_monitor_flags)
 
 GLOBAL_BINDING_START(register_monitor_client, "")
 	NO_ARGUMENTS
-	if (!register_monitor_client()) return auto_exception(PyExc_RuntimeError, "");
+	int outcome;
+	Py_BEGIN_ALLOW_THREADS
+	outcome = register_monitor_client();
+	Py_END_ALLOW_THREADS
+	if (!outcome) return auto_exception(PyExc_RuntimeError, "");
 	NO_RETURN
 GLOBAL_BINDING_END(register_monitor_client)
 

@@ -205,29 +205,31 @@ command_event __rsvp_rqsrvc_hook_deregister_services(const struct rqsrvc_source_
 result __rsvp_rqsrvc_auto_hook_type_check(text_info tType, text_info nName,
   text_info *nNewType, text_info *nNewName)
 {
+	PYTHON_LOCK
+
 	PyObject *hook = get_module_object(MODULE, "__rsvp_rqsrvc_auto_hook_type_check");
-	if (!hook) return 1;
+	if (!hook) PYTHON_UNLOCK2(return 1)
 	if (hook == Py_None)
 	{
 	Py_XDECREF(hook);
-	return 1;
+	PYTHON_UNLOCK2(return 1)
 	}
 	if (!PyCallable_Check(hook))
 	{
 	Py_XDECREF(hook);
-	return 0;
+	PYTHON_UNLOCK2(return 0)
 	}
 
 	PyObject *names = PyEval_CallObject(hook, Py_BuildValue("(ss)", tType, nName));
 	PyErr_Clear();
 	Py_XDECREF(hook);
-	if (!names) return 0;
+	if (!names) PYTHON_UNLOCK2(return 0)
 
-	if (PyObject_Not(names)) return 0;
+	if (PyObject_Not(names)) PYTHON_UNLOCK2(return 0)
 
-	if (names == Py_True) return 1;
+	if (names == Py_True) PYTHON_UNLOCK2(return 1)
 
-	if (!PyTuple_Check(names) && !PyDict_Check(names)) return 0;
+	if (!PyTuple_Check(names) && !PyDict_Check(names)) PYTHON_UNLOCK2(return 0)
 
 
 	PyObject *tuple_object = PyTuple_Check(names)? names : PyTuple_New(0);
@@ -239,7 +241,7 @@ result __rsvp_rqsrvc_auto_hook_type_check(text_info tType, text_info nName,
 	{
 	if (!PyTuple_Check(names)) Py_DECREF(tuple_object);
 	if (!PyDict_Check(names))  Py_DECREF(dict_object);
-	return 0;
+	PYTHON_UNLOCK2(return 0)
 	}
 
 	if (!PyTuple_Check(names)) Py_DECREF(tuple_object);
@@ -248,5 +250,5 @@ result __rsvp_rqsrvc_auto_hook_type_check(text_info tType, text_info nName,
 	if (nNewType) *nNewType = type? strdup(type) : NULL;
 	if (nNewName) *nNewName = name? strdup(name) : NULL;
 
-	return 1;
+	PYTHON_UNLOCK2(return 1)
 }

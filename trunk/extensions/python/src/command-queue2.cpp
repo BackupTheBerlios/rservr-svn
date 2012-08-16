@@ -14,9 +14,9 @@ extern "C" {
 
 
 #define ALL_GLOBAL_BINDINGS(macro) \
-macro(send_command_callback) \
-macro(new_status_callback) \
-macro(cancelable_wait_command_event)
+macro(send_command) \
+macro(new_status) \
+macro(wait_command_event)
 
 
 
@@ -24,22 +24,24 @@ class python_function
 {
 public:
 	python_function(PyObject *cCallback = NULL) : callback(cCallback)
-	{ Py_XINCREF(callback); }
+	{ PYTHON_SINGLE(Py_XINCREF(callback)) }
 
 	python_function(const python_function &eEqual) : callback(eEqual.callback)
-	{ Py_XINCREF(callback); }
+	{ PYTHON_SINGLE(Py_XINCREF(callback)); }
 
 	python_function &operator = (const python_function &eEqual)
 	{
 	if (&eEqual == this) return *this;
+	PYTHON_LOCK
 	Py_XDECREF(callback);
 	callback = eEqual.callback;
 	Py_XINCREF(callback);
+	PYTHON_UNLOCK
 	return *this;
 	}
 
 	virtual ~python_function()
-	{ Py_XDECREF(callback); }
+	{ PYTHON_SINGLE(Py_XDECREF(callback)); }
 
 protected:
 
@@ -56,9 +58,12 @@ public:
 	result operator () (command_reference rReference, command_event eEvent,
 	  command_event cCumulative, const struct command_info *iInfo)
 	{
+	PYTHON_LOCK
 	//NOTE: 'true' indicates that the callback should be removed!
-	if (!callback || !PyCallable_Check(callback)) return true;
-	return execute_callback(callback, rReference, eEvent, cCumulative, iInfo);
+	if (!callback || !PyCallable_Check(callback)) PYTHON_UNLOCK2(return true)
+	result outcome = execute_callback(callback, rReference, eEvent, cCumulative, iInfo);
+	PYTHON_UNLOCK
+	return outcome;
 	}
 
 	event_functor *copy() const
@@ -87,9 +92,12 @@ public:
 
 	int operator () (command_reference rReference, command_event eEvent)
 	{
+	PYTHON_LOCK
 	//NOTE: '-1' indicates that the wait should be canceled
-	if (!callback || !PyCallable_Check(callback)) return -1;
-	return execute_callback(callback, rReference, eEvent);
+	if (!callback || !PyCallable_Check(callback)) PYTHON_UNLOCK2(return -1)
+	int outcome = execute_callback(callback, rReference, eEvent);
+	PYTHON_UNLOCK
+	return outcome;
 	}
 
 private:
@@ -108,15 +116,18 @@ private:
 
 
 
-GLOBAL_BINDING_START(send_command_callback, "")
+GLOBAL_BINDING_START(send_command, "")
 	STATIC_KEYWORDS(keywords) = { "command", "callback", NULL };
 	PyObject *object = NULL, *pointer = NULL;
-	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "OO", keywords, &object, &pointer)) return NULL;
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "O|O", keywords, &object, &pointer)) return NULL;
 	command_handle command = auto_command_handle(object);
 	if (!command) return NULL;
 	command_reference reference = 0;
 
-	if (PyCallable_Check(pointer))
+	if (!pointer)
+	reference = send_command(command);
+
+	else if (PyCallable_Check(pointer))
 	reference = send_command_functor(command, new python_callback(pointer));
 
 	else if (PyList_Check(pointer))
@@ -136,11 +147,11 @@ GLOBAL_BINDING_START(send_command_callback, "")
 
 	if (!reference) return auto_exception(PyExc_RuntimeError, "");
 	return Py_BuildValue("l", reference);
-GLOBAL_BINDING_END(send_command_callback)
+GLOBAL_BINDING_END(send_command)
 
 
 
-GLOBAL_BINDING_START(new_status_callback, "")
+GLOBAL_BINDING_START(new_status, "")
 	STATIC_KEYWORDS(keywords) = { "reference", "callback", NULL };
 	long reference = 0;
 	PyObject *pointer = NULL;
@@ -167,7 +178,7 @@ GLOBAL_BINDING_START(new_status_callback, "")
 
 	if (!outcome) return auto_exception(PyExc_RuntimeError, "");
 	NO_RETURN
-GLOBAL_BINDING_END(new_status_callback)
+GLOBAL_BINDING_END(new_status)
 
 
 
@@ -213,26 +224,42 @@ static int common_cancel_callback(command_reference rReference, command_event eE
 }
 
 
-GLOBAL_BINDING_START(cancelable_wait_command_event, "")
+GLOBAL_BINDING_START(wait_command_event, "")
 	STATIC_KEYWORDS(keywords) = { "reference", "event", "timeout", "pointer", NULL };
 	long reference = 0, event = 0;
 	float timeout = 0.;
 	PyObject *pointer = NULL;
-	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "llfO", keywords, &reference, &event, &timeout, &pointer)) return NULL;
-	if (!PyCallable_Check(pointer)) return auto_exception(PyExc_TypeError, "");
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "llf|O", keywords, &reference, &event, &timeout, &pointer)) return NULL;
+	if (pointer && !PyCallable_Check(pointer)) return auto_exception(PyExc_TypeError, "");
 
+	command_event outcome;
+
+	//NOTE: this allows threads to execute while the loop is running, but
+	//'python_wait_cancel' will obtain GIL before calling the callback
+	Py_BEGIN_ALLOW_THREADS
+
+	if (pointer)
+	{
 	if (pthread_mutex_lock(&cancel_callback_mutex) != 0) return auto_exception(PyExc_RuntimeError, "");
 	cancel_by_thread[pthread_self()] = pointer;
 	if (pthread_mutex_unlock(&cancel_callback_mutex) != 0) return auto_exception(PyExc_RuntimeError, "");
+	}
 
-	command_event outcome = cancelable_wait_command_event(reference, event, timeout, &common_cancel_callback);
+	outcome = pointer?
+	  cancelable_wait_command_event(reference, event, timeout, &common_cancel_callback) :
+	  wait_command_event(reference, event, timeout);
 
+	if (pointer)
+	{
 	if (pthread_mutex_lock(&cancel_callback_mutex) != 0) return auto_exception(PyExc_RuntimeError, "");
 	cancel_by_thread.erase(pthread_self());
 	if (pthread_mutex_unlock(&cancel_callback_mutex) != 0) return auto_exception(PyExc_RuntimeError, "");
+	}
+
+	Py_END_ALLOW_THREADS
 
 	return Py_BuildValue("l", outcome);
-GLOBAL_BINDING_END(cancelable_wait_command_event)
+GLOBAL_BINDING_END(wait_command_event)
 
 
 

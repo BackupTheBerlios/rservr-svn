@@ -22,10 +22,8 @@ NEW_TYPE_WRAPPER_DEFINE(command_handle, command_handle)
 
 #define ALL_GLOBAL_BINDINGS(macro) \
 macro(change_command_priority) \
-macro(send_command) \
 macro(send_command_no_status) \
 macro(destroy_command) \
-macro(wait_command_event) \
 macro(find_command_status) \
 macro(clear_command_status) \
 macro(insert_remote_address) \
@@ -85,16 +83,6 @@ GLOBAL_BINDING_START(destroy_command, "")
 	if (!destroy_command(command)) return auto_exception(PyExc_ValueError, "");
 	NO_RETURN
 GLOBAL_BINDING_END(destroy_command)
-
-
-
-GLOBAL_BINDING_START(wait_command_event, "")
-	STATIC_KEYWORDS(keywords) = { "reference", "event", "timeout", NULL };
-	long reference = 0, event = 0;
-	float timeout = 0.;
-	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "llf", keywords, &reference, &event, &timeout)) return NULL;
-	return Py_BuildValue("l", wait_command_event(reference, event, timeout));
-GLOBAL_BINDING_END(wait_command_event)
 
 
 

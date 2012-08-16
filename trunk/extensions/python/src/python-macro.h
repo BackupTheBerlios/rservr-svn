@@ -193,15 +193,31 @@ if (!load_long_constant(MODULE, #name, name)) return;
 if (!load_none_value(MODULE, #name)) return;
 
 
+#define PYTHON_LOCK \
+PyGILState_STATE gstate; \
+gstate = PyGILState_Ensure();
+
+#define PYTHON_UNLOCK \
+PyGILState_Release(gstate);
+
+#define PYTHON_UNLOCK2(statement) { \
+PyGILState_Release(gstate); \
+statement; }
+
+#define PYTHON_SINGLE(statement) \
+{ PYTHON_LOCK statement; PYTHON_UNLOCK }
+
+
 #define HOOK hook
 
 #define VALUE value
 
 #define DEFAULT_HOOK_FUNCTION_HEAD(name, default) \
+PYTHON_LOCK \
 PyObject *HOOK = get_module_object(MODULE, #name); \
 if (!HOOK || !PyCallable_Check(HOOK)) { \
   Py_XDECREF(HOOK); \
-  return default; }
+  PYTHON_UNLOCK2(return default) }
 
 #define DEFAULT_CALL_HOOK_CALLBACK(args, default) \
 PyObject *VALUE = NULL; \
@@ -210,7 +226,7 @@ PyObject *VALUE = NULL; \
   PyErr_Clear(); \
   Py_XDECREF(callback_args); \
   Py_XDECREF(HOOK); \
-  if (!VALUE) return default; }
+  if (!VALUE) PYTHON_UNLOCK2(return default) }
 
 #define DEFAULT_HOOK_RETURN { \
   if (VALUE == Py_None) { \
@@ -219,10 +235,10 @@ PyObject *VALUE = NULL; \
   long status = 0; \
   int outcome = py_to_long(&status, VALUE); \
   Py_XDECREF(VALUE); \
-  return outcome? status : event_discarded; }
+  PYTHON_UNLOCK2(return outcome? status : event_discarded) }
 
 #define DEFAULT_HOOK_VOID \
-Py_XDECREF(VALUE);
+{ Py_XDECREF(VALUE); PYTHON_UNLOCK }
 
 #define DEFAULT_THREAD_RETURN(call) { \
   int outcome = call; \

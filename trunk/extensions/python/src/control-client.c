@@ -16,7 +16,11 @@ GLOBAL_BINDING_START(register_control_client, "")
 	STATIC_KEYWORDS(keywords) = { "name", NULL };
 	const char *name = NULL;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "s", keywords, &name)) return NULL;
-	if (!register_control_client(name)) return auto_exception(PyExc_RuntimeError, "");
+	int outcome;
+	Py_BEGIN_ALLOW_THREADS
+	outcome = register_control_client(name);
+	Py_END_ALLOW_THREADS
+	if (!outcome) return auto_exception(PyExc_RuntimeError, "");
 	NO_RETURN
 GLOBAL_BINDING_END(register_control_client)
 

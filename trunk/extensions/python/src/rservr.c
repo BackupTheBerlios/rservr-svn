@@ -37,6 +37,7 @@ PyObject ATTR_HIDE *MODULE = NULL;
 
 PyMODINIT_FUNC init_rservr(void)
 {
+	PyEval_InitThreads();
 	MODULE = rservr_module = Py_InitModule3("_rservr", NULL, "Python bindings for librservr-client.");
 	if (!rservr_module) return;
 	ALL_BINDINGS(DECLARE_LOADER)

@@ -14,7 +14,11 @@ GLOBAL_BINDING_START(convert_client_detached, "")
 	STATIC_KEYWORDS(keywords) = { "socket", NULL };
 	int socket = 0;
 	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "i", keywords, &socket)) return NULL;
-	if (!convert_client_detached(socket)) return auto_exception(PyExc_RuntimeError, "");
+	int outcome;
+	Py_BEGIN_ALLOW_THREADS
+	outcome = convert_client_detached(socket);
+	Py_END_ALLOW_THREADS
+	if (!outcome) return auto_exception(PyExc_RuntimeError, "");
 	NO_RETURN
 GLOBAL_BINDING_END(convert_client_detached)
 

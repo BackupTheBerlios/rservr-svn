@@ -163,8 +163,11 @@ GLOBAL_BINDING_END(get_server_name)
 
 GLOBAL_BINDING_START(request_terminal, "")
 	NO_ARGUMENTS
-	int descriptor = -1;
-	if (!request_terminal(&descriptor)) return auto_exception(PyExc_RuntimeError, "");
+	int descriptor = -1, outcome;
+	Py_BEGIN_ALLOW_THREADS
+	outcome = request_terminal(&descriptor);
+	Py_END_ALLOW_THREADS
+	if (!outcome) return auto_exception(PyExc_RuntimeError, "");
 	return Py_BuildValue("i", descriptor);
 GLOBAL_BINDING_END(request_terminal)
 
@@ -172,7 +175,11 @@ GLOBAL_BINDING_END(request_terminal)
 
 GLOBAL_BINDING_START(return_terminal, "")
 	NO_ARGUMENTS
-	if (!return_terminal()) return auto_exception(PyExc_RuntimeError, "");
+	int outcome;
+	Py_BEGIN_ALLOW_THREADS
+	outcome = return_terminal();
+	Py_END_ALLOW_THREADS
+	if (!outcome) return auto_exception(PyExc_RuntimeError, "");
 	NO_RETURN
 GLOBAL_BINDING_END(return_terminal)
 

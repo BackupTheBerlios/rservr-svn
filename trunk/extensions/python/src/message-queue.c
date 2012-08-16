@@ -429,7 +429,11 @@ GLOBAL_BINDING_END(start_message_queue)
 
 GLOBAL_BINDING_START(inline_message_queue, "")
 	NO_ARGUMENTS
-	if (!inline_message_queue()) return auto_exception(PyExc_RuntimeError, "");
+	int outcome;
+	Py_BEGIN_ALLOW_THREADS
+	outcome = inline_message_queue();
+	Py_END_ALLOW_THREADS
+	if (!outcome) return auto_exception(PyExc_RuntimeError, "");
 	NO_RETURN
 GLOBAL_BINDING_END(inline_message_queue)
 
@@ -600,8 +604,10 @@ static queue_event_hook old_queue_event_hook = NULL;
 
 static void queue_event_hook_wrapper(int eEvent)
 {
+	PYTHON_LOCK
 	if (python_queue_event_hook && PyCallable_Check(python_queue_event_hook))
 	Py_XDECREF(PyEval_CallObject(python_queue_event_hook, Py_BuildValue("(i)", eEvent)));
+	PYTHON_UNLOCK
 }
 
 
@@ -638,7 +644,11 @@ GLOBAL_BINDING_END(set_queue_event_hook)
 
 GLOBAL_BINDING_START(message_queue_sync, "")
 	NO_ARGUMENTS
-	if (!message_queue_sync()) return auto_exception(PyExc_RuntimeError, "");
+	int outcome;
+	Py_BEGIN_ALLOW_THREADS
+	outcome = message_queue_sync();
+	Py_END_ALLOW_THREADS
+	if (!outcome) return auto_exception(PyExc_RuntimeError, "");
 	NO_RETURN
 GLOBAL_BINDING_END(message_queue_sync)
 
