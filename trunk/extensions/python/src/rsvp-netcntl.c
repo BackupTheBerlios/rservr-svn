@@ -271,20 +271,84 @@ PyMODINIT_FUNC initrsvp_netcntl(void)
 
 
 
-#warning IMPLEMENT THE HOOK FUNCTIONS!
+static command_event get_list_common(const char *hHook, const struct netcntl_source_info *iInfo, char ***lList)
+{
+	if (!lList) return event_error;
 
-extern command_event __rsvp_netcntl_hook_net_connection_list(const struct netcntl_source_info*, char***);
-extern command_event __rsvp_netcntl_hook_net_connect(const struct netcntl_source_info*, text_info, text_info, char**);
-extern command_event __rsvp_netcntl_hook_net_filtered_connect(const struct netcntl_source_info*, text_info, text_info, text_info, char**);
-extern command_event __rsvp_netcntl_hook_net_disconnect(const struct netcntl_source_info*, text_info);
-extern command_event __rsvp_netcntl_hook_net_listen_list(const struct netcntl_source_info*, char***);
-extern command_event __rsvp_netcntl_hook_net_listen(const struct netcntl_source_info*, text_info);
-extern command_event __rsvp_netcntl_hook_net_unlisten(const struct netcntl_source_info*, text_info);
+	DEFAULT_HOOK_FUNCTION_HEAD2(hHook)
 
-extern command_event __rsvp_netcntl_hook_local_connection_list(const struct netcntl_source_info*, char***);
-extern command_event __rsvp_netcntl_hook_local_connect(const struct netcntl_source_info*, text_info, char**);
-extern command_event __rsvp_netcntl_hook_local_filtered_connect(const struct netcntl_source_info*, text_info, text_info, char**);
-extern command_event __rsvp_netcntl_hook_local_disconnect(const struct netcntl_source_info*, text_info);
-extern command_event __rsvp_netcntl_hook_local_listen_list(const struct netcntl_source_info*, char***);
-extern command_event __rsvp_netcntl_hook_local_listen(const struct netcntl_source_info*, text_info);
-extern command_event __rsvp_netcntl_hook_local_unlisten(const struct netcntl_source_info*, text_info);
+	DEFAULT_CALL_HOOK_CALLBACK(Py_BuildValue("(O)", NEW_TYPE_WRAPPER(netcntl_source_info, iInfo)), event_error)
+
+	if (!PyList_check(VALUE) && !PyTuple_Check(names) && !PyDict_Check(names))
+	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event_error; })
+
+	if (!PyList_check(VALUE) && PyObject_Not(VALUE))
+	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event_error; })
+
+	PyObject *object = NULL;
+	long event = event_complete;
+
+	if (PyList_check(VALUE)) object = VALUE;
+
+	else
+	{
+	PyObject *tuple_object = PyTuple_Check(VALUE)? VALUE : PyTuple_New(0);
+	PyObject *dict_object  = PyDict_Check(VALUE)?  VALUE : PyDict_New();
+
+	STATIC_KEYWORDS(keywords) = { "list", "event", NULL };
+	if(!PyArg_ParseTupleAndKeywords(tuple_object, dict_object, "|Ol", keywords, &object, &event))
+	 {
+	if (!PyTuple_Check(VALUE)) Py_DECREF(tuple_object);
+	if (!PyDict_Check(VALUE))  Py_DECREF(dict_object);
+	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event_error; })
+	 }
+
+	if (!PyTuple_Check(VALUE)) Py_DECREF(tuple_object);
+	if (!PyDict_Check(VALUE))  Py_DECREF(dict_object);
+	}
+
+	if (object)
+	{
+	info_list list = NULL;
+	if (!py_to_info_list(&list, VALUE))
+	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event_error; })
+	*lList = (char**) list;
+	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event; })
+	}
+
+	else PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event; })
+}
+
+
+
+command_event __rsvp_netcntl_hook_net_connection_list(const struct netcntl_source_info *iInfo, char ***lList)
+{ return get_list_common("__rsvp_netcntl_hook_net_connection_list", iInfo, lList); }
+
+
+
+command_event __rsvp_netcntl_hook_net_connect(const struct netcntl_source_info*, text_info, text_info, char**);
+command_event __rsvp_netcntl_hook_net_filtered_connect(const struct netcntl_source_info*, text_info, text_info, text_info, char**);
+command_event __rsvp_netcntl_hook_net_disconnect(const struct netcntl_source_info*, text_info);
+command_event __rsvp_netcntl_hook_net_listen_list(const struct netcntl_source_info *iInfo, char ***lList)
+{ return get_list_common("__rsvp_netcntl_hook_net_connection_list", iInfo, lList); }
+
+
+
+command_event __rsvp_netcntl_hook_net_listen(const struct netcntl_source_info*, text_info);
+command_event __rsvp_netcntl_hook_net_unlisten(const struct netcntl_source_info*, text_info);
+
+command_event __rsvp_netcntl_hook_local_connection_list(const struct netcntl_source_info *iInfo, char ***lList)
+{ return get_list_common("__rsvp_netcntl_hook_net_connection_list", iInfo, lList); }
+
+
+
+command_event __rsvp_netcntl_hook_local_connect(const struct netcntl_source_info*, text_info, char**);
+command_event __rsvp_netcntl_hook_local_filtered_connect(const struct netcntl_source_info*, text_info, text_info, char**);
+command_event __rsvp_netcntl_hook_local_disconnect(const struct netcntl_source_info*, text_info);
+command_event __rsvp_netcntl_hook_local_listen_list(const struct netcntl_source_info *iInfo, char ***lList)
+{ return get_list_common("__rsvp_netcntl_hook_net_connection_list", iInfo, lList); }
+
+
+
+command_event __rsvp_netcntl_hook_local_listen(const struct netcntl_source_info*, text_info);
+command_event __rsvp_netcntl_hook_local_unlisten(const struct netcntl_source_info*, text_info);

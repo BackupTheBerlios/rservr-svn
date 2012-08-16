@@ -63,7 +63,11 @@ GLOBAL_BINDING_END(check_ipc_status)
 
 GLOBAL_BINDING_START(deregister_client, "")
 	NO_ARGUMENTS
-	if (!deregister_client()) return auto_exception(PyExc_RuntimeError, "");
+	int outcome;
+	Py_BEGIN_ALLOW_THREADS
+	outcome = deregister_client();
+	Py_END_ALLOW_THREADS
+	if (!outcome) return auto_exception(PyExc_RuntimeError, "");
 	NO_RETURN
 GLOBAL_BINDING_END(deregister_client)
 

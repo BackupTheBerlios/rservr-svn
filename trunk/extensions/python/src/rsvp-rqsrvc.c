@@ -241,11 +241,13 @@ result __rsvp_rqsrvc_auto_hook_type_check(text_info tType, text_info nName,
 	{
 	if (!PyTuple_Check(names)) Py_DECREF(tuple_object);
 	if (!PyDict_Check(names))  Py_DECREF(dict_object);
+	Py_XDECREF(names);
 	PYTHON_UNLOCK2(return 0)
 	}
 
 	if (!PyTuple_Check(names)) Py_DECREF(tuple_object);
 	if (!PyDict_Check(names))  Py_DECREF(dict_object);
+	Py_XDECREF(names);
 
 	if (nNewType) *nNewType = type? strdup(type) : NULL;
 	if (nNewName) *nNewName = name? strdup(name) : NULL;

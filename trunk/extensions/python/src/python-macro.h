@@ -213,8 +213,11 @@ statement; }
 #define VALUE value
 
 #define DEFAULT_HOOK_FUNCTION_HEAD(name, default) \
+DEFAULT_HOOK_FUNCTION_HEAD2(#name, default)
+
+#define DEFAULT_HOOK_FUNCTION_HEAD2(name, default) \
 PYTHON_LOCK \
-PyObject *HOOK = get_module_object(MODULE, #name); \
+PyObject *HOOK = get_module_object(MODULE, name); \
 if (!HOOK || !PyCallable_Check(HOOK)) { \
   Py_XDECREF(HOOK); \
   PYTHON_UNLOCK2(return default) }

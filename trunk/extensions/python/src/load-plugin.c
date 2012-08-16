@@ -20,7 +20,7 @@ GLOBAL_BINDING_END(load_plugin_lib)
 
 
 GLOBAL_BINDING_START(load_internal_plugins, "")
-	NO_ARGUMENTS;
+	NO_ARGUMENTS
 	if (load_internal_plugins() < 0) return auto_exception(PyExc_RuntimeError, "");
 	NO_RETURN
 GLOBAL_BINDING_END(load_internal_plugins)
