@@ -27,7 +27,7 @@ public:
 	{ PYTHON_SINGLE(Py_XINCREF(callback)) }
 
 	python_function(const python_function &eEqual) : callback(eEqual.callback)
-	{ PYTHON_SINGLE(Py_XINCREF(callback)); }
+	{ PYTHON_SINGLE(Py_XINCREF(callback)) }
 
 	python_function &operator = (const python_function &eEqual)
 	{
@@ -41,7 +41,7 @@ public:
 	}
 
 	virtual ~python_function()
-	{ PYTHON_SINGLE(Py_XDECREF(callback)); }
+	{ PYTHON_SINGLE(Py_XDECREF(callback)) }
 
 protected:
 

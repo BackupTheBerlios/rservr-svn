@@ -280,10 +280,16 @@ static command_event get_list_common(const char *hHook, const struct netcntl_sou
 	DEFAULT_CALL_HOOK_CALLBACK(Py_BuildValue("(O)", NEW_TYPE_WRAPPER(netcntl_source_info, iInfo)), event_error)
 
 	if (!PyList_Check(VALUE) && !PyTuple_Check(VALUE) && !PyDict_Check(VALUE))
-	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event_error; })
+	{
+	Py_XDECREF(VALUE);
+	PYTHON_UNLOCK2(return event_error)
+	}
 
 	if (!PyList_Check(VALUE) && PyObject_Not(VALUE))
-	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event_error; })
+	{
+	Py_XDECREF(VALUE);
+	PYTHON_UNLOCK2(return event_error)
+	}
 
 	PyObject *object = NULL;
 	long event = event_complete;
@@ -352,10 +358,16 @@ static command_event connection_common(const char *hHook, PyObject *vValue, char
 	DEFAULT_CALL_HOOK_CALLBACK(vValue, event_error)
 
 	if (!PyString_Check(VALUE) && !PyTuple_Check(VALUE) && !PyDict_Check(VALUE))
-	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event_error; })
+	{
+	Py_XDECREF(VALUE);
+	PYTHON_UNLOCK2(return event_error)
+	}
 
 	if (PyObject_Not(VALUE)) //(an empty string is an error)
-	PYTHON_UNLOCK2({ Py_XDECREF(VALUE); return event_error; })
+	{
+	Py_XDECREF(VALUE);
+	PYTHON_UNLOCK2(return event_error)
+	}
 
 	text_info string = NULL;
 	long event = event_complete;
