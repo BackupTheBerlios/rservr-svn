@@ -262,16 +262,16 @@ METHOD_BINDING_END(message_info, respond)
 
 
 #define ALL_MESSAGE_INFO_GETATTR(macro) \
-macro("message_info", message_reference) \
-macro("message_info", last_reference) \
-macro("message_info", received_from) \
-macro("message_info", received_address) \
-macro("message_info", sent_to) \
-macro("message_info", sent_address) \
-macro("message_info", creator_pid) \
-macro("message_info", time_received) \
-macro("message_info", priority) \
-macro("message_info", command_name)
+macro(message_info, message_reference) \
+macro(message_info, last_reference) \
+macro(message_info, received_from) \
+macro(message_info, received_address) \
+macro(message_info, sent_to) \
+macro(message_info, sent_address) \
+macro(message_info, creator_pid) \
+macro(message_info, time_received) \
+macro(message_info, priority) \
+macro(message_info, command_name)
 
 
 TYPE_GETATTR(message_info, message_reference, Py_BuildValue("i", SELF->pointer->message_reference))
