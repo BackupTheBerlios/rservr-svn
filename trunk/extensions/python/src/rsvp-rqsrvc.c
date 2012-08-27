@@ -55,7 +55,7 @@ static PyObject *python_rqsrvc_source_info_getattro(python_rqsrvc_source_info *s
 	const char *name = NULL;
 	if (!(name = PyString_AsString(name_object))) return NULL;
 
-	return TYPE_GETATTR_CALL(message_info, self, name_object);
+	return TYPE_GETATTR_CALL(rqsrvc_source_info, self, name_object);
 }
 
 

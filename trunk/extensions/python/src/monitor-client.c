@@ -29,27 +29,22 @@ ALL_GLOBAL_TYPES(TYPE_WRAPPER_COMPARE_DEFINE)
 
 
 
+#define ALL_MONITOR_UPDATE_DATA_GETATTR(macro) \
+macro(monitor_update_data, event_type) \
+macro(monitor_update_data, event_data)
+
+
+TYPE_GETATTR(monitor_update_data, event_type, Py_BuildValue("i", SELF->pointer->event_type))
+TYPE_GETATTR(monitor_update_data, event_data, info_list_to_py(SELF->pointer->event_data))
+
+
 static PyObject *python_monitor_update_data_getattro(python_monitor_update_data *self, PyObject *name_object)
 {
 	if (!self || !self->pointer) return auto_exception(PyExc_IndexError, "");
 	const char *name = NULL;
 	if (!(name = PyString_AsString(name_object))) return NULL;
 
-	//TODO: use a 'std::map' here
-
-	if (0);
-
-	STRING_CASE(name, "event_type")
-	{
-	return Py_BuildValue("i", self->pointer->event_type);
-	}
-
-	STRING_CASE(name, "event_data")
-	{
-	return info_list_to_py(self->pointer->event_data);
-	}
-
-	else return PyObject_GenericGetAttr((PyObject*) self, name_object);
+	return TYPE_GETATTR_CALL(monitor_update_data, self, name_object);
 }
 
 
@@ -105,6 +100,7 @@ int python_load_monitor_client(PyObject *MODULE)
 	ALL_HOOK_FUNCTIONS(NONE_VALUE)
 	ALL_GLOBAL_BINDINGS(LOAD_GLOBAL_BINDING)
 	ALL_GLOBAL_TYPES(LOAD_GLOBAL_TYPE)
+	ALL_MONITOR_UPDATE_DATA_GETATTR(TYPE_GETATTR_REGISTER)
 	return 1;
 }
 

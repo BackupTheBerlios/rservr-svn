@@ -65,7 +65,7 @@ static PyObject *python_netcntl_source_info_getattro(python_netcntl_source_info 
 	const char *name = NULL;
 	if (!(name = PyString_AsString(name_object))) return NULL;
 
-	return TYPE_GETATTR_CALL(message_info, self, name_object);
+	return TYPE_GETATTR_CALL(netcntl_source_info, self, name_object);
 }
 
 

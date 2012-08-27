@@ -55,7 +55,7 @@ static PyObject *python_passthru_source_info_getattro(python_passthru_source_inf
 	const char *name = NULL;
 	if (!(name = PyString_AsString(name_object))) return NULL;
 
-	return TYPE_GETATTR_CALL(message_info, self, name_object);
+	return TYPE_GETATTR_CALL(passthru_source_info, self, name_object);
 }
 
 
