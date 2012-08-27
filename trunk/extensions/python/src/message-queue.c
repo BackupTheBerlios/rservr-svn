@@ -261,6 +261,30 @@ METHOD_BINDING_START(message_info, respond, "")
 METHOD_BINDING_END(message_info, respond)
 
 
+#define ALL_MESSAGE_INFO_GETATTR(macro) \
+macro("message_info", message_reference) \
+macro("message_info", last_reference) \
+macro("message_info", received_from) \
+macro("message_info", received_address) \
+macro("message_info", sent_to) \
+macro("message_info", sent_address) \
+macro("message_info", creator_pid) \
+macro("message_info", time_received) \
+macro("message_info", priority) \
+macro("message_info", command_name)
+
+
+TYPE_GETATTR(message_info, message_reference, Py_BuildValue("i", SELF->pointer->message_reference))
+TYPE_GETATTR(message_info, last_reference,    Py_BuildValue("i", SELF->pointer->last_reference))
+TYPE_GETATTR(message_info, received_from,     Py_BuildValue("s", SELF->pointer->received_from))
+TYPE_GETATTR(message_info, received_address,  Py_BuildValue("s", SELF->pointer->received_address))
+TYPE_GETATTR(message_info, sent_to,           Py_BuildValue("s", SELF->pointer->sent_to))
+TYPE_GETATTR(message_info, sent_address,      Py_BuildValue("s", SELF->pointer->sent_address))
+TYPE_GETATTR(message_info, creator_pid,       Py_BuildValue("i", SELF->pointer->creator_pid))
+TYPE_GETATTR(message_info, time_received,     Py_BuildValue("l", (long) SELF->pointer->time_received))
+TYPE_GETATTR(message_info, priority,          Py_BuildValue("i", SELF->pointer->priority))
+TYPE_GETATTR(message_info, command_name,      Py_BuildValue("s", SELF->pointer->command_name))
+
 
 static PyObject *python_message_info_getattro(python_message_info *self, PyObject *name_object)
 {
@@ -268,61 +292,7 @@ static PyObject *python_message_info_getattro(python_message_info *self, PyObjec
 	const char *name = NULL;
 	if (!(name = PyString_AsString(name_object))) return NULL;
 
-	//TODO: use a 'std::map' here
-
-	if (0);
-
-	STRING_CASE(name, "message_reference")
-	{
-	return Py_BuildValue("i", self->pointer->message_reference);
-	}
-
-	STRING_CASE(name, "last_reference")
-	{
-	return Py_BuildValue("i", self->pointer->last_reference);
-	}
-
-	STRING_CASE(name, "received_from")
-	{
-	return Py_BuildValue("s", self->pointer->received_from);
-	}
-
-	STRING_CASE(name, "received_address")
-	{
-	return Py_BuildValue("s", self->pointer->received_address);
-	}
-
-	STRING_CASE(name, "sent_to")
-	{
-	return Py_BuildValue("s", self->pointer->sent_to);
-	}
-
-	STRING_CASE(name, "sent_address")
-	{
-	return Py_BuildValue("s", self->pointer->sent_address);
-	}
-
-	STRING_CASE(name, "creator_pid")
-	{
-	return Py_BuildValue("i", self->pointer->creator_pid);
-	}
-
-	STRING_CASE(name, "time_received")
-	{
-	return Py_BuildValue("l", (long) self->pointer->time_received);
-	}
-
-	STRING_CASE(name, "priority")
-	{
-	return Py_BuildValue("i", self->pointer->priority);
-	}
-
-	STRING_CASE(name, "command_name")
-	{
-	return Py_BuildValue("s", self->pointer->command_name);
-	}
-
-	else return PyObject_GenericGetAttr((PyObject*) self, name_object);
+	return TYPE_GETATTR_CALL(message_info, self, name_object);
 }
 
 
@@ -751,6 +721,7 @@ int python_load_message_queue(PyObject *MODULE)
 	ALL_LONG_CONSTANTS(LONG_CONSTANT)
 	ALL_GLOBAL_BINDINGS(LOAD_GLOBAL_BINDING)
 	MESSAGE_QUEUE_ALL_GLOBAL_TYPES(LOAD_GLOBAL_TYPE)
+	ALL_MESSAGE_INFO_GETATTR(TYPE_GETATTR_REGISTER)
 	return 1;
 }
 

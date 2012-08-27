@@ -2,6 +2,8 @@ include readme.txt
 include rservr/__init__.py
 include src/rservr.c
 include src/rservr.h
+include src/attr-map.h
+include src/attr-map.cpp
 include src/admin-client.c
 include src/client-timing.c
 include src/client.c

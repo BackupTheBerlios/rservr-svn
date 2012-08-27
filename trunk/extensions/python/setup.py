@@ -69,6 +69,7 @@ ext_modules = [
     distutils.core.Extension(name = 'rservr._rservr',
         sources = [
         'src/rservr.c',
+        'src/attr-map.cpp',
         'src/load-all.c',
         'src/command.c',
         'src/command-queue.c',

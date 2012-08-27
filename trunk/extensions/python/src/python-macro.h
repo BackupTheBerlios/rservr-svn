@@ -8,6 +8,7 @@ extern "C" {
 #include <Python.h>
 
 #include "load-all.h"
+#include "attr-map.h"
 
 #include "rservr.h"
 
@@ -50,8 +51,9 @@ static inline PyObject __attribute__ ((deprecated)) *not_implemented(void)
 { return auto_exception(PyExc_NotImplementedError, ""); }
 
 
-#define SELF sSelf
-#define ARGS aArgs
+#define SELF self
+#define ARGS args
+#define NAME name
 
 
 #define STRING_CASE(var, string) else if (strcmp(var, string) == 0)
@@ -248,6 +250,27 @@ PyObject *VALUE = NULL; \
   if (outcome < 0) return auto_exception(PyExc_RuntimeError, ""); \
   if (outcome == 0) return thread_started(""); \
   NO_RETURN }
+
+
+#define TYPE_GETATTR(type, name, value) \
+PyObject *type_##name##_getattr(python_##type *SELF, PyObject *NAME) \
+{ return value; }
+
+#define TYPE_GETATTR_REGISTER(type, name) \
+register_getattr_callback(#type, #name, (getattr_callback) &type_##name##_getattr);
+
+#define TYPE_GETATTR_CALL(type, self, object) \
+call_getattr(#type, self, object)
+
+#define TYPE_SETATTR(type, name, value) \
+PyObject *type_##name##_setattr(PyObject *VALUE) \
+{ return value; }
+
+#define TYPE_SETATTR_REGISTER(type, name) \
+register_setattr_callback(#type, #name, (setattr_callback) &type_##name##_setattr);
+
+#define TYPE_SETATTR_CALL(type, self, object, value) \
+call_setattr(#type, self, object, value)
 
 #ifdef __cplusplus
 }

@@ -51,42 +51,28 @@ ALL_GLOBAL_TYPES(TYPE_WRAPPER_COMPARE_DEFINE)
 
 
 
+#define ALL_DATAREF_SOURCE_INFO_GETATTR(macro) \
+macro(dataref_source_info, origin) \
+macro(dataref_source_info, target) \
+macro(dataref_source_info, sender) \
+macro(dataref_source_info, address) \
+macro(dataref_source_info, respond)
+
+
+TYPE_GETATTR(dataref_source_info, origin,  Py_BuildValue("s", SELF->pointer->origin))
+TYPE_GETATTR(dataref_source_info, target,  Py_BuildValue("s", SELF->pointer->target))
+TYPE_GETATTR(dataref_source_info, sender,  Py_BuildValue("s", SELF->pointer->sender))
+TYPE_GETATTR(dataref_source_info, address, Py_BuildValue("s", SELF->pointer->address))
+TYPE_GETATTR(dataref_source_info, respond, NEW_TYPE_WRAPPER(message_handle, SELF->pointer->respond))
+
+
 static PyObject *python_dataref_source_info_getattro(python_dataref_source_info *self, PyObject *name_object)
 {
 	if (!self || !self->pointer) return auto_exception(PyExc_IndexError, "");
 	const char *name = NULL;
 	if (!(name = PyString_AsString(name_object))) return NULL;
 
-	//TODO: use a 'std::map' here
-
-	if (0);
-
-	STRING_CASE(name, "origin")
-	{
-	return Py_BuildValue("s", self->pointer->origin);
-	}
-
-	STRING_CASE(name, "target")
-	{
-	return Py_BuildValue("s", self->pointer->target);
-	}
-
-	STRING_CASE(name, "sender")
-	{
-	return Py_BuildValue("s", self->pointer->sender);
-	}
-
-	STRING_CASE(name, "address")
-	{
-	return Py_BuildValue("s", self->pointer->address);
-	}
-
-	STRING_CASE(name, "respond")
-	{
-	return NEW_TYPE_WRAPPER(message_handle, self->pointer->respond);
-	}
-
-	else return PyObject_GenericGetAttr((PyObject*) self, name_object);
+	return TYPE_GETATTR_CALL(message_info, self, name_object);
 }
 
 
@@ -245,6 +231,7 @@ PyMODINIT_FUNC initrsvp_dataref(void)
 	ALL_HOOK_FUNCTIONS(NONE_VALUE2)
 	ALL_GLOBAL_BINDINGS(LOAD_GLOBAL_BINDING2)
 	ALL_GLOBAL_TYPES(LOAD_GLOBAL_TYPE2)
+	ALL_DATAREF_SOURCE_INFO_GETATTR(TYPE_GETATTR_REGISTER)
 	if (!MODULE) return;
 }
 
