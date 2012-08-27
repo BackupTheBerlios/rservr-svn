@@ -48,12 +48,12 @@ def queue_event_hook(event):
                 break
             try:
                 if message.is_info():
-                    print >> sys.stderr, 'info message: "%s"' % (message.to_info_message())
+                    print >> sys.stderr, 'info message (from %s): "%s"' % (message.received_from, message.to_info_message())
                     response = rservr.short_response(message, rservr.event_complete)
                     rservr.send_command_no_status(response)
                     rservr.destroy_command(response)
                 elif message.is_request():
-                    print >> sys.stderr, 'request message: "%s"' % (message.to_request_message())
+                    print >> sys.stderr, 'request message (from %s): "%s"' % (message.received_from, message.to_request_message())
                     response = rservr.client_response(message, rservr.event_complete, message.to_request_message())
                     rservr.send_command_no_status(response)
                     rservr.destroy_command(response)

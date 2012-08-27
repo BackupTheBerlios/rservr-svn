@@ -31,15 +31,18 @@ void register_setattr_callback(const char *type, const char *attr, setattr_callb
 
 PyObject *call_getattr(const char *type, PyObject *self, PyObject *name_object)
 {
+debug_output("type: %s", type);
 	getattr_table::const_iterator position = all_getattr.find(type);
 	if (position == all_getattr.end()) return PyObject_GenericGetAttr(self, name_object);
 
 	const char *name = NULL;
 	if (!(name = PyString_AsString(name_object))) return NULL;
+debug_output("name: %s", name);
 
 	getattr_map::const_iterator function = position->second.find(name);
 	if (function == position->second.end()) return PyObject_GenericGetAttr(self, name_object);
 
+debug_output("found");
 	return (*function->second)(self, name_object);
 }
 
