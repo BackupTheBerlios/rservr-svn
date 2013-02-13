@@ -159,7 +159,7 @@ int daemon_main(int argc, char *argv[])
 	if (setuid(0) >= 0 || setgid(0) >= 0)
 	/*NOTE: 'rservrd' *will not* run as a daemon if it can setuid to root!*/
 	{
-	root_setuid_notice(argv[0], PARAM_RSERVRD_UNAME, PARAM_RSERVRD_GNAME);
+	root_setuid_notice(argv[0]);
 	return 1;
 	}
 

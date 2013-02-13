@@ -45,7 +45,7 @@ extern "C" {
 
 
 //new client execution==========================================================
-text_data    execute_program = "safexec";
+text_data    execute_program = SAFEXEC_PATH "/safexec";
 text_data    execute_sys     = "s";
 text_data    execute_exec    = "e";
 const int    execute_input    = RSERVR_INPUT_PIPE;

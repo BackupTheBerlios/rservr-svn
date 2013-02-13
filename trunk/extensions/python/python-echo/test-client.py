@@ -30,7 +30,7 @@ print >> sys.stderr, 'registering service...'
 service = rservr.register_service(sys.argv[1], 'echo')
 
 reference = rservr.send_command(service)
-status = rservr.wait_command_event(reference, rservr.event_complete, rservr.local_default_timeout())
+status = rservr.wait_command_event(reference)
 if not (status & rservr.event_complete):
     raise RuntimeError('service registration failed with status %.4x' % (status))
 

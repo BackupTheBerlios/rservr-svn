@@ -66,79 +66,14 @@ void set_command_name(const char *nName)
 
 
 static const char global_dir_name[] = PARAM_RSERVRD_TABLE;
-static const char table_dir_name[]  = PARAM_RSERVRD_SUBTABLE;
 static const mode_t global_mode     = S_IRWXU | S_IRGRP | S_IXGRP;
-static const mode_t table_mode      = S_IRWXU | S_IRWXG | S_IRWXO | S_ISVTX;
 
 static uid_t user_id  = -1;
 static gid_t group_id = -1;
 
 
-static void missing_user_notice(const char*, const char*, const char*);
-static void no_setuid_notice(const char*, const char*, const char*);
-
-
-int initialize_id()
-{
-	struct passwd *user_specs  = getpwnam(PARAM_RSERVRD_UNAME);
-	struct group  *group_specs = getgrnam(PARAM_RSERVRD_GNAME);
-
-	if (user_specs)      user_id  = user_specs->pw_uid;
-	if (group_specs)     group_id = group_specs->gr_gid;
-	else if (user_specs) group_id = user_specs->pw_gid;
-
-	if (user_id == (uid_t) -1 || group_id == (gid_t) -1)
-	{
-	missing_user_notice(command_name, PARAM_RSERVRD_UNAME, PARAM_RSERVRD_GNAME);
-	return -1;
-	}
-
-	seteuid(getuid());
-	setegid(getgid());
-
-	return  0;
-}
-
-
-inline int unset_user()
-{
-	int success = 0;
-
-	if ((geteuid() != getuid())  && (seteuid(getuid()) < 0)) success = -1;
-	if ((getegid() != getgid())  && (setegid(getgid()) < 0)) success = -1;
-
-	if (success < 0) fprintf(stderr, "%s: could not unset user/group\n", command_name);
-
-	return success;
-}
-
-
-inline int set_user()
-{
-	int success = 0;
-
-	if ((geteuid() != user_id)  && (seteuid(user_id)  < 0)) success = -1;
-	if ((getegid() != group_id) && (setegid(group_id) < 0)) success = -1;
-
-	if (success < 0)
-	{
-	unset_user();
-	no_setuid_notice(command_name, PARAM_RSERVRD_UNAME, PARAM_RSERVRD_GNAME);
-	return -1;
-	}
-
-	return success;
-}
-
-
 int check_table()
 {
-	if (getuid() != 0 && set_user() < 0)
-	{
-	unset_user();
-	return -1;
-	}
-
 	struct stat current_stats;
 
 	/*visible directory*/
@@ -148,7 +83,6 @@ int check_table()
 	if (stat(global_dir_name, &current_stats) >= 0 && remove(global_dir_name) < 0)
 	 {
 	fprintf(stderr, "%s: call without arguments as root to repair daemon table\n", command_name);
-	unset_user();
 	return -1;
 	 }
 
@@ -156,7 +90,6 @@ int check_table()
 	if (new_dir < 0)
 	 {
 	fprintf(stderr, "%s: could not open or create daemon table\n", command_name);
-	unset_user();
 	return -1;
 	 }
 	}
@@ -164,7 +97,6 @@ int check_table()
 	if (stat(global_dir_name, &current_stats) < 0)
 	{
 	fprintf(stderr, "%s: could not open or create daemon table\n", command_name);
-	unset_user();
 	return -1;
 	}
 
@@ -172,71 +104,15 @@ int check_table()
 	if (chown(global_dir_name, user_id, group_id) < 0)
 	{
 	fprintf(stderr, "%s: call without arguments as root to repair daemon table\n", command_name);
-	unset_user();
 	return -1;
 	}
 
-	if ((current_stats.st_mode & 07777) != global_mode)
-	if (chmod(global_dir_name, global_mode) < 0)
-	{
-	fprintf(stderr, "%s: call without arguments as root to repair daemon table\n", command_name);
-	unset_user();
-	return -1;
-	}
-
-
-	/*internal directory*/
 
 	if (chdir(global_dir_name) < 0)
 	{
 	fprintf(stderr, "%s: could not read daemon table\n", command_name);
-	unset_user();
 	return -1;
 	}
-
-	if (stat(table_dir_name, &current_stats) < 0 || !S_ISDIR(current_stats.st_mode))
-	{
-	if (stat(table_dir_name, &current_stats) >= 0 && remove(table_dir_name) < 0)
-	 {
-	fprintf(stderr, "%s: call without arguments as root to repair daemon table\n", command_name);
-	unset_user();
-	return -1;
-	 }
-
-	int new_dir = mkdir(table_dir_name, table_mode);
-	if (new_dir < 0)
-	 {
-	fprintf(stderr, "%s: could not open or create daemon table\n", command_name);
-	unset_user();
-	return -1;
-	 }
-	}
-
-	if (current_stats.st_uid != user_id || current_stats.st_gid != group_id)
-	if (chown(table_dir_name, user_id, group_id) < 0)
-	{
-	fprintf(stderr, "%s: call without arguments as root to repair daemon table\n", command_name);
-	unset_user();
-	return -1;
-	}
-
-	if ((current_stats.st_mode & 07777) != table_mode)
-	if (chmod(table_dir_name, table_mode) < 0)
-	{
-	fprintf(stderr, "%s: call without arguments as root to repair daemon table\n", command_name);
-	unset_user();
-	return -1;
-	}
-
-
-	if (chdir(table_dir_name) < 0)
-	{
-	fprintf(stderr, "%s: could not read daemon table\n", command_name);
-	unset_user();
-	return -1;
-	}
-
-	if (unset_user() < 0) return -1;
 
 	return 0;
 }
@@ -244,8 +120,6 @@ int check_table()
 
 static int resolve_existing_entry(const char *nName)
 {
-	unset_user();
-
 	struct sockaddr_un new_address;
 	size_t new_length = 0;
 
@@ -266,9 +140,7 @@ static int resolve_existing_entry(const char *nName)
 	{
 	if (errno != EINPROGRESS && errno != EALREADY && errno != EACCES)
 	 {
-	set_user();
 	remove(nName);
-	unset_user();
 	 }
 	}
 	else connected = 1;
@@ -282,14 +154,11 @@ static int resolve_existing_entry(const char *nName)
 
 int register_daemon(const char *nName, int gGroup)
 {
-	if (check_table() < 0 || set_user() < 0)
+	if (check_table() < 0)
 	{
 	fprintf(stderr, "%s: could not read daemon table\n", command_name);
-	unset_user();
 	return -1;
 	}
-
-	unset_user();
 
 	struct stat current_stats;
 
@@ -305,8 +174,6 @@ int register_daemon(const char *nName, int gGroup)
 	 }
 
 	else if (resolve_existing_entry(nName) < 0) return -1;
-
-	else unset_user();
 	}
 
 	/*create socket*/
@@ -339,6 +206,17 @@ int register_daemon(const char *nName, int gGroup)
 
 	/*NOTE: putting this here lets the daemon interface available for blocking*/
 	if (listen(new_socket, PARAM_RSERVRD_MAX_WAITING) < 0)
+	{
+	fprintf(stderr, "%s: couldn't register new daemon '%s': %s\n", command_name,
+	  nName, strerror(errno));
+	remove(nName);
+	close(new_socket);
+	return -1;
+	}
+
+	/*set socket ownership*/
+
+	if (chown(nName, getuid(), getgid()) < 0)
 	{
 	fprintf(stderr, "%s: couldn't register new daemon '%s': %s\n", command_name,
 	  nName, strerror(errno));
@@ -390,14 +268,11 @@ int register_daemon(const char *nName, int gGroup)
 
 static int connect_daemon(const char *nName)
 {
-	if (check_table() < 0 || set_user() < 0)
+	if (check_table() < 0)
 	{
 	fprintf(stderr, "%s: could not read daemon table\n", command_name);
-	unset_user();
 	return -2;
 	}
-
-	unset_user();
 
 	struct stat current_stats;
 
@@ -463,9 +338,7 @@ static int connect_daemon(const char *nName)
 
 	if (errno != EINPROGRESS && errno != EALREADY)
 	 {
-	set_user();
 	remove(nName);
-	unset_user();
 	 }
 
 	/*print "no match" instead of error here*/
@@ -612,16 +485,12 @@ int list_daemons(const char *nName)
 
 	int total_matches = scandir(".", &entries, &show_table_entry, NULL);
 
-	set_user();
-
 	if ((current = entries)) while (total_matches-- && *current)
 	{
 	fprintf(stderr, "%s: bad daemon table entry '%s' (run as root to remove)\n", nName, (*current)->d_name);
 	remove((*current)->d_name);
 	free(*current++);
 	}
-
-	unset_user();
 
 	free(entries);
 
@@ -630,37 +499,9 @@ int list_daemons(const char *nName)
 
 
 
-void missing_user_notice(const char *pProg, const char *uUser, const char *gGroup)
+void root_setuid_notice(const char *pProg)
 {
 	fprintf(stderr, "************************************************************\n");
-	fprintf(stderr, "WARNING: '%s' must be owned by:\n", pProg);
-	fprintf(stderr, "    USER: %s   GROUP: %s\n", uUser, gGroup);
-	fprintf(stderr, " with setuid and setgid flags set. The user name and/or\n");
-	fprintf(stderr, " group name are not present. Add them to the system, make\n");
-	fprintf(stderr, " sure this program is owned as above, and change the\n");
-	fprintf(stderr, " permissions to 6755.\n");
-	fprintf(stderr, "************************************************************\n");
-}
-
-
-void no_setuid_notice(const char *pProg, const char *uUser, const char *gGroup)
-{
-	fprintf(stderr, "************************************************************\n");
-	fprintf(stderr, "WARNING: '%s' must be owned by:\n", pProg);
-	fprintf(stderr, "    USER: %s   GROUP: %s\n", uUser, gGroup);
-	fprintf(stderr, " with setuid and setgid flags set. Make sure this program\n");
-	fprintf(stderr, " is owned as above and change the permissions to 6755.\n");
-	fprintf(stderr, "************************************************************\n");
-}
-
-
-void root_setuid_notice(const char *pProg, const char *uUser, const char *gGroup)
-{
-	fprintf(stderr, "************************************************************\n");
-	fprintf(stderr, "WARNING: '%s' can become root!\n", pProg);
-	fprintf(stderr, " This program *will not* run as a daemon unless owned by:\n");
-	fprintf(stderr, "    USER: %s   GROUP: %s\n", uUser, gGroup);
-	fprintf(stderr, " with setuid and setgid flags set. Make sure this program\n");
-	fprintf(stderr, " is owned as above and change the permissions to 6755.\n");
+	fprintf(stderr, "WARNING: '%s' can become root! Unset the suid/sgid bits.\n", pProg);
 	fprintf(stderr, "************************************************************\n");
 }

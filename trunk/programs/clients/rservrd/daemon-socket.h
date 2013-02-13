@@ -31,9 +31,8 @@
  +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 void set_command_name(const char*);
-int initialize_id();
 int register_daemon(const char*, int);
 int *find_daemon(const char*);
 int check_table();
 int list_daemons(const char*);
-void root_setuid_notice(const char*, const char*, const char*);
+void root_setuid_notice(const char*);

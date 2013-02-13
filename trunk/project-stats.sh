@@ -16,7 +16,7 @@ if [ "$2" = "all" ];then
   additional_really_specific="echo ../../hparser/trunk/Makefile.am; "
 fi
 
-patterns="$additional_really include/{rservr,global$additional} lang libs plugins programs security -name \"*.h\" -o -name \"*.hpp\" -o -name \"*.c\" -o -name \"*.cpp\" -o -name Makefile.am"
+patterns="$additional_really include/{rservr,global$additional} lang libs plugins programs security extensions -name \"*.h\" -o -name \"*.hpp\" -o -name \"*.c\" -o -name \"*.cpp\" -o -name \"*.py\" -o -name \"*.r\" -o -name Makefile.am"
 any_line="\".*\""
 nonblank_line="."
 find_command="( find $patterns -type f; echo param.h; echo attributes.h; $additional_really_specific )"

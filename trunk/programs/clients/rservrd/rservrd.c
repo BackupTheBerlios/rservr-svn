@@ -41,8 +41,6 @@ int main(int argc, char *argv[])
 {
 	set_command_name(argv[0]);
 
-	if (initialize_id() < 0) return 1;
-
 	if (argc == 1) return list_daemons(argv[0]);
 
 	if      (argc > 1 && strncmp(argv[1], "-d", 2) == 0) return daemon_main(argc, argv);

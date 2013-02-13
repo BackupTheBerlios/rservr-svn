@@ -1,4 +1,4 @@
-﻿/* This software is released under the BSD License.
+/* This software is released under the BSD License.
  |
  | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
  | All rights reserved.

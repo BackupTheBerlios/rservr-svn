@@ -237,20 +237,9 @@ extern "C" {
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~ DAEMON PARAMETERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-/* user and group names for suid/sgid */
-/* SET TO 'rservrd' (OR CUSTOMIZE) FOR RELEASE VERSIONS! */
-#define PARAM_RSERVRD_UNAME "rservrd"
-#define PARAM_RSERVRD_GNAME "rservrd"
-
-/* delete the user and group upon uninstall */
-/* SET TO 'false' OR BLANK IF YOU DON'T WANT THEM DELETED UPON UNINSTALL! */
-#define PARAM_RSERVRD_DELETE_UNAME true
-#define PARAM_RSERVRD_DELETE_GNAME true
-
 /* table directory name */
 /* 'table' WILL BE DELETED UPON UNINSTALL AND CANNOT CONTAIN OTHER THINGS! */
 #define PARAM_RSERVRD_TABLE    "/tmp/rservrd"
-#define PARAM_RSERVRD_SUBTABLE "table"
 
 /* maximum waiting 'rservrd' connection requests */
 #define PARAM_RSERVRD_MAX_WAITING 16

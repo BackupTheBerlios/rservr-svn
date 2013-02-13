@@ -1,6 +1,6 @@
 AM_LDFLAGS=-version-info 5:0:0
 ALL_INCLUDES=$(STANDARD_INCLUDES) -I$(srcdir)/local-include -I$(srcdir)/../.. -I$(srcdir)/../../include/rservr -I$(srcdir)/../../include -I$(srcdir)/../include/protocol -I$(srcdir)/../include
-AM_CPPFLAGS=-DPROTOCOL_LIB -DENABLE_VIRT_ARRAY_ALL $(ALL_INCLUDES)
+AM_CPPFLAGS=-DPROTOCOL_LIB -DENABLE_VIRT_ARRAY_ALL "-DSAFEXEC_PATH=\"$(DESTDIR)$(bindir)\"" $(ALL_INCLUDES)
 lib_LTLIBRARIES=librservr-protocol.la
 librservr_protocol_la_SOURCES=api-config-parser.cpp api-timing.cpp api-tools.cpp timing-manager.c timing-query.cpp constants.cpp conversion.cpp api-command.cpp command-generator.cpp api-label-check.cpp ipc/command-transmit.cpp ipc/common-input.cpp ipc/cstring-input.cpp ipc/common-output.cpp ipc/api-external-command.cpp ipc/ipc-parser.tab.cpp ipc/ipc-lexer.c
 librservr_protocol_la_LIBADD=$(STANDARD_LIBRARIES) -lhparser -lhpaux

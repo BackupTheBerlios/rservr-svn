@@ -6,6 +6,7 @@ extern "C" {
 
 #include <pthread.h>
 
+#include <rservr/api/client-timing.h>
 #include <rservr/api/event-functor.hpp>
 
 #include "load-all.h"
@@ -226,10 +227,10 @@ static int common_cancel_callback(command_reference rReference, command_event eE
 
 GLOBAL_BINDING_START(wait_command_event, "")
 	STATIC_KEYWORDS(keywords) = { "reference", "event", "timeout", "pointer", NULL };
-	long reference = 0, event = 0;
-	float timeout = 0.;
+	long reference = 0, event = event_complete;
+	float timeout = local_default_timeout_dec();
 	PyObject *pointer = NULL;
-	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "llf|O", keywords, &reference, &event, &timeout, &pointer)) return NULL;
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "l|lfO", keywords, &reference, &event, &timeout, &pointer)) return NULL;
 	if (pointer && !PyCallable_Check(pointer)) return auto_exception(PyExc_TypeError, "");
 
 	command_event outcome;
