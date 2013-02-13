@@ -12,11 +12,13 @@ bindings for the Resourcerver C API. These bindings provide access to the \
 Resourcerver package.'
 
 
-build_path_guess = 'build/lib.%s-%s-%s.%s' % (
-    platform.system().lower(),
+build_path_guess = '-'.join((
+    'build/lib.' + platform.system().lower(),
+    platform.release(),
     platform.machine(),
-    platform.python_version_tuple()[0],
-    platform.python_version_tuple()[1])
+    '.'.join((
+      platform.python_version_tuple()[0],
+      platform.python_version_tuple()[1]))))
 
 
 try:
@@ -31,6 +33,7 @@ try:
 except KeyError:
     prefix_paths = ['/usr', '/usr/local']
 
+lib_search_paths = [prefix_paths[i] + '/lib' for i in range(len(prefix_paths))]
 libexec_search_paths = [prefix_paths[i] + '/libexec/rservr' for i in range(len(prefix_paths))]
 include_search_paths = [prefix_paths[i] + '/include' for i in range(len(prefix_paths))]
 
@@ -93,14 +96,15 @@ ext_modules = [
         'src/label-check.c',
         'src/config-parser.c'],
         libraries = ['rservr-client'],
-        include_dirs = include_search_paths)] + [
+        include_dirs = include_search_paths,
+        library_dirs = lib_search_paths)] + [
     distutils.core.Extension(name = 'rservr.rsvp_' + submodules[i],
         sources = ['src/rsvp-' + submodules[i] + '.c'] + extra_files[submodules[i]],
         libraries = ['rservr-client'] + extra_libs[submodules[i]] + ['rsvp-' + submodules[i]],
         extra_objects = ['_rservr.so'] + extra_objects[submodules[i]],
         include_dirs = include_search_paths,
-        library_dirs = libexec_search_paths,
-        runtime_library_dirs = libexec_search_paths + [distutils.sysconfig.get_python_lib() + '/rservr'])
+        library_dirs = lib_search_paths + libexec_search_paths,
+        runtime_library_dirs = lib_search_paths + libexec_search_paths + [distutils.sysconfig.get_python_lib() + '/rservr'])
     for i in range(len(submodules))]
 
 
