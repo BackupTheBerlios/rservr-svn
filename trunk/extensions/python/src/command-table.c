@@ -22,39 +22,27 @@ ALL_GLOBAL_TYPES(TYPE_WRAPPER_COMPARE_DEFINE)
 
 
 
+#define ALL_COMMAND_TABLE_INFO_GETATTR(macro) \
+macro(command_table_info, name) \
+macro(command_table_info, alias) \
+macro(command_table_info, info) \
+macro(command_table_info, type)
+
+
+TYPE_GETATTR(command_table_info, name,  Py_BuildValue("s", SELF->pointer->name))
+TYPE_GETATTR(command_table_info, alias, Py_BuildValue("s", SELF->pointer->alias))
+TYPE_GETATTR(command_table_info, info,  Py_BuildValue("s", SELF->pointer->info))
+TYPE_GETATTR(command_table_info, type,  Py_BuildValue("l", (long) SELF->pointer->type))
+
+
 static PyObject *python_command_table_info_getattro(python_command_table_info *self, PyObject *name_object)
 {
 	if (!self || !self->pointer) return auto_exception(PyExc_IndexError, "");
 	const char *name = NULL;
 	if (!(name = PyString_AsString(name_object))) return NULL;
 
-	//TODO: use a 'std::map' here
-
-	if (0);
-
-	STRING_CASE(name, "name")
-	{
-	return Py_BuildValue("s", self->pointer->name);
-	}
-
-	STRING_CASE(name, "alias")
-	{
-	return Py_BuildValue("s", self->pointer->alias);
-	}
-
-	STRING_CASE(name, "info")
-	{
-	return Py_BuildValue("s", self->pointer->info);
-	}
-
-	STRING_CASE(name, "type")
-	{
-	return Py_BuildValue("l", self->pointer->type);
-	}
-
-	else return PyObject_GenericGetAttr((PyObject*) self, name_object);
+	return TYPE_GETATTR_CALL(command_table_info, self, name_object);
 }
-
 
 
 static void python_command_table_info_dealloc(python_command_table_info *self)
