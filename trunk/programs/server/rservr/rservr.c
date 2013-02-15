@@ -69,16 +69,16 @@ static void disable_input();
 static pid_t notify_parent = 0;
 
 #define CANCEL_PARENT \
-if (register_notify_state()) continue_register_notify(0); \
-else if (notify_parent && notify_parent != getpid()) \
-{ kill(notify_parent, SIGUSR2); \
-  notify_parent = 0; }
+{ if (register_notify_state()) continue_register_notify(0); \
+  else if (notify_parent && notify_parent != getpid()) \
+  { kill(notify_parent, SIGUSR2); \
+    notify_parent = 0; } }
 
 #define CONTINUE_PARENT \
-if (!register_notify_state()) \
-if (notify_parent && notify_parent != getpid()) \
-{ kill(notify_parent, SIGHUP); \
-  notify_parent = 0; }
+{ if (!register_notify_state()) \
+  if (notify_parent && notify_parent != getpid()) \
+  { kill(notify_parent, SIGUSR1); \
+    notify_parent = 0; } }
 
 static void parent_signal(int);
 
@@ -162,7 +162,6 @@ int main(int argc, char *argv[])
 
 	signal(SIGUSR1, &parent_signal);
 	signal(SIGUSR2, &parent_signal);
-	signal(SIGHUP, &parent_signal);
 
 	int error = 0, status = 0;
 
@@ -359,15 +358,8 @@ int main(int argc, char *argv[])
 
 static void parent_signal(int sSignal)
 {
-	if (sSignal == SIGUSR1)
-	{
-	struct timespec register_latency = server_register_all_success_latency();
-	nanosleep(&register_latency, NULL);
-	partial_server_exit(0);
-	}
-
 	if (sSignal == SIGUSR2) partial_server_exit(1);
-	if (sSignal == SIGHUP)  partial_server_exit(0);
+	if (sSignal == SIGUSR1) partial_server_exit(0);
 }
 
 

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os, errno, platform, distutils.core, distutils.sysconfig
 
 

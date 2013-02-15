@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 rservr test 'test-server.log' <(
 echo execute_critical rservrd -dxr
