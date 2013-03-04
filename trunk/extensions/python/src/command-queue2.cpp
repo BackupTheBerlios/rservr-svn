@@ -226,12 +226,12 @@ static int common_cancel_callback(command_reference rReference, command_event eE
 
 
 GLOBAL_BINDING_START(wait_command_event, "")
-	STATIC_KEYWORDS(keywords) = { "reference", "event", "timeout", "pointer", NULL };
+	STATIC_KEYWORDS(keywords) = { "reference", "event", "timeout", "callback", NULL };
 	long reference = 0, event = event_complete;
 	float timeout = local_default_timeout_dec();
-	PyObject *pointer = NULL;
-	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "l|lfO", keywords, &reference, &event, &timeout, &pointer)) return NULL;
-	if (pointer && !PyCallable_Check(pointer)) return auto_exception(PyExc_TypeError, "");
+	PyObject *callback = NULL;
+	if(!PyArg_ParseTupleAndKeywords(ARGS, KEYWORDS, "l|lfO", keywords, &reference, &event, &timeout, &callback)) return NULL;
+	if (callback && !PyCallable_Check(callback)) return auto_exception(PyExc_TypeError, "");
 
 	command_event outcome;
 
@@ -239,18 +239,18 @@ GLOBAL_BINDING_START(wait_command_event, "")
 	//'python_wait_cancel' will obtain GIL before calling the callback
 	Py_BEGIN_ALLOW_THREADS
 
-	if (pointer)
+	if (callback)
 	{
 	if (pthread_mutex_lock(&cancel_callback_mutex) != 0) return auto_exception(PyExc_RuntimeError, "");
-	cancel_by_thread[pthread_self()] = pointer;
+	cancel_by_thread[pthread_self()] = callback;
 	if (pthread_mutex_unlock(&cancel_callback_mutex) != 0) return auto_exception(PyExc_RuntimeError, "");
 	}
 
-	outcome = pointer?
+	outcome = callback?
 	  cancelable_wait_command_event(reference, event, timeout, &common_cancel_callback) :
 	  wait_command_event(reference, event, timeout);
 
-	if (pointer)
+	if (callback)
 	{
 	if (pthread_mutex_lock(&cancel_callback_mutex) != 0) return auto_exception(PyExc_RuntimeError, "");
 	cancel_by_thread.erase(pthread_self());

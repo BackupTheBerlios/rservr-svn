@@ -48,7 +48,7 @@ static std::map <load_reference, regex_check> loaded_checks;
 
 static const regex_check &get_check(load_reference lLoad)
 {
-	regex_check not_found;
+	static regex_check not_found;
 	std::map <load_reference, regex_check> ::const_iterator position = loaded_checks.find(lLoad);
 	return (position == loaded_checks.end())? not_found : position->second;
 }
