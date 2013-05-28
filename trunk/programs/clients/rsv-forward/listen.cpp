@@ -173,17 +173,23 @@ static unsigned int total_listen_max          = 0;
 #ifdef RSV_NET
 
 static std::string listen_address = "any";
+static uint32_t listen_address_binary = (uint32_t) -1;
 
 static text_info listen_address_text()
 { return listen_address.c_str(); }
 
 static uint32_t get_listen_address()
-{ return try_get_address(listen_address_text()); }
+{
+	if (listen_address_binary == (uint32_t) -1)
+	listen_address_binary = try_get_address(listen_address_text());
+	return listen_address_binary;
+}
 
 bool set_listen_address(const char *aAddress)
 {
 	if (!aAddress) return false;
 	listen_address = aAddress;
+	listen_address_binary = (uint32_t) -1;
 	return get_listen_address() != (uint32_t) -1;
 }
 
