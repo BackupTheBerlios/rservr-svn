@@ -99,7 +99,8 @@
           <tr class="style_definition_example"><td><b>listen_require "!(^|/)\\.\\./"</b></td></tr>
         </table>
       </div>
-      <p class="overview_content style_definition_long"> The above set of requirements will only allow sockets with the names "<b>program</b>" or "<b>user</b>", all must be somewhere in <span class="style_file_name">/tmp</span>, and none may contain "<b>../</b>" (to prevent something like <span class="style_file_name">/tmp/../home/user</span>.)  Remember to escape "<b>\</b>" when it's a part of the expression so the parser doesn't remove it. </p>
+      <p class="overview_content style_definition_long"> The above set of requirements will only allow sockets with the names "<b>program</b>" or "<b>user</b>", all must be somewhere in <span class="style_file_name">/tmp</span>, and none may contain "<b>../</b>" (to prevent something like <span class="style_file_name">/tmp/../home/user</span>.)  Remember to escape "<b>\</b>" when it's a part of the expression so the parser doesn't remove it. For <span class="style_command_line">net</span> forwarders, the <span class="style_address">address:port</span> string (using the IP address) is checked against the registered patterns. </p>
+
       <p class="overview_content style_definition_long"> The <span class="style_command_line">connect_*</span> options are conceptually identical to their <span class="style_command_line">listen_*</span> counterparts an apply only to the <u>initiating</u> end of the connection (use security filters to protect the listening end from incoming connections.) As with <span class="style_command_line">listen_allow</span> when networking, lack of a <span class="style_command_line">connect_allow</span> specification will prevent connection to any network address by default (see <span class="style_inline_code">PARAM_FORCE_SOCKET_AUTHORIZE</span> in <span class="style_file_name">param.h</span> at the top of the source code package.) Example (for network sockets): </p>
       <div align="center">
         <table>
@@ -129,7 +130,15 @@
           <td class="style_definition_short"> listen to a local socket or network port </td>
         </tr>
       </table>
-      <p class="overview_content style_definition_long"> This option listens to either a local socket or the specified port, depending on whether you use the <span class="style_command_line">fs</span> or <span class="style_command_line">net</span> version of a forwarder, respectively. Ports must be specified using a decimal number. </p>
+      <p class="overview_content style_definition_long"> This option listens to either a local socket or the specified port, depending on whether you use the <span class="style_command_line">fs</span> or <span class="style_command_line">net</span> version of a forwarder, respectively. Ports must be specified using a decimal number. With <span class="style_command_line">net</span> forwarders, you may also specify an address (e.g. <span class="style_command_line">listen "localhost:2048"</span>,) otherwise the default address is used (see <span class="style_command_line">listen_address</span>.) </p>
+      <table summary="definition" class="overview_content">
+        <tr>
+          <td width="400" align="left" class="style_term"> listen_address <i>&lt;address&gt;</i>
+          </td>
+          <td class="style_definition_short"> set the default address to listen on (<span class="style_command_line">net</span> only) </td>
+        </tr>
+      </table>
+      <p class="overview_content style_definition_long"> This option sets the default address to listen on for <span class="style_command_line">net</span> forwarders. By default this is "any", which means that a socket will be bound to all available addresses. Set this to an IP address or a hostname. The forwarder will attempt to resolve the hostname at the time this option is used. If name resolution fails and the <span class="style_command_line">!</span> modifier is used (e.g. <span class="style_command_line">! listen_address "localhost"</span>) then host resolution will be attempted the next time the default address is needed. </p>
       <table summary="definition" class="overview_content">
         <tr>
           <td width="400" align="left" class="style_term"> connect <i>&lt;socket&gt;</i>
