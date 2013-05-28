@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2013, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -70,10 +70,34 @@ void log_message_incoming_fail(text_info) ATTR_INT;
     #endif
 void log_message_disconnect(text_info) ATTR_INT;
 void log_message_disconnect_deny(text_info) ATTR_INT;
+
+    #ifdef RSV_NET
+void log_message_listen(text_info, text_info) ATTR_INT;
+    #endif
+    #ifdef RSV_LOCAL
 void log_message_listen(text_info) ATTR_INT;
+    #endif
+
+    #ifdef RSV_NET
+void log_message_listen_deny(text_info, text_info) ATTR_INT;
+    #endif
+    #ifdef RSV_LOCAL
 void log_message_listen_deny(text_info) ATTR_INT;
+    #endif
+
+    #ifdef RSV_NET
+void log_message_unlisten(text_info, text_info) ATTR_INT;
+    #endif
+    #ifdef RSV_LOCAL
 void log_message_unlisten(text_info) ATTR_INT;
+    #endif
+
+    #ifdef RSV_NET
+void log_message_unlisten_deny(text_info, text_info) ATTR_INT;
+    #endif
+    #ifdef RSV_LOCAL
 void log_message_unlisten_deny(text_info) ATTR_INT;
+    #endif
 
 void log_message_deny_remote(const struct netcntl_source_info*) ATTR_INT;
 

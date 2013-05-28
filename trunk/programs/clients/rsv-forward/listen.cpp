@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2012, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2013, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -84,6 +84,19 @@ extern "C" {
 }
 
 
+//separators--------------------------------------------------------------------
+
+#ifdef RSV_NET
+static const char serial_separator[] = PARAM_NET_SERIAL_SEP;
+static const char port_separator[]   = PARAM_NET_PORT_SEP;
+#endif
+#ifdef RSV_LOCAL
+static const char serial_separator[] = PARAM_LOCAL_SERIAL_SEP;
+#endif
+
+//END separators----------------------------------------------------------------
+
+
 //regex filtering---------------------------------------------------------------
 
 //TODO: add logging points for screening failure
@@ -111,6 +124,8 @@ static bool invert_result(const regex_check &lLeft, const char *rRight)
 { return !(lLeft == rRight); }
 
 
+static bool split_address(const char*, uint32_t&, uint16_t&);
+
 static bool screen_listen(const char *aAddress)
 {
 	if (!aAddress) return false;
@@ -124,22 +139,23 @@ static bool screen_listen(const char *aAddress)
     #endif
 
 #ifdef RSV_NET
-	std::string new_address, new_port = aAddress;
-	if (!revise_address_split(new_address, new_port)) return false;
+	in_addr binary_address;
+	uint16_t binary_port;
+	if (!split_address(aAddress, binary_address.s_addr, binary_port)) return false;
 
-	bool changed_port = new_port == aAddress;
+	char binary_text[RSERVR_MAX_CONVERT_SIZE];
+	std::string revised_address = inet_ntoa(binary_address);
+	std::string revised_port    = convert_integer10(ntohs(binary_port), binary_text);
+
+	std::string address = revised_address + port_separator + revised_port;
 #endif
 
-	allow |= listen_allow.find(aAddress) != data::not_found;
-	if (listen_require.f_find(aAddress, &invert_result) != data::not_found) return false;
-
-#ifdef RSV_NET
-	if (changed_port)
-	{
-	allow |= listen_allow.find(new_port.c_str()) != data::not_found;
-	if (listen_require.f_find(new_port.c_str(), &invert_result) != data::not_found) return false;
-	}
+#ifdef RSV_LOCAL
+	std::string address = aAddress;
 #endif
+
+	allow |= listen_allow.find(address.c_str()) != data::not_found;
+	if (listen_require.f_find(address.c_str(), &invert_result) != data::not_found) return false;
 
 	return allow;
 }
@@ -152,6 +168,27 @@ static bool screen_listen(const char *aAddress)
 static unsigned int individual_connection_max = 0;
 static unsigned int total_connection_max      = 0;
 static unsigned int total_listen_max          = 0;
+
+
+#ifdef RSV_NET
+
+static std::string listen_address = "any";
+
+static text_info listen_address_text()
+{ return listen_address.c_str(); }
+
+static uint32_t get_listen_address()
+{ return try_get_address(listen_address_text()); }
+
+bool set_listen_address(const char *aAddress)
+{
+	if (!aAddress) return false;
+	listen_address = aAddress;
+	return get_listen_address() != (uint32_t) -1;
+}
+
+#endif
+
 
 void set_total_listen_max(unsigned int mMax)
 { total_listen_max = mMax; }
@@ -445,8 +482,14 @@ bool ATTR_INT copy_listen_locations(char ***tTable)
 
 //access module interface-------------------------------------------------------
 
+#ifdef RSV_NET
+static bool add_bound_socket(int sSocket, const std::string &aAddress, const std::string &pPort)
+{ return add_new_listen(sSocket, aAddress + port_separator + pPort); }
+#endif
+#ifdef RSV_LOCAL
 static bool add_bound_socket(int sSocket, const std::string &lLocation)
 { return add_new_listen(sSocket, lLocation); }
+#endif
 
 static bool pre_connection_check(int sSocket)
 { return add_connection_precheck(sSocket); }
@@ -454,8 +497,14 @@ static bool pre_connection_check(int sSocket)
 bool pre_initiation_check()
 { return add_connection_precheck(-1); }
 
+#ifdef RSV_NET
+static bool remove_listen_socket(const std::string &aAddress, const std::string &pPort)
+{ return remove_listen(aAddress + port_separator + pPort); }
+#endif
+#ifdef RSV_LOCAL
 static bool remove_listen_socket(const std::string &lLocation)
 { return remove_listen(lLocation); }
+#endif
 
 static bool remove_bad_socket(int sSocket)
 { return remove_socket_fd(sSocket); }
@@ -475,8 +524,14 @@ static bool fill_listen_select(fd_set *lList)
 static bool get_set_sockets(fd_set *lList, data::clist <const int> &tTable)
 { return get_set_socket_list(lList, tTable); }
 
+#ifdef RSV_NET
+static bool check_unique_location(const std::string &aAddress, const std::string &pPort)
+{ return check_listen_location(aAddress + port_separator + pPort); }
+#endif
+#ifdef RSV_LOCAL
 static bool check_unique_location(const std::string &lLocation)
 { return check_listen_location(lLocation); }
+#endif
 
 static bool check_listen_sockets()
 { return have_listen_sockets(); }
@@ -502,28 +557,53 @@ static uint16_t convert_port_server(const char *pPort)
 }
 
 
-static int create_socket(const char *pPort, std::string &rRevised)
+static bool split_address(const char *lLocation, uint32_t &aAddress, uint16_t &pPort)
 {
-	if (!pPort)
+	pPort = 0;
+	aAddress = get_listen_address();
+	in_addr temp_address;
+	temp_address.s_addr = aAddress;
+
+	std::string working_copy = lLocation, actual_port, actual_address;
+
+	int port_position = working_copy.rfind(port_separator);
+	if (port_position >= 0 && port_position < (signed) working_copy.size())
 	{
-    log_message_listen_deny(pPort);
-	return -1;
+	actual_port = working_copy.substr(port_position + 1,
+	  working_copy.size() - (port_position + 1));
+
+	working_copy.erase(port_position, working_copy.size() - port_position);
+	pPort = convert_port_server(actual_port.c_str());
+
+	temp_address.s_addr = aAddress = try_get_address(working_copy.c_str());
 	}
 
-	uint16_t binary_port = convert_port_server(pPort);
+	else pPort = convert_port_server(lLocation);
 
-	if (!binary_port)
+	actual_address = inet_ntoa(temp_address);
+
+	return pPort && aAddress != (uint32_t) -1;
+}
+
+
+static int create_socket(const char *pPort, std::string &rRevisedAddress, std::string &rRevisedPort)
+{
+	in_addr binary_address;
+	uint16_t binary_port;
+
+	if (!pPort || !split_address(pPort, binary_address.s_addr, binary_port))
 	{
-    log_message_listen_deny(pPort);
+    log_message_listen_deny(listen_address_text(), pPort);
 	return -1;
 	}
 
 	char binary_text[RSERVR_MAX_CONVERT_SIZE];
-	rRevised = convert_integer10(ntohs(binary_port), binary_text);
+	rRevisedAddress = inet_ntoa(binary_address);
+	rRevisedPort = convert_integer10(ntohs(binary_port), binary_text);
 
-	if (!check_unique_location(rRevised))
+	if (!check_unique_location(rRevisedAddress, rRevisedPort))
 	{
-    log_message_listen_deny(pPort);
+    log_message_listen_deny(rRevisedAddress.c_str(), rRevisedPort.c_str());
 	return -1;
 	}
 
@@ -534,7 +614,7 @@ static int create_socket(const char *pPort, std::string &rRevised)
 	int new_socket = socket(PF_INET, SOCK_STREAM, 0);
 	if (new_socket < 0)
 	{
-    log_message_listen_deny(pPort);
+    log_message_listen_deny(rRevisedAddress.c_str(), rRevisedPort.c_str());
 	return -1;
 	}
 
@@ -543,9 +623,9 @@ static int create_socket(const char *pPort, std::string &rRevised)
 
 	//bind socket
 
-        new_address.sin_family = AF_INET;
-        new_address.sin_port        = binary_port; //NOTE: don't call 'htons' here
-        new_address.sin_addr.s_addr = htonl(INADDR_ANY);
+	new_address.sin_family = AF_INET;
+	new_address.sin_port        = binary_port; //NOTE: don't call 'htons' here
+	new_address.sin_addr.s_addr = binary_address.s_addr;
 
     #if defined(SOL_SOCKET) && defined(SO_REUSEADDR)
 	int value = 1;
@@ -555,7 +635,7 @@ static int create_socket(const char *pPort, std::string &rRevised)
 
 	if (bind(new_socket, (struct sockaddr*) &new_address, sizeof new_address) < 0)
 	{
-    log_message_listen_deny(pPort);
+    log_message_listen_deny(rRevisedAddress.c_str(), rRevisedPort.c_str());
 	close(new_socket);
 	return -1;
 	}
@@ -570,29 +650,27 @@ static int create_socket(const char *pPort, std::string &rRevised)
 
 static bool remove_server_socket(const char *pPort)
 {
-	if (!pPort)
-	{
-    log_message_unlisten_deny(pPort);
-	return false;
-	}
+	in_addr binary_address;
+	uint16_t binary_port;
 
-	uint16_t binary_port = convert_port_server(pPort);
-
-	if (!binary_port)
+	if (!pPort || !split_address(pPort, binary_address.s_addr, binary_port))
 	{
-    log_message_unlisten_deny(pPort);
-	return false;
+    log_message_unlisten_deny(listen_address_text(), pPort);
+	return -1;
 	}
 
 	char binary_text[RSERVR_MAX_CONVERT_SIZE];
+	std::string revised_address, revised_port;
+	revised_address = inet_ntoa(binary_address);
+	revised_port = convert_integer10(ntohs(binary_port), binary_text);
 
-	if (!remove_listen_socket( convert_integer10(ntohs(binary_port), binary_text) ))
+	if (!remove_listen_socket(revised_address, revised_port))
 	{
-    log_message_unlisten_deny(pPort);
+    log_message_unlisten_deny(revised_address.c_str(), revised_port.c_str());
 	return false;
 	}
 
-    log_message_unlisten(pPort);
+    log_message_unlisten(revised_address.c_str(), revised_port.c_str());
 
 	return true;
 }
@@ -758,17 +836,35 @@ bool add_listen_socket(const char *lLocation)
 #endif
 
 	int new_socket = -1;
+#ifdef RSV_NET
+	std::string revised_address, revised_port;
+#endif
+#ifdef RSV_LOCAL
 	std::string revised_address;
+#endif
 
 	if ( !check_listen_room() ||
+#ifdef RSV_NET
+	     (new_socket = create_socket(lLocation, revised_address, revised_port)) < 0 ||
+#endif
+#ifdef RSV_LOCAL
 	     (new_socket = create_socket(lLocation, revised_address)) < 0 ||
+#endif
 	     listen(new_socket, PARAM_FORWARD_MAX_WAITING) < 0 ||
+#ifdef RSV_NET
+	     !add_bound_socket(new_socket, revised_address, revised_port) )
+#endif
+#ifdef RSV_LOCAL
 	     !add_bound_socket(new_socket, revised_address) )
+#endif
 	{
 	if (new_socket >= 0)
 	 {
-    log_message_listen_deny(lLocation);
+#ifdef RSV_NET
+    log_message_listen_deny(revised_address.c_str(), revised_port.c_str());
+#endif
 #ifdef RSV_LOCAL
+    log_message_listen_deny(revised_address.c_str());
 	remove(lLocation);
 #endif
 	close(new_socket);
@@ -784,7 +880,12 @@ bool add_listen_socket(const char *lLocation)
 	}
 
 	//NOTE: this is logged here because of multiple possible failures
-    log_message_listen(lLocation);
+#ifdef RSV_NET
+    log_message_listen(revised_address.c_str(), revised_port.c_str());
+#endif
+#ifdef RSV_LOCAL
+    log_message_listen(revised_address.c_str());
+#endif
 
 	unblock_connection_wait();
 	return true;
@@ -1019,27 +1120,58 @@ command_event __rsvp_netcntl_hook_local_listen(const struct netcntl_source_info 
     log_message_incoming_listen(sSource, lLocation);
 	if (!screen_listen(lLocation))
 	{
+#ifdef RSV_NET
+    log_message_listen_deny(listen_address_text(), lLocation);
+#endif
+#ifdef RSV_LOCAL
     log_message_listen_deny(lLocation);
+#endif
 	return event_rejected;
 	}
 
 #ifdef PARAM_SELF_TRUSTING_FORWARDER
 	if (!trusted_remote_check(sSource))
 	{
+    #ifdef RSV_NET
+    log_message_listen_deny(listen_address_text(), lLocation);
+    #endif
+    #ifdef RSV_LOCAL
     log_message_listen_deny(lLocation);
+    #endif
 	return event_rejected;
 	}
 #endif
 
 	int new_socket = -1;
+
+#ifdef RSV_NET
+	std::string revised_address, revised_port;
+#endif
+#ifdef RSV_LOCAL
 	std::string revised_address;
+#endif
 
 	if ( !check_listen_room() ||
+#ifdef RSV_NET
+	     (new_socket = create_socket(lLocation, revised_address, revised_port)) < 0 ||
+#endif
+#ifdef RSV_LOCAL
 	     (new_socket = create_socket(lLocation, revised_address)) < 0 ||
+#endif
 	     listen(new_socket, PARAM_FORWARD_MAX_WAITING) < 0 ||
+#ifdef RSV_NET
+	     !add_bound_socket(new_socket, revised_address, revised_port) )
+#endif
+#ifdef RSV_LOCAL
 	     !add_bound_socket(new_socket, revised_address) )
+#endif
 	{
+#ifdef RSV_NET
+    log_message_listen_deny(revised_address.c_str(), revised_port.c_str());
+#endif
+#ifdef RSV_LOCAL
     log_message_listen_deny(lLocation);
+#endif
 	if (new_socket >= 0)
 	 {
 #ifdef RSV_LOCAL
@@ -1052,8 +1184,11 @@ command_event __rsvp_netcntl_hook_local_listen(const struct netcntl_source_info 
 	}
 	else if (!select_thread_status() && !start_select_thread())
 	{
-    log_message_listen_deny(lLocation);
+#ifdef RSV_NET
+    log_message_listen_deny(revised_address.c_str(), revised_port.c_str());
+#endif
 #ifdef RSV_LOCAL
+    log_message_listen_deny(revised_address.c_str());
 	remove(lLocation);
 #endif
 	remove_bad_socket(new_socket);
@@ -1062,7 +1197,12 @@ command_event __rsvp_netcntl_hook_local_listen(const struct netcntl_source_info 
 	}
 
 	//NOTE: this is logged here because of multiple possible failures
-    log_message_listen(lLocation);
+#ifdef RSV_NET
+    log_message_listen(revised_address.c_str(), revised_port.c_str());
+#endif
+#ifdef RSV_LOCAL
+    log_message_listen(revised_address.c_str());
+#endif
 
 	unblock_connection_wait();
 	return event_complete;
@@ -1091,7 +1231,12 @@ command_event __rsvp_netcntl_hook_local_unlisten(const struct netcntl_source_inf
 #ifdef PARAM_SELF_TRUSTING_FORWARDER
 	if (!trusted_remote_check(sSource))
 	{
+    #ifdef RSV_NET
+    log_message_unlisten_deny(listen_address_text(), lLocation);
+    #endif
+    #ifdef RSV_LOCAL
     log_message_unlisten_deny(lLocation);
+    #endif
 	return event_rejected;
 	}
 #endif

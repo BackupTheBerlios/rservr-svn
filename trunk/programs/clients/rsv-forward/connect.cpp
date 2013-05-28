@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2012, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2013, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -778,6 +778,32 @@ static uint16_t convert_port_client(const char *pPort)
 }
 
 
+uint32_t try_get_address(const char *aAddress)
+{
+	struct in_addr binary_address;
+	binary_address.s_addr = uint32_t(INADDR_ANY);
+
+	if (strcmp(aAddress, "any") == 0) /**/;
+	else if (strcmp(aAddress, "localhost") == 0) inet_aton("127.0.0.1", &binary_address);
+	else if (inet_aton(aAddress, &binary_address) != 0) /**/;
+
+	else
+	{
+	struct addrinfo *host_info = NULL;
+
+	if (getaddrinfo(aAddress, NULL, NULL, &host_info) != 0 || !host_info || !host_info->ai_addr)
+	 {
+	freeaddrinfo(host_info);
+	return (uint32_t) -1;
+	 }
+        else binary_address = ((struct sockaddr_in*) host_info->ai_addr)->sin_addr;
+	freeaddrinfo(host_info);
+	}
+
+	return binary_address.s_addr;
+}
+
+
 bool revise_address_split(std::string &aAddress, std::string &pPort)
 {
 	//example: 'localhost:9999' -or- '127.0.0.1:9999' -or- 'localhost:service'
@@ -792,24 +818,11 @@ bool revise_address_split(std::string &aAddress, std::string &pPort)
 
 	if (!aAddress.size()) return true;
 
-	struct in_addr binary_address;
+	in_addr binary_address;
+	binary_address.s_addr = try_get_address(aAddress.c_str());
 
-	//(saves the trouble of looking it up, which might not work)
-	if (aAddress == "localhost") aAddress = "127.0.0.1";
-
-	else if (inet_aton(aAddress.c_str(), &binary_address) == 0)
-	{
-	struct addrinfo *host_info = NULL;
-
-	if (getaddrinfo(aAddress.c_str(), NULL, NULL, &host_info) != 0 || !host_info || !host_info->ai_addr)
-	 {
-	if (host_info) freeaddrinfo(host_info);
-	return false;
-	 }
-
-	aAddress = inet_ntoa(((struct sockaddr_in*) host_info->ai_addr)->sin_addr);
-	freeaddrinfo(host_info);
-	}
+	if (binary_address.s_addr == (uint32_t) -1) return false;
+	aAddress = inet_ntoa(binary_address);
 
 	return true;
 }
@@ -829,26 +842,8 @@ const char *aAddress, const char *pPort, std::string &rRevised)
 	}
 
 	struct in_addr binary_address;
-
-	if (strcmp(aAddress, "localhost") == 0)
-	{
-	inet_aton("127.0.0.1", &binary_address);
+	if ((binary_address.s_addr = try_get_address(aAddress)) == (uint32_t) -1) return -1;
 	rRevised = inet_ntoa(binary_address);
-	}
-
-	else if (inet_aton(aAddress, &binary_address) != 0)
-	rRevised = inet_ntoa(binary_address);
-
-	else
-	{
-	struct addrinfo *host_info = NULL;
-
-	if (getaddrinfo(aAddress, NULL, NULL, &host_info) != 0 || !host_info || !host_info->ai_addr)
-	return -1;
-
-	rRevised = inet_ntoa(((struct sockaddr_in*) host_info->ai_addr)->sin_addr);
-        binary_address = ((struct sockaddr_in*) host_info->ai_addr)->sin_addr;
-	}
 
 	char buffer[RSERVR_MAX_CONVERT_SIZE] = { 0x00 };
 	(rRevised += port_separator) += convert_integer10(ntohs(binary_port), buffer);

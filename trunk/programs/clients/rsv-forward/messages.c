@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2013, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -158,53 +158,73 @@ void log_message_disconnect_deny(text_info nName)
 	client_log_output(logging_normal, local_source, message_string);
 }
 
+#ifdef RSV_NET
+void log_message_listen(text_info aAddress, text_info pPort)
+{
+	char message_string[PARAM_DEFAULT_FORMAT_BUFFER];
+	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "listening to port '%s' on '%s'", pPort, aAddress);
+	client_log_output(logging_normal, local_source, message_string);
+}
+#endif
+#ifdef RSV_LOCAL
 void log_message_listen(text_info nName)
 {
 	char message_string[PARAM_DEFAULT_FORMAT_BUFFER];
-    #ifdef RSV_NET
-	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "listening to port '%s'", nName);
-    #endif
-    #ifdef RSV_LOCAL
 	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "listening to socket '%s'", nName);
-    #endif
 	client_log_output(logging_normal, local_source, message_string);
 }
+#endif
 
+#ifdef RSV_NET
+void log_message_listen_deny(text_info aAddress, text_info pPort)
+{
+	char message_string[PARAM_DEFAULT_FORMAT_BUFFER];
+	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "can't listen to port '%s' on '%s'", pPort, aAddress);
+	client_log_output(logging_normal, local_source, message_string);
+}
+#endif
+#ifdef RSV_LOCAL
 void log_message_listen_deny(text_info nName)
 {
 	char message_string[PARAM_DEFAULT_FORMAT_BUFFER];
-    #ifdef RSV_NET
-	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "can't listen to port '%s'", nName);
-    #endif
-    #ifdef RSV_LOCAL
 	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "can't listen to socket '%s'", nName);
-    #endif
 	client_log_output(logging_normal, local_source, message_string);
 }
+#endif
 
+#ifdef RSV_NET
+void log_message_unlisten(text_info aAddress, text_info pPort)
+{
+	char message_string[PARAM_DEFAULT_FORMAT_BUFFER];
+	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "stopped listening to port '%s' on '%s'", pPort, aAddress);
+	client_log_output(logging_normal, local_source, message_string);
+}
+#endif
+#ifdef RSV_LOCAL
 void log_message_unlisten(text_info nName)
 {
 	char message_string[PARAM_DEFAULT_FORMAT_BUFFER];
-    #ifdef RSV_NET
-	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "stopped listening to port '%s'", nName);
-    #endif
-    #ifdef RSV_LOCAL
 	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "stopped listening to socket '%s'", nName);
-    #endif
 	client_log_output(logging_normal, local_source, message_string);
 }
+#endif
 
+#ifdef RSV_NET
+void log_message_unlisten_deny(text_info aAddress, text_info pPort)
+{
+	char message_string[PARAM_DEFAULT_FORMAT_BUFFER];
+	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "can't stop listening to port '%s' on '%s'", pPort, aAddress);
+	client_log_output(logging_normal, local_source, message_string);
+}
+#endif
+#ifdef RSV_LOCAL
 void log_message_unlisten_deny(text_info nName)
 {
 	char message_string[PARAM_DEFAULT_FORMAT_BUFFER];
-    #ifdef RSV_NET
-	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "can't stop listening to port '%s'", nName);
-    #endif
-    #ifdef RSV_LOCAL
 	snprintf(message_string, PARAM_DEFAULT_FORMAT_BUFFER, "can't stop listening to socket '%s'", nName);
-    #endif
 	client_log_output(logging_normal, local_source, message_string);
 }
+#endif
 
 
 static text_info show_source_common(text_info oOrigin, text_info tTarget, text_info sSender, text_info aAddress)

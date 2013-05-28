@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2011, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2013, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -233,6 +233,15 @@ static int parse_config_line(const char *lLine, const char *pPath)
 	if (!parse_integer10(config_segment, &new_limit) || new_limit < 0) return allow_fail;
 	set_message_queue_limit(new_limit);
 	}
+
+
+#ifdef RSV_NET
+	else if (strcmp(config_segment, "listen_address") == 0)
+	{
+	if (remaining_line(&config_segment) < 0 || !config_segment) return allow_fail;
+	if (!set_listen_address(config_segment)) return allow_fail;
+	}
+#endif
 
 
 	else if (strcmp(config_segment, "listen_allow") == 0)

@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2013, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -39,6 +39,10 @@ extern "C" {
 #include "attributes.h"
 }
 
+
+#ifdef RSV_NET
+bool set_listen_address(const char*) ATTR_INT;
+#endif
 
 bool add_listen_allow(const char*) ATTR_INT;
 bool add_listen_require(const char*) ATTR_INT;

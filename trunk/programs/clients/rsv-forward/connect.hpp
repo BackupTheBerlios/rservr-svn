@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2013, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -44,6 +44,11 @@ extern "C" {
 }
 
 
+#ifdef RSV_NET
+uint32_t try_get_address(const char*) ATTR_INT;
+bool revise_address_split(std::string&, std::string&) ATTR_INT;
+#endif
+
 void passthru_enable() ATTR_INT;
 void passthru_disable() ATTR_INT;
 bool passthru_status() ATTR_INT;
@@ -53,7 +58,5 @@ bool add_connection_socket(const char*) ATTR_INT;
 bool add_filtered_socket(const char*, const char*) ATTR_INT;
 bool add_listen_connection(int, socket_reference, int, const char*, bool) ATTR_INT;
 void remove_connection_sockets() ATTR_INT;
-
-bool revise_address_split(std::string&, std::string&) ATTR_INT;
 
 #endif //connect_hpp
