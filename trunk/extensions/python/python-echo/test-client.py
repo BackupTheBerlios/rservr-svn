@@ -53,9 +53,9 @@ def queue_event_hook(event):
                     response = rservr.short_response(message, rservr.event_complete)
                     rservr.send_command_no_status(response)
                     rservr.destroy_command(response)
-                elif message.is_request():
-                    print >> sys.stderr, 'request message: "%s"' % (message.to_request_message())
-                    response = rservr.client_response(message, rservr.event_complete, message.to_request_message())
+                elif message.is_request_single():
+                    print >> sys.stderr, 'request message: "%s"' % (message.to_request_single())
+                    response = rservr.client_response(message, rservr.event_complete, message.to_request_single())
                     rservr.send_command_no_status(response)
                     rservr.destroy_command(response)
             except (TypeError, IndexError, RuntimeError):
