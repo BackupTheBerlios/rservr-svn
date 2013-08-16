@@ -219,31 +219,31 @@ struct message_info
 
 /*! Determine if a message is a single request.*/
 #define RSERVR_IS_REQUEST_SINGLE(msg) (RSERVR_IS_REQUEST(msg) && \
-                                        RSERVR_TO_REQUEST(msg).__dimension == \
-                                        single_message)
+                                       RSERVR_TO_REQUEST(msg).__dimension == \
+                                       single_message)
 
 /*! Convert a message to a request's text message data.*/
 #define RSERVR_TO_REQUEST_SINGLE(msg) ((RSERVR_IS_REQUEST_SINGLE(msg) && \
-                                         !RSERVR_TO_REQUEST(msg).__n1.__n2.__size)? \
-                                        RSERVR_TO_REQUEST(msg).__n1.__n2.__n3.__message : NULL)
+                                        !RSERVR_TO_REQUEST(msg).__n1.__n2.__size)? \
+                                       RSERVR_TO_REQUEST(msg).__n1.__n2.__n3.__message : NULL)
 
 /*! Convert a message to a request's binary data.*/
 #define RSERVR_TO_REQUEST_BINARY(msg) ((RSERVR_IS_REQUEST_SINGLE(msg) && \
-                                         RSERVR_TO_REQUEST(msg).__n1.__n2.__size)? \
-                                        RSERVR_TO_REQUEST(msg).__n1.__n2.__n3.__binary : NULL)
+                                        RSERVR_TO_REQUEST(msg).__n1.__n2.__size)? \
+                                       RSERVR_TO_REQUEST(msg).__n1.__n2.__n3.__binary : NULL)
 
 /*! Determine a request message's binary data size.*/
 #define RSERVR_REQUEST_SIZE(msg)      (RSERVR_IS_REQUEST_SINGLE(msg)? \
-                                        RSERVR_TO_REQUEST(msg).__n1.__n2.__size : 0)
+                                       RSERVR_TO_REQUEST(msg).__n1.__n2.__size : 0)
 
 /*! Determine if a message is a list request.*/
 #define RSERVR_IS_REQUEST_LIST(msg)   (RSERVR_IS_REQUEST(msg) && \
-                                        RSERVR_TO_REQUEST(msg).__dimension == \
-                                        multi_message)
+                                       RSERVR_TO_REQUEST(msg).__dimension == \
+                                       multi_message)
 
 /*! Convert a message to a request's text list data.*/
 #define RSERVR_TO_REQUEST_LIST(msg)   (RSERVR_IS_REQUEST_LIST(msg)? \
-                                        RSERVR_TO_REQUEST(msg).__n1.__list : NULL)
+                                       RSERVR_TO_REQUEST(msg).__n1.__list : NULL)
 
 
 /*! Determine if a message is a single response.*/

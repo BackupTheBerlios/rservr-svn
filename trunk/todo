@@ -1,6 +1,14 @@
 20130815
-- finish allowing for request lists:
-  - test examples
+- merge and rename proto libs, maybe rename the whole proto_ prefix thing
+- to simplify:
+  - client API, especially messages
+  - server internals
+- add logging messages to some of the more obscure errors, e.g. detached client's socket not starting with "/"
+- make python handle objects destroy handle (e.g. message, command) when destructed
+- config needs work:
+  - need to be able to pass arguments
+  - need to be able to pass config on the command line, not just via a file
+- add exception messages to python bindings
 
 
 12feb11

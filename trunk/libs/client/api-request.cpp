@@ -41,8 +41,8 @@
 command_handle service_request(text_info nName, text_info mMessage)
 { DEFAULT_QUEUE_CLIENT_COMMAND(nName, new proto_service_request(mMessage)) }
 
-command_handle service_request_list(text_info nName, info_list mMessage)
-{ DEFAULT_QUEUE_CLIENT_COMMAND(nName, new proto_service_request_list(mMessage)) }
+command_handle service_request_list(text_info nName, info_list mMessages)
+{ DEFAULT_QUEUE_CLIENT_COMMAND(nName, new proto_service_request_list(mMessages)) }
 
 command_handle binary_service_request(text_info nName, binary_info mMessage, binary_size sSize)
 { DEFAULT_QUEUE_CLIENT_COMMAND(nName, new proto_service_request(mMessage, sSize)) }

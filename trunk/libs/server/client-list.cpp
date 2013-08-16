@@ -634,6 +634,7 @@ const client_id *rRequestor)
 
 #ifdef PARAM_ABSOLUTE_LOCAL_SOCKETS
 	if (strlen(sSocket) < 1 || sSocket[0] != '/') return -1;
+	//log point
 #endif
 
 	struct stat file_status;
@@ -657,6 +658,7 @@ const client_id *rRequestor)
 	if (getuid() != file_status.st_uid && seteuid(file_status.st_uid) < 0)
 	{
 	setegid(getgid());
+	//log point
 	return -1;
 	}
 
