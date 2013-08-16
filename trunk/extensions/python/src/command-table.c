@@ -138,7 +138,12 @@ GLOBAL_BINDING_START(get_local_command_table, "")
 
 	current = elements;
 	for (I = 0; I < length; I++, ++current)
-	PyList_SetItem(list, I, NEW_TYPE_WRAPPER(command_table_info, *current));
+	if (PyList_SetItem(list, I, NEW_TYPE_WRAPPER(command_table_info, *current)) != 0)
+	{
+	Py_XDECREF(list);
+	free((void*) elements); //NOTE: this only frees the c-list; not the elements
+	return delay_exception(PyExc_RuntimeError, "unable to add element to list");
+	}
 
 	free((void*) elements); //NOTE: this only frees the c-list; not the elements
 	return list;

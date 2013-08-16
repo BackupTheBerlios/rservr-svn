@@ -61,7 +61,7 @@ GLOBAL_BINDING_START(partial_service_response_list, "")
 	message_handle message = auto_message_handle(object);
 	if (!message) return NULL;
 	info_list list = NULL, current = NULL;
-	if (!py_to_info_list(&list, object)) return NULL;
+	if (!py_to_info_list(&list, data)) return NULL;
 	PyObject *response = NEW_TYPE_WRAPPER(command_handle, partial_service_response_list(message, list, type));
 	if ((current = list))
 	{

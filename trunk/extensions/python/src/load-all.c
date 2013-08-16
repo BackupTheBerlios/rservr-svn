@@ -75,7 +75,8 @@ int py_to_double(double *vValue, PyObject *oObject)
 {
 	double value = 0;
 	if (!oObject) return delay_exception(PyExc_TypeError, "");
-	if ((value = PyFloat_AsDouble(oObject)) == -1.0 && PyErr_Occurred()) return delay_exception(PyExc_ValueError, "");
+	if ((value = PyFloat_AsDouble(oObject)) == -1.0 && PyErr_Occurred())
+	return delay_exception(PyExc_ValueError, "unable to parse value");
 	*vValue = value;
 	return 1;
 }
@@ -85,7 +86,8 @@ int py_to_long(long *vValue, PyObject *oObject)
 {
 	long value = 0;
 	if (!oObject) return delay_exception(PyExc_TypeError, "");
-	if ((value = PyInt_AsLong(oObject)) == -1 && PyErr_Occurred()) return delay_exception(PyExc_ValueError, "");
+	if ((value = PyInt_AsLong(oObject)) == -1 && PyErr_Occurred())
+	return delay_exception(PyExc_ValueError, "unable to parse value");
 	*vValue = value;
 	return 1;
 }
@@ -93,12 +95,12 @@ int py_to_long(long *vValue, PyObject *oObject)
 
 int py_to_info_list(info_list *vValue, PyObject *oObject)
 {
-	if (!PyList_Check(oObject)) return delay_exception(PyExc_TypeError, "");
+	if (!PyList_Check(oObject)) return delay_exception(PyExc_TypeError, "not a list object");
 
 	Py_ssize_t list_size = PyList_Size(oObject);
 
 	text_info *text_list = calloc(list_size + 1, sizeof(text_info));
-	if (!text_list) return delay_exception(PyExc_RuntimeError, "");
+	if (!text_list) return delay_exception(PyExc_RuntimeError, "unable to allocate list");
 
 	int I = 0;
 	for (; I < (signed) list_size; I++)
@@ -112,7 +114,7 @@ int py_to_info_list(info_list *vValue, PyObject *oObject)
 	{
 	while (I > 0) free((void*) text_list[I--]);
 	free((void*) text_list);
-	return delay_exception(PyExc_TypeError, "");
+	return delay_exception(PyExc_TypeError, "list contains non-string elements");
 	}
 
 	*vValue = (info_list) text_list;
@@ -133,18 +135,18 @@ PyObject *info_list_to_py(info_list lList)
 	unsigned int size = 0;
 	info_list current = lList;
 
-	if (current) while (current++) size++;
+	if (current) while (*current++) size++;
 
 	PyObject *new_list = PyList_New(size);
-	if (!new_list) return NULL;
+	if (!new_list) return delay_exception(PyExc_RuntimeError, "unable to allocate list");
 
 	current = lList;
 	int I = 0;
 	for (; I < (signed) size; I++)
-	if (!PyList_SetItem(new_list, I++, Py_BuildValue("i", current++)))
+	if (PyList_SetItem(new_list, I, Py_BuildValue("s", *current++)) != 0)
 	{
 	Py_XDECREF(new_list);
-	return NULL;
+	return delay_exception(PyExc_RuntimeError, "unable to add element to list");
 	}
 
 	return new_list;
