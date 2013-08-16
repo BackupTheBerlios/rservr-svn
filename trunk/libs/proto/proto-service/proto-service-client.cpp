@@ -209,11 +209,11 @@ RSERVR_AUTO_BUILTIN_TAG(service_request_list)
 	}
 
 
-RSERVR_RESPONSE_DEFAULTS(proto_service_request_list, RSERVR_BUILTIN_TAG(service_request_list), type_service_client)
+RSERVR_CLIENT_COMMAND_DEFAULTS(proto_service_request_list, RSERVR_BUILTIN_TAG(service_request_list), type_resource_client)
 
 RSERVR_GENERATOR_DEFAULT( proto_service_request_list, \
-  type_resource_client, type_server, \
-  type_active_client,   type_admin_client, \
+  type_service_client, type_server, \
+  type_active_client,  type_admin_client, \
   command_request | command_builtin );
 //END proto_service_request_list command========================================
 
@@ -699,6 +699,7 @@ RSERVR_GENERATOR_DEFAULT( proto_find_services, \
 
 DEFINE_LOAD_FUNCTIONS_START(service)
 ADD_COMMAND_GENERATOR(proto_service_request)
+ADD_COMMAND_GENERATOR(proto_service_request_list)
 ADD_COMMAND_GENERATOR(proto_service_response)
 ADD_COMMAND_GENERATOR(proto_service_response_list)
 ADD_COMMAND_GENERATOR(proto_partial_response)
