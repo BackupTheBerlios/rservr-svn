@@ -64,9 +64,10 @@ RSERVR_AUTO_BUILTIN_TAG(service_request)
 	{
 	RSERVR_INTERFACE_REJECT
 
-	struct incoming_request_data request = { __n1: {
-	  __message: request_message.c_str() },
-	     __size: binary? request_message.size() : 0 };
+	struct incoming_request_data request = {
+	  __dimension: single_message, __n1: { __n2: { __n3: {
+	    __message: request_message.c_str() },
+	       __size: binary? request_message.size() : 0}}};
 	return RSERVR_CLIENT_ARG->register_request(RSERVR_INFO_ARG, &request)?
 	  RSERVR_EVAL_NONE : RSERVR_EVAL_REJECTED;
 	}
@@ -121,6 +122,100 @@ RSERVR_GENERATOR_DEFAULT( proto_service_request, \
   type_active_client,  type_admin_client, \
   command_request | command_builtin );
 //END proto_service_request command=============================================
+
+
+//proto_service_request_list command============================================
+RSERVR_AUTO_BUILTIN_TAG(service_request_list)
+
+	RSERVR_COMMAND_DEFAULT_CONSTRUCT(proto_service_request_list) {}
+
+
+	proto_service_request_list::proto_service_request_list(info_list lList) :
+	RSERVR_COMMAND_INIT_BASE(RSERVR_BUILTIN_TAG(service_request_list)),
+	event_origin(entity_name())
+	{ while (*lList) request_data.push_back(*lList++); }
+
+
+	RSERVR_CLIENT_EVAL_HEAD(proto_service_request_list)
+	{
+	RSERVR_INTERFACE_REJECT_QUIET
+
+	std::vector <text_info> temp_data;
+	temp_data.resize(request_data.size());
+	for (unsigned int I = 0; I < temp_data.size(); I++) temp_data[I] = request_data[I].c_str();
+	temp_data.push_back(NULL);
+
+	struct incoming_request_data request = {
+	  __dimension: multi_message, __n1: {
+	       __list: &temp_data[0] }};
+	bool outcome = RSERVR_CLIENT_ARG->register_request(RSERVR_INFO_ARG, &request);
+
+	if (!RSERVR_CHECK_FROM_REMOTE)
+	RSERVR_CLIENT_ARG->update_local_command_status(RSERVR_INFO_ARG, event_complete);
+	else
+	RSERVR_CLIENT_ARG->update_remote_command_status(RSERVR_INFO_ARG, event_complete);
+	return  outcome? RSERVR_EVAL_NONE : RSERVR_EVAL_REJECTED;
+	}
+
+
+	RSERVR_COMMAND_PARSE_HEAD(proto_service_request_list)
+	{
+	RSERVR_COMMAND_PARSE_CHECK(service_request_list, type_active_client, type_admin_client)
+
+	event_origin.clear();
+	request_data.clear();
+
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_TREE)
+
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 0)
+	RSERVR_COMMAND_COPY_DATA(event_origin)
+
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_INDEX == 1)
+	 {
+	RSERVR_COMMAND_PARSE_START(RSERVR_COMMAND_GROUP)
+
+	RSERVR_COMMAND_CASE(RSERVR_COMMAND_TYPE & (text_section | binary_section))
+	request_data.push_back(RSERVR_COMMAND_DATA);
+
+	RSERVR_COMMAND_DEFAULT return false;
+
+	RSERVR_COMMAND_PARSE_END
+	 }
+
+	RSERVR_COMMAND_DEFAULT break;
+
+	RSERVR_COMMAND_PARSE_END
+
+	return true;
+	}
+
+
+	RSERVR_COMMAND_BUILD_HEAD(proto_service_request_list)
+	{
+	RSERVR_COMMAND_BUILD_CHECK(service_request_list, type_resource_client, type_server)
+
+	RSERVR_COMMAND_BUILD_START
+
+	RSERVR_COMMAND_ADD_TEXT("", event_origin)
+
+	RSERVR_COMMAND_GROUP_START("")
+
+	for (int I = 0; I < (signed) request_data.size(); I++)
+	RSERVR_COMMAND_ADD_TEXT("", request_data[I])
+
+	RSERVR_COMMAND_GROUP_END
+
+	RSERVR_COMMAND_BUILD_END
+	}
+
+
+RSERVR_RESPONSE_DEFAULTS(proto_service_request_list, RSERVR_BUILTIN_TAG(service_request_list), type_service_client)
+
+RSERVR_GENERATOR_DEFAULT( proto_service_request_list, \
+  type_resource_client, type_server, \
+  type_active_client,   type_admin_client, \
+  command_request | command_builtin );
+//END proto_service_request_list command========================================
 
 
 //proto_service_response command================================================

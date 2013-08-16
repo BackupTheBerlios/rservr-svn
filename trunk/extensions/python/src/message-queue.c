@@ -31,15 +31,18 @@ macro(message_info, to_request) \
 macro(message_info, to_response) \
 macro(message_info, to_remote) \
 macro(message_info, to_info) \
-macro(message_info, to_request_message) \
+macro(message_info, is_request_single) \
+macro(message_info, to_request_single) \
 macro(message_info, to_request_binary) \
 macro(message_info, request_size) \
-macro(message_info, is_single_response) \
-macro(message_info, to_single_response) \
+macro(message_info, is_request_list) \
+macro(message_info, to_request_list) \
+macro(message_info, is_response_single) \
+macro(message_info, to_response_single) \
 macro(message_info, to_response_binary) \
 macro(message_info, response_size) \
-macro(message_info, is_list_response) \
-macro(message_info, to_list_response) \
+macro(message_info, is_response_list) \
+macro(message_info, to_response_list) \
 macro(message_info, response_type) \
 macro(message_info, remote_command) \
 macro(message_info, to_info_message) \
@@ -132,19 +135,27 @@ METHOD_BINDING_END(message_info, to_info)
 
 
 
-METHOD_BINDING_START(message_info, to_request_message, "")
+METHOD_BINDING_START(message_info, is_request_single, "")
 	NO_ARGUMENTS
 	if (!SELF || !SELF->pointer) return auto_exception(PyExc_IndexError, "");
-	if (!RSERVR_IS_REQUEST(SELF->pointer) || RSERVR_IS_BINARY(SELF->pointer)) return auto_exception(PyExc_TypeError, "");
-	return Py_BuildValue("s", RSERVR_TO_REQUEST_MESSAGE(SELF->pointer));
-METHOD_BINDING_END(message_info, to_request_message)
+	BOOL_RETURN(RSERVR_IS_REQUEST_SINGLE(SELF->pointer))
+METHOD_BINDING_END(message_info, is_request_single)
+
+
+
+METHOD_BINDING_START(message_info, to_request_single, "")
+	NO_ARGUMENTS
+	if (!SELF || !SELF->pointer) return auto_exception(PyExc_IndexError, "");
+	if (!RSERVR_IS_REQUEST_SINGLE(SELF->pointer) || RSERVR_IS_BINARY(SELF->pointer)) return auto_exception(PyExc_TypeError, "");
+	return Py_BuildValue("s", RSERVR_TO_REQUEST_SINGLE(SELF->pointer));
+METHOD_BINDING_END(message_info, to_request_single)
 
 
 
 METHOD_BINDING_START(message_info, to_request_binary, "")
 	NO_ARGUMENTS
 	if (!SELF || !SELF->pointer) return auto_exception(PyExc_IndexError, "");
-	if (!RSERVR_IS_REQUEST(SELF->pointer) || !RSERVR_IS_BINARY(SELF->pointer)) return auto_exception(PyExc_TypeError, "");
+	if (!RSERVR_IS_REQUEST_SINGLE(SELF->pointer) || !RSERVR_IS_BINARY(SELF->pointer)) return auto_exception(PyExc_TypeError, "");
 	return PyByteArray_FromStringAndSize((text_info) RSERVR_TO_REQUEST_BINARY(SELF->pointer), RSERVR_REQUEST_SIZE(SELF->pointer));
 METHOD_BINDING_END(message_info, to_request_binary)
 
@@ -153,33 +164,50 @@ METHOD_BINDING_END(message_info, to_request_binary)
 METHOD_BINDING_START(message_info, request_size, "")
 	NO_ARGUMENTS
 	if (!SELF || !SELF->pointer) return auto_exception(PyExc_IndexError, "");
-	if (!RSERVR_IS_REQUEST(SELF->pointer) || !RSERVR_IS_BINARY(SELF->pointer)) return auto_exception(PyExc_TypeError, "");
+	if (!RSERVR_IS_REQUEST_SINGLE(SELF->pointer) || !RSERVR_IS_BINARY(SELF->pointer)) return auto_exception(PyExc_TypeError, "");
 	return Py_BuildValue("l", (long) RSERVR_REQUEST_SIZE(SELF->pointer));
 METHOD_BINDING_END(message_info, request_size)
 
 
 
-METHOD_BINDING_START(message_info, is_single_response, "")
+METHOD_BINDING_START(message_info, is_request_list, "")
 	NO_ARGUMENTS
 	if (!SELF || !SELF->pointer) return auto_exception(PyExc_IndexError, "");
-	BOOL_RETURN(RSERVR_IS_SINGLE_RESPONSE(SELF->pointer))
-METHOD_BINDING_END(message_info, is_single_response)
+	BOOL_RETURN(RSERVR_IS_REQUEST_LIST(SELF->pointer))
+METHOD_BINDING_END(message_info, is_request_list)
 
 
 
-METHOD_BINDING_START(message_info, to_single_response, "")
+METHOD_BINDING_START(message_info, to_request_list, "")
 	NO_ARGUMENTS
 	if (!SELF || !SELF->pointer) return auto_exception(PyExc_IndexError, "");
-	if (!RSERVR_IS_SINGLE_RESPONSE(SELF->pointer) || RSERVR_IS_BINARY(SELF->pointer)) return auto_exception(PyExc_TypeError, "");
-	return Py_BuildValue("s", RSERVR_TO_SINGLE_RESPONSE(SELF->pointer));
-METHOD_BINDING_END(message_info, to_single_response)
+	if (!RSERVR_IS_REQUEST_LIST(SELF->pointer)) return auto_exception(PyExc_TypeError, "");
+	return info_list_to_py(RSERVR_TO_REQUEST_LIST(SELF->pointer));
+METHOD_BINDING_END(message_info, to_request_list)
+
+
+
+METHOD_BINDING_START(message_info, is_response_single, "")
+	NO_ARGUMENTS
+	if (!SELF || !SELF->pointer) return auto_exception(PyExc_IndexError, "");
+	BOOL_RETURN(RSERVR_IS_RESPONSE_SINGLE(SELF->pointer))
+METHOD_BINDING_END(message_info, is_response_single)
+
+
+
+METHOD_BINDING_START(message_info, to_response_single, "")
+	NO_ARGUMENTS
+	if (!SELF || !SELF->pointer) return auto_exception(PyExc_IndexError, "");
+	if (!RSERVR_IS_RESPONSE_SINGLE(SELF->pointer) || RSERVR_IS_BINARY(SELF->pointer)) return auto_exception(PyExc_TypeError, "");
+	return Py_BuildValue("s", RSERVR_TO_RESPONSE_SINGLE(SELF->pointer));
+METHOD_BINDING_END(message_info, to_response_single)
 
 
 
 METHOD_BINDING_START(message_info, to_response_binary, "")
 	NO_ARGUMENTS
 	if (!SELF || !SELF->pointer) return auto_exception(PyExc_IndexError, "");
-	if (!RSERVR_IS_SINGLE_RESPONSE(SELF->pointer) || !RSERVR_IS_BINARY(SELF->pointer)) return auto_exception(PyExc_TypeError, "");
+	if (!RSERVR_IS_RESPONSE_SINGLE(SELF->pointer) || !RSERVR_IS_BINARY(SELF->pointer)) return auto_exception(PyExc_TypeError, "");
 	return PyByteArray_FromStringAndSize((text_info) RSERVR_TO_RESPONSE_BINARY(SELF->pointer), RSERVR_RESPONSE_SIZE(SELF->pointer));
 METHOD_BINDING_END(message_info, to_response_binary)
 
@@ -188,26 +216,26 @@ METHOD_BINDING_END(message_info, to_response_binary)
 METHOD_BINDING_START(message_info, response_size, "")
 	NO_ARGUMENTS
 	if (!SELF || !SELF->pointer) return auto_exception(PyExc_IndexError, "");
-	if (!RSERVR_IS_SINGLE_RESPONSE(SELF->pointer) || !RSERVR_IS_BINARY(SELF->pointer)) return auto_exception(PyExc_TypeError, "");
+	if (!RSERVR_IS_RESPONSE_SINGLE(SELF->pointer) || !RSERVR_IS_BINARY(SELF->pointer)) return auto_exception(PyExc_TypeError, "");
 	return Py_BuildValue("l", (long) RSERVR_RESPONSE_SIZE(SELF->pointer));
 METHOD_BINDING_END(message_info, response_size)
 
 
 
-METHOD_BINDING_START(message_info, is_list_response, "")
+METHOD_BINDING_START(message_info, is_response_list, "")
 	NO_ARGUMENTS
 	if (!SELF || !SELF->pointer) return auto_exception(PyExc_IndexError, "");
-	BOOL_RETURN(RSERVR_IS_LIST_RESPONSE(SELF->pointer))
-METHOD_BINDING_END(message_info, is_list_response)
+	BOOL_RETURN(RSERVR_IS_RESPONSE_LIST(SELF->pointer))
+METHOD_BINDING_END(message_info, is_response_list)
 
 
 
-METHOD_BINDING_START(message_info, to_list_response, "")
+METHOD_BINDING_START(message_info, to_response_list, "")
 	NO_ARGUMENTS
 	if (!SELF || !SELF->pointer) return auto_exception(PyExc_IndexError, "");
-	if (!RSERVR_IS_LIST_RESPONSE(SELF->pointer)) return auto_exception(PyExc_TypeError, "");
-	return info_list_to_py(RSERVR_TO_LIST_RESPONSE(SELF->pointer));
-METHOD_BINDING_END(message_info, to_list_response)
+	if (!RSERVR_IS_RESPONSE_LIST(SELF->pointer)) return auto_exception(PyExc_TypeError, "");
+	return info_list_to_py(RSERVR_TO_RESPONSE_LIST(SELF->pointer));
+METHOD_BINDING_END(message_info, to_response_list)
 
 
 

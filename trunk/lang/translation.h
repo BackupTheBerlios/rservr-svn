@@ -394,6 +394,7 @@ extern text_string proto_find_clients_info;
 
 /*service_____________________________________________________________________*/
 extern text_string proto_service_request_info;
+extern text_string proto_service_request_list_info;
 extern text_string proto_service_response_info;
 extern text_string proto_service_response_list_info;
 extern text_string proto_partial_response_info;

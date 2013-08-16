@@ -1,3 +1,8 @@
+20130815
+- finish allowing for request lists:
+  - test examples
+
+
 12feb11
 - *****require that socket paths start with /, e.g. fs forwarders, detached clients, etc.
 - implement create_exact, create_target (create_flags) etc.

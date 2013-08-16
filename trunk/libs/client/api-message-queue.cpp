@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2012, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2013, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -208,17 +208,44 @@ const command_info *oOriginal, command_type tType, const void *mMessage)
 
 	if (tType == command_request)
 	 {
-	const struct incoming_request_data *message_data = (const struct incoming_request_data*) mMessage;
+	const struct incoming_request_data *message_data =
+	  (const struct incoming_request_data*) mMessage;
 
-	new_message->__request.__size = message_data->__size;
-	if (!message_data->__size) new_mirror->message = message_data->__n1.__message;
-	else
+	new_message->__request.__dimension = no_message;
+
+	if (message_data->__dimension == single_message)
 	  {
-	new_mirror->message.resize(message_data->__size);
-	for (unsigned int I = 0; I < message_data->__size; I++)
-	new_mirror->message[I] = (char) message_data->__n1.__binary[I];
+	new_message->__request.__dimension = single_message;
+	new_message->__request.__n1.__n2.__size = message_data->__n1.__n2.__size;
+	if (!message_data->__n1.__n2.__size) new_mirror->message =
+	  message_data->__n1.__n2.__n3.__message;
+	else
+	   {
+	new_mirror->message.resize(message_data->__n1.__n2.__size);
+	for (unsigned int I = 0; I < message_data->__n1.__n2.__size; I++)
+	new_mirror->message[I] = (char) message_data->__n1.__n2.__n3.__binary[I];
+	   }
+	new_message->__request.__n1.__n2.__n3.__message =
+	  new_mirror->message.c_str();
 	  }
-	new_message->__request.__n1.__message = new_mirror->message.c_str();
+
+	else if (message_data->__dimension == multi_message)
+	  {
+	new_message->__request.__dimension = multi_message;
+	new_message->__request.__n1.__n2.__size = 0x00;
+	info_list current = message_data->__n1.__list;
+
+	if (current) while (*current)
+	   {
+	new_mirror->message_list.push_back(*current++);
+	new_mirror->message_pointers.push_back(
+	  new_mirror->message_list[ new_mirror->message_list.size() - 1 ].c_str() );
+	   }
+
+	new_mirror->message_pointers.push_back(NULL);
+	new_message->__request.__n1.__list =
+	  &new_mirror->message_pointers[0];
+	  }
 	 }
 
 

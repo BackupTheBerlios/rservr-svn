@@ -11,7 +11,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2013, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -69,6 +69,16 @@ extern "C" {
  * \return handle of queued command or failure (NULL)
  */
 extern command_handle service_request(text_info Target, text_info Data);
+
+/*! \brief Create a textual service list request.
+ *
+ * Create a textual service list request to be sent to a single service.
+ *
+ * \param Target client or service name
+ * \param Data text-formated message data (NULL-terminated list)
+ * \return handle of queued command or failure (NULL)
+ */
+extern command_handle service_request_list(text_info Target, info_list Data);
 
 /*! \brief Create a binary service request.
  *

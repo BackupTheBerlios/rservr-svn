@@ -377,17 +377,17 @@ static void message_queue_hook(int eEvent)
 	while ((message = current_message()))
 	{
 	if (RSERVR_IS_REQUEST(message) && !RSERVR_IS_BINARY(message))
-	transpose_message(message->received_from, message->received_address, RSERVR_TO_REQUEST_MESSAGE(message));
+	transpose_message(message->received_from, message->received_address, RSERVR_TO_REQUEST_SINGLE(message));
 
 
 	else if (RSERVR_IS_RESPONSE(message) && !RSERVR_IS_BINARY(message))
 	 {
-	if (RSERVR_IS_SINGLE_RESPONSE(message))
-	transpose_message(message->received_from, message->received_address, RSERVR_TO_SINGLE_RESPONSE(message));
+	if (RSERVR_IS_RESPONSE_SINGLE(message))
+	transpose_message(message->received_from, message->received_address, RSERVR_TO_RESPONSE_SINGLE(message));
 
-	else if (RSERVR_IS_LIST_RESPONSE(message))
+	else if (RSERVR_IS_RESPONSE_LIST(message))
 	  {
-	info_list current_text = RSERVR_TO_LIST_RESPONSE(message);
+	info_list current_text = RSERVR_TO_RESPONSE_LIST(message);
 	while (current_text && *current_text)
 	transpose_message(message->received_from, message->received_address, *current_text++);
 	  }

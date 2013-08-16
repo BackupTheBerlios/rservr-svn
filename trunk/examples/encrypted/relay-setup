@@ -16,5 +16,5 @@ connect_allow '^127\\.0\\.0\\.1:'
 #this limits the total connections held by the forwarder
 total_limit 10
 
-listen 2047
-listen 2048
+listen localhost:2047
+listen localhost:2048

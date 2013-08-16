@@ -75,10 +75,14 @@ enum message_dimension {     no_message = 0x00,
 /*! For macro and internal use only.*/
 struct incoming_request_data
 {
-	union {
+	unsigned char __dimension;
+
+	union { struct { union {
 	text_info   __message;
-	binary_info __binary; } __n1;
-	binary_size __size;
+	binary_info __binary; } __n3;
+	binary_size __size; } __n2;
+	info_list   __list;
+	} __n1;
 } __attribute__ ((packed));
 
 
@@ -90,7 +94,7 @@ struct incoming_response_data
 	union { struct { union {
 	text_info   __message;
 	binary_info __binary; } __n3;
-	binary_size __size; } __attribute__ ((packed)) __n2;
+	binary_size __size; } __n2;
 	info_list   __list;
 	} __n1;
 
@@ -188,12 +192,12 @@ struct message_info
 
 
 /*! Determine if a message contains binary data.*/
-#define RSERVR_IS_BINARY(msg)   ( (RSERVR_IS_REQUEST(msg)          && \
-                                   RSERVR_TO_REQUEST(msg).__size)  || \
-                                  (RSERVR_IS_SINGLE_RESPONSE(msg)  && \
-                                   RSERVR_TO_RESPONSE(msg).__n1.__n2.__size) || \
-                                  (RSERVR_IS_INFO(msg)             && \
-                                   RSERVR_TO_INFO(msg).__size) )
+#define RSERVR_IS_BINARY(msg)   ( (RSERVR_IS_REQUEST_SINGLE(msg) && \
+                                   RSERVR_REQUEST_SIZE(msg)        )  || \
+                                  (RSERVR_IS_RESPONSE_SINGLE(msg) && \
+                                   RSERVR_RESPONSE_SIZE(msg)        ) || \
+                                  (RSERVR_IS_INFO(msg) && \
+                                   RSERVR_INFO_SIZE(msg) ) )
 
 
 /*! Convert a message to a request.*/
@@ -213,47 +217,61 @@ struct message_info
                                  msg->__info)
 
 
+/*! Determine if a message is a single request.*/
+#define RSERVR_IS_REQUEST_SINGLE(msg) (RSERVR_IS_REQUEST(msg) && \
+                                        RSERVR_TO_REQUEST(msg).__dimension == \
+                                        single_message)
+
 /*! Convert a message to a request's text message data.*/
-#define RSERVR_TO_REQUEST_MESSAGE(msg) ((RSERVR_IS_REQUEST(msg) && \
-                                         !RSERVR_TO_REQUEST(msg).__size)? \
-                                        RSERVR_TO_REQUEST(msg).__n1.__message : NULL)
+#define RSERVR_TO_REQUEST_SINGLE(msg) ((RSERVR_IS_REQUEST_SINGLE(msg) && \
+                                         !RSERVR_TO_REQUEST(msg).__n1.__n2.__size)? \
+                                        RSERVR_TO_REQUEST(msg).__n1.__n2.__n3.__message : NULL)
 
 /*! Convert a message to a request's binary data.*/
-#define RSERVR_TO_REQUEST_BINARY(msg)  ((RSERVR_IS_REQUEST(msg) && \
-                                         RSERVR_TO_REQUEST(msg).__size)? \
-                                        RSERVR_TO_REQUEST(msg).__n1.__binary : NULL)
+#define RSERVR_TO_REQUEST_BINARY(msg) ((RSERVR_IS_REQUEST_SINGLE(msg) && \
+                                         RSERVR_TO_REQUEST(msg).__n1.__n2.__size)? \
+                                        RSERVR_TO_REQUEST(msg).__n1.__n2.__n3.__binary : NULL)
 
 /*! Determine a request message's binary data size.*/
-#define RSERVR_REQUEST_SIZE(msg)       (RSERVR_IS_REQUEST(msg)? \
-                                        RSERVR_TO_REQUEST(msg).__size : 0)
+#define RSERVR_REQUEST_SIZE(msg)      (RSERVR_IS_REQUEST_SINGLE(msg)? \
+                                        RSERVR_TO_REQUEST(msg).__n1.__n2.__size : 0)
+
+/*! Determine if a message is a list request.*/
+#define RSERVR_IS_REQUEST_LIST(msg)   (RSERVR_IS_REQUEST(msg) && \
+                                        RSERVR_TO_REQUEST(msg).__dimension == \
+                                        multi_message)
+
+/*! Convert a message to a request's text list data.*/
+#define RSERVR_TO_REQUEST_LIST(msg)   (RSERVR_IS_REQUEST_LIST(msg)? \
+                                        RSERVR_TO_REQUEST(msg).__n1.__list : NULL)
 
 
 /*! Determine if a message is a single response.*/
-#define RSERVR_IS_SINGLE_RESPONSE(msg) (RSERVR_IS_RESPONSE(msg) && \
+#define RSERVR_IS_RESPONSE_SINGLE(msg) (RSERVR_IS_RESPONSE(msg) && \
                                         RSERVR_TO_RESPONSE(msg).__dimension == \
                                         single_message)
 
 /*! Convert a message to a response's text message data.*/
-#define RSERVR_TO_SINGLE_RESPONSE(msg) ((RSERVR_IS_SINGLE_RESPONSE(msg) && \
+#define RSERVR_TO_RESPONSE_SINGLE(msg) ((RSERVR_IS_RESPONSE_SINGLE(msg) && \
                                          !RSERVR_TO_RESPONSE(msg).__n1.__n2.__size)? \
                                         RSERVR_TO_RESPONSE(msg).__n1.__n2.__n3.__message : NULL)
 
 /*! Convert a message to a response's binary data.*/
-#define RSERVR_TO_RESPONSE_BINARY(msg) ((RSERVR_IS_SINGLE_RESPONSE(msg) && \
+#define RSERVR_TO_RESPONSE_BINARY(msg) ((RSERVR_IS_RESPONSE_SINGLE(msg) && \
                                          RSERVR_TO_RESPONSE(msg).__n1.__n2.__size)? \
                                         RSERVR_TO_RESPONSE(msg).__n1.__n2.__n3.__binary : NULL)
 
 /*! Determine a response message's binary data size.*/
-#define RSERVR_RESPONSE_SIZE(msg)      (RSERVR_IS_SINGLE_RESPONSE(msg)? \
+#define RSERVR_RESPONSE_SIZE(msg)      (RSERVR_IS_RESPONSE_SINGLE(msg)? \
                                         RSERVR_TO_RESPONSE(msg).__n1.__n2.__size : 0)
 
 /*! Determine if a message is a list response.*/
-#define RSERVR_IS_LIST_RESPONSE(msg)   (RSERVR_IS_RESPONSE(msg) && \
+#define RSERVR_IS_RESPONSE_LIST(msg)   (RSERVR_IS_RESPONSE(msg) && \
                                         RSERVR_TO_RESPONSE(msg).__dimension == \
                                         multi_message)
 
 /*! Convert a message to a response's text list data.*/
-#define RSERVR_TO_LIST_RESPONSE(msg)   (RSERVR_IS_LIST_RESPONSE(msg)? \
+#define RSERVR_TO_RESPONSE_LIST(msg)   (RSERVR_IS_RESPONSE_LIST(msg)? \
                                         RSERVR_TO_RESPONSE(msg).__n1.__list : NULL)
 
 /*! Determine a response message's response type.*/

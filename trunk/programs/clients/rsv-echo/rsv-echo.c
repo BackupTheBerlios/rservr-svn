@@ -131,7 +131,7 @@ static void message_queue_hook(int eEvent)
 
 	if (RSERVR_IS_REQUEST(message) && !RSERVR_IS_BINARY(message))
 	new_command = client_response(RSERVR_RESPOND(message), event_complete,
-	    RSERVR_TO_REQUEST_MESSAGE(message));
+	    RSERVR_TO_REQUEST_SINGLE(message));
 
 	else if (RSERVR_IS_INFO(message) && !RSERVR_IS_BINARY(message))
 	  {

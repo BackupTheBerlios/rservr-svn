@@ -1,7 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 current="$(readlink -f $(dirname "$0"))"
 cd $(dirname "$0")
+
+sed='gsed -r'
+# stat='stat -c "%s %n"'
+stat='stat -f "%z %N"'
 
 additional=
 additional_really=
@@ -36,44 +40,44 @@ echo 'SIZE:    ' $(du -chs `eval $find_command` | tail -n1)
 echo
 echo 'LONGEST 8: (by total lines)'
 grep -c ".*" $( eval $find_command ) | \
-  sed -r 's/^(.+):([0-9]+)$/  \2\t\1/' | \
-  sed -r '{:start;s/^  ([0-9]{,4})\t/  0\1\t/g;tstart}' | \
-  sort -r | head -8 | sed -r '{:start;s/(^| )0/\1 /g;tstart}' | grep -n ".*"
+  $sed 's/^(.+):([0-9]+)$/  \2\t\1/' | \
+  $sed '{:start;s/^  ([0-9]{,4})\t/  0\1\t/g;tstart}' | \
+  sort -r | head -8 | $sed '{:start;s/(^| )0/\1 /g;tstart}' | grep -n ".*"
 
 echo
 echo 'LARGEST 8: (by file size)'
-stat -c'%s %n' $( eval $find_command ) | \
-  sed -r 's/^([0-9]+) /\1\t/' | \
-  sed -r '{:start;s/^([0-9]{,6})\t/0\1\t/g;tstart}' | \
-  sort -r | head -8 | sed -r '{:start;s/(^| )0/\1 /g;tstart}' | grep -n ".*"
+eval $stat $( eval $find_command ) | \
+  $sed 's/^([0-9]+) /\1\t/' | \
+  $sed '{:start;s/^([0-9]{,6})\t/0\1\t/g;tstart}' | \
+  sort -r | head -8 | $sed '{:start;s/(^| )0/\1 /g;tstart}' | grep -n ".*"
 
 echo
 echo 'HIGHEST 8 UNUSED LINES: (non-API / minus license header)'
 eval $find_command | grep -v "include/rservr/" | while read file; do
-  total=$( sed -r 'btest; {:remove;N;/\*\//{N;d;b};bremove}; :test;1,/\*\// {/[ \t]*\/\*/bremove}' "$file" | grep -c ".*" )
+  total=$( $sed 'btest; {:remove;N;/\*\//{N;d;b};bremove}; :test;1,/\*\// {/[ \t]*\/\*/bremove}' "$file" | grep -c ".*" )
   used=$( ./uncomment "$file" | grep -c "." )
 
   if [ "$total" -ne 0 ]; then
-    ratio=$( echo "100*($total-$used)/($total)" | bc | sed -r '{:start;s/^([0-9]{,2})(\.|$)/0\1\2/g;tstart}' )
+    ratio=$( echo "100*($total-$used)/($total)" | bc | $sed '{:start;s/^([0-9]{,2})(\.|$)/0\1\2/g;tstart}' )
   else
     ratio="(empty file)"
   fi
   echo -e "   $ratio%\t$file"
 done | \
-  sort -r | head -8 | sed -r '{:start;s/(^| )0/\1 /g;tstart}' | grep -n ".*"
+  sort -r | head -8 | $sed '{:start;s/(^| )0/\1 /g;tstart}' | grep -n ".*"
 
 echo
 echo 'HIGHEST 8 AVERAGE LINE LENGTH: (non-Makefile / non-blank/non-comment)'
 eval $find_command | grep -v Makefile.am | while read file; do
   used=$( ./uncomment "$file" | grep -c "." )
-  characters=$( ./uncomment "$file" | sed -r '{:a;s/([^\n])([^\n]+)$/\1\n\2/g;ta}' | grep -c . )
+  characters=$( ./uncomment "$file" | $sed '{:a;s/([^\n])([^\n]+)$/\1\n\2/g;ta}' | grep -c . )
 
   if [ "$used" -ne 0 ]; then
-    ratio=$( echo "scale=1;$characters/$used" | bc | sed -r '{:start;s/^([0-9]{,3})(\.|$)/0\1\2/g;tstart}' )
+    ratio=$( echo "scale=1;$characters/$used" | bc | $sed '{:start;s/^([0-9]{,3})(\.|$)/0\1\2/g;tstart}' )
   else
     ratio="(empty file)"
   fi
 
   echo -e " $ratio\t$file"
 done | \
-  sort -r | head -8 | sed -r '{:start;s/(^| )0/\1 /g;tstart}' | grep -n ".*"
+  sort -r | head -8 | $sed '{:start;s/(^| )0/\1 /g;tstart}' | grep -n ".*"

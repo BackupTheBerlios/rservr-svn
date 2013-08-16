@@ -114,8 +114,8 @@ static pid_t common_execute(command_handle cCommand)
 
 	int value = -1;
 
-	if (RSERVR_IS_SINGLE_RESPONSE(message))
-	parse_integer10(RSERVR_TO_SINGLE_RESPONSE(message), &value);
+	if (RSERVR_IS_RESPONSE_SINGLE(message))
+	parse_integer10(RSERVR_TO_RESPONSE_SINGLE(message), &value);
 
 	remove_responses(sent_command);
 

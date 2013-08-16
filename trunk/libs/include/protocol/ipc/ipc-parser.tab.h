@@ -1,9 +1,8 @@
-/* A Bison parser, made by GNU Bison 2.4.3.  */
+/* A Bison parser, made by GNU Bison 2.7.12-4996.  */
 
-/* Skeleton interface for Bison's Yacc-like parsers in C
+/* Bison interface for Yacc-like parsers in C
    
-      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2009, 2010 Free Software Foundation, Inc.
+      Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,6 +30,15 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
+#ifndef YY_PROTOCOL_IPC_PARSER_TAB_H_INCLUDED
+# define YY_PROTOCOL_IPC_PARSER_TAB_H_INCLUDED
+/* Enabling traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int protocol_debug;
+#endif
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -62,12 +70,10 @@
 
 
 
-
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
 {
-
-/* Line 1685 of yacc.c  */
+/* Line 2053 of yacc.c  */
 #line 62 "ipc-parser.y"
 
 	struct {
@@ -81,9 +87,8 @@ typedef union YYSTYPE
 	struct storage_section *holding;
 
 
-
-/* Line 1685 of yacc.c  */
-#line 87 "ipc-parser.tab.h"
+/* Line 2053 of yacc.c  */
+#line 92 "ipc-parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -91,15 +96,15 @@ typedef union YYSTYPE
 #endif
 
 
-
-
-#ifndef YYPUSH_DECLS
-#  define YYPUSH_DECLS
-struct protocol_pstate;
-typedef struct protocol_pstate protocol_pstate;
+#ifndef YYPUSH_MORE_DEFINED
+# define YYPUSH_MORE_DEFINED
 enum { YYPUSH_MORE = 4 };
+#endif
+
+typedef struct protocol_pstate protocol_pstate;
+
 #if defined __STDC__ || defined __cplusplus
-int protocol_push_parse (protocol_pstate *yyps, int yypushed_char, YYSTYPE const *yypushed_val, struct protocol_scanner_context *cContext, void *sScanner);
+int protocol_push_parse (protocol_pstate *ps, int pushed_char, YYSTYPE const *pushed_val, struct protocol_scanner_context *cContext, void *sScanner);
 #else
 int protocol_push_parse ();
 #endif
@@ -110,9 +115,9 @@ protocol_pstate * protocol_pstate_new (void);
 protocol_pstate * protocol_pstate_new ();
 #endif
 #if defined __STDC__ || defined __cplusplus
-void protocol_pstate_delete (protocol_pstate *yyps);
+void protocol_pstate_delete (protocol_pstate *ps);
 #else
 void protocol_pstate_delete ();
 #endif
-#endif
 
+#endif /* !YY_PROTOCOL_IPC_PARSER_TAB_H_INCLUDED  */

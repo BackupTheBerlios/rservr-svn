@@ -1,6 +1,6 @@
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2013, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -55,7 +55,7 @@
 text_string proto_server_response_info = BUILTIN TYPE_SERVER
   "general response from the server with optional message";
 text_string proto_server_response_list_info = BUILTIN TYPE_SERVER
-  "list response from the server";
+  "response list from the server";
 text_string proto_server_directive_info = BUILTIN TYPE_SERVER
   "directive to a client from the server";
 text_string proto_set_timing_info = BUILTIN TYPE_SERVER
@@ -69,7 +69,7 @@ text_string proto_monitor_data_info = BUILTIN TYPE_SERVER
 text_string proto_client_response_info = BUILTIN TYPE_CLIENT BYPASS
   "general response from a client with optional message";
 text_string proto_client_response_list_info = BUILTIN TYPE_CLIENT BYPASS
-  "list response from a client";
+  "response list from a client";
 text_string proto_short_response_info = BUILTIN TYPE_CLIENT BYPASS
   "general response from a client";
 text_string proto_register_client_info = BUILTIN TYPE_CLIENT
@@ -108,14 +108,16 @@ text_string proto_find_clients_info = BUILTIN TYPE_ADMIN
 /*service_____________________________________________________________________*/
 text_string proto_service_request_info = BUILTIN TYPE_SERVICE
   "send a service request from one client to another";
+text_string proto_service_request_list_info = BUILTIN TYPE_SERVICE
+  "send a service request list from one client to another";
 text_string proto_service_response_info = BUILTIN TYPE_SERVICE
   "send a general response to a service request from one client to another";
 text_string proto_service_response_list_info = BUILTIN TYPE_SERVICE
-  "send a list response to a service request from one client to another";
+  "send a response list to a service request from one client to another";
 text_string proto_partial_response_info = BUILTIN TYPE_SERVICE
   "send a partial response to a service request from one client to another";
 text_string proto_partial_response_list_info = BUILTIN TYPE_SERVICE
-  "send a partial list response to a service request from one client to another";
+  "send a partial response list to a service request from one client to another";
 text_string proto_find_services_info = BUILTIN TYPE_SERVICE
   "find services based on name and type regular expressions";
 

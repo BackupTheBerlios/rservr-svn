@@ -11,7 +11,7 @@ _]|]_______]|]]]]|]__]|]]]]]|]__]|]____________]|]__]|]____________, , , , , ,__
 
 /* This software is released under the BSD License.
  |
- | Copyright (c) 2009, Kevin P. Barry [the resourcerver project]
+ | Copyright (c) 2013, Kevin P. Barry [the resourcerver project]
  | All rights reserved.
  |
  | Redistribution  and  use  in  source  and   binary  forms,  with  or  without
@@ -57,6 +57,8 @@ extern "C" {
 
 #include "command.h"
 
+
+struct local_commands;
 
 /*! Callback function defined by a plug-in library.*/
 typedef int (*plugin_loader_callback)(struct local_commands*);

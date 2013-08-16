@@ -194,9 +194,9 @@ static int find_services_common(FILE *fFile, text_info nName, text_info tType, t
 	return -1;
 	}
 
-	if (RSERVR_IS_LIST_RESPONSE(message))
+	if (RSERVR_IS_RESPONSE_LIST(message))
 	{
-	info_list current_line = RSERVR_TO_LIST_RESPONSE(message);
+	info_list current_line = RSERVR_TO_RESPONSE_LIST(message);
 	if (current_line) while (*current_line)
 	fprintf(fFile, "%s\n", *current_line++);
 	}
@@ -317,9 +317,9 @@ static int list_connections_common(FILE *fFile, bool lLocal)
 	return -1;
 	}
 
-	if (RSERVR_IS_LIST_RESPONSE(message))
+	if (RSERVR_IS_RESPONSE_LIST(message))
 	{
-	info_list current_line = RSERVR_TO_LIST_RESPONSE(message);
+	info_list current_line = RSERVR_TO_RESPONSE_LIST(message);
 	if (current_line) while (*current_line)
 	fprintf(fFile, "%s\n", *current_line++);
 	}
@@ -462,15 +462,15 @@ static int message_func_common(FILE *fFile, text_info cCommand, text_info lLabel
 
 	while ((message = rotate_response(new_send)))
 	{
-	if (RSERVR_IS_SINGLE_RESPONSE(message))
+	if (RSERVR_IS_RESPONSE_SINGLE(message))
 	 {
-	text_info current_line = RSERVR_TO_SINGLE_RESPONSE(message);
+	text_info current_line = RSERVR_TO_RESPONSE_SINGLE(message);
 	if (current_line) fprintf(fFile, "%s\n", current_line);
 	 }
 
-	else if (RSERVR_IS_LIST_RESPONSE(message))
+	else if (RSERVR_IS_RESPONSE_LIST(message))
 	 {
-	info_list current_line = RSERVR_TO_LIST_RESPONSE(message);
+	info_list current_line = RSERVR_TO_RESPONSE_LIST(message);
 	if (current_line) while (*current_line)
 	fprintf(fFile, "%s\n", *current_line++);
 	 }

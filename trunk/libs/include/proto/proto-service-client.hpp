@@ -50,6 +50,14 @@ RSERVR_COMMAND_CLASS( proto_service_request, \
 	text_data request_message; )
 
 
+RSERVR_COMMAND_CLASS( proto_service_request_list, \
+	/*constructors*/ \
+	proto_service_request_list(info_list);, \
+	/*members*/ \
+	text_data event_origin; \
+	data_list request_data; )
+
+
 RSERVR_COMMAND_CLASS( proto_service_response, \
 	/*constructors*/ \
 	proto_service_response(text_info); \
