@@ -108,18 +108,18 @@ int nNumber, flag_set &oObjects)
 
 	if (nNumber >= 0 && nNumber < (signed) oObjects.size())
 	    {
-	if (strcmp(RSERVR_TO_REQUEST_MESSAGE(mMessage), "check") == 0)
+	if (strcmp(RSERVR_TO_REQUEST_SINGLE(mMessage), "check") == 0)
 	new_command = oObjects[nNumber]?
 	  client_response(RSERVR_RESPOND(mMessage), event_complete, "on") :
 	  client_response(RSERVR_RESPOND(mMessage), event_complete, "off");
 
-	else if (strcmp(RSERVR_TO_REQUEST_MESSAGE(mMessage), "on") == 0)
+	else if (strcmp(RSERVR_TO_REQUEST_SINGLE(mMessage), "on") == 0)
 	     {
 	oObjects[nNumber] = true;
 	new_command = short_response(RSERVR_RESPOND(mMessage), event_complete);
 	     }
 
-	else if (strcmp(RSERVR_TO_REQUEST_MESSAGE(mMessage), "off") == 0)
+	else if (strcmp(RSERVR_TO_REQUEST_SINGLE(mMessage), "off") == 0)
 	     {
 	oObjects[nNumber] = false;
 	new_command = short_response(RSERVR_RESPOND(mMessage), event_complete);

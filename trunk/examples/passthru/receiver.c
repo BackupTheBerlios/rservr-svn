@@ -1,4 +1,4 @@
-﻿/* This client acts passively and waits for direction from 'sender' (sender.c).
+/* This client acts passively and waits for direction from 'sender' (sender.c).
  * 'sender' sends a request via a remote connection for this client to steal
  * the connection the request was sent via for passthru. Once this happens,
  * this client waits for direction from 'sender' to read data from the passthru

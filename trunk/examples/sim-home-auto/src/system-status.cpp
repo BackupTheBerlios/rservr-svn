@@ -154,7 +154,7 @@ command_reference &rReference)
 
 	if (!(message = rotate_response(rReference))) return NULL;
 
-	if (!(response_list = RSERVR_TO_LIST_RESPONSE(message)))
+	if (!(response_list = RSERVR_TO_RESPONSE_LIST(message)))
 	//a non-list message in response is an error
 	{
 	clear_messages();

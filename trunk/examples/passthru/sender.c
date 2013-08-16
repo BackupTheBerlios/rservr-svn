@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 	}
 
 	clear_command_status(connection1_status);
-	connection1_name = strdup(RSERVR_TO_SINGLE_RESPONSE(message));
+	connection1_name = strdup(RSERVR_TO_RESPONSE_SINGLE(message));
 	remove_responses(connection1_status);
 
 
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 	}
 
 	clear_command_status(connection2_status);
-	connection2_name = strdup(RSERVR_TO_SINGLE_RESPONSE(message));
+	connection2_name = strdup(RSERVR_TO_RESPONSE_SINGLE(message));
 	remove_responses(connection2_status);
 
 
