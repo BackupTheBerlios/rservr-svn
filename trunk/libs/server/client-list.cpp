@@ -51,6 +51,7 @@ extern "C" {
 #include <errno.h> //'errno'
 #include <sched.h> //scheduling
 #include <stdlib.h> //'calloc'
+#include <stddef.h> //'offsetof'
 #include <string.h> //'strlen'
 #include <sys/socket.h> //sockets
 #include <sys/un.h> //socket macros
