@@ -1009,7 +1009,7 @@ bool clear_client_waiting(client_list *tTable, entity_handle hHandle)
 
 const client_id *get_client_id(const client_list *tTable, entity_handle hHandle)
 {
-	if (!tTable) return false;
+	if (!tTable) return NULL;
 
 	int position = tTable->f_find(hHandle, &find_by_handle);
 	if (position == data::not_found) return NULL;
@@ -1020,7 +1020,7 @@ const client_id *get_client_id(const client_list *tTable, entity_handle hHandle)
 
 client_id *get_client_id_mutable(client_list *tTable, entity_handle hHandle)
 {
-	if (!tTable) return false;
+	if (!tTable) return NULL;
 
 	int position = tTable->f_find(hHandle, &find_by_handle);
 	if (position == data::not_found) return NULL;
@@ -1031,7 +1031,7 @@ client_id *get_client_id_mutable(client_list *tTable, entity_handle hHandle)
 
 const client_id *get_client_id_name(const client_list *tTable, text_info nName)
 {
-	if (!tTable || !nName) return false;
+	if (!tTable || !nName) return NULL;
 
 	int position = tTable->f_find(nName, &find_by_name);
 	if (position == data::not_found) return NULL;
