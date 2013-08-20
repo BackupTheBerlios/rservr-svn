@@ -39,6 +39,8 @@ extern "C" {
 
 #include <string>
 
+#include <stdint.h> //'uint32_t'
+
 extern "C" {
 #include "attributes.h"
 }

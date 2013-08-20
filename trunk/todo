@@ -1,4 +1,6 @@
 20130815
+- use sscanf where possible, instead of strsep and strtok
+- add macros from param.h to python bindings
 - merge and rename proto libs, maybe rename the whole proto_ prefix thing
 - to simplify:
   - client API, especially messages
@@ -9,6 +11,7 @@
   - need to be able to pass arguments
   - need to be able to pass config on the command line, not just via a file
 - add exception messages to python bindings
+- rewrite documentation to be more concise
 
 
 12feb11

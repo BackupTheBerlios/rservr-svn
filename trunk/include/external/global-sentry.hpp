@@ -34,6 +34,7 @@
 #ifndef GLOBAL_SENTRY_HPP
 #define GLOBAL_SENTRY_HPP protect
 #include <memory>
+#include <stdlib.h>
 
 #include "components/base__.hpp"
 #include "components/literal__.hpp"

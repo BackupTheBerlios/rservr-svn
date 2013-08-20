@@ -32,8 +32,6 @@
 
 #include "client-output.hpp"
 
-#include <stddef.h> //'NULL', 'size_t'
-
 #include "external/global-sentry-pthread.hpp"
 
 #include "protocol/constants.hpp"

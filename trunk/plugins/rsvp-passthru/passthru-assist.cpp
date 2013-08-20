@@ -45,6 +45,7 @@ extern "C" {
 #include <sys/socket.h> //'socket'
 #include <sys/un.h> //socket macros
 #include <sys/stat.h> //'chmod'
+#include <stddef.h> //'offsetof'
 
 extern "C" {
 #include "plugin-dev/entry-point.h"

@@ -33,6 +33,8 @@
 #ifndef plugin_dataref_hpp
 #define plugin_dataref_hpp
 
+#include <unistd.h> //'ssize_t'
+
 #include "plugin-dev/header-macro.hpp"
 
 

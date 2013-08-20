@@ -56,6 +56,8 @@ extern "C" {
 #include <fcntl.h> //'fcntl'
 #include <sys/stat.h> //'stat'
 #include <time.h> //'nanosleep'
+#include <unistd.h> //'close'
+#include <stddef.h> //'offsetof'
 
 #ifdef RSV_NET
 #include <netinet/in.h> //socket macros
