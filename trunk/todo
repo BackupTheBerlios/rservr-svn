@@ -1,5 +1,6 @@
 20130815
 - use sscanf where possible, instead of strsep and strtok
+- fix warnings (some are bad, e.g. no return for non-void function)
 - add macros from param.h to python bindings
 - merge and rename proto libs, maybe rename the whole proto_ prefix thing
 - to simplify:

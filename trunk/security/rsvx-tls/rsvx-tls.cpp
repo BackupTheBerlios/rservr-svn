@@ -53,6 +53,7 @@ extern "C" {
 #include <netdb.h> //'getnameinfo'
 #include <arpa/inet.h> //'inet_ntoa'
 #include <sys/un.h> //'sockaddr_un'
+#include <unistd.h> //'read', 'write'
 
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
