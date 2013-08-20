@@ -239,7 +239,7 @@ extern "C" {
 
 /* table directory name */
 /* 'table' WILL BE DELETED UPON UNINSTALL AND CANNOT CONTAIN OTHER THINGS! */
-#define PARAM_RSERVRD_TABLE    "/tmp/rservrd"
+#define PARAM_RSERVRD_TABLE "/tmp/rservrd"
 
 /* maximum waiting 'rservrd' connection requests */
 #define PARAM_RSERVRD_MAX_WAITING 16

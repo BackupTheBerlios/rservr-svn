@@ -99,7 +99,7 @@ struct client_command_loader : public local_commands
 	return client_commands.add_element(nNew);
 	}
 
-	inline virtual ~client_command_loader() {}
+	virtual inline ~client_command_loader() {}
 };
 
 static client_command_loader internal_client_command_loader;

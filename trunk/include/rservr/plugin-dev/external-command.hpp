@@ -80,7 +80,7 @@ public:
 
 	virtual bool allow_sender(text_info, text_info, text_info) const;
 
-	inline virtual ~external_command() {}
+	virtual inline ~external_command() {}
 
 protected:
 	static bool is_command_from_remote(const command_info&);

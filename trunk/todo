@@ -1,22 +1,20 @@
-20130815
-- use sscanf where possible, instead of strsep and strtok
+20130820
 - fix warnings (some are bad, e.g. no return for non-void function)
+- make python handle objects destroy handle (e.g. message, command) when destructed
 - add macros from param.h to python bindings
+- add exception messages to python bindings
+- add logging messages to some of the more obscure errors, e.g. detached client's socket not starting with "/"
+- update docs with new request-message structure
 - merge and rename proto libs, maybe rename the whole proto_ prefix thing
+- use sscanf where possible, instead of strsep and strtok
 - to simplify:
   - client API, especially messages
   - server internals
-- add logging messages to some of the more obscure errors, e.g. detached client's socket not starting with "/"
-- make python handle objects destroy handle (e.g. message, command) when destructed
 - config needs work:
   - need to be able to pass arguments
   - need to be able to pass config on the command line, not just via a file
-- add exception messages to python bindings
 - rewrite documentation to be more concise
-- update docs with new request-message structure
-- when calling rservr with no arguments:
-0xb6fb6904 in condemn_status (base=0x6df75624) at ./../../include/external/components/mutex__.hpp:76
-76          { return !base? true : base->condemn_status(); }
+- get rid of all TODO: in code
 
 
 12feb11

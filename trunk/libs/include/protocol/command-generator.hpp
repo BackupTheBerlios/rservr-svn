@@ -58,7 +58,7 @@ public:
 	bool              can_auto_gen() const;
 	external_command *auto_gen_command(const text_data&) const;
 
-	inline virtual ~command_generator() { }
+	virtual inline ~command_generator() { }
 
 private:
 	text_data name, alias, info;
@@ -73,7 +73,7 @@ struct local_commands
 {
 	virtual bool load_generator(const command_generator&) const = 0;
 
-	inline virtual ~local_commands() { }
+	virtual inline ~local_commands() { }
 };
 
 #endif //command_generator_hpp

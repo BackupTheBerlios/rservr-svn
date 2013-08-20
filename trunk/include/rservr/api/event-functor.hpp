@@ -175,6 +175,8 @@ struct event_functor
 	  command_event Cumulative, const struct command_info *Info) = 0;
 
 	virtual event_functor *copy() const = 0;
+
+	virtual inline ~event_functor() { }
 };
 
 
@@ -207,7 +209,7 @@ public:
 	inline event_functor *copy() const
 	{ return functor? functor->copy() : NULL; }
 
-	~auto_event_functor()
+	virtual ~auto_event_functor()
 	{
 	event_functor *old_functor = functor;
 	functor = NULL;

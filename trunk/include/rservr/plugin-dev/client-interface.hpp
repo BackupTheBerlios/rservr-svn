@@ -68,7 +68,7 @@ struct client_interface
 	virtual bool update_timing_table(const command_info&, const data_list&) = 0;
 	virtual bool update_registration(const command_info&, entity_type) = 0;
 
-	inline virtual ~client_interface() { }
+	virtual inline ~client_interface() { }
 };
 
 #endif //rservr_client_interface_hpp

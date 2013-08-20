@@ -49,7 +49,7 @@ struct command_finder
 {
 	virtual bool new_command(command_transmit&, const text_data&) const = 0;
 
-	inline virtual ~command_finder() { }
+	virtual inline ~command_finder() { }
 };
 
 
@@ -57,7 +57,7 @@ struct response_receiver
 {
 	virtual protected_output *response_output() = 0;
 
-	inline virtual ~response_receiver() { }
+	virtual inline ~response_receiver() { }
 };
 
 
@@ -88,7 +88,7 @@ struct command_info
 
 	entity_type sender_type;
 
-	inline virtual ~command_info() { }
+	virtual inline ~command_info() { }
 };
 
 

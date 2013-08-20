@@ -92,7 +92,7 @@ struct server_command_loader : public local_commands
 	return server_commands.add_element(nNew);
 	}
 
-	inline virtual ~server_command_loader() { }
+	virtual inline ~server_command_loader() { }
 };
 
 static server_command_loader internal_server_command_loader;

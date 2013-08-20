@@ -83,7 +83,7 @@ struct server_interface
 	virtual bool monitor_disconnect(text_info) = 0;
 	virtual bool unmonitor_disconnect(text_info) = 0;
 
-	inline virtual ~server_interface() { }
+	virtual inline ~server_interface() { }
 };
 
 #endif //server_interface_hpp
