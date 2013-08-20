@@ -13,6 +13,10 @@
   - need to be able to pass config on the command line, not just via a file
 - add exception messages to python bindings
 - rewrite documentation to be more concise
+- update docs with new request-message structure
+- when calling rservr with no arguments:
+0xb6fb6904 in condemn_status (base=0x6df75624) at ./../../include/external/components/mutex__.hpp:76
+76          { return !base? true : base->condemn_status(); }
 
 
 12feb11

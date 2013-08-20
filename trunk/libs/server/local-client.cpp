@@ -130,7 +130,9 @@ static const input_section default_input_section;
 	{
 	//*** NOTE: SENSITIVE FUNCTION! BE OVERLY CAUTIOUS WHEN EDITING! ***
 
-	monitor_client_exit((entity_handle) this, client_name.c_str());
+	//NOTE: this prevents destruction of the default instance for 'clist' from causing problems on exit
+	if (!fresh_client) monitor_client_exit((entity_handle) this, client_name.c_str());
+
 	if (process_id >= 0)
 	 {
 	if (client_type != type_none) monitor_client_deregister(process_id, client_name.c_str());
