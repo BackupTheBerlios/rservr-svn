@@ -15,6 +15,7 @@ macro(control_client) \
 macro(resource_client) \
 macro(monitor_client) \
 macro(detached_client) \
+macro(param) \
 macro(request) \
 macro(response) \
 macro(log_output) \

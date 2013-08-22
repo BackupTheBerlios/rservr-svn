@@ -23,6 +23,7 @@ include src/log-output.c
 include src/message-queue.c
 include src/message-queue.h
 include src/monitor-client.c
+include src/param.c
 include src/python-macro.h
 include src/remote-service.c
 include src/request.c

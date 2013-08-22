@@ -25,6 +25,8 @@ extern int load_global_binding(PyObject*, PyMethodDef*);
 
 extern int load_long_constant(PyObject*, const char*, long);
 extern int load_double_constant(PyObject*, const char*, double);
+extern int load_string_constant(PyObject*, const char*, const char*);
+extern int load_char_constant(PyObject*, const char*, char);
 extern int load_none_value(PyObject*, const char*);
 
 extern PyObject *get_module_object(PyObject*, const char*);

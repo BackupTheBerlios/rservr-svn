@@ -87,6 +87,7 @@ ext_modules = [
         'src/resource-client.c',
         'src/monitor-client.c',
         'src/detached-client.c',
+        'src/param.c',
         'src/request.c',
         'src/response.c',
         'src/log-output.c',

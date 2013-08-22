@@ -38,6 +38,32 @@ int load_double_constant(PyObject *MODULE, const char *nName, double vValue)
 }
 
 
+int load_string_constant(PyObject *MODULE, const char *nName, const char *vValue)
+{
+	PyObject *constant = Py_BuildValue("s", vValue);
+	if (!constant) return 0;
+	if (PyModule_AddObject(MODULE, nName, constant) != 0)
+	{
+	Py_XDECREF(constant);
+	return 0;
+	}
+	return 1;
+}
+
+
+int load_char_constant(PyObject *MODULE, const char *nName, char vValue)
+{
+	PyObject *constant = Py_BuildValue("c", (int) vValue);
+	if (!constant) return 0;
+	if (PyModule_AddObject(MODULE, nName, constant) != 0)
+	{
+	Py_XDECREF(constant);
+	return 0;
+	}
+	return 1;
+}
+
+
 int load_none_value(PyObject *MODULE, const char *nName)
 {
 	Py_INCREF(Py_None);

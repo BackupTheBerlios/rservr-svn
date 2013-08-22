@@ -176,6 +176,18 @@ if (PyModule_AddObject(MODULE, #name, (PyObject*) &python_##name##_type) < 0) re
 #define LONG_CONSTANT(name) \
 if (!load_long_constant(MODULE, #name, name)) return 0;
 
+#define LONG_CONSTANT_VAL(name, value) \
+if (!load_long_constant(MODULE, #name, value)) return 0;
+
+#define DOUBLE_CONSTANT(name) \
+if (!load_double_constant(MODULE, #name, name)) return 0;
+
+#define STRING_CONSTANT(name) \
+if (!load_string_constant(MODULE, #name, name)) return 0;
+
+#define CHAR_CONSTANT(name) \
+if (!load_char_constant(MODULE, #name, name)) return 0;
+
 #define NONE_VALUE(name) \
 if (!load_none_value(MODULE, #name)) return 0;
 
