@@ -1,4 +1,5 @@
 20130820
+- client_message is substantially slower than service_message in rsv-terminal when sending to remove rsv-echo
 - fix warnings (some are bad, e.g. no return for non-void function)
 - make python handle objects destroy handle (e.g. message, command) when destructed
 - add macros from param.h to python bindings
